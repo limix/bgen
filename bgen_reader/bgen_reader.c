@@ -127,7 +127,11 @@ int64_t bgen_reader_read(BGenFile *bgenfile)
 }
 
 int64_t bgen_reader_nsamples(BGenFile *bgenfile)
-{}
+{
+    return bgenfile->header.nsamples;
+}
 
 int64_t bgen_reader_nvariants(BGenFile *bgenfile)
-{}
+{
+    return bgenfile->header.nvariants;
+}

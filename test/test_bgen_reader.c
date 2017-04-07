@@ -1,4 +1,5 @@
 #include "bgen_reader/bgen_reader.h"
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,6 +12,9 @@ int main()
     int64_t  err = bgen_reader_read(&bgen_file);
 
     if (err) return -1;
+
+    assert(bgen_reader_nsamples(&bgen_file) == 500);
+    assert(bgen_reader_nvariants(&bgen_file) == 199);
 
     printf("Number of samples: %lld\n", bgen_reader_nsamples(&bgen_file));
     printf("Number of variants: %lld\n", bgen_reader_nvariants(&bgen_file));
