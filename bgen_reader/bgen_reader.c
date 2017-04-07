@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "bgen_reader.h"
+
 int64_t fread_check(void *restrict buffer, size_t size,
                     FILE *restrict stream, char *filepath)
 {
@@ -23,16 +25,6 @@ int64_t fread_check(void *restrict buffer, size_t size,
     }
     return 0;
 }
-
-typedef struct
-{
-    uint32_t offset;
-    uint32_t header_length;
-    uint32_t nvariants;
-    uint32_t nsamples;
-    uint32_t magic_number;
-    uint32_t flags;
-} Header;
 
 int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 {
@@ -72,19 +64,6 @@ int has_sample_identifier(Header *header)
     return (header->flags & - 1) >> 31;
 }
 
-typedef struct
-{
-    uint16_t length;
-    char    *id;
-} SampleId;
-
-typedef struct
-{
-    uint32_t  length;
-    uint32_t  nsamples;
-    SampleId *sampleids;
-} SampleIdBlock;
-
 int read_sample_identifier_block(SampleIdBlock *block,
                                  FILE *restrict f,
                                  char          *filepath)
@@ -116,7 +95,7 @@ int read_sample_identifier_block(SampleIdBlock *block,
     return 0;
 }
 
-int bgen_reader_read()
+int64_t bgen_reader_read(BGenFile *bgenfile)
 {
     char *fp = "/Users/horta/workspace/bgen-reader/test/example.1bits.bgen";
     FILE *f  = fopen(fp, "rb");
@@ -127,21 +106,28 @@ int bgen_reader_read()
 
     printf("offset: %u\n", offset);
 
-    Header header;
-
-    if (read_header(&header, f, fp)) return -1;
+    if (read_header(&(bgenfile->header), f, fp)) return -1;
 
 
-    printf("snp_block_compression: %d\n", snp_block_compression(&header));
-    printf("snp_block_layout: %d\n",      snp_block_layout(&header));
-    printf("has_sample_identifier: %d\n", has_sample_identifier(&header));
+    printf("snp_block_compression: %d\n",
+           snp_block_compression(&(bgenfile->header)));
+    printf("snp_block_layout: %d\n", snp_block_layout(&(bgenfile->header)));
+    printf("has_sample_identifier: %d\n",
+           has_sample_identifier(&(bgenfile->header)));
 
     SampleIdBlock sampleid_block;
 
-    if (has_sample_identifier(&header))
-        if (read_sample_identifier_block(&sampleid_block, f, fp)) return -1;
+    if (has_sample_identifier(&(bgenfile->header)))
+        if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
+                                         fp)) return -1;
 
 
     fclose(f);
     return 0;
 }
+
+int64_t bgen_reader_nsamples(BGenFile *bgenfile)
+{}
+
+int64_t bgen_reader_nvariants(BGenFile *bgenfile)
+{}

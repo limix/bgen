@@ -7,7 +7,11 @@
 
 int main()
 {
-  bgen_reader_read();
+    BGenFile bgen_file;
+    int64_t  err = bgen_reader_read(&bgen_file);
 
-  return 0;
+    if (err) return -1;
+
+    printf("Number of samples: %lld\n", bgen_reader_nsamples(&bgen_file));
+    printf("Number of variants: %lld\n", bgen_reader_nvariants(&bgen_file));
 }
