@@ -35,5 +35,6 @@ typedef struct
 int64_t bgen_reader_read(BGenFile *);
 int64_t bgen_reader_nsamples(BGenFile *);
 int64_t bgen_reader_nvariants(BGenFile *);
+int64_t bgen_reader_sample_id(BGenFile *, uint64_t, char **, uint64_t *);
 
 #endif /* ifndef BGEN_READER_H */
