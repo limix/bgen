@@ -94,6 +94,10 @@ int read_sample_identifier_block(SampleIdBlock* block, FILE *restrict f, char* f
                 return -1;
   if (fread_check(&(block->nsamples), 4, f, filepath))
                 return -1;
+
+  printf("sampleid_length: %d\n", block->length);
+  printf("sampleid_nsamples: %d\n", block->nsamples);
+
   block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
   assert(sizeof(char) == 1);
@@ -141,6 +145,3 @@ int bgen_reader_read()
         fclose(f);
         return 0;
 }
-
-// LH-20	Free data area. This could be used to store, for example, identifying information about the file
-// 4	A set of flags, with bits numbered as for an unsigned integer. See below for flag definitions.
