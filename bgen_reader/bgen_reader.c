@@ -58,8 +58,6 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
     printf("header_length: %u\n", (header->header_length));
     printf("nvariants: %u\n",     (header->nvariants));
     printf("nsamples: %u\n",      (header->nsamples));
-    printf("magic_number: %u\n",  (header->magic_number));
-    printf("flags: %u\n",         (header->flags));
 
     return 0;
 }
@@ -82,7 +80,7 @@ int read_sample_identifier_block(SampleIdBlock *block,
 
     if (fread_check(&(block->nsamples), 4, f, filepath)) return EXIT_FAILURE;
 
-    printf("sampleid_length: %d\n",   block->length);
+    printf("sample_block_length: %d\n",   block->length);
     printf("sampleid_nsamples: %d\n", block->nsamples);
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
@@ -104,52 +102,6 @@ int read_sample_identifier_block(SampleIdBlock *block,
     }
     return 0;
 }
-
-// typedef struct
-// {
-//     uint32_t  nsamples;
-//     uint16_t  id_length;
-//     char    *id;
-//     uint16_t  rsid_length;
-//     char    *rsid;
-//     uint16_t  chrom_length;
-//     char    *chrom;
-//     uint32_t position;
-//     uint16_t  nalleles;
-//     Allele *alleles;
-// } VariantIdBlock;
-
-// int read_variant_identifier_block(VariantIdBlock *block,
-//                                  FILE *restrict f,
-//                                  char          *filepath)
-// {
-//     if (fread_check(&(block->nsamples), 4, f, filepath)) return -1;
-//
-//     if (fread_check(&(block->nsamples), 4, f, filepath)) return -1;
-//
-//     printf("sampleid_length: %d\n",   block->length);
-//     printf("sampleid_nsamples: %d\n", block->nsamples);
-//
-//     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
-//
-//     assert(sizeof(char) == 1);
-//
-//     for (size_t i = 0; i < block->nsamples; i++)
-//     {
-//         uint16_t *length = &(block->sampleids[i].length);
-//
-//         if (fread_check(length, 2, f, filepath)) return -1;
-//
-//
-//         block->sampleids[i].id =
-//             malloc(block->sampleids[i].length * sizeof(char));
-//
-//         if (fread_check(block->sampleids[i].id, block->sampleids[i].length,
-// f,
-//                         filepath)) return -1;
-//     }
-//     return 0;
-// }
 
 int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
@@ -238,7 +190,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     fseek(f, bgenfile->variants_start, SEEK_SET);
 
-    if (bgen_reader_layout(bgenfile) == 1)
+    if (bgen_reader_layout(bgenfile) == 0)
     {
         if (fread_check(&(vb->nsamples), 4, f, fp)) return EXIT_FAILURE;
     }
@@ -246,7 +198,6 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     if (fread_check(&(vb->id_length), 2, f, fp)) return EXIT_FAILURE;
 
     vb->id = malloc(vb->id_length);
-    printf("vb->id_length: %d\n", vb->id_length);
 
     if (fread_check(vb->id, vb->id_length, f, fp)) return EXIT_FAILURE;
 

@@ -49,11 +49,10 @@ int main()
 
     idx = 0;
 
-    // bgen_reader_variant_id(&bgen_file, idx, &variant_id,
-    //                        &variant_id_length);
-    //
-    // printf("\n\n%d\n\n", variant_id_length);
-    // printf("\n\n%.*s\n\n", variant_id_length, variant_id);
+    bgen_reader_variant_id(&bgen_file, idx, &variant_id,
+                           &variant_id_length);
+
+    if (strncmp(variant_id, "SNPID_2", variant_id_length) != 0) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
