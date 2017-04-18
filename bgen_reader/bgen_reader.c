@@ -95,6 +95,51 @@ int read_sample_identifier_block(SampleIdBlock *block,
     return 0;
 }
 
+// typedef struct
+// {
+//     uint32_t  nsamples;
+//     uint16_t  id_length;
+//     char    *id;
+//     uint16_t  rsid_length;
+//     char    *rsid;
+//     uint16_t  chrom_length;
+//     char    *chrom;
+//     uint32_t position;
+//     uint16_t  nalleles;
+//     Allele *alleles;
+// } VariantIdBlock;
+
+// int read_variant_identifier_block(VariantIdBlock *block,
+//                                  FILE *restrict f,
+//                                  char          *filepath)
+// {
+//     if (fread_check(&(block->nsamples), 4, f, filepath)) return -1;
+//
+//     if (fread_check(&(block->nsamples), 4, f, filepath)) return -1;
+//
+//     printf("sampleid_length: %d\n",   block->length);
+//     printf("sampleid_nsamples: %d\n", block->nsamples);
+//
+//     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
+//
+//     assert(sizeof(char) == 1);
+//
+//     for (size_t i = 0; i < block->nsamples; i++)
+//     {
+//         uint16_t *length = &(block->sampleids[i].length);
+//
+//         if (fread_check(length, 2, f, filepath)) return -1;
+//
+//
+//         block->sampleids[i].id =
+//             malloc(block->sampleids[i].length * sizeof(char));
+//
+//         if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
+//                         filepath)) return -1;
+//     }
+//     return 0;
+// }
+
 int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
     FILE *f = fopen(filepath, "rb");
@@ -125,9 +170,17 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
         if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
                                          filepath)) return -1;
 
+    // if (read_variant_identifier_block(&(bgenfile->variantid_block), f,
+    //                                   filepath)) return -1;
 
     fclose(f);
     return 0;
+}
+
+int64_t bgen_reader_layout(BGenFile *bgenfile)
+{
+    // 111100
+    return (bgenfile->header.flags & 60) >> 2;
 }
 
 int64_t bgen_reader_nsamples(BGenFile *bgenfile)
@@ -141,6 +194,19 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
 }
 
 int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
+                              uint64_t *length)
+{
+    if (idx >= bgen_reader_nsamples(bgenfile)) return -1;
+
+    SampleId *sampleid = &(bgenfile->sampleid_block.sampleids[idx]);
+
+    *length = sampleid->length;
+    *id     = sampleid->id;
+
+    return 0;
+}
+
+int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
                               uint64_t *length)
 {
     if (idx >= bgen_reader_nsamples(bgenfile)) return -1;

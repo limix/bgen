@@ -14,6 +14,8 @@ int main()
 
     if (err) return -1;
 
+    assert(bgen_reader_layout(&bgen_file) == 2);
+
     assert(bgen_reader_nsamples(&bgen_file) == 500);
     assert(bgen_reader_nvariants(&bgen_file) == 199);
 
@@ -39,7 +41,6 @@ int main()
 
     printf("Sample id for %llu-th: %.*s\n", idx, (int)sample_id_length,
            sample_id);
-
 
     idx = 500;
     assert(bgen_reader_sample_id(&bgen_file, idx, &sample_id,
