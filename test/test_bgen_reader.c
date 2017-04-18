@@ -15,6 +15,7 @@ int main()
     if (err) return -1;
 
     assert(bgen_reader_layout(&bgen_file) == 2);
+    assert(bgen_reader_layout(&bgen_file) == 1);
 
     assert(bgen_reader_nsamples(&bgen_file) == 500);
     assert(bgen_reader_nvariants(&bgen_file) == 199);

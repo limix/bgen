@@ -179,6 +179,11 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
+    return (bgenfile->header.flags & 3);
+}
+
+int64_t bgen_reader_compression(BGenFile *bgenfile)
+{
     // 111100
     return (bgenfile->header.flags & 60) >> 2;
 }
