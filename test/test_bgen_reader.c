@@ -14,14 +14,13 @@ int main()
 
     if (err) return -1;
 
-    assert(bgen_reader_layout(&bgen_file) == 2);
-    assert(bgen_reader_layout(&bgen_file) == 1);
+    if (bgen_reader_layout(&bgen_file) != 1) return -1;
 
-    assert(bgen_reader_nsamples(&bgen_file) == 500);
-    assert(bgen_reader_nvariants(&bgen_file) == 199);
+    if (bgen_reader_compression(&bgen_file) != 2) return -1;
 
-    printf("Number of samples: %lld\n",  bgen_reader_nsamples(&bgen_file));
-    printf("Number of variants: %lld\n", bgen_reader_nvariants(&bgen_file));
+    if (bgen_reader_nsamples(&bgen_file) != 500) return -1;
+
+    if (bgen_reader_nvariants(&bgen_file) != 199) return -1;
 
     char *sample_id;
     uint64_t sample_id_length;
@@ -32,20 +31,18 @@ int main()
     if (bgen_reader_sample_id(&bgen_file, idx, &sample_id,
                               &sample_id_length)) return -1;
 
-    printf("Sample id for %llu-th: %.*s\n", idx, (int)sample_id_length,
-           sample_id);
+    if (strncmp(sample_id, "sample_001", sample_id_length) != 0) return -1;
 
     idx = 499;
 
     if (bgen_reader_sample_id(&bgen_file, idx, &sample_id,
                               &sample_id_length)) return -1;
 
-    printf("Sample id for %llu-th: %.*s\n", idx, (int)sample_id_length,
-           sample_id);
+    if (strncmp(sample_id, "sample_500", sample_id_length) != 0) return -1;
 
     idx = 500;
     assert(bgen_reader_sample_id(&bgen_file, idx, &sample_id,
-                              &sample_id_length) == -1);
+                                 &sample_id_length) == -1);
 
     return 0;
 }
