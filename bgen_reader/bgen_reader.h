@@ -54,6 +54,7 @@ typedef struct
 
 typedef struct
 {
+    char *filepath;
     Header        header;
     SampleIdBlock sampleid_block;
     long variants_start;
@@ -62,6 +63,7 @@ typedef struct
 int64_t bgen_reader_read(BGenFile *, char *);
 int64_t bgen_reader_layout(BGenFile *);
 int64_t bgen_reader_compression(BGenFile *);
+int64_t bgen_reader_sample_identifiers(BGenFile *);
 int64_t bgen_reader_nsamples(BGenFile *);
 int64_t bgen_reader_nvariants(BGenFile *);
 int64_t bgen_reader_sample_id(BGenFile *, uint64_t, char **, uint64_t *);

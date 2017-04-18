@@ -6,6 +6,21 @@
 
 #include "bgen_reader.h"
 
+char* ft_strdup(char *src)
+{
+    char *str;
+    char *p;
+    int   len = 0;
+
+    while (src[len]) len++;
+    str = malloc(len + 1);
+    p   = str;
+
+    while (*src) *p++ = *src++;
+    *p = '\0';
+    return str;
+}
+
 int64_t fread_check(void *restrict buffer, size_t size,
                     FILE *restrict stream, char *filepath)
 {
@@ -57,11 +72,6 @@ int snp_block_compression(Header *header)
 int snp_block_layout(Header *header)
 {
     return (header->flags & (4 + 8 + 16 + 32)) >> 2;
-}
-
-int has_sample_identifier(Header *header)
-{
-    return (header->flags & - 1) >> 31;
 }
 
 int read_sample_identifier_block(SampleIdBlock *block,
@@ -134,7 +144,8 @@ int read_sample_identifier_block(SampleIdBlock *block,
 //         block->sampleids[i].id =
 //             malloc(block->sampleids[i].length * sizeof(char));
 //
-//         if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
+//         if (fread_check(block->sampleids[i].id, block->sampleids[i].length,
+// f,
 //                         filepath)) return -1;
 //     }
 //     return 0;
@@ -146,8 +157,10 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", filepath);
-       return EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
+
+    bgenfile->filepath = ft_strdup(filepath);
 
     uint32_t offset;
 
@@ -159,11 +172,12 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     SampleIdBlock sampleid_block;
 
-    if (has_sample_identifier(&(bgenfile->header)))
+    if (bgen_reader_sample_identifiers(bgenfile))
         if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
                                          filepath)) return EXIT_FAILURE;
 
     bgenfile->variants_start = ftell(f);
+    printf("variants_start %ld\n", bgenfile->variants_start);
 
     if (bgenfile->variants_start == EOF)
     {
@@ -177,7 +191,12 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
-    return (bgenfile->header.flags & 3);
+    return bgenfile->header.flags & 3;
+}
+
+int64_t bgen_reader_sample_identifiers(BGenFile *bgenfile)
+{
+    return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
 
 int64_t bgen_reader_compression(BGenFile *bgenfile)
@@ -209,10 +228,29 @@ int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
     return 0;
 }
 
-int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
-                              uint64_t *length)
+int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
+                                  VariantBlock *vb)
 {
+    char *fp = bgenfile->filepath;
+    FILE *f  = fopen(fp, "rb");
+
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    fseek(f, bgenfile->variants_start, SEEK_SET);
+
+    if (bgen_reader_layout(bgenfile) == 1)
+    {
+        if (fread_check(&(vb->nsamples), 4, f, fp)) return EXIT_FAILURE;
+    }
+
+    if (fread_check(&(vb->id_length), 2, f, fp)) return EXIT_FAILURE;
+
+    vb->id = malloc(vb->id_length);
+    printf("vb->id_length: %d\n", vb->id_length);
+
+    if (fread_check(vb->id, vb->id_length, f, fp)) return EXIT_FAILURE;
+
+    fclose(f);
 
     // typedef struct
     // {
@@ -233,5 +271,50 @@ int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
     // *length = variantid->length;
     // *id     = variantid->id;
 
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
+                               uint64_t *length)
+{
+    FILE *f = fopen(bgenfile->filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
+        return EXIT_FAILURE;
+    }
+
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    VariantBlock vb;
+
+    bgen_reader_variant_block(bgenfile, idx, &vb);
+
+    *length = vb.id_length;
+    *id     = vb.id;
+
+    // fseek(f, bgenfile->variants_start, SEEK_SET);
+
+    fclose(f);
+
+    // typedef struct
+    // {
+    //     uint32_t  nsamples;
+    //     uint16_t  id_length;
+    //     char    *id;
+    //     uint16_t  rsid_length;
+    //     char    *rsid;
+    //     uint16_t  chrom_length;
+    //     char    *chrom;
+    //     uint32_t position;
+    //     uint16_t  nalleles;
+    //     Allele *alleles;
+    // } VariantBlock;
+
+    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
+    //
+    // *length = variantid->length;
+    // *id     = variantid->id;
+
+    return EXIT_SUCCESS;
 }

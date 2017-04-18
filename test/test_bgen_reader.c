@@ -22,6 +22,8 @@ int main()
 
     if (bgen_reader_nvariants(&bgen_file) != 199) return EXIT_FAILURE;
 
+    if (bgen_reader_sample_identifiers(&bgen_file) != 1) return EXIT_FAILURE;
+
     char *sample_id, *variant_id;
     uint64_t sample_id_length, variant_id_length;
     uint64_t idx;
@@ -47,8 +49,11 @@ int main()
 
     idx = 0;
 
-    bgen_reader_variant_id(&bgen_file, idx, &variant_id,
-                           &variant_id_length);
+    // bgen_reader_variant_id(&bgen_file, idx, &variant_id,
+    //                        &variant_id_length);
+    //
+    // printf("\n\n%d\n\n", variant_id_length);
+    // printf("\n\n%.*s\n\n", variant_id_length, variant_id);
 
     return EXIT_SUCCESS;
 }
