@@ -50,13 +50,13 @@ typedef struct
     uint32_t position;
     uint16_t  nalleles;
     Allele *alleles;
-} VariantIdBlock;
+} VariantBlock;
 
 typedef struct
 {
     Header        header;
     SampleIdBlock sampleid_block;
-    VariantIdBlock variantid_block;
+    long variants_start;
 } BGenFile;
 
 int64_t bgen_reader_read(BGenFile *, char *);

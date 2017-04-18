@@ -18,27 +18,27 @@ int64_t fread_check(void *restrict buffer, size_t size,
             fprintf(stderr,
                     "Error reading %s: unexpected end of file.\n",
                     filepath);
-            return -1;
+            return EXIT_FAILURE;
         }
         fprintf(stderr, "Unknown error while reading %s.\n", filepath);
-        return -1;
+        return EXIT_FAILURE;
     }
     return 0;
 }
 
 int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 {
-    if (fread_check(&(header->header_length), 4, f, filepath)) return -1;
+    if (fread_check(&(header->header_length), 4, f, filepath)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->nvariants), 4, f, filepath)) return -1;
+    if (fread_check(&(header->nvariants), 4, f, filepath)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->nsamples), 4, f, filepath)) return -1;
+    if (fread_check(&(header->nsamples), 4, f, filepath)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->magic_number), 4, f, filepath)) return -1;
+    if (fread_check(&(header->magic_number), 4, f, filepath)) return EXIT_FAILURE;
 
     fseek(f, (header->header_length) - 20, SEEK_CUR);
 
-    if (fread_check(&(header->flags), 4, f, filepath)) return -1;
+    if (fread_check(&(header->flags), 4, f, filepath)) return EXIT_FAILURE;
 
     printf("header_length: %u\n", (header->header_length));
     printf("nvariants: %u\n",     (header->nvariants));
@@ -68,9 +68,9 @@ int read_sample_identifier_block(SampleIdBlock *block,
                                  FILE *restrict f,
                                  char          *filepath)
 {
-    if (fread_check(&(block->length), 4, f, filepath)) return -1;
+    if (fread_check(&(block->length), 4, f, filepath)) return EXIT_FAILURE;
 
-    if (fread_check(&(block->nsamples), 4, f, filepath)) return -1;
+    if (fread_check(&(block->nsamples), 4, f, filepath)) return EXIT_FAILURE;
 
     printf("sampleid_length: %d\n",   block->length);
     printf("sampleid_nsamples: %d\n", block->nsamples);
@@ -83,14 +83,14 @@ int read_sample_identifier_block(SampleIdBlock *block,
     {
         uint16_t *length = &(block->sampleids[i].length);
 
-        if (fread_check(length, 2, f, filepath)) return -1;
+        if (fread_check(length, 2, f, filepath)) return EXIT_FAILURE;
 
 
         block->sampleids[i].id =
             malloc(block->sampleids[i].length * sizeof(char));
 
         if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
-                        filepath)) return -1;
+                        filepath)) return EXIT_FAILURE;
     }
     return 0;
 }
@@ -151,30 +151,28 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     uint32_t offset;
 
-    if (fread_check(&offset, 4, f, filepath)) return -1;
+    if (fread_check(&offset, 4, f, filepath)) return EXIT_FAILURE;
 
     printf("offset: %u\n", offset);
 
-    if (read_header(&(bgenfile->header), f, filepath)) return -1;
-
-
-    printf("snp_block_compression: %d\n",
-           snp_block_compression(&(bgenfile->header)));
-    printf("snp_block_layout: %d\n", snp_block_layout(&(bgenfile->header)));
-    printf("has_sample_identifier: %d\n",
-           has_sample_identifier(&(bgenfile->header)));
+    if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
 
     SampleIdBlock sampleid_block;
 
     if (has_sample_identifier(&(bgenfile->header)))
         if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
-                                         filepath)) return -1;
+                                         filepath)) return EXIT_FAILURE;
 
-    // if (read_variant_identifier_block(&(bgenfile->variantid_block), f,
-    //                                   filepath)) return -1;
+    bgenfile->variants_start = ftell(f);
+
+    if (bgenfile->variants_start == EOF)
+    {
+        perror("Could not find variant blocks.");
+        return EXIT_FAILURE;
+    }
 
     fclose(f);
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int64_t bgen_reader_layout(BGenFile *bgenfile)
@@ -201,7 +199,7 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
 int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
                               uint64_t *length)
 {
-    if (idx >= bgen_reader_nsamples(bgenfile)) return -1;
+    if (idx >= bgen_reader_nsamples(bgenfile)) return EXIT_FAILURE;
 
     SampleId *sampleid = &(bgenfile->sampleid_block.sampleids[idx]);
 
@@ -214,12 +212,26 @@ int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
 int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
                               uint64_t *length)
 {
-    if (idx >= bgen_reader_nsamples(bgenfile)) return -1;
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
-    SampleId *sampleid = &(bgenfile->sampleid_block.sampleids[idx]);
+    // typedef struct
+    // {
+    //     uint32_t  nsamples;
+    //     uint16_t  id_length;
+    //     char    *id;
+    //     uint16_t  rsid_length;
+    //     char    *rsid;
+    //     uint16_t  chrom_length;
+    //     char    *chrom;
+    //     uint32_t position;
+    //     uint16_t  nalleles;
+    //     Allele *alleles;
+    // } VariantBlock;
 
-    *length = sampleid->length;
-    *id     = sampleid->id;
+    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
+    //
+    // *length = variantid->length;
+    // *id     = variantid->id;
 
     return 0;
 }

@@ -12,37 +12,43 @@ int main()
     BGenFile bgen_file;
     int64_t  err = bgen_reader_read(&bgen_file, fp);
 
-    if (err) return -1;
+    if (err) return EXIT_FAILURE;
 
-    if (bgen_reader_layout(&bgen_file) != 1) return -1;
+    if (bgen_reader_layout(&bgen_file) != 1) return EXIT_FAILURE;
 
-    if (bgen_reader_compression(&bgen_file) != 2) return -1;
+    if (bgen_reader_compression(&bgen_file) != 2) return EXIT_FAILURE;
 
-    if (bgen_reader_nsamples(&bgen_file) != 500) return -1;
+    if (bgen_reader_nsamples(&bgen_file) != 500) return EXIT_FAILURE;
 
-    if (bgen_reader_nvariants(&bgen_file) != 199) return -1;
+    if (bgen_reader_nvariants(&bgen_file) != 199) return EXIT_FAILURE;
 
-    char *sample_id;
-    uint64_t sample_id_length;
+    char *sample_id, *variant_id;
+    uint64_t sample_id_length, variant_id_length;
     uint64_t idx;
 
     idx = 0;
 
     if (bgen_reader_sample_id(&bgen_file, idx, &sample_id,
-                              &sample_id_length)) return -1;
+                              &sample_id_length)) return EXIT_FAILURE;
 
-    if (strncmp(sample_id, "sample_001", sample_id_length) != 0) return -1;
+    if (strncmp(sample_id, "sample_001", sample_id_length) != 0) return EXIT_FAILURE;
 
     idx = 499;
 
     if (bgen_reader_sample_id(&bgen_file, idx, &sample_id,
-                              &sample_id_length)) return -1;
+                              &sample_id_length)) return EXIT_FAILURE;
 
-    if (strncmp(sample_id, "sample_500", sample_id_length) != 0) return -1;
+    if (strncmp(sample_id, "sample_500", sample_id_length) != 0) return EXIT_FAILURE;
 
     idx = 500;
-    assert(bgen_reader_sample_id(&bgen_file, idx, &sample_id,
-                                 &sample_id_length) == -1);
 
-    return 0;
+    if (bgen_reader_sample_id(&bgen_file, idx, &sample_id,
+                              &sample_id_length) != EXIT_FAILURE) return EXIT_FAILURE;
+
+    idx = 0;
+
+    bgen_reader_variant_id(&bgen_file, idx, &variant_id,
+                           &variant_id_length);
+
+    return EXIT_SUCCESS;
 }
