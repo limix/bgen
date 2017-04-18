@@ -7,4 +7,4 @@ else()
   target_link_libraries (test_bgen_reader LINK_PUBLIC bgen_reader m)
 endif()
 
-# file(COPY table.csv DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY data/example.1bits.bgen DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)

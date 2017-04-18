@@ -8,8 +8,9 @@
 
 int main()
 {
+    char *fp = "test/data/example.1bits.bgen";
     BGenFile bgen_file;
-    int64_t  err = bgen_reader_read(&bgen_file);
+    int64_t  err = bgen_reader_read(&bgen_file, fp);
 
     if (err) return -1;
 

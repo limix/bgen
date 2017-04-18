@@ -95,18 +95,22 @@ int read_sample_identifier_block(SampleIdBlock *block,
     return 0;
 }
 
-int64_t bgen_reader_read(BGenFile *bgenfile)
+int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
-    char *fp = "/Users/horta/workspace/bgen-reader/test/example.1bits.bgen";
-    FILE *f  = fopen(fp, "rb");
+    FILE *f = fopen(filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", filepath);
+       return EXIT_FAILURE;
+    }
 
     uint32_t offset;
 
-    if (fread_check(&offset, 4, f, fp)) return -1;
+    if (fread_check(&offset, 4, f, filepath)) return -1;
 
     printf("offset: %u\n", offset);
 
-    if (read_header(&(bgenfile->header), f, fp)) return -1;
+    if (read_header(&(bgenfile->header), f, filepath)) return -1;
 
 
     printf("snp_block_compression: %d\n",
@@ -119,7 +123,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile)
 
     if (has_sample_identifier(&(bgenfile->header)))
         if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
-                                         fp)) return -1;
+                                         filepath)) return -1;
 
 
     fclose(f);
