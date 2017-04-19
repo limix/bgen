@@ -73,8 +73,6 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     if (fread_check(&offset, 4, f, filepath)) return EXIT_FAILURE;
 
-    printf("offset: %u\n", offset);
-
     if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
 
     SampleIdBlock sampleid_block;
@@ -84,7 +82,6 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
                                          filepath)) return EXIT_FAILURE;
 
     bgenfile->variants_start = ftell(f);
-    printf("variants_start %ld\n", bgenfile->variants_start);
 
     if (bgenfile->variants_start == EOF)
     {
@@ -119,104 +116,4 @@ int64_t bgen_reader_nsamples(BGenFile *bgenfile)
 int64_t bgen_reader_nvariants(BGenFile *bgenfile)
 {
     return bgenfile->header.nvariants;
-}
-
-int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
-                              uint64_t *length)
-{
-    if (idx >= bgen_reader_nsamples(bgenfile)) return EXIT_FAILURE;
-
-    SampleId *sampleid = &(bgenfile->sampleid_block.sampleids[idx]);
-
-    *length = sampleid->length;
-    *id     = sampleid->id;
-
-    return 0;
-}
-
-int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
-                               uint64_t *length)
-{
-    FILE *f = fopen(bgenfile->filepath, "rb");
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
-
-    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
-
-    VariantBlock vb;
-
-    bgen_reader_variant_block(bgenfile, idx, &vb);
-
-    *length = vb.id_length;
-    *id     = vb.id;
-
-    fclose(f);
-
-    // typedef struct
-    // {
-    //     uint32_t  nsamples;
-    //     uint16_t  id_length;
-    //     char    *id;
-    //     uint16_t  rsid_length;
-    //     char    *rsid;
-    //     uint16_t  chrom_length;
-    //     char    *chrom;
-    //     uint32_t position;
-    //     uint16_t  nalleles;
-    //     Allele *alleles;
-    // } VariantBlock;
-
-    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
-    //
-    // *length = variantid->length;
-    // *id     = variantid->id;
-
-    return EXIT_SUCCESS;
-}
-
-int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, char **rsid,
-                               uint64_t *length)
-{
-    FILE *f = fopen(bgenfile->filepath, "rb");
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
-
-    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
-
-    VariantBlock vb;
-
-    bgen_reader_variant_block(bgenfile, idx, &vb);
-
-    *length = vb.rsid_length;
-    *rsid     = vb.rsid;
-
-    fclose(f);
-}
-
-int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, char **chrom,
-                               uint64_t *length)
-{
-    FILE *f = fopen(bgenfile->filepath, "rb");
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
-
-    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
-
-    VariantBlock vb;
-
-    bgen_reader_variant_block(bgenfile, idx, &vb);
-
-    *length = vb.chrom_length;
-    *chrom     = vb.chrom;
-
-    fclose(f);
 }
