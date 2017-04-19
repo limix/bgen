@@ -40,30 +40,21 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     if (fread_check(&(vb->position), 4, f, fp)) return EXIT_FAILURE;
 
-    if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
+    // printf("ftell: %ld\n", ftell(f));
+
+    if (bgen_reader_layout(bgenfile) == 0) vb->nalleles = 2;
     else if (fread_check(&(vb->nalleles), 2, f, fp)) return EXIT_FAILURE;
 
+    size_t i;
+    vb->alleles = malloc(vb->nalleles * sizeof(Allele));
+    for (i = 0; i < vb->nalleles; ++i)
+    {
+        if (fread_check(&(vb->alleles[i].length), 4, f, fp)) return EXIT_FAILURE;
+        vb->alleles[i].id = malloc(vb->alleles[i].length);
+        if (fread_check(vb->alleles[i].id, vb->alleles[i].length, f, fp)) return EXIT_FAILURE;
+    }
 
     fclose(f);
-
-    // typedef struct
-    // {
-    //     uint32_t  nsamples;
-    //     uint16_t  id_length;
-    //     char    *id;
-    //     uint16_t  rsid_length;
-    //     char    *rsid;
-    //     uint16_t  chrom_length;
-    //     char    *chrom;
-    //     uint32_t position;
-    //     uint16_t  nalleles;
-    //     Allele *alleles;
-    // } VariantBlock;
-
-    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
-    //
-    // *length = variantid->length;
-    // *id     = variantid->id;
 
     return EXIT_SUCCESS;
 }
@@ -88,25 +79,6 @@ int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
     *id     = vb.id;
 
     fclose(f);
-
-    // typedef struct
-    // {
-    //     uint32_t  nsamples;
-    //     uint16_t  id_length;
-    //     char    *id;
-    //     uint16_t  rsid_length;
-    //     char    *rsid;
-    //     uint16_t  chrom_length;
-    //     char    *chrom;
-    //     uint32_t position;
-    //     uint16_t  nalleles;
-    //     Allele *alleles;
-    // } VariantBlock;
-
-    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
-    //
-    // *length = variantid->length;
-    // *id     = variantid->id;
 
     return EXIT_SUCCESS;
 }
