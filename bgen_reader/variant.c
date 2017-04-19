@@ -47,10 +47,13 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     size_t i;
     vb->alleles = malloc(vb->nalleles * sizeof(Allele));
+
     for (i = 0; i < vb->nalleles; ++i)
     {
         if (fread_check(&(vb->alleles[i].length), 4, f, fp)) return EXIT_FAILURE;
+
         vb->alleles[i].id = malloc(vb->alleles[i].length);
+
         if (fread_check(vb->alleles[i].id, vb->alleles[i].length, f, fp)) return EXIT_FAILURE;
     }
 
@@ -171,4 +174,30 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
     fclose(f);
 
     return vb.nalleles;
+}
+
+int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
+                                      uint64_t idx1, char **id,
+                                      uint64_t *length)
+{
+    FILE *f = fopen(bgenfile->filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
+        return EXIT_FAILURE;
+    }
+
+    if (idx0 >= bgen_reader_nvariants(bgenfile)) return -1;
+
+    if (idx1 >= bgen_reader_variant_nalleles(bgenfile, idx0)) return EXIT_FAILURE;
+
+    VariantBlock vb;
+
+    bgen_reader_variant_block(bgenfile, idx0, &vb);
+
+    *id = vb.alleles[idx1].id;
+
+    fclose(f);
+
+    return EXIT_SUCCESS;
 }

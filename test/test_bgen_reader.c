@@ -24,9 +24,9 @@ int main()
 
     if (bgen_reader_sample_identifiers(&bgen_file) != 1) return EXIT_FAILURE;
 
-    char *sample_id, *variant_id, *variant_rsid, *variant_chrom;
+    char *sample_id, *variant_id, *variant_rsid, *variant_chrom, *allele_id;
     uint64_t sample_id_length, variant_id_length, variant_rsid_length,
-             variant_chrom_length;
+             variant_chrom_length, allele_id_length;
     uint64_t idx;
 
     idx = 0;
@@ -70,6 +70,12 @@ int main()
     if (bgen_reader_variant_position(&bgen_file, idx) != 2000) return EXIT_FAILURE;
 
     if (bgen_reader_variant_nalleles(&bgen_file, idx) != 2) return EXIT_FAILURE;
+
+    bgen_reader_variant_allele_id(&bgen_file, idx, 0, &allele_id, &allele_id_length);
+    if (strncmp(allele_id, "A", allele_id_length) != 0) return EXIT_FAILURE;
+
+    bgen_reader_variant_allele_id(&bgen_file, idx, 1, &allele_id, &allele_id_length);
+    if (strncmp(allele_id, "G", allele_id_length) != 0) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
