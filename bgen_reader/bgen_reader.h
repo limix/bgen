@@ -68,5 +68,7 @@ int64_t bgen_reader_nsamples(BGenFile *);
 int64_t bgen_reader_nvariants(BGenFile *);
 int64_t bgen_reader_sample_id(BGenFile *, uint64_t, char **, uint64_t *);
 int64_t bgen_reader_variant_id(BGenFile *, uint64_t, char **, uint64_t *);
+int64_t bgen_reader_variant_rsid(BGenFile *, uint64_t, char **, uint64_t *);
+int64_t bgen_reader_variant_chrom(BGenFile *, uint64_t, char **, uint64_t *);
 
 #endif /* ifndef BGEN_READER_H */

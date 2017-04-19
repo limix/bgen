@@ -201,6 +201,18 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     if (fread_check(vb->id, vb->id_length, f, fp)) return EXIT_FAILURE;
 
+    if (fread_check(&(vb->rsid_length), 2, f, fp)) return EXIT_FAILURE;
+
+    vb->rsid = malloc(vb->rsid_length);
+
+    if (fread_check(vb->rsid, vb->rsid_length, f, fp)) return EXIT_FAILURE;
+
+    if (fread_check(&(vb->chrom_length), 2, f, fp)) return EXIT_FAILURE;
+
+    vb->chrom = malloc(vb->chrom_length);
+
+    if (fread_check(vb->chrom, vb->chrom_length, f, fp)) return EXIT_FAILURE;
+
     fclose(f);
 
     // typedef struct
@@ -244,8 +256,6 @@ int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
     *length = vb.id_length;
     *id     = vb.id;
 
-    // fseek(f, bgenfile->variants_start, SEEK_SET);
-
     fclose(f);
 
     // typedef struct
@@ -268,4 +278,48 @@ int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
     // *id     = variantid->id;
 
     return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, char **rsid,
+                               uint64_t *length)
+{
+    FILE *f = fopen(bgenfile->filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
+        return EXIT_FAILURE;
+    }
+
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    VariantBlock vb;
+
+    bgen_reader_variant_block(bgenfile, idx, &vb);
+
+    *length = vb.rsid_length;
+    *rsid     = vb.rsid;
+
+    fclose(f);
+}
+
+int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, char **chrom,
+                               uint64_t *length)
+{
+    FILE *f = fopen(bgenfile->filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
+        return EXIT_FAILURE;
+    }
+
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    VariantBlock vb;
+
+    bgen_reader_variant_block(bgenfile, idx, &vb);
+
+    *length = vb.chrom_length;
+    *chrom     = vb.chrom;
+
+    fclose(f);
 }
