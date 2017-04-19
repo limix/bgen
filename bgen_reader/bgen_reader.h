@@ -5,25 +5,25 @@
 
 typedef struct
 {
-    uint32_t offset;
-    uint32_t header_length;
-    uint32_t nvariants;
-    uint32_t nsamples;
-    uint32_t magic_number;
-    uint32_t flags;
+        uint32_t offset;
+        uint32_t header_length;
+        uint32_t nvariants;
+        uint32_t nsamples;
+        uint32_t magic_number;
+        uint32_t flags;
 } Header;
 
 typedef struct
 {
-    uint16_t length;
-    char    *id;
+        uint16_t length;
+        char    *id;
 } SampleId;
 
 typedef struct
 {
-    uint32_t  length;
-    uint32_t  nsamples;
-    SampleId *sampleids;
+        uint32_t length;
+        uint32_t nsamples;
+        SampleId *sampleids;
 } SampleIdBlock;
 
 // typedef struct
@@ -34,30 +34,30 @@ typedef struct
 
 typedef struct
 {
-    uint32_t length;
-    char    *id;
+        uint32_t length;
+        char    *id;
 } Allele;
 
 typedef struct
 {
-    uint32_t nsamples;
-    uint16_t id_length;
-    char    *id;
-    uint16_t rsid_length;
-    char    *rsid;
-    uint16_t chrom_length;
-    char    *chrom;
-    uint32_t position;
-    uint16_t nalleles;
-    Allele  *alleles;
+        uint32_t nsamples;
+        uint16_t id_length;
+        char    *id;
+        uint16_t rsid_length;
+        char    *rsid;
+        uint16_t chrom_length;
+        char    *chrom;
+        uint32_t position;
+        uint16_t nalleles;
+        Allele  *alleles;
 } VariantBlock;
 
 typedef struct
 {
-    char         *filepath;
-    Header        header;
-    SampleIdBlock sampleid_block;
-    long          variants_start;
+        char         *filepath;
+        Header header;
+        SampleIdBlock sampleid_block;
+        long variants_start;
 } BGenFile;
 
 int64_t bgen_reader_read(BGenFile *,
@@ -83,5 +83,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *,
                                   uint64_t,
                                   char **,
                                   uint64_t *);
+int64_t bgen_reader_variant_position(BGenFile *,
+                                     uint64_t);
 
 #endif /* ifndef BGEN_READER_H */
