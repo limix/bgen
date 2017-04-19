@@ -5,41 +5,9 @@
 #include <stdlib.h>
 
 #include "bgen_reader.h"
+#include "file.h"
+#include "util.h"
 
-char* ft_strdup(char *src)
-{
-    char *str;
-    char *p;
-    int   len = 0;
-
-    while (src[len]) len++;
-    str = malloc(len + 1);
-    p   = str;
-
-    while (*src) *p++ = *src++;
-    *p = '\0';
-    return str;
-}
-
-int64_t fread_check(void *restrict buffer, size_t size,
-                    FILE *restrict stream, char *filepath)
-{
-    size_t err = fread(buffer, size, 1, stream);
-
-    if (err != 1)
-    {
-        if (feof(stream))
-        {
-            fprintf(stderr,
-                    "Error reading %s: unexpected end of file.\n",
-                    filepath);
-            return EXIT_FAILURE;
-        }
-        fprintf(stderr, "Unknown error while reading %s.\n", filepath);
-        return EXIT_FAILURE;
-    }
-    return 0;
-}
 
 int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 {
@@ -62,16 +30,6 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
     return 0;
 }
 
-int snp_block_compression(Header *header)
-{
-    return header->flags & 3;
-}
-
-int snp_block_layout(Header *header)
-{
-    return (header->flags & (4 + 8 + 16 + 32)) >> 2;
-}
-
 int read_sample_identifier_block(SampleIdBlock *block,
                                  FILE *restrict f,
                                  char          *filepath)
@@ -79,9 +37,6 @@ int read_sample_identifier_block(SampleIdBlock *block,
     if (fread_check(&(block->length), 4, f, filepath)) return EXIT_FAILURE;
 
     if (fread_check(&(block->nsamples), 4, f, filepath)) return EXIT_FAILURE;
-
-    printf("sample_block_length: %d\n",   block->length);
-    printf("sampleid_nsamples: %d\n", block->nsamples);
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
@@ -153,7 +108,6 @@ int64_t bgen_reader_sample_identifiers(BGenFile *bgenfile)
 
 int64_t bgen_reader_compression(BGenFile *bgenfile)
 {
-    // 111100
     return (bgenfile->header.flags & 60) >> 2;
 }
 
@@ -178,63 +132,6 @@ int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, char **id,
     *id     = sampleid->id;
 
     return 0;
-}
-
-int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
-                                  VariantBlock *vb)
-{
-    char *fp = bgenfile->filepath;
-    FILE *f  = fopen(fp, "rb");
-
-    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
-
-    fseek(f, bgenfile->variants_start, SEEK_SET);
-
-    if (bgen_reader_layout(bgenfile) == 0)
-    {
-        if (fread_check(&(vb->nsamples), 4, f, fp)) return EXIT_FAILURE;
-    }
-
-    if (fread_check(&(vb->id_length), 2, f, fp)) return EXIT_FAILURE;
-
-    vb->id = malloc(vb->id_length);
-
-    if (fread_check(vb->id, vb->id_length, f, fp)) return EXIT_FAILURE;
-
-    if (fread_check(&(vb->rsid_length), 2, f, fp)) return EXIT_FAILURE;
-
-    vb->rsid = malloc(vb->rsid_length);
-
-    if (fread_check(vb->rsid, vb->rsid_length, f, fp)) return EXIT_FAILURE;
-
-    if (fread_check(&(vb->chrom_length), 2, f, fp)) return EXIT_FAILURE;
-
-    vb->chrom = malloc(vb->chrom_length);
-
-    if (fread_check(vb->chrom, vb->chrom_length, f, fp)) return EXIT_FAILURE;
-
-    fclose(f);
-
-    // typedef struct
-    // {
-    //     uint32_t  nsamples;
-    //     uint16_t  id_length;
-    //     char    *id;
-    //     uint16_t  rsid_length;
-    //     char    *rsid;
-    //     uint16_t  chrom_length;
-    //     char    *chrom;
-    //     uint32_t position;
-    //     uint16_t  nalleles;
-    //     Allele *alleles;
-    // } VariantBlock;
-
-    // VariantId *variantid = &(bgenfile->variantid_block.sampleids[idx]);
-    //
-    // *length = variantid->length;
-    // *id     = variantid->id;
-
-    return EXIT_SUCCESS;
 }
 
 int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
