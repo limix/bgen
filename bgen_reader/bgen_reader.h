@@ -85,5 +85,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *,
                                   uint64_t *);
 int64_t bgen_reader_variant_position(BGenFile *,
                                      uint64_t);
+int64_t bgen_reader_variant_nalleles(BGenFile *,
+                                     uint64_t);
 
 #endif /* ifndef BGEN_READER_H */

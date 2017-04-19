@@ -40,6 +40,10 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     if (fread_check(&(vb->position), 4, f, fp)) return EXIT_FAILURE;
 
+    if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
+    else if (fread_check(&(vb->nalleles), 2, f, fp)) return EXIT_FAILURE;
+
+
     fclose(f);
 
     // typedef struct
@@ -174,4 +178,25 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
     fclose(f);
 
     return vb.position;
+}
+
+int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
+                                     uint64_t  idx)
+{
+    FILE *f = fopen(bgenfile->filepath, "rb");
+
+    if (!f) {
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
+        return -1;
+    }
+
+    if (idx >= bgen_reader_nvariants(bgenfile)) return -1;
+
+    VariantBlock vb;
+
+    bgen_reader_variant_block(bgenfile, idx, &vb);
+
+    fclose(f);
+
+    return vb.nalleles;
 }

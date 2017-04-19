@@ -69,5 +69,7 @@ int main()
 
     if (bgen_reader_variant_position(&bgen_file, idx) != 2000) return EXIT_FAILURE;
 
+    if (bgen_reader_variant_nalleles(&bgen_file, idx) != 2) return EXIT_FAILURE;
+
     return EXIT_SUCCESS;
 }

@@ -23,10 +23,6 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 
     if (fread_check(&(header->flags), 4, f, filepath)) return EXIT_FAILURE;
 
-    printf("header_length: %u\n", (header->header_length));
-    printf("nvariants: %u\n",     (header->nvariants));
-    printf("nsamples: %u\n",      (header->nsamples));
-
     return 0;
 }
 
