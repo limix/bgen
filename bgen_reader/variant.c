@@ -238,7 +238,7 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
 int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
-    uint32_t clength;
+    uint64_t clength;
     BYTE    *cchunk, *uchunk;
 
     size_t ulength = 6 * nsamples;
@@ -306,26 +306,26 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
-    uint32_t clength;
-    BYTE    *chunk, *uchunk;
+    uint64_t clength, ulength;
+    BYTE    *cchunk, *uchunk;
 
-    uint32_t nvariants = 6;
-    size_t   ulength   = nvariants * nsamples;
-
-    if (compression != 0)
+    if (compression == 0)
     {
-        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
-
-        chunk = malloc(clength);
-
         if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
 
-        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
-
         uchunk = malloc(ulength);
-        zlib_uncompress(chunk, clength, &uchunk, &ulength);
+
+        if (fread_check(uchunk, ulength, f, fp)) return EXIT_FAILURE;
     } else {
-        if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
+        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+
+        cchunk = malloc(clength);
+        uchunk = malloc(ulength);
+
+        if (fread_check(cchunk, clength - 4, f, fp)) return EXIT_FAILURE;
+
+        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
     }
 
     return EXIT_SUCCESS;
