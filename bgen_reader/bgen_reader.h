@@ -2,6 +2,7 @@
 #define BGEN_READER_H
 
 #include <stdint.h>
+typedef unsigned char BYTE;
 
 typedef struct
 {
@@ -16,7 +17,7 @@ typedef struct
 typedef struct
 {
         uint16_t length;
-        char    *id;
+        BYTE    *id;
 } SampleId;
 
 typedef struct
@@ -35,18 +36,18 @@ typedef struct
 typedef struct
 {
         uint32_t length;
-        char    *id;
+        BYTE    *id;
 } Allele;
 
 typedef struct
 {
         uint32_t nsamples;
         uint16_t id_length;
-        char    *id;
+        BYTE    *id;
         uint16_t rsid_length;
-        char    *rsid;
+        BYTE    *rsid;
         uint16_t chrom_length;
-        char    *chrom;
+        BYTE    *chrom;
         uint32_t position;
         uint16_t nalleles;
         Allele  *alleles;
@@ -67,13 +68,14 @@ int64_t bgen_reader_compression(BGenFile *);
 int64_t bgen_reader_sample_identifiers(BGenFile *);
 int64_t bgen_reader_nsamples(BGenFile *);
 int64_t bgen_reader_nvariants(BGenFile *);
-int64_t bgen_reader_sample_id(BGenFile *, uint64_t, char **, uint64_t *);
-int64_t bgen_reader_variant_id(BGenFile *, uint64_t, char **, uint64_t *);
-int64_t bgen_reader_variant_rsid(BGenFile *, uint64_t, char **, uint64_t *);
-int64_t bgen_reader_variant_chrom(BGenFile *, uint64_t, char **, uint64_t *);
+int64_t bgen_reader_sample_id(BGenFile *, uint64_t, BYTE **, uint64_t *);
+int64_t bgen_reader_variant_id(BGenFile *, uint64_t, BYTE **, uint64_t *);
+int64_t bgen_reader_variant_rsid(BGenFile *, uint64_t, BYTE **, uint64_t *);
+int64_t bgen_reader_variant_chrom(BGenFile *, uint64_t, BYTE **, uint64_t *);
 int64_t bgen_reader_variant_position(BGenFile *, uint64_t);
 int64_t bgen_reader_variant_nalleles(BGenFile *, uint64_t);
-int64_t bgen_reader_variant_allele_id(BGenFile *, uint64_t, uint64_t, char **,
+int64_t bgen_reader_variant_allele_id(BGenFile *, uint64_t, uint64_t, BYTE **,
                                       uint64_t *);
+int64_t bgen_reader_genotype_block(BGenFile *, uint64_t, VariantBlock *);
 
 #endif /* ifndef BGEN_READER_H */

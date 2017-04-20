@@ -36,8 +36,6 @@ int read_sample_identifier_block(SampleIdBlock *block,
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
-    assert(sizeof(char) == 1);
-
     for (size_t i = 0; i < block->nsamples; i++)
     {
         uint16_t *length = &(block->sampleids[i].length);
@@ -46,7 +44,7 @@ int read_sample_identifier_block(SampleIdBlock *block,
 
 
         block->sampleids[i].id =
-            malloc(block->sampleids[i].length * sizeof(char));
+            malloc(block->sampleids[i].length);
 
         if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
                         filepath)) return EXIT_FAILURE;

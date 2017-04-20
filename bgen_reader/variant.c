@@ -1,5 +1,6 @@
 #include "bgen_reader.h"
 #include "file.h"
+#include "util.h"
 
 #include <assert.h>
 #include <math.h>
@@ -64,7 +65,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
+int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, BYTE **id,
                                uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
@@ -88,7 +89,7 @@ int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, char **id,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, char **rsid,
+int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, BYTE **rsid,
                                  uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
@@ -112,7 +113,7 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, char **rsid,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, char **chrom,
+int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom,
                                   uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
@@ -179,7 +180,7 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
-                                      uint64_t idx1, char **id,
+                                      uint64_t idx1, BYTE **id,
                                       uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
@@ -204,6 +205,64 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
     return EXIT_SUCCESS;
 }
 
+int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
+                                int64_t nsamples)
+{
+    uint32_t clength;
+    BYTE    *chunk, *uchunk;
+
+    size_t ulength = 6 * nsamples;
+    uchunk = malloc(ulength);
+
+    if (compression != 0)
+    {
+        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+
+        chunk = malloc(clength);
+
+        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
+
+        zlib_uncompress(chunk, clength, uchunk, &ulength);
+    } else {
+        if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+// int64_t _genotype_block_layout2(BGenFile *bgenfile, uint64_t idx,
+//                                 VariantBlock *vb)
+// {
+//     bgen_reader_variant_block(bgenfile, idx, vb);
+//
+//     char *fp = bgenfile->filepath;
+//     FILE *f  = fopen(fp, "rb");
+//
+//     uint32_t clength, ulength;
+//     char    *chunk, *uchunk;
+//
+//     fseek(f, vb->genotype_start, SEEK_SET);
+//
+//     if (bgen_reader_compression(bgenfile) != 0)
+//     {
+//         if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+//
+//         chunk = malloc(clength);
+//
+//         if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
+//
+//         uchunk = malloc(nsamples * 6);
+//
+//         if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+//
+//         zlib_uncompress(chunk, chunk + clength, uchunk);
+//     }
+//
+//     fclose(f);
+//
+//     return EXIT_SUCCESS;
+// }
+
 int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
                                    VariantBlock *vb)
 {
@@ -212,47 +271,41 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
     char *fp = bgenfile->filepath;
     FILE *f  = fopen(fp, "rb");
 
-    uint32_t clength, ulength;
-    char    *chunk;
-
     fseek(f, vb->genotype_start, SEEK_SET);
 
-    if (bgen_reader_compression(bgenfile) != 0)
+    if (bgen_reader_layout(bgenfile) == 1)
     {
-        printf("Ponto 1\n");
-        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
-        printf("clength: %ld\n", clength);
-
-        chunk = malloc(clength);
-
-        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
-
-        if (bgen_reader_layout(bgenfile) == 1)
-        {
-            printf("Ponto 2\n");
-            // uncompress
-        } else if (bgen_reader_layout(bgenfile) == 2) {
-
-            printf("Ponto 3\n");
-            if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
-            printf("ulength: %ld\n", ulength);
-
-        } else if (bgen_reader_layout(bgenfile) == 3) {
-            printf("Ponto 4\n");
-            // pass
-        }
+        _genotype_block_layout1(f, fp, bgen_reader_compression(bgenfile),
+                                bgen_reader_nsamples(bgenfile));
     }
-
-
-    // if (bgen_reader_layout(bgenfile) == 0)
-    // {
-    // } else if (bgen_reader_layout(bgenfile) == 1) {
-    //     // pass
-    // } else {
-    //     // pass
-    // }
-
     fclose(f);
 
     return EXIT_SUCCESS;
 }
+
+// // compressed_data contains the (compressed or uncompressed) probability
+// data.
+// uint32_t const compressionType = (context.flags &
+// bgen::e_CompressedSNPBlocks) ;
+// if( compressionType != e_NoCompression ) {
+//     byte_t const* begin = &compressed_data[0] ;
+//     byte_t const* const end = &compressed_data[0] + compressed_data.size() ;
+//     uint32_t uncompressed_data_size = 0 ;
+//     if( (context.flags & e_Layout) == e_Layout1 ) {
+//         uncompressed_data_size = 6 * context.number_of_samples ;
+//     } else {
+//         begin = read_little_endian_integer( begin, end,
+// &uncompressed_data_size ) ;
+//     }
+//     buffer->resize( uncompressed_data_size ) ;
+//     if( compressionType == e_ZlibCompression ) {
+//         zlib_uncompress( begin, end, buffer ) ;
+//     } else if( compressionType == e_ZstdCompression ) {
+//         zstd_uncompress( begin, end, buffer ) ;
+//     }
+//     assert( buffer->size() == uncompressed_data_size ) ;
+// }
+// else {
+//     // copy the data between buffers.
+//     buffer->assign( compressed_data.begin(), compressed_data.end() ) ;
+// }
