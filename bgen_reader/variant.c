@@ -239,26 +239,40 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
     uint32_t clength;
-    BYTE    *chunk, *uchunk;
+    BYTE    *cchunk, *uchunk;
 
     size_t ulength = 6 * nsamples;
 
     uchunk = malloc(ulength);
 
-    if (compression != 0)
+    if (compression == 0)
     {
+        if (fread_check(uchunk, ulength, f, fp)) return EXIT_FAILURE;
+    } else {
         if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
 
-        chunk = malloc(clength);
+        cchunk = malloc(clength);
 
-        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
+        if (fread_check(cchunk, clength, f, fp)) return EXIT_FAILURE;
 
-        zlib_uncompress(chunk, clength, &uchunk, &ulength);
-    } else {
-        if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
+        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+
+        free(cchunk);
     }
 
     uint16_t *ui_uchunk = (uint16_t *)uchunk;
+
+    size_t nprobs = 3 * nsamples;
+    *probabilities = malloc(sizeof(double) * nprobs);
+
+    size_t i;
+
+    for (i = 0; i < nprobs; ++i)
+    {
+        (*probabilities)[i] = ((double)ui_uchunk[i]) / 32768;
+    }
+
+    free(uchunk);
 
     return EXIT_SUCCESS;
 }
@@ -277,6 +291,18 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 //     | 4   | uncompressed data length, D       |
 //     | C-4 | compressed genotype probabilities |
 //     -------------------------------------------
+//
+// Probabilities block
+// ------------------------------------------------
+// | 4     | # samples                            |
+// | 2     | # alleles                            |
+// | 1     | minimum ploidy                       |
+// | 1     | maximum ploidy                       |
+// | N     | ploidy and missigness of each sample |
+// | 1     | phased or not                        |
+// | 1     | # bits per probability               |
+// | C+N+6 | probabilities for each genotype      |
+// ------------------------------------------------
 int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
@@ -284,7 +310,7 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
     BYTE    *chunk, *uchunk;
 
     uint32_t nvariants = 6;
-    size_t ulength = nvariants * nsamples;
+    size_t   ulength   = nvariants * nsamples;
 
     if (compression != 0)
     {
@@ -300,22 +326,6 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
         zlib_uncompress(chunk, clength, &uchunk, &ulength);
     } else {
         if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
-    }
-
-
-    uint16_t *ui_uchunk = (uint16_t *)uchunk;
-
-    *probabilities = malloc(sizeof(double) * nvariants * nsamples);
-
-    size_t i, j;
-
-    for (i = 0; i < nsamples * nvariants; i += nvariants)
-    {
-        for (j = i; j < i + nvariants; ++j)
-        {
-            (*probabilities)[j] = ((double) ui_uchunk[j]) / 32768;
-        }
-
     }
 
     return EXIT_SUCCESS;
