@@ -90,7 +90,5 @@ int main()
 
     printf("genotype_start: %ld\n", vb.genotype_start);
 
-    // if (vb->alleles[0] != ) return EXIT_FAILURE;
-
     return EXIT_SUCCESS;
 }

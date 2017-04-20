@@ -204,12 +204,13 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
 }
 
 int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
-                                int64_t nsamples)
+                                int64_t nsamples, double **probabilities)
 {
     uint32_t clength;
     BYTE    *chunk, *uchunk;
 
     size_t ulength = 6 * nsamples;
+
     uchunk = malloc(ulength);
 
     if (compression != 0)
@@ -225,18 +226,19 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
         if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
     }
 
-    uint16_t *ui_uchunk = (uint16_t*) uchunk;
+    uint16_t *ui_uchunk = (uint16_t *)uchunk;
 
     return EXIT_SUCCESS;
 }
 
 int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
-                                int64_t nsamples)
+                                int64_t nsamples, double **probabilities)
 {
     uint32_t clength;
     BYTE    *chunk, *uchunk;
 
-    size_t ulength = 6 * nsamples;
+    uint32_t nvariants = 6;
+    size_t ulength = nvariants * nsamples;
 
     if (compression != 0)
     {
@@ -250,15 +252,25 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
 
         uchunk = malloc(ulength);
         zlib_uncompress(chunk, clength, &uchunk, &ulength);
-
     } else {
         if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
     }
 
 
-    uint16_t *ui_uchunk = (uint16_t*) uchunk;
+    uint16_t *ui_uchunk = (uint16_t *)uchunk;
 
-    // double prob = ((double) ui_uchunk[0]) / 32768;
+    *probabilities = malloc(sizeof(double) * nvariants * nsamples);
+
+    size_t i, j;
+
+    for (i = 0; i < nsamples * nvariants; i += nvariants)
+    {
+        for (j = i; j < i + nvariants; ++j)
+        {
+            (*probabilities)[j] = ((double) ui_uchunk[j]) / 32768;
+        }
+
+    }
 
     return EXIT_SUCCESS;
 }
@@ -274,14 +286,17 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
     fseek(f, vb->genotype_start, SEEK_SET);
 
     int64_t layout = bgen_reader_layout(bgenfile);
+    double *probabilities;
 
     if (layout == 1)
     {
         _genotype_block_layout1(f, fp, bgen_reader_compression(bgenfile),
-                                bgen_reader_nsamples(bgenfile));
+                                bgen_reader_nsamples(bgenfile),
+                                &probabilities);
     } else if (layout == 2) {
         _genotype_block_layout2(f, fp, bgen_reader_compression(bgenfile),
-                                bgen_reader_nsamples(bgenfile));
+                                bgen_reader_nsamples(bgenfile),
+                                &probabilities);
     }
     fclose(f);
 
