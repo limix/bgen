@@ -6,6 +6,26 @@
 #include <math.h>
 #include <stdlib.h>
 
+// Variant identifying data
+//
+// ---------------------------------------------
+// | 4     | # samples (layout > 1)            |
+// | 2     | # variant id length, Lid          |
+// | Lid   | variant id                        |
+// | 2     | variant rsid length, Lrsid        |
+// | Lrsid | rsid                              |
+// | 2     | chrom length, Lchr                |
+// | Lchr  | chromossome                       |
+// | 4     | variant position                  |
+// | 2     | number of alleles, K (layout > 1) |
+// | 4     | first allele length, La1          |
+// | La1   | first allele                      |
+// | 4     | second allele length, La2         |
+// | La2   | second allele                     |
+// | ...   |                                   |
+// | 4     | last allele length, LaK           |
+// | LaK   | last allele                       |
+// ---------------------------------------------
 int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
@@ -203,6 +223,18 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
     return EXIT_SUCCESS;
 }
 
+// Genotype data block (Layout 1)
+//
+//   1) No compression
+//     -----------------------------------
+//     | C = 6N | genotype probabilities |
+//     -----------------------------------
+//
+//   2) Compressed
+//     --------------------------------
+//     | 4 | genotype chunk length, C |
+//     | C | genotype probabilities   |
+//     --------------------------------
 int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
@@ -231,6 +263,20 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
     return EXIT_SUCCESS;
 }
 
+// Genotype data block (Layout 2)
+//
+//   1) No compression
+//     -------------------------------
+//     | 4 | block length minus 4, C |
+//     | C | genotype probabilities  |
+//     -------------------------------
+//
+//   2) Compressed
+//     -------------------------------------------
+//     | 4   | block length minus 4, C           |
+//     | 4   | uncompressed data length, D       |
+//     | C-4 | compressed genotype probabilities |
+//     -------------------------------------------
 int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {

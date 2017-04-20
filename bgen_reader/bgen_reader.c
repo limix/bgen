@@ -9,6 +9,16 @@
 #include "util.h"
 
 
+// Header
+//
+// ------------------------------
+// | 4       | block length, Lh |
+// | 4       | # variants       |
+// | 4       | # samples        |
+// | 4       | magic number     |
+// | Lh - 20 | free data area   |
+// | 4       | flags            |
+// ------------------------------
 int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 {
     if (fread_check(&(header->header_length), 4, f, filepath)) return EXIT_FAILURE;
@@ -26,6 +36,19 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
     return 0;
 }
 
+// Sample identifier block
+//
+// -------------------------------
+// | 4   | block length          |
+// | 4   | # samples             |
+// | 2   | length of sample 1 id |
+// | Ls1 | sample 1 id           |
+// | 2   | length of sample 2 id |
+// | Ls2 | sample 2 id           |
+// | ... |                       |
+// | 2   | length of sample N id |
+// | LsN | sample N id           |
+// -------------------------------
 int read_sample_identifier_block(SampleIdBlock *block,
                                  FILE *restrict f,
                                  char          *filepath)
@@ -65,6 +88,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     uint32_t offset;
 
+    // First four bytes (offset)
     if (fread_check(&offset, 4, f, filepath)) return EXIT_FAILURE;
 
     if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
