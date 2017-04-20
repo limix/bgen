@@ -238,10 +238,10 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
 int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
-    uint64_t clength;
+    uint32_t clength;
     BYTE    *cchunk, *uchunk;
 
-    size_t ulength = 6 * nsamples;
+    uint32_t ulength = 6 * nsamples;
 
     uchunk = malloc(ulength);
 
@@ -306,7 +306,7 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
-    uint64_t clength, ulength;
+    uint32_t clength, ulength;
     BYTE    *cchunk, *uchunk;
 
     if (compression == 0)
@@ -358,30 +358,3 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
 
     return EXIT_SUCCESS;
 }
-
-// // compressed_data contains the (compressed or uncompressed) probability
-// data.
-// uint32_t const compressionType = (context.flags &
-// bgen::e_CompressedSNPBlocks) ;
-// if( compressionType != e_NoCompression ) {
-//     byte_t const* begin = &compressed_data[0] ;
-//     byte_t const* const end = &compressed_data[0] + compressed_data.size() ;
-//     uint32_t uncompressed_data_size = 0 ;
-//     if( (context.flags & e_Layout) == e_Layout1 ) {
-//         uncompressed_data_size = 6 * context.number_of_samples ;
-//     } else {
-//         begin = read_little_endian_integer( begin, end,
-// &uncompressed_data_size ) ;
-//     }
-//     buffer->resize( uncompressed_data_size ) ;
-//     if( compressionType == e_ZlibCompression ) {
-//         zlib_uncompress( begin, end, buffer ) ;
-//     } else if( compressionType == e_ZstdCompression ) {
-//         zstd_uncompress( begin, end, buffer ) ;
-//     }
-//     assert( buffer->size() == uncompressed_data_size ) ;
-// }
-// else {
-//     // copy the data between buffers.
-//     buffer->assign( compressed_data.begin(), compressed_data.end() ) ;
-// }

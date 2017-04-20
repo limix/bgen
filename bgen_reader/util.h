@@ -20,7 +20,7 @@ inline static char* ft_strdup(char *src)
 }
 
 inline static int64_t zlib_uncompress(const BYTE *src, size_t src_size,
-                                      BYTE **dst, size_t *dst_size)
+                                      BYTE **dst, uint32_t *dst_size)
 {
     uLongf z_dst_size = *dst_size;
 
