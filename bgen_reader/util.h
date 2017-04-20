@@ -3,6 +3,7 @@
 
 #include <zlib.h>
 #include <stdlib.h>
+#include <string.h>
 
 inline static char* ft_strdup(char *src)
 {
@@ -40,3 +41,9 @@ inline static int64_t zlib_uncompress(const BYTE *src, size_t src_size,
 }
 
 #endif /* end of include guard: UTIL_H */
+
+inline static void MEMCPY(void *dst, BYTE **src, size_t n)
+{
+        memcpy(dst, *src, n);
+        *src = *src + n;
+}

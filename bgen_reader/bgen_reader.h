@@ -2,7 +2,7 @@
 #define BGEN_READER_H
 
 #include <stdint.h>
-typedef unsigned char BYTE;
+#include "byte.h"
 
 typedef struct
 {

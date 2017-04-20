@@ -1,6 +1,7 @@
 #include "bgen_reader.h"
 #include "file.h"
 #include "util.h"
+#include "list.h"
 
 #include <assert.h>
 #include <math.h>
@@ -277,6 +278,79 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
     return EXIT_SUCCESS;
 }
 
+inline static uint8_t _read_ploidy(BYTE ploidy_miss)
+{
+    return ploidy_miss & 127;
+}
+
+inline static uint8_t _read_missingness(BYTE ploidy_miss)
+{
+    return (ploidy_miss & 256) >> 7;
+}
+
+int64_t _read_phased_probabilities(const BYTE *chunk, uint8_t nbits,
+                                   uint8_t max_ploidy, BYTE *ploidy_miss,
+                                   uint32_t nsamples, struct node **root)
+{
+    BYTE   *G;
+    size_t  i, j;
+    uint8_t ploidy;
+    uint8_t miss;
+
+    for (i = 0; i < max_ploidy; ++i)
+    {
+        for (j = 0; j < nsamples; ++j)
+        {
+            ploidy = _read_ploidy(ploidy_miss[j]);
+            miss   = _read_missingness(ploidy_miss[j]);
+        }
+    }
+    return EXIT_SUCCESS;
+}
+
+int64_t _probabilities_block_layout2(BYTE *chunk)
+{
+    uint32_t nsamples;
+    uint16_t nalleles;
+    uint8_t  min_ploidy, max_ploidy;
+    size_t   i;
+
+    MEMCPY(&nsamples,   &chunk, 4);
+
+    MEMCPY(&nalleles,   &chunk, 2);
+
+    MEMCPY(&min_ploidy, &chunk, 1);
+
+    MEMCPY(&max_ploidy, &chunk, 1);
+
+    BYTE *ploidy_miss = malloc(nsamples);
+
+    MEMCPY(ploidy_miss, &chunk, nsamples);
+
+    uint8_t phased;
+    MEMCPY(&phased,     &chunk, 1);
+
+    uint8_t nbits;
+    MEMCPY(&nbits,      &chunk, 1);
+
+    struct node *root;
+
+    if (phased)
+    {
+        _read_phased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
+                                   nsamples, &root);
+    } else {
+        // pass
+        // _read_unphased_probabilities(chunk);
+    }
+
+    // for (i = 0; i < nsamples; ++i)
+    // {
+    //
+    // }
+    return EXIT_SUCCESS;
+}
+
 // Genotype data block (Layout 2)
 //
 //   1) No compression
@@ -318,6 +392,7 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
         if (fread_check(uchunk, ulength, f, fp)) return EXIT_FAILURE;
     } else {
         if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+
         if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
 
         cchunk = malloc(clength);
@@ -326,7 +401,11 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
         if (fread_check(cchunk, clength - 4, f, fp)) return EXIT_FAILURE;
 
         zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+
+        free(cchunk);
     }
+
+    _probabilities_block_layout2(uchunk);
 
     return EXIT_SUCCESS;
 }
