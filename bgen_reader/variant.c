@@ -222,7 +222,7 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 
         if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
 
-        zlib_uncompress(chunk, clength, uchunk, &ulength);
+        zlib_uncompress(chunk, clength, &uchunk, &ulength);
     } else {
         if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
     }

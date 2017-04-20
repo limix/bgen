@@ -20,13 +20,15 @@ inline static char* ft_strdup(char *src)
 }
 
 inline static int64_t zlib_uncompress(const BYTE *src, size_t src_size,
-                                      BYTE *dst, size_t *dst_size)
+                                      BYTE **dst, size_t *dst_size)
 {
     uLongf z_dst_size = *dst_size;
 
-    int result = uncompress(dst, &z_dst_size, src, src_size);
+    int result = uncompress(*dst, &z_dst_size, src, src_size);
 
     *dst_size = z_dst_size;
+
+    *dst = realloc(*dst, *dst_size);
 
     // assert( result == Z_OK ) ;
     // assert( dest_size % sizeof( T ) == 0 ) ;
