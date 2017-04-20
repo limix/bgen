@@ -89,7 +89,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
-    return bgenfile->header.flags & 3;
+    return (bgenfile->header.flags & (15 << 2)) >> 2;
 }
 
 int64_t bgen_reader_sample_identifiers(BGenFile *bgenfile)

@@ -27,12 +27,6 @@ typedef struct
         SampleId *sampleids;
 } SampleIdBlock;
 
-// typedef struct
-// {
-//     uint32_t length;
-//     uint16_t *prob_chunk;
-// } Probability;
-
 typedef struct
 {
         uint32_t length;

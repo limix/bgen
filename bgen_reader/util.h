@@ -24,16 +24,19 @@ inline static int64_t zlib_uncompress(const BYTE *src, size_t src_size,
 {
     uLongf z_dst_size = *dst_size;
 
-    int result = uncompress(*dst, &z_dst_size, src, src_size);
+    int err = uncompress(*dst, &z_dst_size, src, src_size);
+
+    if (err != Z_OK)
+    {
+        printf("zlib failed to uncompress: %s.\n", zError(err));
+        return EXIT_FAILURE;
+    }
 
     *dst_size = z_dst_size;
 
     *dst = realloc(*dst, *dst_size);
 
-    // assert( result == Z_OK ) ;
-    // assert( dest_size % sizeof( T ) == 0 ) ;
-    // dest->resize( dest_size / sizeof( T )) ;
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 #endif /* end of include guard: UTIL_H */

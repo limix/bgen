@@ -43,7 +43,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     // printf("ftell: %ld\n", ftell(f));
 
-    if (bgen_reader_layout(bgenfile) == 0) vb->nalleles = 2;
+    if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
     else if (fread_check(&(vb->nalleles), 2, f, fp)) return EXIT_FAILURE;
 
     size_t i;
@@ -213,55 +213,126 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 
     size_t ulength = 6 * nsamples;
     uchunk = malloc(ulength);
+    printf("ulength: %zu\n", ulength);
 
     if (compression != 0)
     {
+        printf("Ponto 2.1\n");
         if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
 
         chunk = malloc(clength);
 
+        printf("clength: %u\n", clength);
+
         if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
 
+        printf("chunk[0]: %02X\n", chunk[0]);
+        printf("chunk[1]: %02X\n", chunk[1]);
+        printf("chunk[2]: %02X\n", chunk[2]);
+        printf("chunk[3]: %02X\n", chunk[3]);
+        printf("chunk[4]: %02X\n", chunk[4]);
+
         zlib_uncompress(chunk, clength, &uchunk, &ulength);
+
+        printf("after ulength: %zu\n", ulength);
+
+        printf("uchunk[0]: %02X\n", uchunk[0]);
+        printf("uchunk[1]: %02X\n", uchunk[1]);
+        printf("uchunk[2]: %02X\n", uchunk[2]);
+        printf("uchunk[3]: %02X\n", uchunk[3]);
+        printf("uchunk[4]: %02X\n", uchunk[4]);
     } else {
+        printf("Ponto 2.2\n");
         if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
     }
+
+    uint16_t *ui_uchunk = (uint16_t*) uchunk;
+
+    double prob = ((double) ui_uchunk[0]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[1]) / 32768;
+    printf("Probability: %f\n", prob);
+
+
+    prob = ((double) ui_uchunk[2]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[3]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[4]) / 32768;
+    printf("Probability: %f\n", prob);
 
     return EXIT_SUCCESS;
 }
 
-// int64_t _genotype_block_layout2(BGenFile *bgenfile, uint64_t idx,
-//                                 VariantBlock *vb)
-// {
-//     bgen_reader_variant_block(bgenfile, idx, vb);
-//
-//     char *fp = bgenfile->filepath;
-//     FILE *f  = fopen(fp, "rb");
-//
-//     uint32_t clength, ulength;
-//     char    *chunk, *uchunk;
-//
-//     fseek(f, vb->genotype_start, SEEK_SET);
-//
-//     if (bgen_reader_compression(bgenfile) != 0)
-//     {
-//         if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
-//
-//         chunk = malloc(clength);
-//
-//         if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
-//
-//         uchunk = malloc(nsamples * 6);
-//
-//         if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
-//
-//         zlib_uncompress(chunk, chunk + clength, uchunk);
-//     }
-//
-//     fclose(f);
-//
-//     return EXIT_SUCCESS;
-// }
+int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
+                                int64_t nsamples)
+{
+    uint32_t clength;
+    BYTE    *chunk, *uchunk;
+
+    size_t ulength = 6 * nsamples;
+    printf("ulength: %zu\n", ulength);
+
+    if (compression != 0)
+    {
+        printf("Ponto 3.1\n");
+        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+
+        chunk = malloc(clength);
+
+        printf("clength: %u\n", clength);
+
+        if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+
+
+        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
+
+        uchunk = malloc(ulength);
+        zlib_uncompress(chunk, clength, &uchunk, &ulength);
+
+        printf("chunk[0]: %02X\n", chunk[0]);
+        printf("chunk[1]: %02X\n", chunk[1]);
+        printf("chunk[2]: %02X\n", chunk[2]);
+        printf("chunk[3]: %02X\n", chunk[3]);
+        printf("chunk[4]: %02X\n", chunk[4]);
+
+        printf("after ulength: %zu\n", ulength);
+
+        printf("uchunk[0]: %02X\n", uchunk[0]);
+        printf("uchunk[1]: %02X\n", uchunk[1]);
+        printf("uchunk[2]: %02X\n", uchunk[2]);
+        printf("uchunk[3]: %02X\n", uchunk[3]);
+        printf("uchunk[4]: %02X\n", uchunk[4]);
+    } else {
+        printf("Ponto 3.2\n");
+        if (fread_check(uchunk, nsamples, f, fp)) return EXIT_FAILURE;
+    }
+
+
+
+    uint16_t *ui_uchunk = (uint16_t*) uchunk;
+
+    double prob = ((double) ui_uchunk[0]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[1]) / 32768;
+    printf("Probability: %f\n", prob);
+
+
+    prob = ((double) ui_uchunk[2]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[3]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    prob = ((double) ui_uchunk[4]) / 32768;
+    printf("Probability: %f\n", prob);
+
+    return EXIT_SUCCESS;
+}
 
 int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
                                    VariantBlock *vb)
@@ -273,9 +344,17 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
 
     fseek(f, vb->genotype_start, SEEK_SET);
 
-    if (bgen_reader_layout(bgenfile) == 1)
+    int64_t layout = bgen_reader_layout(bgenfile);
+
+    printf("Ponto 1\n");
+    if (layout == 1)
     {
+        printf("Ponto 2\n");
         _genotype_block_layout1(f, fp, bgen_reader_compression(bgenfile),
+                                bgen_reader_nsamples(bgenfile));
+    } else if (layout == 2) {
+        printf("Ponto 3\n");
+        _genotype_block_layout2(f, fp, bgen_reader_compression(bgenfile),
                                 bgen_reader_nsamples(bgenfile));
     }
     fclose(f);
