@@ -50,6 +50,7 @@ typedef struct
         uint32_t position;
         uint16_t nalleles;
         Allele  *alleles;
+        long genotype_start;
 } VariantBlock;
 
 typedef struct

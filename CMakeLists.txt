@@ -12,6 +12,9 @@ endif()
 
 file(STRINGS "VERSION" BGEN_READER_VERSION)
 
+find_package( ZLIB REQUIRED )
+
+include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories(.)
 
 add_subdirectory(bgen_reader)
@@ -29,16 +32,19 @@ install(TARGETS bgen_reader
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         PUBLIC_HEADER DESTINATION include/bgen_reader)
+target_link_libraries( bgen_reader ${ZLIB_LIBRARIES} )
 
 install(TARGETS bgen_reader_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         PUBLIC_HEADER DESTINATION include/bgen_reader)
+target_link_libraries( bgen_reader_static ${ZLIB_LIBRARIES} )
 
 add_subdirectory(test)
 
 enable_testing()
 add_test(NAME TestBgenReader COMMAND test_bgen_reader)
+
 # add_test(NAME TestLinking COMMAND test_linking)
 # add_test(NAME TestIntegration COMMAND test_integration)
 # add_test(NAME TestSpecific COMMAND test_specific)

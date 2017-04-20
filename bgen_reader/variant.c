@@ -57,6 +57,8 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
         if (fread_check(vb->alleles[i].id, vb->alleles[i].length, f, fp)) return EXIT_FAILURE;
     }
 
+    vb->genotype_start = ftell(f);
+
     fclose(f);
 
     return EXIT_SUCCESS;
@@ -196,6 +198,59 @@ int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
     bgen_reader_variant_block(bgenfile, idx0, &vb);
 
     *id = vb.alleles[idx1].id;
+
+    fclose(f);
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
+                                   VariantBlock *vb)
+{
+    bgen_reader_variant_block(bgenfile, idx, vb);
+
+    char *fp = bgenfile->filepath;
+    FILE *f  = fopen(fp, "rb");
+
+    uint32_t clength, ulength;
+    char    *chunk;
+
+    fseek(f, vb->genotype_start, SEEK_SET);
+
+    if (bgen_reader_compression(bgenfile) != 0)
+    {
+        printf("Ponto 1\n");
+        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+        printf("clength: %ld\n", clength);
+
+        chunk = malloc(clength);
+
+        if (fread_check(chunk, clength, f, fp)) return EXIT_FAILURE;
+
+        if (bgen_reader_layout(bgenfile) == 1)
+        {
+            printf("Ponto 2\n");
+            // uncompress
+        } else if (bgen_reader_layout(bgenfile) == 2) {
+
+            printf("Ponto 3\n");
+            if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+            printf("ulength: %ld\n", ulength);
+
+        } else if (bgen_reader_layout(bgenfile) == 3) {
+            printf("Ponto 4\n");
+            // pass
+        }
+    }
+
+
+    // if (bgen_reader_layout(bgenfile) == 0)
+    // {
+    // } else if (bgen_reader_layout(bgenfile) == 1) {
+    //     // pass
+    // } else {
+    //     // pass
+    // }
 
     fclose(f);
 

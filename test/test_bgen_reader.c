@@ -77,5 +77,12 @@ int main()
     bgen_reader_variant_allele_id(&bgen_file, idx, 1, &allele_id, &allele_id_length);
     if (strncmp(allele_id, "G", allele_id_length) != 0) return EXIT_FAILURE;
 
+    idx = 0;
+    VariantBlock vb;
+
+    bgen_reader_genotype_block(&bgen_file, idx, &vb);
+
+    printf("genotype_start: %lld\n", vb.genotype_start);
+
     return EXIT_SUCCESS;
 }
