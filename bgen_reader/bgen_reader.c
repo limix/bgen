@@ -97,20 +97,27 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (header->header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
+        fclose(f);
         return EXIT_FAILURE;
     }
 
     SampleIdBlock sampleid_block;
 
     if (bgen_reader_sample_identifiers(bgenfile))
+    {
         if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
-                                         filepath)) return EXIT_FAILURE;
+                                         filepath)) {
+            fclose(f);
+            return EXIT_FAILURE;
+        }
+    }
 
     bgenfile->variants_start = ftell(f);
 
     if (bgenfile->variants_start == EOF)
     {
-        perror("Could not find variant blocks.");
+        perror("Could not find variant blocks");
+        fclose(f);
         return EXIT_FAILURE;
     }
 
