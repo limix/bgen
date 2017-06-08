@@ -33,7 +33,7 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 
     if (fread_check(&(header->flags), 4, f, filepath)) return EXIT_FAILURE;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 // Sample identifier block
@@ -72,7 +72,7 @@ int read_sample_identifier_block(SampleIdBlock *block,
         if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
                         filepath)) return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 // Main function, called before anything.
@@ -118,11 +118,13 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     return EXIT_SUCCESS;
 }
 
+// What layout is that?
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (15 << 2)) >> 2;
 }
 
+// Is sample identifier block present?
 int64_t bgen_reader_sample_identifiers(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (1 << 31)) >> 31;

@@ -15,8 +15,8 @@
 // 2-5 | Layout              | 0     | this value is not supported
 // 2-5 | Layout              | 1     | layout 1
 // 2-5 | Layout              | 2     | layout 2
-// 31 | SampleIdentifiers    | 0     | sample identifiers are not stored
-// 31 | SampleIdentifiers    | 1     | sample identifier block follows header
+// 31  | SampleIdentifiers   | 0     | sample identifiers are not stored
+// 31  | SampleIdentifiers   | 1     | sample identifier block follows header
 typedef struct
 {
         uint32_t offset;
