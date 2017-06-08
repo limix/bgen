@@ -88,7 +88,5 @@ int main()
 
     bgen_reader_genotype_block(&bgen_file, idx, &vb);
 
-    printf("genotype_start: %ld\n", vb.genotype_start);
-
     return EXIT_SUCCESS;
 }

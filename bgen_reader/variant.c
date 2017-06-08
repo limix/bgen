@@ -310,43 +310,51 @@ int64_t _read_phased_probabilities(const BYTE *chunk, uint8_t nbits,
 }
 
 int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
-                                   uint8_t max_ploidy, BYTE *ploidy_miss,
-                                   uint32_t nsamples, uint16_t nalleles,
-                                   struct node **root)
+                                     uint8_t max_ploidy, BYTE *ploidy_miss,
+                                     uint32_t nsamples, uint16_t nalleles,
+                                     struct node **root)
 {
-    double   *g = malloc(max_size);
-    size_t  i, j;
-    size_t bi;
-    uint8_t ploidy;
-    uint8_t miss;
+    double  *g = malloc(100);
+    size_t   i, j;
+    size_t   bi;
+    uint8_t  ploidy;
+    uint8_t  miss;
     uint32_t ui_prob;
 
-    uint32_t ncomb = choose(nalleles + max_ploidy - 1, nalleles - 1) - 1;
+    uint32_t ncomb = choose(nalleles + max_ploidy - 1, nalleles - 1);
 
-    for (j = 0; j < nsamples; ++j)
+    printf("nalleles: %u\n",   nalleles);
+    printf("max_ploidy: %u\n", max_ploidy);
+    printf("ncomb: %u\n",      ncomb);
+
+    for (j = 0; j < nsamples / 100; ++j)
     {
         ploidy = _read_ploidy(ploidy_miss[j]);
-        miss   = _read_missingness(ploidy_miss[j]);
+        printf("ploidy for ith sample: %u\n", ploidy);
+        miss = _read_missingness(ploidy_miss[j]);
+        printf("miss for ith sample: %u\n",   miss);
 
         if (miss)
         {
             // pass
         } else {
-            ncomb = choose(nalleles + ploidy - 1, nalleles - 1) - 1;
+            ncomb   = choose(nalleles + ploidy - 1, nalleles - 1);
             ui_prob = 0;
-            for (i = 0; i < ncomb; ++i)
+
+            for (i = 0; i < ncomb - 1; ++i)
             {
                 for (bi = 0; bi < nbits; ++bi)
                 {
-                    if (GetBit(chunk + bit_to_byte_idx(bi), bit_in_byte_idx(bi)))
-                        SetBit(ui_prob, bit_in_byte_idx(bi));
+                    if (GetBit(chunk + bit_to_byte_idx(bi), bit_in_byte_idx(bi))) SetBit(ui_prob, bit_in_byte_idx(bi));
                 }
 
                 // g[j] = transform(ui_prob);
             }
+
             // push(root, &g, 4);
         }
-        //chunk += STEP ENTIRE INDIVIDUAL;
+
+        //     //chunk += STEP ENTIRE INDIVIDUAL;
     }
     return EXIT_SUCCESS;
 }
@@ -387,6 +395,7 @@ int64_t _probabilities_block_layout2(BYTE *chunk)
         printf("UNPHASED\n");
         _read_unphased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
                                      nsamples, nalleles, &root);
+
         // pass
         // _read_unphased_probabilities(chunk);
     }
