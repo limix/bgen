@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Duplicate a string.
 inline static char* ft_strdup(char *src)
 {
     char *str;

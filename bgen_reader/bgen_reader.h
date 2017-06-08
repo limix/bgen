@@ -4,6 +4,19 @@
 #include <stdint.h>
 #include "byte.h"
 
+// flags definition:
+// bit | name                | value | description
+// 0-1 | CompressedSNPBlocks | 0     | SNP block probability data is not
+//                                     compressed
+// 0-1 | CompressedSNPBlocks | 1     | SNP block probability data is compressed
+//                                     using zlib's compressed()
+// 0-1 | CompressedSNPBlocks | 2     | SNP block probability data is compressed
+//                                     using zstandard's ZSTD_compress()
+// 2-5 | Layout              | 0     | this value is not supported
+// 2-5 | Layout              | 1     | layout 1
+// 2-5 | Layout              | 2     | layout 2
+// 31 | SampleIdentifiers    | 0     | sample identifiers are not stored
+// 31 | SampleIdentifiers    | 1     | sample identifier block follows header
 typedef struct
 {
         uint32_t offset;

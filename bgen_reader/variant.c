@@ -345,7 +345,8 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
             {
                 for (bi = 0; bi < nbits; ++bi)
                 {
-                    if (GetBit(chunk + bit_to_byte_idx(bi), bit_in_byte_idx(bi))) SetBit(ui_prob, bit_in_byte_idx(bi));
+                    // pass
+                    // if (GetBit(chunk + bit_to_byte_idx(bi), bit_in_byte_idx(bi))) SetBit(ui_prob, bit_in_byte_idx(bi));
                 }
 
                 // g[j] = transform(ui_prob);

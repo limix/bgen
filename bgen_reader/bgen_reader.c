@@ -75,6 +75,7 @@ int read_sample_identifier_block(SampleIdBlock *block,
     return 0;
 }
 
+// Main function, called before anything.
 int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
     FILE *f = fopen(filepath, "rb");
@@ -92,6 +93,12 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (fread_check(&offset, 4, f, filepath)) return EXIT_FAILURE;
 
     if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
+
+    if (header->header_length > offset)
+    {
+        fprintf(stderr, "Header length is larger then offset's.\n");
+        return EXIT_FAILURE;
+    }
 
     SampleIdBlock sampleid_block;
 
