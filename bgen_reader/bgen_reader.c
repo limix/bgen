@@ -19,19 +19,19 @@
 // | Lh - 20 | free data area   |
 // | 4       | flags            |
 // ------------------------------
-int64_t read_header(Header *header, FILE *restrict f, char *filepath)
+int64_t read_header(BGenFile *bgenfile, Header *header)
 {
-    if (fread_check(&(header->header_length), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(header->header_length), 4)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->nvariants), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(header->nvariants), 4)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->nsamples), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(header->nsamples), 4)) return EXIT_FAILURE;
 
-    if (fread_check(&(header->magic_number), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(header->magic_number), 4)) return EXIT_FAILURE;
 
     fseek(f, (header->header_length) - 20, SEEK_CUR);
 
-    if (fread_check(&(header->flags), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(header->flags), 4)) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -49,13 +49,11 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 // | 2   | length of sample N id |
 // | LsN | sample N id           |
 // -------------------------------
-int read_sampleid_block(SampleIdBlock *block,
-                        FILE *restrict f,
-                        char          *filepath)
+int read_sampleid_block(BGenFile *bgenfile, SampleIdBlock *block)
 {
-    if (fread_check(&(block->length), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
 
-    if (fread_check(&(block->nsamples), 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
@@ -63,14 +61,13 @@ int read_sampleid_block(SampleIdBlock *block,
     {
         uint16_t *length = &(block->sampleids[i].length);
 
-        if (fread_check(length, 2, f, filepath)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, length, 2)) return EXIT_FAILURE;
 
 
         block->sampleids[i].id =
             malloc(block->sampleids[i].length);
 
-        if (fread_check(block->sampleids[i].id, block->sampleids[i].length, f,
-                        filepath)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, block->sampleids[i].id, block->sampleids[i].length)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
@@ -91,9 +88,9 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     uint32_t offset;
 
     // First four bytes (offset)
-    if (fread_check(&offset, 4, f, filepath)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &offset, 4)) return EXIT_FAILURE;
 
-    if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
+    if (read_header(bgenfile, &(bgenfile->header))) return EXIT_FAILURE;
 
     if (bgenfile->header.header_length > offset)
     {
@@ -106,7 +103,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     if (bgen_reader_sampleids(bgenfile))
     {
-        if (read_sampleid_block(&(bgenfile->sampleid_block), f, filepath))
+        if (read_sampleid_block(bgenfile, &(bgenfile->sampleid_block)))
         {
             if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
             return EXIT_FAILURE;

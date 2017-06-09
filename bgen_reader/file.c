@@ -21,21 +21,20 @@ int64_t bgen_fclose(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t fread_check(void *restrict buffer, size_t size,
-                    FILE *restrict stream, char *filepath)
+int64_t fread_check(BGenFile *bgenfile, void *restrict buffer, size_t size)
 {
-    size_t err = fread(buffer, size, 1, stream);
+    size_t err = fread(buffer, size, 1, bgenfile->file);
 
     if (err != 1)
     {
-        if (feof(stream))
+        if (feof(bgenfile->file))
         {
             fprintf(stderr,
                     "Error reading %s: unexpected end of file.\n",
-                    filepath);
+                    bgenfile->filepath);
             return EXIT_FAILURE;
         }
-        fprintf(stderr, "Unknown error while reading %s.\n", filepath);
+        fprintf(stderr, "Unknown error while reading %s.\n", bgenfile->filepath);
         return EXIT_FAILURE;
     }
     return 0;
