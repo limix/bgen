@@ -61,16 +61,19 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     printf("Point 5\n");
 
     if (fread_check(bgenfile, &(vb->id_length), 2)) return EXIT_FAILURE;
+
     printf("Point 6\n");
     printf("id_length %hu\n", vb->id_length);
 
     vb->id = malloc(vb->id_length);
 
     if (fread_check(bgenfile, vb->id, vb->id_length)) return EXIT_FAILURE;
+
     printf("Point 7\n");
     printf("id %s\n", vb->id);
 
     if (fread_check(bgenfile, &(vb->rsid_length), 2)) return EXIT_FAILURE;
+
     printf("Point 8\n");
 
     vb->rsid = malloc(vb->rsid_length);
@@ -117,6 +120,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     vb->genotype_start = ftell(bgenfile->file);
 
     printf("Point 15\n");
+    printf("genotype_start: %d\n", vb->genotype_start);
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
@@ -131,7 +135,9 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     printf("Ponto 1\n");
+
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
     printf("Ponto 2\n");
 
     VariantBlock vb;
@@ -220,8 +226,8 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
-                                      uint64_t idx1, BYTE **id,
-                                      uint64_t *length)
+                                     uint64_t idx1, BYTE **id,
+                                     uint64_t *length)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
@@ -324,6 +330,29 @@ int64_t _read_phased_probabilities(const BYTE *chunk, uint8_t nbits,
     return EXIT_SUCCESS;
 }
 
+inline static size_t bit_sample_start(size_t sample_idx, uint8_t nbits,
+                                   uint32_t ncomb)
+{
+    return sample_idx * (nbits * (ncomb - 1));
+}
+
+inline static size_t bit_geno_start(size_t  geno_idx, uint8_t nbits)
+{
+    return geno_idx * nbits;
+}
+
+inline static int get_bit(const BYTE *mem, size_t bit_idx)
+{
+    size_t bytes = bit_idx / 8;
+    return GetBit(*(mem + bytes), bit_idx % 8);
+}
+
+inline static void set_bit(uint32_t *mem, size_t bit_idx)
+{
+    size_t bytes = bit_idx / 8;
+    SetBit(*(mem + bytes), bit_idx % 8);
+}
+
 int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
                                      uint8_t max_ploidy, BYTE *ploidy_miss,
                                      uint32_t nsamples, uint16_t nalleles,
@@ -332,22 +361,26 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
     double  *g = malloc(100);
     size_t   i, j;
     size_t   bi;
+    size_t sample_start, geno_start, bit_idx;
     uint8_t  ploidy;
     uint8_t  miss;
     uint32_t ui_prob;
 
     uint32_t ncomb = choose(nalleles + max_ploidy - 1, nalleles - 1);
 
+    printf("nsamples: %u\n",   nsamples);
+    printf("nbits: %u\n",      nbits);
     printf("nalleles: %u\n",   nalleles);
     printf("max_ploidy: %u\n", max_ploidy);
     printf("ncomb: %u\n",      ncomb);
 
-    for (j = 0; j < nsamples / 100; ++j)
+    // nsamples
+    for (j = 0; j < 50; ++j)
     {
+        printf("Individual %d:\n", j);
         ploidy = _read_ploidy(ploidy_miss[j]);
-        printf("ploidy for ith sample: %u\n", ploidy);
-        miss = _read_missingness(ploidy_miss[j]);
-        printf("miss for ith sample: %u\n",   miss);
+        miss   = _read_missingness(ploidy_miss[j]);
+        // printf("ploidy and missingness for %dth sample: %u, %u\n", j, ploidy, miss);
 
         if (miss)
         {
@@ -360,8 +393,12 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
             {
                 for (bi = 0; bi < nbits; ++bi)
                 {
-                    // pass
-                    // if (GetBit(chunk + bit_to_byte_idx(bi), bit_in_byte_idx(bi))) SetBit(ui_prob, bit_in_byte_idx(bi));
+                    sample_start = bit_sample_start(j, nbits, ncomb);
+                    geno_start   = bit_geno_start(i, nbits);
+                    bit_idx = sample_start + geno_start + bi;
+                    printf("  Bit at bit index %d: %d\n", bit_idx, get_bit(chunk, bit_idx));
+                    if (get_bit(chunk, bit_idx))
+                        set_bit(&ui_prob, bit_idx);
                 }
 
                 // g[j] = transform(ui_prob);
@@ -377,6 +414,7 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
 
 int64_t _probabilities_block_layout2(BYTE *chunk)
 {
+    printf("INSIDE _probabilities_block_layout2!!!!!!\n");
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t  min_ploidy, max_ploidy;
@@ -452,6 +490,7 @@ int64_t _probabilities_block_layout2(BYTE *chunk)
 int64_t _genotype_block_layout2(BGenFile *bgenfile, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
+    printf("INSIDE _genotype_block_layout2: compression %lld, nsamples %lld\n", compression, nsamples);
     uint32_t clength, ulength;
     BYTE    *cchunk, *uchunk;
 
@@ -465,12 +504,18 @@ int64_t _genotype_block_layout2(BGenFile *bgenfile, int64_t compression,
     } else {
         if (fread_check(bgenfile, &clength, 4)) return EXIT_FAILURE;
 
+        clength -= 4;
+
         if (fread_check(bgenfile, &ulength, 4)) return EXIT_FAILURE;
 
         cchunk = malloc(clength);
+
+        if (fread_check(bgenfile, cchunk, clength)) return EXIT_FAILURE;
+
         uchunk = malloc(ulength);
 
-        if (fread_check(bgenfile, cchunk, clength - 4)) return EXIT_FAILURE;
+        assert(compression == 2);
+        printf("Ready to uncompress, type %lld.\n", compression);
 
         zlib_uncompress(cchunk, clength, &uchunk, &ulength);
 
@@ -504,6 +549,7 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
                                 bgen_reader_nsamples(bgenfile),
                                 &probabilities);
     }
+
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
