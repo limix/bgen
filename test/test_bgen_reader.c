@@ -72,8 +72,6 @@ int main()
     printf("variant id: %s\n",       varid);
     printf("variant id len: %llu\n", varid_len);
 
-    return EXIT_SUCCESS;
-
 
     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;
 
@@ -97,12 +95,14 @@ int main()
 
     bgen_reader_variant_alleleid(&bgen_file, idx, 1, &alleleid, &alleleid_len);
 
+
     if (bytencmp(alleleid, "G", alleleid_len) != 0) return EXIT_FAILURE;
 
     idx = 0;
     VariantBlock vb;
 
     bgen_reader_genotype_block(&bgen_file, idx, &vb);
+
 
     bgen_reader_close(&bgen_file);
 
