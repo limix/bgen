@@ -78,9 +78,10 @@ int read_sampleid_block(SampleIdBlock *block,
 // Main function, called before anything.
 int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
-    FILE *f = fopen(filepath, "rb");
+    assert(bgenfile->file == NULL);
+    bgenfile->file = fopen(filepath, "rb");
 
-    if (!f) {
+    if (bgenfile->file == NULL) {
         fprintf(stderr, "File opening failed: %s\n", filepath);
         return EXIT_FAILURE;
     }
@@ -97,7 +98,8 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
-        fclose(f);
+        fclose(bgenfile->file);
+        bgenfile->file = NULL;
         return EXIT_FAILURE;
     }
 
@@ -107,7 +109,8 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     {
         if (read_sampleid_block(&(bgenfile->sampleid_block), f, filepath))
         {
-            fclose(f);
+            fclose(bgenfile->file);
+            bgenfile->file = NULL;
             return EXIT_FAILURE;
         }
     }
@@ -116,11 +119,14 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (bgenfile->variants_start == EOF)
     {
         perror("Could not find variant blocks");
-        fclose(f);
+        fclose(bgenfile->file);
+        bgenfile->file = NULL;
         return EXIT_FAILURE;
     }
 
-    fclose(f);
+    fclose(bgenfile->file);
+    bgenfile->file = NULL;
+
     return EXIT_SUCCESS;
 }
 

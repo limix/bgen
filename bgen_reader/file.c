@@ -1,6 +1,25 @@
 #include "file.h"
 
-#include <stdlib.h>
+int64_t bgen_fopen(BGenFile *bgenfile)
+{
+    assert(bgenfile->file == NULL);
+    bgenfile->file = fopen(bgenfile->filepath, "rb");
+
+    if (bgenfile->file == NULL) {
+        fprintf(stderr, "File opening failed: %s\n", filepath);
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_fclose(BGenFile *bgenfile)
+{
+    assert(bgenfile->file != NULL);
+    fclose(bgenfile->file);
+    bgenfile->file = NULL;
+    return EXIT_SUCCESS;
+}
 
 int64_t fread_check(void *restrict buffer, size_t size,
                     FILE *restrict stream, char *filepath)

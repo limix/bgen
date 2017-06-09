@@ -62,20 +62,21 @@ int main()
 
 
 
-
     BYTE *sampleid, *varid, *var_rsid, *var_chrom, *alleleid;
     uint64_t sampleid_len, varid_len, var_rsid_len, var_chrom_len,
              alleleid_len;
     uint64_t idx;
 
-    return EXIT_SUCCESS;
-
     idx = 0;
 
-    bgen_reader_variantid(&bgen_file, idx, &varid,
-                          &varid_len);
+    bgen_reader_variantid(&bgen_file, idx, &varid, &varid_len);
+
+    printf("variant id: %s\n", varid);
+    printf("variant id len: %d\n", varid_len);
+    return EXIT_SUCCESS;
 
     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;
+
 
     bgen_reader_variant_rsid(&bgen_file, idx, &var_rsid, &var_rsid_len);
 

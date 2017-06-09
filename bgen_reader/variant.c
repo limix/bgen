@@ -31,6 +31,7 @@
 int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
+    printf("Inside bgen_reader_variant_block\n");
     char *fp = bgenfile->filepath;
     FILE *f  = fopen(fp, "rb");
 
@@ -86,7 +87,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 }
 
 int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
-                               uint64_t *length)
+                              uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
 
@@ -95,16 +96,21 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
         return EXIT_FAILURE;
     }
 
+    printf("Ponto 1\n");
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    printf("Ponto 2\n");
 
     VariantBlock vb;
 
     bgen_reader_variant_block(bgenfile, idx, &vb);
+    printf("Ponto 3\n");
 
     *length = vb.id_length;
     *id     = vb.id;
 
     fclose(f);
+
+    printf("Ponto 4\n");
 
     return EXIT_SUCCESS;
 }
