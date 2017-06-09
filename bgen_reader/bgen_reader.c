@@ -129,6 +129,7 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
     assert(bgenfile->file == NULL);
     free(bgenfile->filepath);
     bgenfile->filepath = NULL;
+    return EXIT_SUCCESS;
 }
 
 // What layout is that?
