@@ -32,43 +32,76 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
     printf("Inside bgen_reader_variant_block\n");
+    printf("Point 1\n");
 
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
+    printf("Point 2\n");
+
+    printf("nvariants %llu\n", bgen_reader_nvariants(bgenfile));
+
+
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    printf("Point 3\n");
+    printf("variants_start: %ld\n", bgenfile->variants_start);
 
     fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
-    if (bgen_reader_layout(bgenfile) == 0)
+    printf("Point 4\n");
+
+    printf("Layout: %llu\n", bgen_reader_layout(bgenfile));
+
+    assert(bgen_reader_layout(bgenfile) != 0);
+
+    if (bgen_reader_layout(bgenfile) == 1)
     {
         if (fread_check(bgenfile, &(vb->nsamples), 4)) return EXIT_FAILURE;
     }
+    printf("Point 5\n");
 
     if (fread_check(bgenfile, &(vb->id_length), 2)) return EXIT_FAILURE;
+    printf("Point 6\n");
+    printf("id_length %hu\n", vb->id_length);
 
     vb->id = malloc(vb->id_length);
 
     if (fread_check(bgenfile, vb->id, vb->id_length)) return EXIT_FAILURE;
+    printf("Point 7\n");
+    printf("id %s\n", vb->id);
 
     if (fread_check(bgenfile, &(vb->rsid_length), 2)) return EXIT_FAILURE;
+    printf("Point 8\n");
 
     vb->rsid = malloc(vb->rsid_length);
 
     if (fread_check(bgenfile, vb->rsid, vb->rsid_length)) return EXIT_FAILURE;
 
+    printf("Point 9\n");
+
     if (fread_check(bgenfile, &(vb->chrom_length), 2)) return EXIT_FAILURE;
+
+    printf("Point 10\n");
 
     vb->chrom = malloc(vb->chrom_length);
 
     if (fread_check(bgenfile, vb->chrom, vb->chrom_length)) return EXIT_FAILURE;
 
+    printf("Point 11\n");
+
     if (fread_check(bgenfile, &(vb->position), 4)) return EXIT_FAILURE;
+
+    printf("Point 12\n");
 
     if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
     else if (fread_check(bgenfile, &(vb->nalleles), 2)) return EXIT_FAILURE;
 
+    printf("Point 13\n");
+
     size_t i;
     vb->alleles = malloc(vb->nalleles * sizeof(Allele));
+
+    printf("nalleles: %d\n", vb->nalleles);
 
     for (i = 0; i < vb->nalleles; ++i)
     {
@@ -79,9 +112,15 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
         if (fread_check(bgenfile, vb->alleles[i].id, vb->alleles[i].length)) return EXIT_FAILURE;
     }
 
+    printf("Point 14\n");
+
     vb->genotype_start = ftell(bgenfile->file);
 
+    printf("Point 15\n");
+
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    printf("Point 16\n");
 
     return EXIT_SUCCESS;
 }

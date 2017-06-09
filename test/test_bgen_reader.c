@@ -39,11 +39,7 @@ int main()
     char *fp = "test/data/example.1bits.bgen";
     BGenFile bgen_file;
 
-    int64_t err = bgen_reader_open(&bgen_file, fp);
-
-
-    if (err) return EXIT_FAILURE;
-
+    if (bgen_reader_open(&bgen_file, fp) != EXIT_SUCCESS) return EXIT_FAILURE;
 
     if (bgen_reader_layout(&bgen_file) != 2) return EXIT_FAILURE;
 
@@ -72,11 +68,11 @@ int main()
 
     bgen_reader_variantid(&bgen_file, idx, &varid, &varid_len);
 
-    return EXIT_SUCCESS;
-
 
     printf("variant id: %s\n",       varid);
     printf("variant id len: %llu\n", varid_len);
+
+    return EXIT_SUCCESS;
 
 
     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;

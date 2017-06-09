@@ -95,7 +95,7 @@ int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
     if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
-        if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+        bgen_fclose(bgenfile);
         return EXIT_FAILURE;
     }
 
@@ -103,18 +103,19 @@ int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
 
     if (bgen_reader_sampleids(bgenfile))
     {
+        printf("It has sampleid block. Reading it now.\n");
         if (read_sampleid_block(bgenfile, &(bgenfile->sampleid_block)))
         {
             if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-            return EXIT_FAILURE;
         }
     }
 
+    bgenfile->variants_start = ftell(bgenfile->file);
 
     if (bgenfile->variants_start == EOF)
     {
         perror("Could not find variant blocks");
-        if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+        bgen_fclose(bgenfile);
         return EXIT_FAILURE;
     }
 
