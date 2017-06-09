@@ -49,6 +49,23 @@ typedef struct
 
 typedef struct
 {
+    uint32_t* ui_probs;
+} SampleProbs;
+
+typedef struct
+{
+    uint32_t nsamples;
+    uint16_t nalleles;
+    uint8_t  min_ploidy;
+    uint8_t  max_ploidy;
+    uint8_t *missingness;
+    uint8_t  phased;
+    uint8_t  nbits;
+    SampleProbs *sample_probs;
+} VariantProbsBlock;
+
+typedef struct
+{
     uint32_t nsamples;
     uint16_t id_length;
     BYTE    *id;
@@ -60,6 +77,7 @@ typedef struct
     uint16_t nalleles;
     Allele  *alleles;
     long     genotype_start;
+    VariantProbsBlock *vpb;
 } VariantBlock;
 
 typedef struct
@@ -71,7 +89,8 @@ typedef struct
     long           variants_start;
 } BGenFile;
 
-int64_t bgen_reader_open(BGenFile *, char *);
+int64_t bgen_reader_open(BGenFile *,
+                         char *);
 int64_t bgen_reader_close(BGenFile *);
 int64_t bgen_reader_layout(BGenFile *);
 int64_t bgen_reader_compression(BGenFile *);
