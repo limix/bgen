@@ -32,53 +32,54 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
     printf("Inside bgen_reader_variant_block\n");
+
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
-    fseek(f, bgenfile->variants_start, SEEK_SET);
+    fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
     if (bgen_reader_layout(bgenfile) == 0)
     {
-        if (fread_check(&(vb->nsamples), 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &(vb->nsamples), 4)) return EXIT_FAILURE;
     }
 
-    if (fread_check(&(vb->id_length), 2, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(vb->id_length), 2)) return EXIT_FAILURE;
 
     vb->id = malloc(vb->id_length);
 
-    if (fread_check(vb->id, vb->id_length, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, vb->id, vb->id_length)) return EXIT_FAILURE;
 
-    if (fread_check(&(vb->rsid_length), 2, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(vb->rsid_length), 2)) return EXIT_FAILURE;
 
     vb->rsid = malloc(vb->rsid_length);
 
-    if (fread_check(vb->rsid, vb->rsid_length, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, vb->rsid, vb->rsid_length)) return EXIT_FAILURE;
 
-    if (fread_check(&(vb->chrom_length), 2, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(vb->chrom_length), 2)) return EXIT_FAILURE;
 
     vb->chrom = malloc(vb->chrom_length);
 
-    if (fread_check(vb->chrom, vb->chrom_length, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, vb->chrom, vb->chrom_length)) return EXIT_FAILURE;
 
-    if (fread_check(&(vb->position), 4, f, fp)) return EXIT_FAILURE;
+    if (fread_check(bgenfile, &(vb->position), 4)) return EXIT_FAILURE;
 
     if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
-    else if (fread_check(&(vb->nalleles), 2, f, fp)) return EXIT_FAILURE;
+    else if (fread_check(bgenfile, &(vb->nalleles), 2)) return EXIT_FAILURE;
 
     size_t i;
     vb->alleles = malloc(vb->nalleles * sizeof(Allele));
 
     for (i = 0; i < vb->nalleles; ++i)
     {
-        if (fread_check(&(vb->alleles[i].length), 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &(vb->alleles[i].length), 4)) return EXIT_FAILURE;
 
         vb->alleles[i].id = malloc(vb->alleles[i].length);
 
-        if (fread_check(vb->alleles[i].id, vb->alleles[i].length, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, vb->alleles[i].id, vb->alleles[i].length)) return EXIT_FAILURE;
     }
 
-    vb->genotype_start = ftell(f);
+    vb->genotype_start = ftell(bgenfile->file);
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
@@ -89,11 +90,6 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
                               uint64_t *length)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
 
     printf("Ponto 1\n");
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
@@ -119,11 +115,6 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, BYTE **rsid,
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
-
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
     VariantBlock vb;
@@ -142,11 +133,6 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom
                                   uint64_t *length)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
 
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
@@ -167,11 +153,6 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return -1;
-    }
-
     if (idx >= bgen_reader_nvariants(bgenfile)) return -1;
 
     VariantBlock vb;
@@ -187,11 +168,6 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
                                      uint64_t  idx)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return -1;
-    }
 
     if (idx >= bgen_reader_nvariants(bgenfile)) return -1;
 
@@ -209,11 +185,6 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
                                       uint64_t *length)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    if (!f) {
-        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
-        return EXIT_FAILURE;
-    }
 
     if (idx0 >= bgen_reader_nvariants(bgenfile)) return -1;
 
@@ -242,7 +213,7 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
 //     | 4 | genotype chunk length, C |
 //     | C | genotype probabilities   |
 //     --------------------------------
-int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
+int64_t _genotype_block_layout1(BGenFile *bgenfile, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
     uint32_t clength;
@@ -254,13 +225,13 @@ int64_t _genotype_block_layout1(FILE *f, char *fp, int64_t compression,
 
     if (compression == 0)
     {
-        if (fread_check(uchunk, ulength, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
     } else {
-        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &clength, 4)) return EXIT_FAILURE;
 
         cchunk = malloc(clength);
 
-        if (fread_check(cchunk, clength, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, cchunk, clength)) return EXIT_FAILURE;
 
         zlib_uncompress(cchunk, clength, &uchunk, &ulength);
 
@@ -439,7 +410,7 @@ int64_t _probabilities_block_layout2(BYTE *chunk)
 // | 1     | # bits per probability               |
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
-int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
+int64_t _genotype_block_layout2(BGenFile *bgenfile, int64_t compression,
                                 int64_t nsamples, double **probabilities)
 {
     uint32_t clength, ulength;
@@ -447,20 +418,20 @@ int64_t _genotype_block_layout2(FILE *f, char *fp, int64_t compression,
 
     if (compression == 0)
     {
-        if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &ulength, 4)) return EXIT_FAILURE;
 
         uchunk = malloc(ulength);
 
-        if (fread_check(uchunk, ulength, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
     } else {
-        if (fread_check(&clength, 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &clength, 4)) return EXIT_FAILURE;
 
-        if (fread_check(&ulength, 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, &ulength, 4)) return EXIT_FAILURE;
 
         cchunk = malloc(clength);
         uchunk = malloc(ulength);
 
-        if (fread_check(cchunk, clength - 4, f, fp)) return EXIT_FAILURE;
+        if (fread_check(bgenfile, cchunk, clength - 4)) return EXIT_FAILURE;
 
         zlib_uncompress(cchunk, clength, &uchunk, &ulength);
 
@@ -477,21 +448,20 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
 {
     bgen_reader_variant_block(bgenfile, idx, vb);
 
-    char *fp = bgenfile->filepath;
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    fseek(f, vb->genotype_start, SEEK_SET);
+    fseek(bgenfile->file, vb->genotype_start, SEEK_SET);
 
     int64_t layout = bgen_reader_layout(bgenfile);
     double *probabilities;
 
     if (layout == 1)
     {
-        _genotype_block_layout1(f, fp, bgen_reader_compression(bgenfile),
+        _genotype_block_layout1(bgenfile, bgen_reader_compression(bgenfile),
                                 bgen_reader_nsamples(bgenfile),
                                 &probabilities);
     } else if (layout == 2) {
-        _genotype_block_layout2(f, fp, bgen_reader_compression(bgenfile),
+        _genotype_block_layout2(bgenfile, bgen_reader_compression(bgenfile),
                                 bgen_reader_nsamples(bgenfile),
                                 &probabilities);
     }

@@ -2,6 +2,7 @@
 #define BGEN_READER_H
 
 #include <stdint.h>
+#include <stdio.h>
 #include "byte.h"
 
 // flags definition:
@@ -70,8 +71,8 @@ typedef struct
     long           variants_start;
 } BGenFile;
 
-int64_t bgen_reader_read(BGenFile *,
-                         char *);
+int64_t bgen_reader_open(BGenFile *, char *);
+int64_t bgen_reader_close(BGenFile *);
 int64_t bgen_reader_layout(BGenFile *);
 int64_t bgen_reader_compression(BGenFile *);
 int64_t bgen_reader_sampleids(BGenFile *);

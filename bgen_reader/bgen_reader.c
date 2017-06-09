@@ -29,7 +29,7 @@ int64_t read_header(BGenFile *bgenfile, Header *header)
 
     if (fread_check(bgenfile, &(header->magic_number), 4)) return EXIT_FAILURE;
 
-    fseek(f, (header->header_length) - 20, SEEK_CUR);
+    fseek(bgenfile->file, (header->header_length) - 20, SEEK_CUR);
 
     if (fread_check(bgenfile, &(header->flags), 4)) return EXIT_FAILURE;
 
@@ -73,17 +73,17 @@ int read_sampleid_block(BGenFile *bgenfile, SampleIdBlock *block)
 }
 
 // Main function, called before anything.
-int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
+int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
 {
+    bgenfile->filepath = ft_strdup(filepath);
+
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
 
     if (bgenfile->file == NULL) {
-        fprintf(stderr, "File opening failed: %s\n", filepath);
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
         return EXIT_FAILURE;
     }
-
-    bgenfile->filepath = ft_strdup(filepath);
 
     uint32_t offset;
 
@@ -121,6 +121,13 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_close(BGenFile *bgenfile)
+{
+    assert(bgenfile->file == NULL);
+    free(bgenfile->filepath);
+    bgenfile->filepath = NULL;
 }
 
 // What layout is that?

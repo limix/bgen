@@ -6,7 +6,7 @@ int64_t bgen_fopen(BGenFile *bgenfile)
     bgenfile->file = fopen(bgenfile->filepath, "rb");
 
     if (bgenfile->file == NULL) {
-        fprintf(stderr, "File opening failed: %s\n", filepath);
+        fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
         return EXIT_FAILURE;
     }
 

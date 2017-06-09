@@ -38,13 +38,16 @@ int main()
 {
     char *fp = "test/data/example.1bits.bgen";
     BGenFile bgen_file;
-    int64_t  err = bgen_reader_read(&bgen_file, fp);
+
+    int64_t  err = bgen_reader_open(&bgen_file, fp);
 
 
     if (err) return EXIT_FAILURE;
 
+    return EXIT_SUCCESS;
 
     if (bgen_reader_layout(&bgen_file) != 2) return EXIT_FAILURE;
+
 
 
     if (bgen_reader_compression(&bgen_file) != 2) return EXIT_FAILURE;
@@ -62,6 +65,7 @@ int main()
 
 
 
+
     BYTE *sampleid, *varid, *var_rsid, *var_chrom, *alleleid;
     uint64_t sampleid_len, varid_len, var_rsid_len, var_chrom_len,
              alleleid_len;
@@ -72,8 +76,8 @@ int main()
     bgen_reader_variantid(&bgen_file, idx, &varid, &varid_len);
 
     printf("variant id: %s\n", varid);
-    printf("variant id len: %d\n", varid_len);
-    return EXIT_SUCCESS;
+    printf("variant id len: %llu\n", varid_len);
+
 
     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;
 
@@ -102,6 +106,8 @@ int main()
     VariantBlock vb;
 
     bgen_reader_genotype_block(&bgen_file, idx, &vb);
+
+    bgen_reader_close(&bgen_file);
 
     return EXIT_SUCCESS;
 }
