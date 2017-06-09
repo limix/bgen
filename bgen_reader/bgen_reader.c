@@ -72,7 +72,6 @@ int bgen_read_sampleid_block(BGenFile *bgenfile, SampleIdBlock *block)
     return EXIT_SUCCESS;
 }
 
-// Main function, called before anything.
 int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
 {
     bgenfile->filepath = ft_strdup(filepath);

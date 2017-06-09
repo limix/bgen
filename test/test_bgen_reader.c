@@ -103,11 +103,21 @@ int main()
     if (test_variants_block(&bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
 
 
-    VariantBlock vb;
+    uint64_t nsamples, ncombs;
 
-    bgen_reader_genotype_block(&bgen_file, 0, &vb);
+    nsamples = bgen_reader_nsamples(&bgen_file);
+    bgen_reader_variant_ncombs(&bgen_file, 0, &ncombs);
+
+    if (ncombs != 3) return EXIT_FAILURE;
+
+    uint32_t *ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
+
+    VariantBlock vb;
+    bgen_reader_genotype_block(&bgen_file, 0, &vb, ui_probs);
 
     bgen_reader_close(&bgen_file);
+
+    free(ui_probs);
 
     return EXIT_SUCCESS;
 }

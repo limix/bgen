@@ -39,18 +39,23 @@ inline static void set_bit(uint32_t *val, size_t bit_idx)
     SetBit(*val, bit_idx % 8);
 }
 
-int64_t bgen_read_unphased_probabilities(const BYTE *chunk, VariantProbsBlock *vpb)
+int64_t bgen_read_unphased_probabilities(const BYTE        *chunk,
+                                         VariantProbsBlock *vpb,
+                                         uint32_t          *ui_probs)
 {
-    size_t    i, j;
-    size_t    bi;
-    size_t    sample_start, geno_start, bit_idx;
-    uint8_t   ploidy;
-    uint8_t   miss;
-    uint32_t  ui_prob;
-    uint32_t *ui_probs;
-    uint32_t  ui_prob_sum;
+    if (ui_probs == NULL)
+        return EXIT_SUCCESS;
 
-    uint32_t ncomb = choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
+    size_t   i, j;
+    size_t   bi;
+    size_t   sample_start, geno_start, bit_idx;
+    uint8_t  ploidy;
+    uint8_t  miss;
+    uint32_t ui_prob;
+    uint32_t ui_prob_sum;
+
+    uint32_t ncombs =
+        choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
     vpb->sample_probs = malloc(sizeof(SampleProbs) * vpb->nsamples);
 
@@ -61,34 +66,38 @@ int64_t bgen_read_unphased_probabilities(const BYTE *chunk, VariantProbsBlock *v
         miss   = bgen_read_missingness(vpb->missingness[j]);
         assert(miss == 0);
 
-        ncomb = choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
+        ncombs = choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
 
-        ui_prob_sum                   = 0;
-        vpb->sample_probs[j].ui_probs = malloc((ncomb - 1) * sizeof(uint32_t));
+        ui_prob_sum = 0;
 
-        for (i = 0; i < ncomb - 1; ++i)
+        // vpb->sample_probs[j].ui_probs = malloc((ncombs - 1) *
+        // sizeof(uint32_t));
+
+        for (i = 0; i < ncombs - 1; ++i)
         {
             ui_prob = 0;
 
             for (bi = 0; bi < vpb->nbits; ++bi)
             {
-                sample_start = bit_sample_start(j, vpb->nbits, ncomb);
+                sample_start = bit_sample_start(j, vpb->nbits, ncombs);
                 geno_start   = bit_geno_start(i, vpb->nbits);
                 bit_idx      = sample_start + geno_start + bi;
 
                 if (get_bit(chunk, bit_idx)) SetBit(ui_prob, bi);
             }
-            vpb->sample_probs[j].ui_probs[i] = ui_prob;
-            ui_prob_sum                     += ui_prob;
-        }
 
+            // vpb->sample_probs[j].ui_probs[i] = ui_prob;
+            ui_probs[j * (ncombs - 1) + i] = ui_prob;
+            ui_prob_sum                   += ui_prob;
+        }
     }
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_probabilities_block_layout2(BYTE *chunk, VariantProbsBlock *vpb)
+int64_t bgen_probabilities_block_layout2(BYTE              *chunk,
+                                         VariantProbsBlock *vpb,
+                                         uint32_t          *ui_probs)
 {
-
     MEMCPY(&(vpb->nsamples),   &chunk, 4);
 
     MEMCPY(&(vpb->nalleles),   &chunk, 2);
@@ -106,21 +115,7 @@ int64_t bgen_probabilities_block_layout2(BYTE *chunk, VariantProbsBlock *vpb)
     MEMCPY(&(vpb->nbits),    &chunk, 1);
 
     assert(vpb->phased == 0);
-    bgen_read_unphased_probabilities(chunk, vpb);
-
-    // struct node *root;
-    //
-    // if (vpb.phased)
-    // {
-    //     read_phased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
-    //                                nsamples, &root);
-    // } else {
-    //     bgen_read_unphased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
-    //                                  nsamples, nalleles, &root);
-    //
-    //     // pass
-    //     // bgen_read_unphased_probabilities(chunk);
-    // }
+    bgen_read_unphased_probabilities(chunk, vpb, ui_probs);
 
     return EXIT_SUCCESS;
 }
@@ -151,8 +146,11 @@ int64_t bgen_probabilities_block_layout2(BYTE *chunk, VariantProbsBlock *vpb)
 // | 1     | # bits per probability               |
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
-int64_t bgen_genotype_block_layout2(BGenFile *bgenfile, int64_t compression,
-                                int64_t nsamples, VariantBlock *vb)
+int64_t bgen_genotype_block_layout2(BGenFile     *bgenfile,
+                                    int64_t       compression,
+                                    int64_t       nsamples,
+                                    VariantBlock *vb,
+                                    uint32_t     *ui_probs)
 {
     uint32_t clength, ulength;
     BYTE    *cchunk, *uchunk;
@@ -185,7 +183,7 @@ int64_t bgen_genotype_block_layout2(BGenFile *bgenfile, int64_t compression,
     }
 
     vb->vpb = malloc(sizeof(VariantProbsBlock));
-    bgen_probabilities_block_layout2(uchunk, vb->vpb);
+    bgen_probabilities_block_layout2(uchunk, vb->vpb, ui_probs);
 
     return EXIT_SUCCESS;
 }
