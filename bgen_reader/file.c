@@ -37,5 +37,5 @@ int64_t fread_check(BGenFile *bgenfile, void *restrict buffer, size_t size)
         fprintf(stderr, "Unknown error while reading %s.\n", bgenfile->filepath);
         return EXIT_FAILURE;
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
