@@ -32,8 +32,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
     printf("Inside bgen_reader_variant_block\n");
-    char *fp = bgenfile->filepath;
-    FILE *f  = fopen(fp, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
@@ -81,7 +80,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 
     vb->genotype_start = ftell(f);
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -89,7 +88,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
 int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
                               uint64_t *length)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -108,7 +107,7 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
     *length = vb.id_length;
     *id     = vb.id;
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     printf("Ponto 4\n");
 
@@ -118,7 +117,7 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
 int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, BYTE **rsid,
                                  uint64_t *length)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -134,7 +133,7 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, BYTE **rsid,
     *length = vb.rsid_length;
     *rsid   = vb.rsid;
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -142,7 +141,7 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile, uint64_t idx, BYTE **rsid,
 int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom,
                                   uint64_t *length)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -158,7 +157,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom
     *length = vb.chrom_length;
     *chrom  = vb.chrom;
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -166,7 +165,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom
 int64_t bgen_reader_variant_position(BGenFile *bgenfile,
                                      uint64_t  idx)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -179,7 +178,7 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 
     bgen_reader_variant_block(bgenfile, idx, &vb);
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return vb.position;
 }
@@ -187,7 +186,7 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
                                      uint64_t  idx)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -200,7 +199,7 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
 
     bgen_reader_variant_block(bgenfile, idx, &vb);
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return vb.nalleles;
 }
@@ -209,7 +208,7 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
                                       uint64_t idx1, BYTE **id,
                                       uint64_t *length)
 {
-    FILE *f = fopen(bgenfile->filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (!f) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
@@ -226,7 +225,7 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
 
     *id = vb.alleles[idx1].id;
 
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -479,7 +478,7 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
     bgen_reader_variant_block(bgenfile, idx, vb);
 
     char *fp = bgenfile->filepath;
-    FILE *f  = fopen(fp, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     fseek(f, vb->genotype_start, SEEK_SET);
 
@@ -496,7 +495,7 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
                                 bgen_reader_nsamples(bgenfile),
                                 &probabilities);
     }
-    fclose(f);
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }

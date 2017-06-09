@@ -78,8 +78,8 @@ int read_sampleid_block(SampleIdBlock *block,
 // Main function, called before anything.
 int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 {
-    assert(bgenfile->file == NULL);
-    bgenfile->file = fopen(filepath, "rb");
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
 
     if (bgenfile->file == NULL) {
         fprintf(stderr, "File opening failed: %s\n", filepath);
@@ -98,8 +98,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
-        fclose(bgenfile->file);
-        bgenfile->file = NULL;
+        if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
         return EXIT_FAILURE;
     }
 
@@ -109,8 +108,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     {
         if (read_sampleid_block(&(bgenfile->sampleid_block), f, filepath))
         {
-            fclose(bgenfile->file);
-            bgenfile->file = NULL;
+            if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
             return EXIT_FAILURE;
         }
     }
@@ -119,13 +117,11 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
     if (bgenfile->variants_start == EOF)
     {
         perror("Could not find variant blocks");
-        fclose(bgenfile->file);
-        bgenfile->file = NULL;
+        if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
         return EXIT_FAILURE;
     }
 
-    fclose(bgenfile->file);
-    bgenfile->file = NULL;
+    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
