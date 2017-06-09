@@ -56,9 +56,16 @@ static int test_variants_block(BGenFile *bgen_file)
 
     if (bytencmp(var_chrom, "01", var_chrom_len) != 0) return EXIT_FAILURE;
 
-    if (bgen_reader_variant_position(bgen_file, 0) != 2000) return EXIT_FAILURE;
+    uint64_t pos;
 
-    if (bgen_reader_variant_nalleles(bgen_file, 0) != 2) return EXIT_FAILURE;
+    bgen_reader_variant_position(bgen_file, 0, &pos);
+
+    if (pos != 2000) return EXIT_FAILURE;
+
+    uint64_t nalleles;
+    bgen_reader_variant_nalleles(bgen_file, 0, &nalleles);
+
+    if (nalleles != 2) return EXIT_FAILURE;
 
     bgen_reader_variant_alleleid(bgen_file, 0, 0, &alleleid, &alleleid_len);
 

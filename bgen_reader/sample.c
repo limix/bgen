@@ -12,5 +12,5 @@ int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
     *length = sampleid->length;
     *id     = sampleid->id;
 
-    return 0;
+    return EXIT_SUCCESS;
 }

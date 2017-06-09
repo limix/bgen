@@ -37,6 +37,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
                                   VariantBlock *vb)
 {
     printf("Inside bgen_reader_variant_block\n");
+
     // printf("Point 1\n");
 
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
@@ -63,6 +64,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     {
         if (fread_check(bgenfile, &(vb->nsamples), 4)) return EXIT_FAILURE;
     }
+
     // printf("Point 5\n");
 
     if (fread_check(bgenfile, &(vb->id_length), 2)) return EXIT_FAILURE;
@@ -199,11 +201,11 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile, uint64_t idx, BYTE **chrom
 }
 
 int64_t bgen_reader_variant_position(BGenFile *bgenfile,
-                                     uint64_t  idx)
+                                     uint64_t idx, uint64_t *position)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (idx >= bgen_reader_nvariants(bgenfile)) return -1;
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
     VariantBlock vb;
 
@@ -211,15 +213,17 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    return vb.position;
+    *position = vb.position;
+
+    return EXIT_SUCCESS;
 }
 
 int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
-                                     uint64_t  idx)
+                                     uint64_t idx, uint64_t *nalleles)
 {
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    if (idx >= bgen_reader_nvariants(bgenfile)) return -1;
+    if (idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
     VariantBlock vb;
 
@@ -227,7 +231,9 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    return vb.nalleles;
+    *nalleles = vb.nalleles;
+
+    return EXIT_SUCCESS;
 }
 
 int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
@@ -238,7 +244,11 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
 
     if (idx0 >= bgen_reader_nvariants(bgenfile)) return -1;
 
-    if (idx1 >= bgen_reader_variant_nalleles(bgenfile, idx0)) return EXIT_FAILURE;
+    uint64_t nalleles;
+
+    bgen_reader_variant_nalleles(bgenfile, idx0, &nalleles);
+
+    if (idx1 >= nalleles) return EXIT_FAILURE;
 
     VariantBlock vb;
 
@@ -360,14 +370,14 @@ inline static void set_bit(uint32_t *val, size_t bit_idx)
 
 int64_t _read_unphased_probabilities(const BYTE *chunk, VariantProbsBlock *vpb)
 {
-    size_t   i, j;
-    size_t   bi;
-    size_t   sample_start, geno_start, bit_idx;
-    uint8_t  ploidy;
-    uint8_t  miss;
-    uint32_t ui_prob;
+    size_t    i, j;
+    size_t    bi;
+    size_t    sample_start, geno_start, bit_idx;
+    uint8_t   ploidy;
+    uint8_t   miss;
+    uint32_t  ui_prob;
     uint32_t *ui_probs;
-    uint32_t ui_prob_sum;
+    uint32_t  ui_prob_sum;
 
     uint32_t ncomb = choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
@@ -389,7 +399,7 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, VariantProbsBlock *vpb)
 
         ncomb = choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
 
-        ui_prob_sum = 0;
+        ui_prob_sum                   = 0;
         vpb->sample_probs[j].ui_probs = malloc((ncomb - 1) * sizeof(uint32_t));
 
         for (i = 0; i < ncomb - 1; ++i)
@@ -403,20 +413,18 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, VariantProbsBlock *vpb)
                 bit_idx      = sample_start + geno_start + bi;
 
                 if (get_bit(chunk, bit_idx)) SetBit(ui_prob, bi);
-
             }
             vpb->sample_probs[j].ui_probs[i] = ui_prob;
-            ui_prob_sum += ui_prob;
-
+            ui_prob_sum                     += ui_prob;
         }
 
         // printf("  Prob (comb %zu): %f\n", i, transform(ui_prob, vpb->nbits));
-        // printf("  Prob (comb %d): %f\n", ncomb, transform(pow(2, vpb->nbits) - 1 - ui_prob_sum, vpb->nbits));
+        // printf("  Prob (comb %d): %f\n", ncomb, transform(pow(2, vpb->nbits)
+        // - 1 - ui_prob_sum, vpb->nbits));
 
         // ui_probs
 
         // push(root, &g, 4);
-
     }
     return EXIT_SUCCESS;
 }
