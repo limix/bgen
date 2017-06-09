@@ -72,16 +72,16 @@ typedef struct
 int64_t bgen_reader_read(BGenFile *, char *);
 int64_t bgen_reader_layout(BGenFile *);
 int64_t bgen_reader_compression(BGenFile *);
-int64_t bgen_reader_sample_identifiers(BGenFile *);
+int64_t bgen_reader_sampleids(BGenFile *);
 int64_t bgen_reader_nsamples(BGenFile *);
 int64_t bgen_reader_nvariants(BGenFile *);
-int64_t bgen_reader_sample_id(BGenFile *, uint64_t, BYTE **, uint64_t *);
-int64_t bgen_reader_variant_id(BGenFile *, uint64_t, BYTE **, uint64_t *);
+int64_t bgen_reader_sampleid(BGenFile *, uint64_t, BYTE **, uint64_t *);
+int64_t bgen_reader_variantid(BGenFile *, uint64_t, BYTE **, uint64_t *);
 int64_t bgen_reader_variant_rsid(BGenFile *, uint64_t, BYTE **, uint64_t *);
 int64_t bgen_reader_variant_chrom(BGenFile *, uint64_t, BYTE **, uint64_t *);
 int64_t bgen_reader_variant_position(BGenFile *, uint64_t);
 int64_t bgen_reader_variant_nalleles(BGenFile *, uint64_t);
-int64_t bgen_reader_variant_allele_id(BGenFile *, uint64_t, uint64_t, BYTE **,
+int64_t bgen_reader_variant_alleleid(BGenFile *, uint64_t, uint64_t, BYTE **,
                                       uint64_t *);
 int64_t bgen_reader_genotype_block(BGenFile *, uint64_t, VariantBlock *);
 

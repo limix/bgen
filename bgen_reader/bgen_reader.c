@@ -49,9 +49,9 @@ int64_t read_header(Header *header, FILE *restrict f, char *filepath)
 // | 2   | length of sample N id |
 // | LsN | sample N id           |
 // -------------------------------
-int read_sample_identifier_block(SampleIdBlock *block,
-                                 FILE *restrict f,
-                                 char          *filepath)
+int read_sampleid_block(SampleIdBlock *block,
+                        FILE *restrict f,
+                        char          *filepath)
 {
     if (fread_check(&(block->length), 4, f, filepath)) return EXIT_FAILURE;
 
@@ -94,7 +94,7 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     if (read_header(&(bgenfile->header), f, filepath)) return EXIT_FAILURE;
 
-    if (header->header_length > offset)
+    if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
         fclose(f);
@@ -103,16 +103,15 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 
     SampleIdBlock sampleid_block;
 
-    if (bgen_reader_sample_identifiers(bgenfile))
+    if (bgen_reader_sampleids(bgenfile))
     {
-        if (read_sample_identifier_block(&(bgenfile->sampleid_block), f,
-                                         filepath)) {
+        if (read_sampleid_block(&(bgenfile->sampleid_block), f, filepath))
+        {
             fclose(f);
             return EXIT_FAILURE;
         }
     }
 
-    bgenfile->variants_start = ftell(f);
 
     if (bgenfile->variants_start == EOF)
     {
@@ -126,17 +125,22 @@ int64_t bgen_reader_read(BGenFile *bgenfile, char *filepath)
 }
 
 // What layout is that?
+// Possible values are 1 and 2.
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (15 << 2)) >> 2;
 }
 
 // Is sample identifier block present?
-int64_t bgen_reader_sample_identifiers(BGenFile *bgenfile)
+int64_t bgen_reader_sampleids(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
 
+// Does it use compression? Which type?
+// 0: no compression
+// 1: zlib's compress()
+// 2: zstandard's ZSTD_compress()
 int64_t bgen_reader_compression(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & 60) >> 2;

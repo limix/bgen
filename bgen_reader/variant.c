@@ -85,7 +85,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_id(BGenFile *bgenfile, uint64_t idx, BYTE **id,
+int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
                                uint64_t *length)
 {
     FILE *f = fopen(bgenfile->filepath, "rb");
@@ -199,7 +199,7 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
     return vb.nalleles;
 }
 
-int64_t bgen_reader_variant_allele_id(BGenFile *bgenfile, uint64_t idx0,
+int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t idx0,
                                       uint64_t idx1, BYTE **id,
                                       uint64_t *length)
 {

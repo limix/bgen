@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 
-int64_t bgen_reader_sample_id(BGenFile *bgenfile, uint64_t idx, BYTE **id,
+int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t idx, BYTE **id,
                               uint64_t *length)
 {
     if (idx >= bgen_reader_nsamples(bgenfile)) return EXIT_FAILURE;
