@@ -8,6 +8,11 @@
 #include <math.h>
 #include <stdlib.h>
 
+static inline float transform(uint32_t v, size_t nbits)
+{
+    return ((float) v) / (pow(2, nbits) - 1);
+}
+
 // Variant identifying data
 //
 // ---------------------------------------------
@@ -347,10 +352,9 @@ inline static int get_bit(const BYTE *mem, size_t bit_idx)
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-inline static void set_bit(uint32_t *mem, size_t bit_idx)
+inline static void set_bit(uint32_t *val, size_t bit_idx)
 {
-    size_t bytes = bit_idx / 8;
-    SetBit(*(mem + bytes), bit_idx % 8);
+    SetBit(*val, bit_idx % 8);
 }
 
 int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
@@ -365,6 +369,7 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
     uint8_t  ploidy;
     uint8_t  miss;
     uint32_t ui_prob;
+    uint32_t ui_prob_sum;
 
     uint32_t ncomb = choose(nalleles + max_ploidy - 1, nalleles - 1);
 
@@ -375,7 +380,7 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
     printf("ncomb: %u\n",      ncomb);
 
     // nsamples
-    for (j = 0; j < 50; ++j)
+    for (j = 0; j < 5; ++j)
     {
         printf("Individual %d:\n", j);
         ploidy = _read_ploidy(ploidy_miss[j]);
@@ -387,22 +392,26 @@ int64_t _read_unphased_probabilities(const BYTE *chunk, uint8_t nbits,
             // pass
         } else {
             ncomb   = choose(nalleles + ploidy - 1, nalleles - 1);
-            ui_prob = 0;
 
+            ui_prob_sum = 0;
             for (i = 0; i < ncomb - 1; ++i)
             {
+                ui_prob = 0;
                 for (bi = 0; bi < nbits; ++bi)
                 {
                     sample_start = bit_sample_start(j, nbits, ncomb);
                     geno_start   = bit_geno_start(i, nbits);
                     bit_idx = sample_start + geno_start + bi;
-                    printf("  Bit at bit index %d: %d\n", bit_idx, get_bit(chunk, bit_idx));
                     if (get_bit(chunk, bit_idx))
-                        set_bit(&ui_prob, bit_idx);
+                        SetBit(ui_prob, bi);
                 }
 
-                // g[j] = transform(ui_prob);
+                // g[j] = transform(ui_prob, nbits);
+                ui_prob_sum += ui_prob;
+                printf("  Prob (comb %d): %f\n", i, transform(ui_prob, nbits));
             }
+
+            printf("  Prob (comb %d): %f\n", ncomb, transform(pow(2, nbits) - 1 - ui_prob_sum, nbits));
 
             // push(root, &g, 4);
         }
