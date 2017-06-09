@@ -1,5 +1,8 @@
 #include "file.h"
 
+#include <assert.h>
+#include <stdlib.h>
+
 int64_t bgen_fopen(BGenFile *bgenfile)
 {
     assert(bgenfile->file == NULL);

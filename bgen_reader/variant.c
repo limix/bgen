@@ -88,28 +88,6 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t idx,
     return EXIT_SUCCESS;
 }
 
-// int64_t read_phased_probabilities(const BYTE *chunk, uint8_t nbits,
-//                                    uint8_t max_ploidy, BYTE *ploidy_miss,
-//                                    uint32_t nsamples, struct node **root)
-// {
-//     BYTE   *G;
-//     size_t  i, j;
-//     uint8_t ploidy;
-//     uint8_t miss;
-//
-//     for (i = 0; i < max_ploidy; ++i)
-//     {
-//         for (j = 0; j < nsamples; ++j)
-//         {
-//             ploidy = bgen_read_ploidy(ploidy_miss[j]);
-//             miss   = bgen_read_missingness(ploidy_miss[j]);
-//         }
-//     }
-//     return EXIT_SUCCESS;
-// }
-
-// Interface functions
-
 int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t idx,
                                    VariantBlock *vb)
 {

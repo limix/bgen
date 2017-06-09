@@ -4,6 +4,7 @@
 #include "bits.h"
 
 #include <stdlib.h>
+#include <assert.h>
 
 inline static uint8_t bgen_read_ploidy(BYTE ploidy_miss)
 {
@@ -111,11 +112,9 @@ int64_t bgen_probabilities_block_layout2(BYTE *chunk, VariantProbsBlock *vpb)
     //
     // if (vpb.phased)
     // {
-    //     printf("PHASED\n");
     //     read_phased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
     //                                nsamples, &root);
     // } else {
-    //     printf("UNPHASED\n");
     //     bgen_read_unphased_probabilities(chunk, nbits, max_ploidy, ploidy_miss,
     //                                  nsamples, nalleles, &root);
     //

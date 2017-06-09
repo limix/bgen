@@ -41,8 +41,6 @@ static int test_variants_block(BGenFile *bgen_file)
 
     bgen_reader_variantid(bgen_file, 0, &varid, &varid_len);
 
-    printf("variant id: %s\n",       varid);
-    printf("variant id len: %llu\n", varid_len);
 
     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;
 

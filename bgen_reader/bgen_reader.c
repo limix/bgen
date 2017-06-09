@@ -19,7 +19,7 @@
 // | Lh - 20 | free data area   |
 // | 4       | flags            |
 // ------------------------------
-int64_t read_header(BGenFile *bgenfile, Header *header)
+int64_t bgen_read_header(BGenFile *bgenfile, Header *header)
 {
     if (fread_check(bgenfile, &(header->header_length), 4)) return EXIT_FAILURE;
 
@@ -49,7 +49,7 @@ int64_t read_header(BGenFile *bgenfile, Header *header)
 // | 2   | length of sample N id |
 // | LsN | sample N id           |
 // -------------------------------
-int read_sampleid_block(BGenFile *bgenfile, SampleIdBlock *block)
+int bgen_read_sampleid_block(BGenFile *bgenfile, SampleIdBlock *block)
 {
     if (fread_check(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
 
@@ -90,7 +90,7 @@ int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
     // First four bytes (offset)
     if (fread_check(bgenfile, &offset, 4)) return EXIT_FAILURE;
 
-    if (read_header(bgenfile, &(bgenfile->header))) return EXIT_FAILURE;
+    if (bgen_read_header(bgenfile, &(bgenfile->header))) return EXIT_FAILURE;
 
     if (bgenfile->header.header_length > offset)
     {
@@ -103,8 +103,7 @@ int64_t bgen_reader_open(BGenFile *bgenfile, char *filepath)
 
     if (bgen_reader_sampleids(bgenfile))
     {
-        printf("It has sampleid block. Reading it now.\n");
-        if (read_sampleid_block(bgenfile, &(bgenfile->sampleid_block)))
+        if (bgen_read_sampleid_block(bgenfile, &(bgenfile->sampleid_block)))
         {
             if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
         }

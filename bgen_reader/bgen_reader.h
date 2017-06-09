@@ -149,4 +149,4 @@ int64_t bgen_reader_genotype_block(BGenFile     *bgenfile,
                                    uint64_t      idx,
                                    VariantBlock *vb);
 
-#endif /* ifndef BGEN_READER_H */
+#endif /* end of include guard: BGEN_READER_H */
