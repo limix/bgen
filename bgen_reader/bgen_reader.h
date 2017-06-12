@@ -7,10 +7,9 @@ typedef unsigned char BYTE;
 
 typedef struct BGenFile BGenFile;
 
-BGenFile* bgen_reader_open(char *filename);
+BGenFile* bgen_reader_open(const char *filepath);
 int64_t   bgen_reader_close(BGenFile *bgenfile);
 
-int64_t   bgen_reader_sampleids(BGenFile *bgenfile);
 int64_t   bgen_reader_nsamples(BGenFile *bgenfile);
 int64_t   bgen_reader_nvariants(BGenFile *bgenfile);
 

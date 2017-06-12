@@ -16,7 +16,13 @@
 #define FCLOSE bgen_reader_fclose
 #define NVARIANTS bgen_reader_nvariants
 
-BGenFile* bgen_reader_open(char *filepath)
+// Is sample identifier block present?
+int64_t bgen_reader_sampleids(BGenFile *bgenfile)
+{
+    return (bgenfile->header.flags & (1 << 31)) >> 31;
+}
+
+BGenFile* bgen_reader_open(const char *filepath)
 {
     BGenFile *bgenfile = malloc(sizeof(BGenFile));
 
@@ -81,12 +87,6 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
 
     free(bgenfile);
     return EXIT_SUCCESS;
-}
-
-// Is sample identifier block present?
-int64_t bgen_reader_sampleids(BGenFile *bgenfile)
-{
-    return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
 
 int64_t bgen_reader_nsamples(BGenFile *bgenfile)

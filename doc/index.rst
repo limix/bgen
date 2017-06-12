@@ -8,6 +8,7 @@ BGen-reader's documentation
     :maxdepth: 2
 
     install
+    api
 
 *****************
 Comments and bugs
