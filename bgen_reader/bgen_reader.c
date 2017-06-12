@@ -153,8 +153,8 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
     return bgenfile->header.nvariants;
 }
 
-int64_t bgen_reader_read_probabilities(BGenFile *bgenfile, uint64_t variant_idx,
-                                       uint32_t *ui_probs)
+int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
+                                  uint32_t **ui_probs)
 {
     VariantBlock vb;
 
@@ -165,6 +165,7 @@ int64_t bgen_reader_read_probabilities(BGenFile *bgenfile, uint64_t variant_idx,
     fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
 
     int64_t e = bgen_reader_read_current_genotype_block(bgenfile, ui_probs);
+
     if (e == EXIT_FAILURE) return EXIT_FAILURE;
 
     if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;

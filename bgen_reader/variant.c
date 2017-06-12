@@ -256,25 +256,6 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_ncombs(BGenFile *bgenfile,
-                                   uint64_t  variant_idx,
-                                   uint64_t *ncombs)
-{
-    if (FOPEN(bgenfile) == FAIL) return FAIL;
-
-    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-
-    VariantBlock vb;
-    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
-
-    *ncombs = choose(vb.vpb->nalleles + vb.vpb->max_ploidy - 1,
-                     vb.vpb->nalleles - 1);
-
-    if (FCLOSE(bgenfile) == FAIL) return FAIL;
-
-    return EXIT_SUCCESS;
-}
-
 int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
                                      uint64_t allele_idx, BYTE **id,
                                      uint64_t *length)
@@ -299,12 +280,12 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
 }
 
 int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
-                                                uint32_t     *ui_probs)
+                                                uint32_t     **ui_probs)
 {
     int64_t layout = bgen_reader_layout(bgenfile);
     assert(layout == 2);
 
-    VariantProbsBlock vpb;
+    VariantGenotypeBlock vpb;
     int64_t compression = bgen_reader_compression(bgenfile);
     int64_t nsamples = bgen_reader_nsamples(bgenfile);
 

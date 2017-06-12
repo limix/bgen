@@ -15,7 +15,7 @@ typedef struct
     uint32_t *ui_probs;
 } SampleProbs;
 
-typedef struct VariantProbsBlock
+typedef struct VariantGenotypeBlock
 {
     uint32_t     nsamples;
     uint16_t     nalleles;
@@ -25,7 +25,7 @@ typedef struct VariantProbsBlock
     uint8_t      phased;
     uint8_t      nbits;
     SampleProbs *sample_probs;
-} VariantProbsBlock;
+} VariantGenotypeBlock;
 
 // It represents both the variant identifying block
 // (all fields except the last one) and the variant probabilities block (the
@@ -43,7 +43,7 @@ typedef struct VariantBlock
     uint16_t           nalleles;
     Allele            *alleles;
     long               genotype_start;
-    VariantProbsBlock *vpb;
+    VariantGenotypeBlock *vpb;
 } VariantBlock;
 
 int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
@@ -51,6 +51,6 @@ int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
                                          VariantBlock *vb);
 
 int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
-                                                uint32_t     *ui_probs);
+                                                uint32_t     **ui_probs);
 
 #endif /* end of include guard: VARIANT_H */

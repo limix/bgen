@@ -112,14 +112,11 @@ int main()
 
     nsamples = bgen_reader_nsamples(bgen_file);
 
-    // bgen_reader_variant_ncombs(bgen_file, 0, &ncombs);
-
-    // if (ncombs != 3) return EXIT_FAILURE;
-
-    uint32_t *ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
+    uint32_t *ui_probs;
+    //  = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
     // first SNP
-    bgen_reader_read_probabilities(bgen_file, 0, ui_probs);
+    bgen_reader_read_genotype(bgen_file, 0, &ui_probs);
 
     // Sample 0 (sample_001)
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
@@ -132,11 +129,8 @@ int main()
 
     free(ui_probs);
 
-
-    ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
-
     // second SNP
-    bgen_reader_read_probabilities(bgen_file, 1, ui_probs);
+    bgen_reader_read_genotype(bgen_file, 1, &ui_probs);
 
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
 
