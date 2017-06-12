@@ -42,6 +42,8 @@ typedef struct VariantBlock
     VariantGenotypeBlock *vpb;
 } VariantBlock;
 
+typedef struct BGenFile BGenFile;
+
 int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
                                          uint64_t      variant_idx,
                                          VariantBlock *vb);

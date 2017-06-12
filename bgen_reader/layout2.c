@@ -89,15 +89,14 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk,
-                               int64_t compression)
+int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk)
 {
     uint32_t clength, ulength;
     BYTE    *cchunk;
 
-    if (compression == 0)
+    if (bgen_reader_compression(bgenfile) == 0)
     {
-        if (FREAD(bgenfile, &ulength, 4)) return FAIL;
+        ulength = 6 * bgenfile->header.nsamples;
 
         *uchunk = malloc(ulength);
 
@@ -150,14 +149,13 @@ int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk,
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
 int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
-                                          int64_t               compression,
                                           VariantGenotypeBlock *vpb,
                                           uint32_t            **ui_probs)
 {
     BYTE   *chunk;
     int64_t e;
 
-    e = bgen_reader_uncompress(bgenfile, &chunk, compression);
+    e = bgen_reader_uncompress(bgenfile, &chunk);
 
     if (e == FAIL) return FAIL;
 
@@ -177,12 +175,11 @@ int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile,
-                                               int64_t   compression)
+int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile)
 {
     uint32_t length;
 
-    if (compression == 0)
+    if (bgen_reader_compression(bgenfile) == 0)
     {
         length = 6 * bgenfile->header.nsamples;
     } else {

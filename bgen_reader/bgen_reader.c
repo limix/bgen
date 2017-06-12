@@ -24,7 +24,6 @@ BGenFile* bgen_reader_open(char *filepath)
 
     if (FOPEN(bgenfile) == FAIL) return NULL;
 
-
     if (bgenfile->file == NULL) {
         fprintf(stderr, "File opening failed: %s\n", bgenfile->filepath);
         return NULL;

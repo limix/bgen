@@ -2,10 +2,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "variant.h"
 #include "bgen_file.h"
 #include "layout1.h"
 #include "layout2.h"
-#include "util/list.h"
 
 #define FREAD bgen_reader_fread
 #define FAIL EXIT_FAILURE
@@ -89,8 +89,6 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 {
     assert(bgen_reader_layout(bgenfile) == 2);
 
-    int64_t compression = bgen_reader_compression(bgenfile);
-
     fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
     VariantBlock vb;
@@ -100,7 +98,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
     for (i = 0; i < variant_idx; ++i)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vb);
-        bgen_reader_read_genotype_layout2_skip(bgenfile, compression);
+        bgen_reader_read_genotype_layout2_skip(bgenfile);
     }
     return EXIT_SUCCESS;
 }
@@ -150,6 +148,5 @@ int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
     VariantGenotypeBlock vpb;
     int64_t compression = bgen_reader_compression(bgenfile);
 
-    return bgen_reader_read_genotype_layout2(bgenfile, compression,
-                                             &vpb, ui_probs);
+    return bgen_reader_read_genotype_layout2(bgenfile, &vpb, ui_probs);
 }
