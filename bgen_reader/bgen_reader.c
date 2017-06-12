@@ -8,9 +8,7 @@
 #include "bgen_file.h"
 #include "variant.h"
 #include "sample.h"
-#include "file.h"
-#include "util.h"
-#include "mem.h"
+#include "util/mem.h"
 
 
 // Sample identifier block

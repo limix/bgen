@@ -2,7 +2,8 @@
 #define SAMPLE_H
 
 #include <stdint.h>
-#include "byte.h"
+
+#include "util/byte.h"
 
 typedef struct
 {

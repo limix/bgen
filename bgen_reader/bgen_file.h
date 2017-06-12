@@ -4,8 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "file.h"
-
 typedef struct SampleIdBlock SampleIdBlock;
 
 // flags definition:
@@ -41,5 +39,12 @@ typedef struct BGenFile
 } BGenFile;
 
 int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header);
+
+int64_t bgen_reader_fopen(BGenFile *bgenfile);
+int64_t bgen_reader_fclose(BGenFile *bgenfile);
+
+int64_t bgen_reader_fread(BGenFile      *bgenfile,
+                          void *restrict buffer,
+                          size_t         size);
 
 #endif /* end of include guard: BGEN_FILE_H */

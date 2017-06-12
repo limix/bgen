@@ -1,14 +1,12 @@
-#include "bgen_reader.h"
-#include "file.h"
-#include "util.h"
-#include "list.h"
-#include "layout1.h"
-#include "layout2.h"
-#include "bgen_file.h"
-
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
+
+#include "bgen_reader.h"
+#include "bgen_file.h"
+#include "layout1.h"
+#include "layout2.h"
+#include "util/list.h"
 
 #define FREAD bgen_reader_fread
 #define FAIL EXIT_FAILURE

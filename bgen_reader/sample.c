@@ -1,7 +1,7 @@
+#include <stdlib.h>
+
 #include "sample.h"
 #include "bgen_file.h"
-
-#include <stdlib.h>
 
 int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, BYTE **id,
                               uint64_t *length)

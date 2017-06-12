@@ -1,12 +1,12 @@
-#include "bgen_file.h"
-#include "variant.h"
-#include "choose.h"
-#include "bits.h"
-#include "zlib_wrapper.h"
-#include "mem.h"
-
 #include <stdlib.h>
 #include <assert.h>
+
+#include "bgen_file.h"
+#include "variant.h"
+#include "util/choose.h"
+#include "util/bits.h"
+#include "util/zlib_wrapper.h"
+#include "util/mem.h"
 
 #define FREAD bgen_reader_fread
 #define FAIL EXIT_FAILURE
