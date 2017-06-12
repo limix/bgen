@@ -113,19 +113,29 @@ int main()
     uint32_t *ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
     VariantBlock vb;
-    bgen_reader_genotype_block(&bgen_file, 0, &vb, ui_probs);
-
-    bgen_reader_close(&bgen_file);
 
     // first SNP
-    uint32_t *up = ui_probs;
+    bgen_reader_genotype_block(&bgen_file, 0, &vb, ui_probs);
 
     // Sample 0 (sample_001)
-    if (up[0] != 0 || up[0] != 0) return EXIT_FAILURE;
+    if (ui_probs[0] != 0 || ui_probs[0] != 0) return EXIT_FAILURE;
     // Sample 3 (sample_004)
-    if (up[6] != 0 || up[7] != 1) return EXIT_FAILURE;
+    if (ui_probs[6] != 0 || ui_probs[7] != 1) return EXIT_FAILURE;
     // Sample 498 (sample_499)
-    if (up[498 * 2] != 1 || up[498 * 2 + 1] != 0) return EXIT_FAILURE;
+    if (ui_probs[498 * 2] != 1 || ui_probs[498 * 2 + 1] != 0) return EXIT_FAILURE;
+
+    free(ui_probs);
+
+    ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
+
+    // second SNP
+    bgen_reader_genotype_block(&bgen_file, 1, &vb, ui_probs);
+
+    if (ui_probs[0] != 0 || ui_probs[0] != 0) return EXIT_FAILURE;
+    if (ui_probs[4] != 1 || ui_probs[5] != 0) return EXIT_FAILURE;
+
+    free(ui_probs);
+
 
     // // Sample 498 (sample_499)
     // printf("ui_probs: %u %u\n", up[498 * 2], up[498 * 2 + 1]);
@@ -162,7 +172,9 @@ int main()
     // 1  0.946198
     // 1  0.008423
 
-    free(ui_probs);
+    bgen_reader_close(&bgen_file);
+
+
 
     return EXIT_SUCCESS;
 }

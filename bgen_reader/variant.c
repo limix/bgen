@@ -9,36 +9,8 @@
 #include <math.h>
 #include <stdlib.h>
 
-// Variant identifying data
-//
-// ---------------------------------------------
-// | 4     | # samples (layout > 1)            |
-// | 2     | # variant id length, Lid          |
-// | Lid   | variant id                        |
-// | 2     | variant rsid length, Lrsid        |
-// | Lrsid | rsid                              |
-// | 2     | chrom length, Lchr                |
-// | Lchr  | chromossome                       |
-// | 4     | variant position                  |
-// | 2     | number of alleles, K (layout > 1) |
-// | 4     | first allele length, La1          |
-// | La1   | first allele                      |
-// | 4     | second allele length, La2         |
-// | La2   | second allele                     |
-// | ...   |                                   |
-// | 4     | last allele length, LaK           |
-// | LaK   | last allele                       |
-// ---------------------------------------------
-int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t variant_idx,
-                                  VariantBlock *vb)
+int64_t bgen_reader_variant_block_parse(BGenFile *bgenfile, VariantBlock *vb)
 {
-    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
-
-    fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
-
     assert(bgen_reader_layout(bgenfile) != 0);
 
     if (bgen_reader_layout(bgenfile) == 1)
@@ -83,6 +55,65 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t variant_idx,
 
     vb->genotype_start = ftell(bgenfile->file);
 
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_fseek(BGenFile *bgenfile, uint64_t variant_idx)
+{
+    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
+
+    VariantBlock vb;
+
+    size_t i;
+
+    for (i = 0; i < variant_idx; ++i)
+    {
+        bgen_reader_variant_block_parse(bgenfile, &vb);
+
+        int64_t layout = bgen_reader_layout(bgenfile);
+        assert(layout == 2);
+
+        bgen_genotype_block_layout2_skip(bgenfile,
+                                         bgen_reader_compression(bgenfile),
+                                         bgen_reader_nsamples(bgenfile));
+    }
+}
+
+// Variant identifying data
+//
+// ---------------------------------------------
+// | 4     | # samples (layout > 1)            |
+// | 2     | # variant id length, Lid          |
+// | Lid   | variant id                        |
+// | 2     | variant rsid length, Lrsid        |
+// | Lrsid | rsid                              |
+// | 2     | chrom length, Lchr                |
+// | Lchr  | chromossome                       |
+// | 4     | variant position                  |
+// | 2     | number of alleles, K (layout > 1) |
+// | 4     | first allele length, La1          |
+// | La1   | first allele                      |
+// | 4     | second allele length, La2         |
+// | La2   | second allele                     |
+// | ...   |                                   |
+// | 4     | last allele length, LaK           |
+// | LaK   | last allele                       |
+// ---------------------------------------------
+int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t variant_idx,
+                                  VariantBlock *vb)
+{
+    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+
+    bgen_reader_variant_fseek(bgenfile, variant_idx);
+
+    // fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
+
+    bgen_reader_variant_block_parse(bgenfile, vb);
+
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
@@ -94,6 +125,8 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t variant_idx,
     bgen_reader_variant_block(bgenfile, variant_idx, vb);
 
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    printf("vb->genotype_start: %ld\n", vb->genotype_start);
 
     fseek(bgenfile->file, vb->genotype_start, SEEK_SET);
 

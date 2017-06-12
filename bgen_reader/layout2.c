@@ -43,8 +43,7 @@ int64_t bgen_read_unphased_probabilities(const BYTE        *chunk,
                                          VariantProbsBlock *vpb,
                                          uint32_t          *ui_probs)
 {
-    if (ui_probs == NULL)
-        return EXIT_SUCCESS;
+    if (ui_probs == NULL) return EXIT_SUCCESS;
 
     size_t   i, j;
     size_t   bi;
@@ -184,6 +183,24 @@ int64_t bgen_genotype_block_layout2(BGenFile     *bgenfile,
 
     vb->vpb = malloc(sizeof(VariantProbsBlock));
     bgen_probabilities_block_layout2(uchunk, vb->vpb, ui_probs);
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_genotype_block_layout2_skip(BGenFile     *bgenfile,
+                                         int64_t       compression,
+                                         int64_t       nsamples)
+{
+    uint32_t length;
+
+    if (compression == 0)
+    {
+        length = 6 * nsamples;
+    } else {
+        if (fread_check(bgenfile, &length, 4)) return EXIT_FAILURE;
+    }
+
+    fseek(bgenfile->file, length, SEEK_CUR);
 
     return EXIT_SUCCESS;
 }
