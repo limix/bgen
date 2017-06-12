@@ -1,7 +1,10 @@
 #ifndef LAYOUT2_H
 #define LAYOUT2_H
 
-#include "variant.h"
+#include <stdint.h>
+
+typedef struct BGenFile BGenFile;
+typedef struct VariantGenotypeBlock VariantGenotypeBlock;
 
 int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
                                           VariantGenotypeBlock *vpb,

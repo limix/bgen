@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "layout2.h"
 #include "bgen_file.h"
 #include "variant.h"
 #include "util/choose.h"
