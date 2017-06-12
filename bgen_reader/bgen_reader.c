@@ -54,15 +54,11 @@ int64_t bgen_read_header(BGenFile *bgenfile, Header *header)
 int bgen_read_sampleid_block(BGenFile *bgenfile)
 {
     SampleIdBlock *block = bgenfile->sampleid_block;
-    printf("ponto 1\n\n\n");
     if (fread_check(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
-    printf("ponto 2\n\n\n");
 
     if (fread_check(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
-    printf("ponto 3\n\n\n");
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
-    printf("ponto 4: %d\n\n\n", block->nsamples);
 
     for (size_t i = 0; i < block->nsamples; i++)
     {
@@ -110,9 +106,10 @@ BGenFile *bgen_reader_open(char *filepath)
     {
         bgenfile->sampleid_block = malloc(sizeof(SampleIdBlock));
 
-        if (bgen_read_sampleid_block(bgenfile))
+        if (bgen_read_sampleid_block(bgenfile) == EXIT_FAILURE)
         {
-            if (bgen_fclose(bgenfile) == EXIT_FAILURE) return NULL;
+            bgen_fclose(bgenfile);
+            return NULL;
         }
     }
 
@@ -133,8 +130,15 @@ BGenFile *bgen_reader_open(char *filepath)
 int64_t bgen_reader_close(BGenFile *bgenfile)
 {
     assert(bgenfile->file == NULL);
+
     free(bgenfile->filepath);
     bgenfile->filepath = NULL;
+
+    assert(bgenfile->sampleid_block != NULL);
+    free(bgenfile->sampleid_block);
+    bgenfile->sampleid_block = NULL;
+
+    free(bgenfile);
     return EXIT_SUCCESS;
 }
 

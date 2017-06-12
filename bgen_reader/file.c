@@ -20,14 +20,8 @@ int64_t bgen_fopen(BGenFile *bgenfile)
 int64_t bgen_fclose(BGenFile *bgenfile)
 {
     assert(bgenfile->file != NULL);
-    assert(bgenfile->sampleid_block != NULL);
     fclose(bgenfile->file);
-
     bgenfile->file = NULL;
-
-    free(bgenfile->sampleid_block);
-    bgenfile->sampleid_block = NULL;
-
     return EXIT_SUCCESS;
 }
 

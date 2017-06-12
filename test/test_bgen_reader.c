@@ -85,10 +85,12 @@ int main()
 
     bgen_file = bgen_reader_open(fp);
 
+
     if (bgen_file == NULL) return EXIT_FAILURE;
 
 
     if (bgen_reader_layout(bgen_file) != 2) return EXIT_FAILURE;
+
 
 
     if (bgen_reader_compression(bgen_file) != 2) return EXIT_FAILURE;
@@ -103,16 +105,16 @@ int main()
 
     if (test_sampleids_block(bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
 
-    return EXIT_SUCCESS;
 
     if (test_variants_block(bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
 
-    uint64_t nsamples, ncombs;
+    uint64_t nsamples, ncombs = 3;
 
     nsamples = bgen_reader_nsamples(bgen_file);
-    bgen_reader_variant_ncombs(bgen_file, 0, &ncombs);
 
-    if (ncombs != 3) return EXIT_FAILURE;
+    // bgen_reader_variant_ncombs(bgen_file, 0, &ncombs);
+
+    // if (ncombs != 3) return EXIT_FAILURE;
 
     uint32_t *ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
@@ -129,6 +131,7 @@ int main()
     if ((ui_probs[498 * 2] != 1) || (ui_probs[498 * 2 + 1] != 0)) return EXIT_FAILURE;
 
     free(ui_probs);
+
 
     ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 

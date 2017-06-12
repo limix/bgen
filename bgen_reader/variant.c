@@ -116,6 +116,7 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t variant_idx,
 
     bgen_reader_variant_block_parse(bgenfile, vb);
 
+
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
@@ -128,8 +129,6 @@ int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t variant_idx,
     bgen_reader_variant_block(bgenfile, variant_idx, &vb);
 
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    printf("vb.genotype_start: %ld\n", vb.genotype_start);
 
     fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
 
