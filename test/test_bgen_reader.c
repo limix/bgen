@@ -113,7 +113,6 @@ int main()
     nsamples = bgen_reader_nsamples(bgen_file);
 
     uint32_t *ui_probs;
-    //  = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
     // first SNP
     bgen_reader_read_genotype(bgen_file, 0, &ui_probs);

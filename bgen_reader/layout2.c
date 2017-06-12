@@ -8,6 +8,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#define FREAD bgen_reader_fread
+#define FAIL EXIT_FAILURE
+
 inline static uint8_t bgen_read_ploidy(BYTE ploidy_miss)
 {
     return ploidy_miss & 127;
@@ -41,9 +44,9 @@ inline static void set_bit(uint32_t *val, size_t bit_idx)
     SetBit(*val, bit_idx % 8);
 }
 
-int64_t bgen_read_unphased_probabilities(const BYTE        *chunk,
-                                         VariantGenotypeBlock *vpb,
-                                         uint32_t          **ui_probs)
+int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
+                                           VariantGenotypeBlock *vpb,
+                                           uint32_t            **ui_probs)
 {
     if (ui_probs == NULL) return EXIT_SUCCESS;
 
@@ -85,34 +88,42 @@ int64_t bgen_read_unphased_probabilities(const BYTE        *chunk,
             }
 
             (*ui_probs)[j * (ncombs - 1) + i] = ui_prob;
-            ui_prob_sum                   += ui_prob;
+            ui_prob_sum                      += ui_prob;
         }
     }
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_probabilities_block_layout2(BYTE              *chunk,
-                                         VariantGenotypeBlock *vpb,
-                                         uint32_t          **ui_probs)
+int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk,
+                               int64_t compression)
 {
-    MEMCPY(&(vpb->nsamples),   &chunk, 4);
+    uint32_t clength, ulength;
+    BYTE    *cchunk;
 
-    MEMCPY(&(vpb->nalleles),   &chunk, 2);
+    if (compression == 0)
+    {
+        if (FREAD(bgenfile, &ulength, 4)) return FAIL;
 
-    MEMCPY(&(vpb->min_ploidy), &chunk, 1);
+        *uchunk = malloc(ulength);
 
-    MEMCPY(&(vpb->max_ploidy), &chunk, 1);
+        if (FREAD(bgenfile, *uchunk, ulength)) return FAIL;
+    } else {
+        if (FREAD(bgenfile, &clength, 4)) return FAIL;
 
-    vpb->missingness = malloc(vpb->nsamples);
+        clength -= 4;
 
-    MEMCPY(vpb->missingness, &chunk, vpb->nsamples);
+        if (FREAD(bgenfile, &ulength, 4)) return FAIL;
 
-    MEMCPY(&(vpb->phased),   &chunk, 1);
+        cchunk = malloc(clength);
 
-    MEMCPY(&(vpb->nbits),    &chunk, 1);
+        if (FREAD(bgenfile, cchunk, clength)) return FAIL;
 
-    assert(vpb->phased == 0);
-    bgen_read_unphased_probabilities(chunk, vpb, ui_probs);
+        *uchunk = malloc(ulength);
+        assert(compression == 2);
+        zlib_uncompress(cchunk, clength, uchunk, &ulength);
+
+        free(cchunk);
+    }
 
     return EXIT_SUCCESS;
 }
@@ -143,50 +154,38 @@ int64_t bgen_probabilities_block_layout2(BYTE              *chunk,
 // | 1     | # bits per probability               |
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
-int64_t bgen_genotype_block_layout2(BGenFile          *bgenfile,
-                                    int64_t            compression,
-                                    int64_t            nsamples,
-                                    VariantGenotypeBlock *vpb,
-                                    uint32_t          **ui_probs)
+int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
+                                          int64_t               compression,
+                                          int64_t               nsamples,
+                                          VariantGenotypeBlock *vpb,
+                                          uint32_t            **ui_probs)
 {
-    uint32_t clength, ulength;
-    BYTE    *cchunk, *uchunk;
+    BYTE   *chunk;
+    int64_t e;
 
-    if (compression == 0)
-    {
-        if (bgen_reader_fread(bgenfile, &ulength, 4)) return EXIT_FAILURE;
+    e = bgen_reader_uncompress(bgenfile, &chunk, compression);
 
-        uchunk = malloc(ulength);
+    if (e == FAIL) return FAIL;
 
-        if (bgen_reader_fread(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
-    } else {
-        if (bgen_reader_fread(bgenfile, &clength, 4)) return EXIT_FAILURE;
+    MEMCPY(&(vpb->nsamples),   &chunk, 4);
+    MEMCPY(&(vpb->nalleles),   &chunk, 2);
+    MEMCPY(&(vpb->min_ploidy), &chunk, 1);
+    MEMCPY(&(vpb->max_ploidy), &chunk, 1);
 
-        clength -= 4;
+    vpb->missingness = malloc(vpb->nsamples);
+    MEMCPY(vpb->missingness,   &chunk, vpb->nsamples);
+    MEMCPY(&(vpb->phased),     &chunk, 1);
+    MEMCPY(&(vpb->nbits),      &chunk, 1);
 
-        if (bgen_reader_fread(bgenfile, &ulength, 4)) return EXIT_FAILURE;
-
-        cchunk = malloc(clength);
-
-        if (bgen_reader_fread(bgenfile, cchunk, clength)) return EXIT_FAILURE;
-
-        uchunk = malloc(ulength);
-
-        assert(compression == 2);
-
-        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
-
-        free(cchunk);
-    }
-
-    bgen_probabilities_block_layout2(uchunk, vpb, ui_probs);
+    assert(vpb->phased == 0);
+    bgen_reader_read_unphased_genotype(chunk, vpb, ui_probs);
 
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_genotype_block_layout2_skip(BGenFile *bgenfile,
-                                         int64_t   compression,
-                                         int64_t   nsamples)
+int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile,
+                                               int64_t   compression,
+                                               int64_t   nsamples)
 {
     uint32_t length;
 
@@ -194,7 +193,7 @@ int64_t bgen_genotype_block_layout2_skip(BGenFile *bgenfile,
     {
         length = 6 * nsamples;
     } else {
-        if (bgen_reader_fread(bgenfile, &length, 4)) return EXIT_FAILURE;
+        if (FREAD(bgenfile, &length, 4)) return FAIL;
     }
 
     fseek(bgenfile->file, length, SEEK_CUR);

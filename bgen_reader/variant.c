@@ -107,7 +107,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
     for (i = 0; i < variant_idx; ++i)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vb);
-        bgen_genotype_block_layout2_skip(bgenfile, compression, nsamples);
+        bgen_reader_read_genotype_layout2_skip(bgenfile, compression, nsamples);
     }
     return EXIT_SUCCESS;
 }
@@ -289,6 +289,6 @@ int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
     int64_t compression = bgen_reader_compression(bgenfile);
     int64_t nsamples = bgen_reader_nsamples(bgenfile);
 
-    return bgen_genotype_block_layout2(bgenfile, compression, nsamples,
+    return bgen_reader_read_genotype_layout2(bgenfile, compression, nsamples,
                                        &vpb, ui_probs);
 }
