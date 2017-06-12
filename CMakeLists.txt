@@ -31,6 +31,7 @@ set_target_properties(bgen_reader
 install(TARGETS bgen_reader
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
+        RUNTIME DESTINATION lib
         PUBLIC_HEADER DESTINATION include/bgen_reader)
 target_link_libraries( bgen_reader ${ZLIB_LIBRARIES} )
 
