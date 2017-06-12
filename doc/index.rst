@@ -7,6 +7,8 @@ BGen-reader's documentation
     :name: mastertoc
     :maxdepth: 2
 
+    install
+
 *****************
 Comments and bugs
 *****************
