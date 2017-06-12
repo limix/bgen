@@ -46,4 +46,11 @@ typedef struct VariantBlock
     VariantProbsBlock *vpb;
 } VariantBlock;
 
+int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
+                                         uint64_t      variant_idx,
+                                         VariantBlock *vb);
+
+int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
+                                                uint32_t     *ui_probs);
+
 #endif /* end of include guard: VARIANT_H */

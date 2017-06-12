@@ -147,11 +147,11 @@ int64_t bgen_probabilities_block_layout2(BYTE              *chunk,
 // | 1     | # bits per probability               |
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
-int64_t bgen_genotype_block_layout2(BGenFile     *bgenfile,
-                                    int64_t       compression,
-                                    int64_t       nsamples,
-                                    VariantBlock *vb,
-                                    uint32_t     *ui_probs)
+int64_t bgen_genotype_block_layout2(BGenFile          *bgenfile,
+                                    int64_t            compression,
+                                    int64_t            nsamples,
+                                    VariantProbsBlock *vpb,
+                                    uint32_t          *ui_probs)
 {
     uint32_t clength, ulength;
     BYTE    *cchunk, *uchunk;
@@ -183,15 +183,14 @@ int64_t bgen_genotype_block_layout2(BGenFile     *bgenfile,
         free(cchunk);
     }
 
-    vb->vpb = malloc(sizeof(VariantProbsBlock));
-    bgen_probabilities_block_layout2(uchunk, vb->vpb, ui_probs);
+    bgen_probabilities_block_layout2(uchunk, vpb, ui_probs);
 
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_genotype_block_layout2_skip(BGenFile     *bgenfile,
-                                         int64_t       compression,
-                                         int64_t       nsamples)
+int64_t bgen_genotype_block_layout2_skip(BGenFile *bgenfile,
+                                         int64_t   compression,
+                                         int64_t   nsamples)
 {
     uint32_t length;
 

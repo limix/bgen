@@ -10,51 +10,77 @@
 #include <math.h>
 #include <stdlib.h>
 
+#define FREAD bgen_reader_fread
+#define FAIL EXIT_FAILURE
+#define FOPEN bgen_reader_fopen
+#define FCLOSE bgen_reader_fclose
+#define NVARIANTS bgen_reader_nvariants
+
+// Variant identifying data
+//
+// ---------------------------------------------
+// | 4     | # samples (layout > 1)            |
+// | 2     | # variant id length, Lid          |
+// | Lid   | variant id                        |
+// | 2     | variant rsid length, Lrsid        |
+// | Lrsid | rsid                              |
+// | 2     | chrom length, Lchr                |
+// | Lchr  | chromossome                       |
+// | 4     | variant position                  |
+// | 2     | number of alleles, K (layout > 1) |
+// | 4     | first allele length, La1          |
+// | La1   | first allele                      |
+// | 4     | second allele length, La2         |
+// | La2   | second allele                     |
+// | ...   |                                   |
+// | 4     | last allele length, LaK           |
+// | LaK   | last allele                       |
+// ---------------------------------------------
 int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
                                                  VariantBlock *vb)
 {
-    assert(bgen_reader_layout(bgenfile) != 0);
+    int64_t layout = bgen_reader_layout(bgenfile);
 
-    if (bgen_reader_layout(bgenfile) == 1)
+    if (layout == 1)
     {
-        if (bgen_reader_fread(bgenfile, &(vb->nsamples), 4)) return EXIT_FAILURE;
+        if (FREAD(bgenfile, &(vb->nsamples), 4)) return FAIL;
     }
 
-    if (bgen_reader_fread(bgenfile, &(vb->id_length), 2)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, &(vb->id_length), 2)) return FAIL;
 
     vb->id = malloc(vb->id_length);
 
-    if (bgen_reader_fread(bgenfile, vb->id, vb->id_length)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, vb->id, vb->id_length)) return FAIL;
 
-    if (bgen_reader_fread(bgenfile, &(vb->rsid_length), 2)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, &(vb->rsid_length), 2)) return FAIL;
 
     vb->rsid = malloc(vb->rsid_length);
 
-    if (bgen_reader_fread(bgenfile, vb->rsid, vb->rsid_length)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, vb->rsid, vb->rsid_length)) return FAIL;
 
-    if (bgen_reader_fread(bgenfile, &(vb->chrom_length), 2)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, &(vb->chrom_length), 2)) return FAIL;
 
     vb->chrom = malloc(vb->chrom_length);
 
-    if (bgen_reader_fread(bgenfile, vb->chrom, vb->chrom_length)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, vb->chrom, vb->chrom_length)) return FAIL;
 
-    if (bgen_reader_fread(bgenfile, &(vb->position), 4)) return EXIT_FAILURE;
+    if (FREAD(bgenfile, &(vb->position), 4)) return FAIL;
 
-    if (bgen_reader_layout(bgenfile) == 1) vb->nalleles = 2;
-    else if (bgen_reader_fread(bgenfile, &(vb->nalleles), 2)) return EXIT_FAILURE;
+    if (layout == 1) vb->nalleles = 2;
+    else if (FREAD(bgenfile, &(vb->nalleles), 2)) return FAIL;
 
     size_t i;
     vb->alleles = malloc(vb->nalleles * sizeof(Allele));
 
     for (i = 0; i < vb->nalleles; ++i)
     {
-        if (bgen_reader_fread(bgenfile, &(vb->alleles[i].length),
-                        4)) return EXIT_FAILURE;
+        if (FREAD(bgenfile, &(vb->alleles[i].length),
+                  4)) return FAIL;
 
         vb->alleles[i].id = malloc(vb->alleles[i].length);
 
-        if (bgen_reader_fread(bgenfile, vb->alleles[i].id,
-                        vb->alleles[i].length)) return EXIT_FAILURE;
+        if (FREAD(bgenfile, vb->alleles[i].id,
+                  vb->alleles[i].length)) return FAIL;
     }
 
     vb->genotype_start = ftell(bgenfile->file);
@@ -62,9 +88,15 @@ int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
     return EXIT_SUCCESS;
 }
 
+// fseek to the file position from which the variant block can be read
 int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 {
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    assert(bgen_reader_layout(bgenfile) == 2);
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    int64_t compression = bgen_reader_compression(bgenfile);
+    int64_t nsamples    = bgen_reader_nsamples(bgenfile);
 
     fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
@@ -75,13 +107,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
     for (i = 0; i < variant_idx; ++i)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vb);
-
-        int64_t layout = bgen_reader_layout(bgenfile);
-        assert(layout == 2);
-
-        bgen_genotype_block_layout2_skip(bgenfile,
-                                         bgen_reader_compression(bgenfile),
-                                         bgen_reader_nsamples(bgenfile));
+        bgen_genotype_block_layout2_skip(bgenfile, compression, nsamples);
     }
     return EXIT_SUCCESS;
 }
@@ -109,39 +135,31 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile, uint64_t variant_idx,
                                          VariantBlock *vb)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     bgen_reader_seek_variant_block(bgenfile, variant_idx);
 
     bgen_reader_read_current_variantid_block(bgenfile, vb);
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_probabilities(BGenFile *bgenfile, uint64_t variant_idx,
-                                   uint32_t *ui_probs)
+int64_t bgen_reader_variant_probabilities(BGenFile *bgenfile,
+                                          uint64_t  variant_idx,
+                                          uint32_t *ui_probs)
 {
-    VariantBlock vb;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
+    if (variant_idx >= NVARIANTS(bgenfile)) return -1;
+
+    VariantBlock vb;
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
-
-    int64_t layout = bgen_reader_layout(bgenfile);
-
-    assert(layout == 2);
-
-    bgen_genotype_block_layout2(bgenfile, bgen_reader_compression(bgenfile),
-                                bgen_reader_nsamples(bgenfile),
-                                &vb, ui_probs);
-
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -149,18 +167,17 @@ int64_t bgen_reader_read_probabilities(BGenFile *bgenfile, uint64_t variant_idx,
 int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, BYTE **id,
                               uint64_t *length)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
     *length = vb.id_length;
     *id     = vb.id;
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -170,18 +187,17 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
                                  BYTE    **rsid,
                                  uint64_t *length)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
     *length = vb.rsid_length;
     *rsid   = vb.rsid;
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -191,18 +207,17 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
                                   BYTE    **chrom,
                                   uint64_t *length)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
     *length = vb.chrom_length;
     *chrom  = vb.chrom;
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -210,17 +225,16 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
 int64_t bgen_reader_variant_position(BGenFile *bgenfile,
                                      uint64_t variant_idx, uint64_t *position)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
     *position = vb.position;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -228,17 +242,16 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
                                      uint64_t variant_idx, uint64_t *nalleles)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
     *nalleles = vb.nalleles;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -247,17 +260,17 @@ int64_t bgen_reader_variant_ncombs(BGenFile *bgenfile,
                                    uint64_t  variant_idx,
                                    uint64_t *ncombs)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantBlock vb;
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
     *ncombs = choose(vb.vpb->nalleles + vb.vpb->max_ploidy - 1,
                      vb.vpb->nalleles - 1);
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
@@ -266,42 +279,35 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
                                      uint64_t allele_idx, BYTE **id,
                                      uint64_t *length)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return -1;
+    if (variant_idx >= NVARIANTS(bgenfile)) return -1;
 
     uint64_t nalleles;
-
     bgen_reader_variant_nalleles(bgenfile, variant_idx, &nalleles);
 
-    if (allele_idx >= nalleles) return EXIT_FAILURE;
+    if (allele_idx >= nalleles) return FAIL;
 
     VariantBlock vb;
-
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
     *id = vb.alleles[allele_idx].id;
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_probabilities(BGenFile *bgenfile,
-                                          uint64_t  variant_idx,
-                                          uint32_t *ui_probs)
+int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
+                                                uint32_t     *ui_probs)
 {
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    int64_t layout = bgen_reader_layout(bgenfile);
+    assert(layout == 2);
 
-    if (variant_idx >= bgen_reader_nvariants(bgenfile)) return -1;
+    VariantProbsBlock vpb;
+    int64_t compression = bgen_reader_compression(bgenfile);
+    int64_t nsamples = bgen_reader_nsamples(bgenfile);
 
-    VariantBlock vb;
-
-    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
-
-    // bgen_reader_read_probabilities(bgenfile, variant_idx, ui_probs);
-
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
-
-    return EXIT_SUCCESS;
+    return bgen_genotype_block_layout2(bgenfile, compression, nsamples,
+                                       &vpb, ui_probs);
 }

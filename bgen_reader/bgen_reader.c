@@ -6,6 +6,7 @@
 
 #include "bgen_reader.h"
 #include "bgen_file.h"
+#include "variant.h"
 #include "sample.h"
 #include "file.h"
 #include "util.h"
@@ -27,6 +28,7 @@
 int bgen_read_sampleid_block(BGenFile *bgenfile)
 {
     SampleIdBlock *block = bgenfile->sampleid_block;
+
     if (bgen_reader_fread(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
 
     if (bgen_reader_fread(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
@@ -42,12 +44,13 @@ int bgen_read_sampleid_block(BGenFile *bgenfile)
         block->sampleids[i].id =
             malloc(block->sampleids[i].length);
 
-        if (bgen_reader_fread(bgenfile, block->sampleids[i].id, block->sampleids[i].length)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, block->sampleids[i].id,
+                              block->sampleids[i].length)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
 
-BGenFile *bgen_reader_open(char *filepath)
+BGenFile* bgen_reader_open(char *filepath)
 {
     BGenFile *bgenfile = malloc(sizeof(BGenFile));
 
@@ -119,7 +122,10 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
 // Possible values are 1 and 2.
 int64_t bgen_reader_layout(BGenFile *bgenfile)
 {
-    return (bgenfile->header.flags & (15 << 2)) >> 2;
+    int64_t l = (bgenfile->header.flags & (15 << 2)) >> 2;
+
+    assert(l != 0);
+    return l;
 }
 
 // Is sample identifier block present?
@@ -145,4 +151,23 @@ int64_t bgen_reader_nsamples(BGenFile *bgenfile)
 int64_t bgen_reader_nvariants(BGenFile *bgenfile)
 {
     return bgenfile->header.nvariants;
+}
+
+int64_t bgen_reader_read_probabilities(BGenFile *bgenfile, uint64_t variant_idx,
+                                       uint32_t *ui_probs)
+{
+    VariantBlock vb;
+
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
+
+    int64_t e = bgen_reader_read_current_genotype_block(bgenfile, ui_probs);
+    if (e == EXIT_FAILURE) return EXIT_FAILURE;
+
+    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+
+    return EXIT_SUCCESS;
 }
