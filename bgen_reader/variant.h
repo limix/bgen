@@ -27,6 +27,9 @@ typedef struct VariantProbsBlock
     SampleProbs *sample_probs;
 } VariantProbsBlock;
 
+// It represents both the variant identifying block
+// (all fields except the last one) and the variant probabilities block (the
+// last field)
 typedef struct VariantBlock
 {
     uint32_t           nsamples;

@@ -6,49 +6,50 @@
 
 typedef struct BGenFile BGenFile;
 
-BGenFile *bgen_reader_open(char *filename);
-int64_t bgen_reader_close(BGenFile *bgenfile);
+BGenFile* bgen_reader_open(char *filename);
+int64_t   bgen_reader_close(BGenFile *bgenfile);
 
-int64_t bgen_reader_layout(BGenFile *bgenfile);
-int64_t bgen_reader_compression(BGenFile *bgenfile);
-int64_t bgen_reader_sampleids(BGenFile *bgenfile);
-int64_t bgen_reader_nsamples(BGenFile *bgenfile);
-int64_t bgen_reader_nvariants(BGenFile *bgenfile);
+int64_t   bgen_reader_layout(BGenFile *bgenfile);
+int64_t   bgen_reader_compression(BGenFile *bgenfile);
+int64_t   bgen_reader_sampleids(BGenFile *bgenfile);
+int64_t   bgen_reader_nsamples(BGenFile *bgenfile);
+int64_t   bgen_reader_nvariants(BGenFile *bgenfile);
 
-// Returns the sample identification
-int64_t bgen_reader_sampleid(BGenFile *bgenfile,
-                             uint64_t  sample_idx,
-                             BYTE    **id,
-                             uint64_t *length);
+// Get sample identification
+int64_t   bgen_reader_sampleid(BGenFile *bgenfile,
+                               uint64_t  sample_idx,
+                               BYTE    **id,
+                               uint64_t *length);
 
-// Returns the variant identification
+// Get variant identification
 int64_t bgen_reader_variantid(BGenFile *bgenfile,
                               uint64_t  variant_idx,
                               BYTE    **id,
                               uint64_t *length);
 
-// Returns the variant rsid
+// Get the variant rsid
 int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
                                  uint64_t  variant_idx,
                                  BYTE    **rsid,
                                  uint64_t *length);
 
-// Returns identification of the variant's chromossome
+// Get identification of the variant's chromossome
 int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
                                   uint64_t  variant_idx,
                                   BYTE    **chrom,
                                   uint64_t *length);
 
-// Returns variant's position
+// Get variant's position
 int64_t bgen_reader_variant_position(BGenFile *bgenfile,
                                      uint64_t  variant_idx,
                                      uint64_t *position);
 
-// Returns the number of alleles a variant has
+// Get the number of alleles a variant has
 int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
                                      uint64_t  variant_idx,
                                      uint64_t *nalleles);
 
+// TODO: finish this
 int64_t bgen_reader_variant_ncombs(BGenFile *bgenfile,
                                    uint64_t  variant_idx,
                                    uint64_t *ncombs);
@@ -60,8 +61,8 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile,
                                      BYTE    **id,
                                      uint64_t *length);
 
-int64_t bgen_reader_genotype_block(BGenFile     *bgenfile,
-                                   uint64_t      variant_idx,
-                                   uint32_t     *ui_probs);
+int64_t bgen_reader_read_probabilities(BGenFile *bgenfile,
+                                       uint64_t  variant_idx,
+                                       uint32_t *ui_probs);
 
 #endif /* end of include guard: BGEN_READER_H */

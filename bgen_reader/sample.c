@@ -9,9 +9,7 @@ int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, BYTE **id,
 
     if (sample_idx >= bgenfile->header.nsamples) return EXIT_FAILURE;
 
-
     SampleId *sampleid = &(bgenfile->sampleid_block->sampleids[sample_idx]);
-
 
     *length = sampleid->length;
     *id     = sampleid->id;

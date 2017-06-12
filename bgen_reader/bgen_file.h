@@ -38,4 +38,6 @@ typedef struct BGenFile
     long           variants_start;
 } BGenFile;
 
+int64_t bgen_read_read_header(BGenFile *bgenfile, Header *header);
+
 #endif /* end of include guard: BGEN_FILE_H */

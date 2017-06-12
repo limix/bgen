@@ -158,21 +158,21 @@ int64_t bgen_genotype_block_layout2(BGenFile     *bgenfile,
 
     if (compression == 0)
     {
-        if (fread_check(bgenfile, &ulength, 4)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, &ulength, 4)) return EXIT_FAILURE;
 
         uchunk = malloc(ulength);
 
-        if (fread_check(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
     } else {
-        if (fread_check(bgenfile, &clength, 4)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, &clength, 4)) return EXIT_FAILURE;
 
         clength -= 4;
 
-        if (fread_check(bgenfile, &ulength, 4)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, &ulength, 4)) return EXIT_FAILURE;
 
         cchunk = malloc(clength);
 
-        if (fread_check(bgenfile, cchunk, clength)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, cchunk, clength)) return EXIT_FAILURE;
 
         uchunk = malloc(ulength);
 
@@ -199,7 +199,7 @@ int64_t bgen_genotype_block_layout2_skip(BGenFile     *bgenfile,
     {
         length = 6 * nsamples;
     } else {
-        if (fread_check(bgenfile, &length, 4)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, &length, 4)) return EXIT_FAILURE;
     }
 
     fseek(bgenfile->file, length, SEEK_CUR);

@@ -119,7 +119,7 @@ int main()
     uint32_t *ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
     // first SNP
-    bgen_reader_genotype_block(bgen_file, 0, ui_probs);
+    bgen_reader_read_probabilities(bgen_file, 0, ui_probs);
 
     // Sample 0 (sample_001)
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
@@ -136,7 +136,7 @@ int main()
     ui_probs = malloc(sizeof(uint32_t) * nsamples * (ncombs - 1));
 
     // second SNP
-    bgen_reader_genotype_block(bgen_file, 1, ui_probs);
+    bgen_reader_read_probabilities(bgen_file, 1, ui_probs);
 
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
 

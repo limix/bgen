@@ -11,33 +11,6 @@
 #include "util.h"
 
 
-// Header
-//
-// ------------------------------
-// | 4       | block length, Lh |
-// | 4       | # variants       |
-// | 4       | # samples        |
-// | 4       | magic number     |
-// | Lh - 20 | free data area   |
-// | 4       | flags            |
-// ------------------------------
-int64_t bgen_read_header(BGenFile *bgenfile, Header *header)
-{
-    if (fread_check(bgenfile, &(header->header_length), 4)) return EXIT_FAILURE;
-
-    if (fread_check(bgenfile, &(header->nvariants), 4)) return EXIT_FAILURE;
-
-    if (fread_check(bgenfile, &(header->nsamples), 4)) return EXIT_FAILURE;
-
-    if (fread_check(bgenfile, &(header->magic_number), 4)) return EXIT_FAILURE;
-
-    fseek(bgenfile->file, (header->header_length) - 20, SEEK_CUR);
-
-    if (fread_check(bgenfile, &(header->flags), 4)) return EXIT_FAILURE;
-
-    return EXIT_SUCCESS;
-}
-
 // Sample identifier block
 //
 // -------------------------------
@@ -54,9 +27,9 @@ int64_t bgen_read_header(BGenFile *bgenfile, Header *header)
 int bgen_read_sampleid_block(BGenFile *bgenfile)
 {
     SampleIdBlock *block = bgenfile->sampleid_block;
-    if (fread_check(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
+    if (bgen_reader_fread(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
 
-    if (fread_check(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
+    if (bgen_reader_fread(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
@@ -64,12 +37,12 @@ int bgen_read_sampleid_block(BGenFile *bgenfile)
     {
         uint16_t *length = &(block->sampleids[i].length);
 
-        if (fread_check(bgenfile, length, 2)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, length, 2)) return EXIT_FAILURE;
 
         block->sampleids[i].id =
             malloc(block->sampleids[i].length);
 
-        if (fread_check(bgenfile, block->sampleids[i].id, block->sampleids[i].length)) return EXIT_FAILURE;
+        if (bgen_reader_fread(bgenfile, block->sampleids[i].id, block->sampleids[i].length)) return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;
 }
@@ -80,7 +53,7 @@ BGenFile *bgen_reader_open(char *filepath)
 
     bgenfile->filepath = ft_strdup(filepath);
 
-    if (bgen_fopen(bgenfile) == EXIT_FAILURE) return NULL;
+    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return NULL;
 
 
     if (bgenfile->file == NULL) {
@@ -91,14 +64,14 @@ BGenFile *bgen_reader_open(char *filepath)
     uint32_t offset;
 
     // First four bytes (offset)
-    if (fread_check(bgenfile, &offset, 4)) return NULL;
+    if (bgen_reader_fread(bgenfile, &offset, 4)) return NULL;
 
-    if (bgen_read_header(bgenfile, &(bgenfile->header))) return NULL;
+    if (bgen_read_read_header(bgenfile, &(bgenfile->header))) return NULL;
 
     if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
-        bgen_fclose(bgenfile);
+        bgen_reader_fclose(bgenfile);
         return NULL;
     }
 
@@ -108,7 +81,7 @@ BGenFile *bgen_reader_open(char *filepath)
 
         if (bgen_read_sampleid_block(bgenfile) == EXIT_FAILURE)
         {
-            bgen_fclose(bgenfile);
+            bgen_reader_fclose(bgenfile);
             return NULL;
         }
     }
@@ -118,11 +91,11 @@ BGenFile *bgen_reader_open(char *filepath)
     if (bgenfile->variants_start == EOF)
     {
         perror("Could not find variant blocks");
-        bgen_fclose(bgenfile);
+        bgen_reader_fclose(bgenfile);
         return NULL;
     }
 
-    if (bgen_fclose(bgenfile) == EXIT_FAILURE) return NULL;
+    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return NULL;
 
     return bgenfile;
 }

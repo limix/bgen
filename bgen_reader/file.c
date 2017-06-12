@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-int64_t bgen_fopen(BGenFile *bgenfile)
+int64_t bgen_reader_fopen(BGenFile *bgenfile)
 {
     assert(bgenfile->file == NULL);
     bgenfile->file = fopen(bgenfile->filepath, "rb");
@@ -17,7 +17,7 @@ int64_t bgen_fopen(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_fclose(BGenFile *bgenfile)
+int64_t bgen_reader_fclose(BGenFile *bgenfile)
 {
     assert(bgenfile->file != NULL);
     fclose(bgenfile->file);
@@ -25,7 +25,7 @@ int64_t bgen_fclose(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t fread_check(BGenFile *bgenfile, void *restrict buffer, size_t size)
+int64_t bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size)
 {
     size_t err = fread(buffer, size, 1, bgenfile->file);
 

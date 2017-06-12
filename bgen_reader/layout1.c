@@ -29,13 +29,13 @@
 //     //
 //     // if (compression == 0)
 //     // {
-//     //     if (fread_check(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
+//     //     if (bgen_reader_fread(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
 //     // } else {
-//     //     if (fread_check(bgenfile, &clength, 4)) return EXIT_FAILURE;
+//     //     if (bgen_reader_fread(bgenfile, &clength, 4)) return EXIT_FAILURE;
 //     //
 //     //     cchunk = malloc(clength);
 //     //
-//     //     if (fread_check(bgenfile, cchunk, clength)) return EXIT_FAILURE;
+//     //     if (bgen_reader_fread(bgenfile, cchunk, clength)) return EXIT_FAILURE;
 //     //
 //     //     zlib_uncompress(cchunk, clength, &uchunk, &ulength);
 //     //
