@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "util/byte.h"
+typedef unsigned char BYTE;
 
 typedef struct BGenFile BGenFile;
 
@@ -57,8 +57,8 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile,
                                      BYTE    **id,
                                      uint64_t *length);
 
-int64_t bgen_reader_read_genotype(BGenFile *bgenfile,
-                                  uint64_t  variant_idx,
+int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
+                                  uint64_t   variant_idx,
                                   uint32_t **ui_probs);
 
 #endif /* end of include guard: BGEN_READER_H */

@@ -10,44 +10,11 @@
 #include "sample.h"
 #include "util/mem.h"
 
-
-// Sample identifier block
-//
-// -------------------------------
-// | 4   | block length          |
-// | 4   | # samples             |
-// | 2   | length of sample 1 id |
-// | Ls1 | sample 1 id           |
-// | 2   | length of sample 2 id |
-// | Ls2 | sample 2 id           |
-// | ... |                       |
-// | 2   | length of sample N id |
-// | LsN | sample N id           |
-// -------------------------------
-int bgen_read_sampleid_block(BGenFile *bgenfile)
-{
-    SampleIdBlock *block = bgenfile->sampleid_block;
-
-    if (bgen_reader_fread(bgenfile, &(block->length), 4)) return EXIT_FAILURE;
-
-    if (bgen_reader_fread(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
-
-    block->sampleids = malloc(block->nsamples * sizeof(SampleId));
-
-    for (size_t i = 0; i < block->nsamples; i++)
-    {
-        uint16_t *length = &(block->sampleids[i].length);
-
-        if (bgen_reader_fread(bgenfile, length, 2)) return EXIT_FAILURE;
-
-        block->sampleids[i].id =
-            malloc(block->sampleids[i].length);
-
-        if (bgen_reader_fread(bgenfile, block->sampleids[i].id,
-                              block->sampleids[i].length)) return EXIT_FAILURE;
-    }
-    return EXIT_SUCCESS;
-}
+#define FREAD bgen_reader_fread
+#define FAIL EXIT_FAILURE
+#define FOPEN bgen_reader_fopen
+#define FCLOSE bgen_reader_fclose
+#define NVARIANTS bgen_reader_nvariants
 
 BGenFile* bgen_reader_open(char *filepath)
 {
@@ -55,7 +22,7 @@ BGenFile* bgen_reader_open(char *filepath)
 
     bgenfile->filepath = ft_strdup(filepath);
 
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return NULL;
+    if (FOPEN(bgenfile) == FAIL) return NULL;
 
 
     if (bgenfile->file == NULL) {
@@ -73,7 +40,7 @@ BGenFile* bgen_reader_open(char *filepath)
     if (bgenfile->header.header_length > offset)
     {
         fprintf(stderr, "Header length is larger then offset's.\n");
-        bgen_reader_fclose(bgenfile);
+        FCLOSE(bgenfile);
         return NULL;
     }
 
@@ -81,9 +48,9 @@ BGenFile* bgen_reader_open(char *filepath)
     {
         bgenfile->sampleid_block = malloc(sizeof(SampleIdBlock));
 
-        if (bgen_read_sampleid_block(bgenfile) == EXIT_FAILURE)
+        if (bgen_read_sampleid_block(bgenfile) == FAIL)
         {
-            bgen_reader_fclose(bgenfile);
+            FCLOSE(bgenfile);
             return NULL;
         }
     }
@@ -93,11 +60,11 @@ BGenFile* bgen_reader_open(char *filepath)
     if (bgenfile->variants_start == EOF)
     {
         perror("Could not find variant blocks");
-        bgen_reader_fclose(bgenfile);
+        FCLOSE(bgenfile);
         return NULL;
     }
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return NULL;
+    if (FCLOSE(bgenfile) == FAIL) return NULL;
 
     return bgenfile;
 }
@@ -127,12 +94,6 @@ int64_t bgen_reader_layout(BGenFile *bgenfile)
     return l;
 }
 
-// Is sample identifier block present?
-int64_t bgen_reader_sampleids(BGenFile *bgenfile)
-{
-    return (bgenfile->header.flags & (1 << 31)) >> 31;
-}
-
 // Does it use compression? Which type?
 // 0: no compression
 // 1: zlib's compress()
@@ -140,6 +101,12 @@ int64_t bgen_reader_sampleids(BGenFile *bgenfile)
 int64_t bgen_reader_compression(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & 60) >> 2;
+}
+
+// Is sample identifier block present?
+int64_t bgen_reader_sampleids(BGenFile *bgenfile)
+{
+    return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
 
 int64_t bgen_reader_nsamples(BGenFile *bgenfile)
@@ -152,6 +119,135 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
     return bgenfile->header.nvariants;
 }
 
+int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, BYTE **id,
+                              uint64_t *length)
+{
+
+    if (sample_idx >= bgenfile->header.nsamples) return FAIL;
+
+    SampleId *sampleid = &(bgenfile->sampleid_block->sampleids[sample_idx]);
+
+    *length = sampleid->length;
+    *id     = sampleid->id;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, BYTE **id,
+                              uint64_t *length)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *length = vb.id_length;
+    *id     = vb.id;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
+                                 uint64_t  variant_idx,
+                                 BYTE    **rsid,
+                                 uint64_t *length)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *length = vb.rsid_length;
+    *rsid   = vb.rsid;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
+                                  uint64_t  variant_idx,
+                                  BYTE    **chrom,
+                                  uint64_t *length)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *length = vb.chrom_length;
+    *chrom  = vb.chrom;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_position(BGenFile *bgenfile,
+                                     uint64_t variant_idx, uint64_t *position)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *position = vb.position;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
+                                     uint64_t variant_idx, uint64_t *nalleles)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *nalleles = vb.nalleles;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
+int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
+                                     uint64_t allele_idx, BYTE **id,
+                                     uint64_t *length)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    if (variant_idx >= NVARIANTS(bgenfile)) return -1;
+
+    uint64_t nalleles;
+    bgen_reader_variant_nalleles(bgenfile, variant_idx, &nalleles);
+
+    if (allele_idx >= nalleles) return FAIL;
+
+    VariantBlock vb;
+    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
+
+    *id = vb.alleles[allele_idx].id;
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}
+
 int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
                                   uint32_t **ui_probs)
 {
@@ -159,15 +255,15 @@ int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
 
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
 
-    if (bgen_reader_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
 
     fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
 
     int64_t e = bgen_reader_read_current_genotype_block(bgenfile, ui_probs);
 
-    if (e == EXIT_FAILURE) return EXIT_FAILURE;
+    if (e == FAIL) return FAIL;
 
-    if (bgen_reader_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
