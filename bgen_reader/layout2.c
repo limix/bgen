@@ -1,4 +1,6 @@
 #include "bgen_reader.h"
+#include "bgen_file.h"
+#include "variant.h"
 #include "util.h"
 #include "file.h"
 #include "bits.h"

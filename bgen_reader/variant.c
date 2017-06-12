@@ -4,6 +4,7 @@
 #include "list.h"
 #include "layout1.h"
 #include "layout2.h"
+#include "bgen_file.h"
 
 #include <assert.h>
 #include <math.h>
@@ -79,6 +80,7 @@ int64_t bgen_reader_variant_fseek(BGenFile *bgenfile, uint64_t variant_idx)
                                          bgen_reader_compression(bgenfile),
                                          bgen_reader_nsamples(bgenfile));
     }
+    return EXIT_SUCCESS;
 }
 
 // Variant identifying data
@@ -120,28 +122,24 @@ int64_t bgen_reader_variant_block(BGenFile *bgenfile, uint64_t variant_idx,
 }
 
 int64_t bgen_reader_genotype_block(BGenFile *bgenfile, uint64_t variant_idx,
-                                   VariantBlock *vb, uint32_t *ui_probs)
+                                   uint32_t *ui_probs)
 {
-    bgen_reader_variant_block(bgenfile, variant_idx, vb);
+    VariantBlock vb;
+    bgen_reader_variant_block(bgenfile, variant_idx, &vb);
 
     if (bgen_fopen(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
-    printf("vb->genotype_start: %ld\n", vb->genotype_start);
+    printf("vb.genotype_start: %ld\n", vb.genotype_start);
 
-    fseek(bgenfile->file, vb->genotype_start, SEEK_SET);
+    fseek(bgenfile->file, vb.genotype_start, SEEK_SET);
 
     int64_t layout = bgen_reader_layout(bgenfile);
 
-    if (layout == 1)
-    {
-        bgen_genotype_block_layout1(bgenfile, bgen_reader_compression(bgenfile),
-                                    bgen_reader_nsamples(bgenfile),
-                                    vb, ui_probs);
-    } else if (layout == 2) {
-        bgen_genotype_block_layout2(bgenfile, bgen_reader_compression(bgenfile),
-                                    bgen_reader_nsamples(bgenfile),
-                                    vb, ui_probs);
-    }
+    assert(layout == 2);
+
+    bgen_genotype_block_layout2(bgenfile, bgen_reader_compression(bgenfile),
+                                bgen_reader_nsamples(bgenfile),
+                                &vb, ui_probs);
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
@@ -250,8 +248,8 @@ int64_t bgen_reader_variant_ncombs(BGenFile *bgenfile,
     if (variant_idx >= bgen_reader_nvariants(bgenfile)) return EXIT_FAILURE;
 
     VariantBlock vb;
-
-    bgen_reader_genotype_block(bgenfile, variant_idx, &vb, NULL);
+    bgen_reader_variant_block(bgenfile, variant_idx, &vb);
+    // bgen_reader_genotype_block(bgenfile, variant_idx, &vb, NULL);
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 
@@ -295,7 +293,8 @@ int64_t bgen_reader_variant_probabilities(BGenFile *bgenfile,
 
     VariantBlock vb;
 
-    bgen_reader_genotype_block(bgenfile, variant_idx, &vb, ui_probs);
+    bgen_reader_variant_block(bgenfile, variant_idx, &vb);
+    // bgen_reader_genotype_block(bgenfile, variant_idx, ui_probs);
 
     if (bgen_fclose(bgenfile) == EXIT_FAILURE) return EXIT_FAILURE;
 

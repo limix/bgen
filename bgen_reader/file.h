@@ -1,6 +1,7 @@
 #ifndef FILE_H
 #define FILE_H
 
+#include <stdio.h>
 #include "bgen_reader.h"
 
 int64_t bgen_fopen(BGenFile *bgenfile);
