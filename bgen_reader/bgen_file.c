@@ -1,6 +1,6 @@
-#include "bgen_file.h"
-#include "file.h"
 #include <stdlib.h>
+
+#include "bgen_file.h"
 
 // Header
 //
@@ -12,7 +12,7 @@
 // | Lh - 20 | free data area   |
 // | 4       | flags            |
 // ------------------------------
-int64_t bgen_read_read_header(BGenFile *bgenfile, Header *header)
+int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header)
 {
     if (bgen_reader_fread(bgenfile, &(header->header_length), 4)) return EXIT_FAILURE;
 

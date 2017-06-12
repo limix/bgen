@@ -1,9 +1,9 @@
-#include "bgen_reader.h"
 #include "bgen_file.h"
 #include "variant.h"
-#include "util.h"
-#include "file.h"
+#include "choose.h"
 #include "bits.h"
+#include "zlib_wrapper.h"
+#include "mem.h"
 
 #include <stdlib.h>
 #include <assert.h>
@@ -37,11 +37,6 @@ inline static int get_bit(const BYTE *mem, size_t bit_idx)
     size_t bytes = bit_idx / 8;
 
     return GetBit(*(mem + bytes), bit_idx % 8);
-}
-
-inline static void set_bit(uint32_t *val, size_t bit_idx)
-{
-    SetBit(*val, bit_idx % 8);
 }
 
 int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,

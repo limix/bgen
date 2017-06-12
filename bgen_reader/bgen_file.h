@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "file.h"
+
 typedef struct SampleIdBlock SampleIdBlock;
 
 // flags definition:
@@ -38,6 +40,6 @@ typedef struct BGenFile
     long           variants_start;
 } BGenFile;
 
-int64_t bgen_read_read_header(BGenFile *bgenfile, Header *header);
+int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header);
 
 #endif /* end of include guard: BGEN_FILE_H */

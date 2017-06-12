@@ -10,6 +10,7 @@
 #include "sample.h"
 #include "file.h"
 #include "util.h"
+#include "mem.h"
 
 
 // Sample identifier block
@@ -69,7 +70,7 @@ BGenFile* bgen_reader_open(char *filepath)
     // First four bytes (offset)
     if (bgen_reader_fread(bgenfile, &offset, 4)) return NULL;
 
-    if (bgen_read_read_header(bgenfile, &(bgenfile->header))) return NULL;
+    if (bgen_reader_read_header(bgenfile, &(bgenfile->header))) return NULL;
 
     if (bgenfile->header.header_length > offset)
     {
