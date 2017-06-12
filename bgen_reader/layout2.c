@@ -151,7 +151,6 @@ int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk,
 // ------------------------------------------------
 int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
                                           int64_t               compression,
-                                          int64_t               nsamples,
                                           VariantGenotypeBlock *vpb,
                                           uint32_t            **ui_probs)
 {
@@ -179,14 +178,13 @@ int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
 }
 
 int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile,
-                                               int64_t   compression,
-                                               int64_t   nsamples)
+                                               int64_t   compression)
 {
     uint32_t length;
 
     if (compression == 0)
     {
-        length = 6 * nsamples;
+        length = 6 * bgenfile->header.nsamples;
     } else {
         if (FREAD(bgenfile, &length, 4)) return FAIL;
     }

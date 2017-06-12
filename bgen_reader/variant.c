@@ -2,7 +2,6 @@
 #include <math.h>
 #include <stdlib.h>
 
-#include "bgen_reader.h"
 #include "bgen_file.h"
 #include "layout1.h"
 #include "layout2.h"
@@ -12,7 +11,6 @@
 #define FAIL EXIT_FAILURE
 #define FOPEN bgen_reader_fopen
 #define FCLOSE bgen_reader_fclose
-#define NVARIANTS bgen_reader_nvariants
 
 // Variant identifying data
 //
@@ -91,10 +89,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 {
     assert(bgen_reader_layout(bgenfile) == 2);
 
-    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-
     int64_t compression = bgen_reader_compression(bgenfile);
-    int64_t nsamples    = bgen_reader_nsamples(bgenfile);
 
     fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
@@ -105,7 +100,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
     for (i = 0; i < variant_idx; ++i)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vb);
-        bgen_reader_read_genotype_layout2_skip(bgenfile, compression, nsamples);
+        bgen_reader_read_genotype_layout2_skip(bgenfile, compression);
     }
     return EXIT_SUCCESS;
 }
@@ -130,12 +125,11 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile, uint64_t variant_idx,
+int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile,
+                                         uint64_t variant_idx,
                                          VariantBlock *vb)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
-
-    if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     bgen_reader_seek_variant_block(bgenfile, variant_idx);
 
@@ -146,32 +140,16 @@ int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile, uint64_t variant_id
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_probabilities(BGenFile *bgenfile,
-                                          uint64_t  variant_idx,
-                                          uint32_t *ui_probs)
-{
-    if (FOPEN(bgenfile) == FAIL) return FAIL;
-
-    if (variant_idx >= NVARIANTS(bgenfile)) return -1;
-
-    VariantBlock vb;
-    bgen_reader_read_variantid_block(bgenfile, variant_idx, &vb);
-
-    if (FCLOSE(bgenfile) == FAIL) return FAIL;
-
-    return EXIT_SUCCESS;
-}
-
-int64_t bgen_reader_read_current_genotype_block(BGenFile     *bgenfile,
-                                                uint32_t     **ui_probs)
+int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
+                                                uint32_t **ui_probs)
 {
     int64_t layout = bgen_reader_layout(bgenfile);
+
     assert(layout == 2);
 
     VariantGenotypeBlock vpb;
     int64_t compression = bgen_reader_compression(bgenfile);
-    int64_t nsamples = bgen_reader_nsamples(bgenfile);
 
-    return bgen_reader_read_genotype_layout2(bgenfile, compression, nsamples,
-                                       &vpb, ui_probs);
+    return bgen_reader_read_genotype_layout2(bgenfile, compression,
+                                             &vpb, ui_probs);
 }

@@ -38,7 +38,8 @@ typedef struct BGenFile
     long           variants_start;
 } BGenFile;
 
-int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header);
+int64_t bgen_reader_read_header(BGenFile *bgenfile,
+                                Header   *header);
 
 int64_t bgen_reader_fopen(BGenFile *bgenfile);
 int64_t bgen_reader_fclose(BGenFile *bgenfile);
@@ -46,5 +47,8 @@ int64_t bgen_reader_fclose(BGenFile *bgenfile);
 int64_t bgen_reader_fread(BGenFile      *bgenfile,
                           void *restrict buffer,
                           size_t         size);
+
+int64_t bgen_reader_layout(BGenFile *bgenfile);
+int64_t bgen_reader_compression(BGenFile *bgenfile);
 
 #endif /* end of include guard: BGEN_FILE_H */

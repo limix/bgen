@@ -69,3 +69,22 @@ int64_t bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size
     }
     return EXIT_SUCCESS;
 }
+
+// What layout is that?
+// Possible values are 1 and 2.
+int64_t bgen_reader_layout(BGenFile *bgenfile)
+{
+    int64_t l = (bgenfile->header.flags & (15 << 2)) >> 2;
+
+    assert(l != 0);
+    return l;
+}
+
+// Does it use compression? Which type?
+// 0: no compression
+// 1: zlib's compress()
+// 2: zstandard's ZSTD_compress()
+int64_t bgen_reader_compression(BGenFile *bgenfile)
+{
+    return (bgenfile->header.flags & 60) >> 2;
+}

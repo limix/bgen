@@ -89,12 +89,6 @@ int main()
     if (bgen_file == NULL) return EXIT_FAILURE;
 
 
-    if (bgen_reader_layout(bgen_file) != 2) return EXIT_FAILURE;
-
-
-
-    if (bgen_reader_compression(bgen_file) != 2) return EXIT_FAILURE;
-
     if (bgen_reader_nsamples(bgen_file) != 500) return EXIT_FAILURE;
 
 

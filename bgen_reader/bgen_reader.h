@@ -10,8 +10,6 @@ typedef struct BGenFile BGenFile;
 BGenFile* bgen_reader_open(char *filename);
 int64_t   bgen_reader_close(BGenFile *bgenfile);
 
-int64_t   bgen_reader_layout(BGenFile *bgenfile);
-int64_t   bgen_reader_compression(BGenFile *bgenfile);
 int64_t   bgen_reader_sampleids(BGenFile *bgenfile);
 int64_t   bgen_reader_nsamples(BGenFile *bgenfile);
 int64_t   bgen_reader_nvariants(BGenFile *bgenfile);
