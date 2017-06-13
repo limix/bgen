@@ -35,51 +35,53 @@
 int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
                                                  VariantBlock *vb)
 {
-    int64_t layout = bgen_reader_layout(bgenfile);
+    int64_t layout      = bgen_reader_layout(bgenfile);
+    VariantIdBlock *vib = &(vb->id_block);
 
     if (layout == 1)
     {
-        if (FREAD(bgenfile, &(vb->nsamples), 4)) return FAIL;
+        if (FREAD(bgenfile, &(vib->nsamples), 4)) return FAIL;
     }
 
-    if (FREAD(bgenfile, &(vb->id_length), 2)) return FAIL;
+    if (FREAD(bgenfile, &(vib->id_length), 2)) return FAIL;
 
-    vb->id = malloc(vb->id_length);
+    vib->id = malloc(vib->id_length);
 
-    if (FREAD(bgenfile, vb->id, vb->id_length)) return FAIL;
+    if (FREAD(bgenfile, vib->id, vib->id_length)) return FAIL;
 
-    if (FREAD(bgenfile, &(vb->rsid_length), 2)) return FAIL;
+    if (FREAD(bgenfile, &(vib->rsid_length), 2)) return FAIL;
 
-    vb->rsid = malloc(vb->rsid_length);
+    vib->rsid = malloc(vib->rsid_length);
 
-    if (FREAD(bgenfile, vb->rsid, vb->rsid_length)) return FAIL;
+    if (FREAD(bgenfile, vib->rsid, vib->rsid_length)) return FAIL;
 
-    if (FREAD(bgenfile, &(vb->chrom_length), 2)) return FAIL;
+    if (FREAD(bgenfile, &(vib->chrom_length), 2)) return FAIL;
 
-    vb->chrom = malloc(vb->chrom_length);
+    vib->chrom = malloc(vib->chrom_length);
 
-    if (FREAD(bgenfile, vb->chrom, vb->chrom_length)) return FAIL;
+    if (FREAD(bgenfile, vib->chrom, vib->chrom_length)) return FAIL;
 
-    if (FREAD(bgenfile, &(vb->position), 4)) return FAIL;
+    if (FREAD(bgenfile, &(vib->position), 4)) return FAIL;
 
-    if (layout == 1) vb->nalleles = 2;
-    else if (FREAD(bgenfile, &(vb->nalleles), 2)) return FAIL;
+    if (layout == 1) vib->nalleles = 2;
+    else if (FREAD(bgenfile, &(vib->nalleles), 2)) return FAIL;
+
+    vib->allele_lengths = malloc(vib->nalleles * sizeof(uint32_t));
+    vib->alleleids      = malloc(vib->nalleles * sizeof(unsigned char*));
 
     size_t i;
-    vb->alleles = malloc(vb->nalleles * sizeof(Allele));
 
-    for (i = 0; i < vb->nalleles; ++i)
+    for (i = 0; i < vib->nalleles; ++i)
     {
-        if (FREAD(bgenfile, &(vb->alleles[i].length),
-                  4)) return FAIL;
+        if (FREAD(bgenfile, vib->allele_lengths + i, 4)) return FAIL;
 
-        vb->alleles[i].id = malloc(vb->alleles[i].length);
+        vib->alleleids[i] = malloc(vib->allele_lengths[i]);
 
-        if (FREAD(bgenfile, vb->alleles[i].id,
-                  vb->alleles[i].length)) return FAIL;
+        if (FREAD(bgenfile, vib->alleleids[i],
+                  vib->allele_lengths[i])) return FAIL;
     }
 
-    vb->genotype_start = ftell(bgenfile->file);
+    vib->genotype_start = ftell(bgenfile->file);
 
     return EXIT_SUCCESS;
 }
@@ -152,11 +154,12 @@ int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
     int64_t compression = bgen_reader_compression(bgenfile);
 
     int64_t e = bgen_reader_read_genotype_layout2(bgenfile, &vpb);
+
     if (e == FAIL) return FAIL;
 
-    *ploidy = vpb.max_ploidy;
+    *ploidy   = vpb.max_ploidy;
     *nalleles = vpb.nalleles;
-    *nbits = vpb.nbits;
+    *nbits    = vpb.nbits;
     *ui_probs = vpb.genotypes;
 
     return EXIT_SUCCESS;

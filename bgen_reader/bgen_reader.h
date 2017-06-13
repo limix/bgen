@@ -3,21 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct VariantIdData
-{
-    int64_t        nsamples;
-    int64_t        id_length;
-    unsigned char *id;
-    int64_t        rsid_length;
-    unsigned char *rsid;
-    int64_t        chrom_length;
-    unsigned char *chrom;
-    int64_t        position;
-    int64_t        nalleles;
-    int64_t       *alleleid_length;
-    unsigned char *alleles;
-    struct VariantIdData *next;
-} VariantIdData;
+#include "variant_id_block.h"
 
 typedef struct BGenFile BGenFile;
 
@@ -78,7 +64,7 @@ int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
 int64_t bgen_reader_choose(uint64_t n,
                            uint64_t k);
 
-// int64_t bgen_reader_read_all_variantid_data(BGenFile      *bgenfile,
-//                                             VariantBlock **head_ref);
+int64_t bgen_reader_read_all_variantid_data(BGenFile        *bgenfile,
+                                            VariantIdBlock **head_ref);
 
 #endif /* end of include guard: BGEN_READER_H */

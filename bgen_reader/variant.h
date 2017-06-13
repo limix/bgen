@@ -3,13 +3,8 @@
 
 #include <stdint.h>
 
+#include "variant_id_block.h"
 #include "util/byte.h"
-
-typedef struct
-{
-    uint32_t length;
-    BYTE    *id;
-} Allele;
 
 typedef struct VariantGenotypeBlock
 {
@@ -28,17 +23,7 @@ typedef struct VariantGenotypeBlock
 // last field)
 typedef struct VariantBlock
 {
-    uint32_t              nsamples;
-    uint16_t              id_length;
-    BYTE                 *id;
-    uint16_t              rsid_length;
-    BYTE                 *rsid;
-    uint16_t              chrom_length;
-    BYTE                 *chrom;
-    uint32_t              position;
-    uint16_t              nalleles;
-    Allele               *alleles;
-    long                  genotype_start;
+    VariantIdBlock       id_block;
     VariantGenotypeBlock *vpb;
 } VariantBlock;
 
