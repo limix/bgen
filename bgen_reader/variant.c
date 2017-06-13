@@ -123,8 +123,8 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile,
-                                         uint64_t variant_idx,
+int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
+                                         uint64_t      variant_idx,
                                          VariantBlock *vb)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -139,6 +139,8 @@ int64_t bgen_reader_read_variantid_block(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
+                                                uint64_t  *ploidy,
+                                                uint64_t  *nalleles,
                                                 uint32_t **ui_probs)
 {
     int64_t layout = bgen_reader_layout(bgenfile);
@@ -148,5 +150,12 @@ int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
     VariantGenotypeBlock vpb;
     int64_t compression = bgen_reader_compression(bgenfile);
 
-    return bgen_reader_read_genotype_layout2(bgenfile, &vpb, ui_probs);
+    int64_t e = bgen_reader_read_genotype_layout2(bgenfile, &vpb);
+    if (e == FAIL) return FAIL;
+
+    *ploidy = vpb.max_ploidy;
+    *nalleles = vpb.nalleles;
+    *ui_probs = vpb.genotypes;
+
+    return EXIT_SUCCESS;
 }

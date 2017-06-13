@@ -56,6 +56,8 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile,
 
 int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
                                   uint64_t   variant_idx,
-                                  uint32_t **ui_probs);
+                                  uint32_t **ui_probs,
+                                  uint64_t  *ploidy,
+                                  uint64_t  *nalleles);
 
 #endif /* end of include guard: BGEN_READER_H */

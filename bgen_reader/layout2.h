@@ -7,8 +7,7 @@ typedef struct BGenFile BGenFile;
 typedef struct VariantGenotypeBlock VariantGenotypeBlock;
 
 int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
-                                          VariantGenotypeBlock *vpb,
-                                          uint32_t            **ui_probs);
+                                          VariantGenotypeBlock *vpb);
 
 int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile);
 

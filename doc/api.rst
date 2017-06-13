@@ -139,13 +139,24 @@ Functions description
 
 .. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,\
                                                   uint64_t   variant_idx,\
-                                                  uint32_t** ui_probs)
+                                                  uint32_t** ui_probs,\
+                                                  uint64_t*  ploidy,\
+                                                  uint64_t*  nalleles)
 
   Read the genotype probabilities of the specified variant index.
+  Let :math:`n_a` and :math:`n_p` be the number of alleles and the ploidy.
+  The resulting matrix ``ui_probs`` will be :math:`n`-by-:math:`k`, where
+  :math:`n` is the number of samples and
+
+  .. math::
+
+    k = {n_a + n_p - 1 \choose n_a - 1}.
 
   :param BGenFile*: Bgen file handler.
   :param uint64_t: Variant index.
   :param uint64_t**: Genotype probabilities.
+  :param uint64_t*: Ploidy.
+  :param uint64_t*: Number of alleles.
 
   :return: exit status.
   :rtype: int64_t

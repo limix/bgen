@@ -41,11 +41,8 @@ inline static int get_bit(const BYTE *mem, size_t bit_idx)
 }
 
 int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
-                                           VariantGenotypeBlock *vpb,
-                                           uint32_t            **ui_probs)
+                                           VariantGenotypeBlock *vpb)
 {
-    if (ui_probs == NULL) return EXIT_SUCCESS;
-
     size_t   i, j;
     size_t   bi;
     size_t   sample_start, geno_start, bit_idx;
@@ -57,7 +54,7 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
     uint32_t ncombs =
         choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
-    *ui_probs = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
+    vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
 
     // nsamples
     for (j = 0; j < vpb->nsamples; ++j)
@@ -83,8 +80,8 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
                 if (get_bit(chunk, bit_idx)) SetBit(ui_prob, bi);
             }
 
-            (*ui_probs)[j * (ncombs - 1) + i] = ui_prob;
-            ui_prob_sum                      += ui_prob;
+            vpb->genotypes[j * (ncombs - 1) + i] = ui_prob;
+            ui_prob_sum                         += ui_prob;
         }
     }
     return EXIT_SUCCESS;
@@ -150,8 +147,7 @@ int64_t bgen_reader_uncompress(BGenFile *bgenfile, BYTE **uchunk)
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
 int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
-                                          VariantGenotypeBlock *vpb,
-                                          uint32_t            **ui_probs)
+                                          VariantGenotypeBlock *vpb)
 {
     BYTE   *chunk;
     int64_t e;
@@ -171,7 +167,7 @@ int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     MEMCPY(&(vpb->nbits),      &chunk, 1);
 
     assert(vpb->phased == 0);
-    bgen_reader_read_unphased_genotype(chunk, vpb, ui_probs);
+    bgen_reader_read_unphased_genotype(chunk, vpb);
 
     return EXIT_SUCCESS;
 }
