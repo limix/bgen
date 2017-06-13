@@ -58,7 +58,8 @@ int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
                                   uint64_t   variant_idx,
                                   uint32_t **ui_probs,
                                   uint64_t  *ploidy,
-                                  uint64_t  *nalleles);
+                                  uint64_t  *nalleles,
+                                  uint64_t  *nbits);
 
 int64_t bgen_reader_choose(uint64_t n, uint64_t k);
 

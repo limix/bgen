@@ -229,7 +229,7 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
 
 int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
                                   uint32_t **ui_probs, uint64_t  *ploidy,
-                                  uint64_t  *nalleles)
+                                  uint64_t  *nalleles, uint64_t  *nbits)
 {
     VariantBlock vb;
 
@@ -242,6 +242,7 @@ int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
     int64_t e = bgen_reader_read_current_genotype_block(bgenfile,
                                                         ploidy,
                                                         nalleles,
+                                                        nbits,
                                                         ui_probs);
 
     if (e == FAIL) return FAIL;

@@ -51,6 +51,7 @@ int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
 int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
                                                 uint64_t  *ploidy,
                                                 uint64_t  *nalleles,
+                                                uint64_t  *nbits,
                                                 uint32_t **ui_probs);
 
 #endif /* end of include guard: VARIANT_H */

@@ -4,7 +4,10 @@
 
 #include "bgen_reader/bgen_reader.h"
 
-void print_genotypes(uint32_t *genotypes, uint64_t nsamples, uint64_t ngenotypes)
+void print_genotypes(uint32_t *genotypes,
+                     uint64_t  nsamples,
+                     uint64_t  ngenotypes,
+                     uint64_t  nbits)
 {
     uint64_t i, j;
 
@@ -79,7 +82,8 @@ int main()
 
     uint32_t *genotypes;
     uint64_t  ploidy;
-    bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,
+    uint64_t  nbits;
+    bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy, &nbits,
                               &nalleles);
 
     int64_t nsamples   = bgen_reader_nsamples(bgenfile);
@@ -89,7 +93,7 @@ int main()
            variantidx,
            ngenotypes);
 
-    print_genotypes(genotypes, nsamples, ngenotypes);
+    print_genotypes(genotypes, nsamples, ngenotypes, nbits);
 
     free(genotypes);
 

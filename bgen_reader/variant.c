@@ -141,6 +141,7 @@ int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
 int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
                                                 uint64_t  *ploidy,
                                                 uint64_t  *nalleles,
+                                                uint64_t  *nbits,
                                                 uint32_t **ui_probs)
 {
     int64_t layout = bgen_reader_layout(bgenfile);
@@ -155,6 +156,7 @@ int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
 
     *ploidy = vpb.max_ploidy;
     *nalleles = vpb.nalleles;
+    *nbits = vpb.nbits;
     *ui_probs = vpb.genotypes;
 
     return EXIT_SUCCESS;

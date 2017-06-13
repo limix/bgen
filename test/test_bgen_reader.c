@@ -19,6 +19,7 @@ static int test_sampleids_block(BGenFile *bgen_file)
                              &sampleid_len)) return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
+
     if (bytencmp(sampleid, "sample_001",
                  sampleid_len) != 0) return EXIT_FAILURE;
 
@@ -100,14 +101,17 @@ int main()
 
     if (test_variants_block(bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
 
-    uint64_t nsamples, ploidy, nalleles;
+    uint64_t nsamples, ploidy, nalleles, nbits;
 
     nsamples = bgen_reader_nsamples(bgen_file);
 
     uint32_t *ui_probs;
 
     // first SNP
-    bgen_reader_read_genotype(bgen_file, 0, &ui_probs, &ploidy, &nalleles);
+    bgen_reader_read_genotype(bgen_file, 0, &ui_probs, &ploidy, &nalleles,
+                              &nbits);
+
+    if (nbits != 1) return EXIT_FAILURE;
 
     // Sample 0 (sample_001)
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
@@ -116,12 +120,16 @@ int main()
     if ((ui_probs[6] != 0) || (ui_probs[7] != 1)) return EXIT_FAILURE;
 
     // Sample 498 (sample_499)
-    if ((ui_probs[498 * 2] != 1) || (ui_probs[498 * 2 + 1] != 0)) return EXIT_FAILURE;
+    if ((ui_probs[498 * 2] != 1) ||
+        (ui_probs[498 * 2 + 1] != 0)) return EXIT_FAILURE;
 
     free(ui_probs);
 
     // second SNP
-    bgen_reader_read_genotype(bgen_file, 1, &ui_probs, &ploidy, &nalleles);
+    bgen_reader_read_genotype(bgen_file, 1, &ui_probs, &ploidy, &nalleles,
+                              &nbits);
+
+    if (nbits != 1) return EXIT_FAILURE;
 
     if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
 
