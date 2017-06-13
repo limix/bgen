@@ -137,8 +137,8 @@ Functions description
   :return: exit status.
   :rtype: int64_t
 
-.. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,
-                                                  uint64_t   variant_idx,
+.. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,\
+                                                  uint64_t   variant_idx,\
                                                   uint32_t** ui_probs)
 
   Read the genotype probabilities of the specified variant index.
