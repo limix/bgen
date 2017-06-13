@@ -136,3 +136,16 @@ Functions description
 
   :return: exit status.
   :rtype: int64_t
+
+.. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,
+                                                  uint64_t   variant_idx,
+                                                  uint32_t** ui_probs)
+
+  Read the genotype probabilities of the specified variant index.
+
+  :param BGenFile*: Bgen file handler.
+  :param uint64_t: Variant index.
+  :param uint64_t**: Genotype probabilities.
+
+  :return: exit status.
+  :rtype: int64_t
