@@ -10,14 +10,19 @@ void print_genotypes(uint32_t *genotypes,
                      uint64_t  nbits)
 {
     uint64_t i, j;
+    uint64_t precision = (1 << nbits) - 1;
+    uint64_t sum;
 
-    for (i = 0; i < nsamples / 100; ++i)
+    for (i = 0; i < nsamples / 50; ++i)
     {
+        sum = 0;
         for (j = 0; j < ngenotypes - 1; ++j)
         {
+            sum += genotypes[i * (ngenotypes - 1) + j];
             printf("%d ", genotypes[i * (ngenotypes - 1) + j]);
         }
-        printf("\n");
+
+        printf("%llu \n", precision - sum);
     }
 }
 
@@ -83,8 +88,8 @@ int main()
     uint32_t *genotypes;
     uint64_t  ploidy;
     uint64_t  nbits;
-    bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy, &nbits,
-                              &nalleles);
+    bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,
+                              &nalleles, &nbits);
 
     int64_t nsamples   = bgen_reader_nsamples(bgenfile);
     int64_t ngenotypes = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
