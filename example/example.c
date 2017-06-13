@@ -10,8 +10,10 @@ void print_genotypes(uint32_t *genotypes,
                      uint64_t  nbits)
 {
     uint64_t i, j;
-    uint64_t precision = (1 << nbits) - 1;
-    uint64_t sum;
+    uint32_t precision = 1;
+    precision <<= nbits;
+    precision -= 1;
+    uint32_t sum;
 
     for (i = 0; i < nsamples / 50; ++i)
     {
@@ -19,16 +21,43 @@ void print_genotypes(uint32_t *genotypes,
         for (j = 0; j < ngenotypes - 1; ++j)
         {
             sum += genotypes[i * (ngenotypes - 1) + j];
-            printf("%d ", genotypes[i * (ngenotypes - 1) + j]);
+            printf("%010u ", genotypes[i * (ngenotypes - 1) + j]);
         }
 
-        printf("%llu \n", precision - sum);
+        printf("%010u \n", precision - sum);
     }
 }
 
-int main()
+void print_genotypes_probabilities(uint32_t *genotypes,
+                                   uint64_t  nsamples,
+                                   uint64_t  ngenotypes,
+                                   uint64_t  nbits)
 {
-    BGenFile *bgenfile = bgen_reader_open("example.1bits.bgen");
+    uint64_t i, j;
+    uint64_t precision = 1;
+    precision <<= nbits;
+    precision -= 1;
+    double denom = precision;
+    uint64_t sum, s;
+
+    for (i = 0; i < nsamples / 50; ++i)
+    {
+        sum = 0;
+        for (j = 0; j < ngenotypes - 1; ++j)
+        {
+            s = genotypes[i * (ngenotypes - 1) + j];
+            sum += s;
+            printf("%.8f ", s / denom);
+        }
+
+        printf("%.8f \n", (precision - sum) / denom);
+    }
+}
+
+void print_bgen(const char* filepath)
+{
+    printf("---- File name: %s ----\n", filepath);
+    BGenFile *bgenfile = bgen_reader_open(filepath);
     BYTE     *id;
     uint64_t  len;
     uint64_t  sampleidx = 350;
@@ -99,8 +128,18 @@ int main()
            ngenotypes);
 
     print_genotypes(genotypes, nsamples, ngenotypes, nbits);
+    print_genotypes_probabilities(genotypes, nsamples, ngenotypes, nbits);
 
     free(genotypes);
 
     bgen_reader_close(bgenfile);
+
+    printf("---- End ----\n\n");
+}
+
+int main()
+{
+    print_bgen("example.16bits.bgen");
+    print_bgen("example.32bits.bgen");
+    return 0;
 }
