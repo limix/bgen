@@ -4,6 +4,20 @@
 
 #include "bgen_reader/bgen_reader.h"
 
+void print_genotypes(uint32_t *genotypes, uint64_t nsamples, uint64_t ngenotypes)
+{
+    uint64_t i, j;
+
+    for (i = 0; i < nsamples / 100; ++i)
+    {
+        for (j = 0; j < ngenotypes - 1; ++j)
+        {
+            printf("%d ", genotypes[i * (ngenotypes - 1) + j]);
+        }
+        printf("\n");
+    }
+}
+
 int main()
 {
     BGenFile *bgenfile = bgen_reader_open("example.1bits.bgen");
@@ -64,16 +78,20 @@ int main()
     }
 
     uint32_t *genotypes;
-    uint64_t ploidy;
+    uint64_t  ploidy;
     bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,
                               &nalleles);
 
-    uint32_t ncols = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
+    int64_t nsamples   = bgen_reader_nsamples(bgenfile);
+    int64_t ngenotypes = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
+
+    printf("Number of genotypes of variant index %llu: %lld\n",
+           variantidx,
+           ngenotypes);
+
+    print_genotypes(genotypes, nsamples, ngenotypes);
 
     free(genotypes);
 
     bgen_reader_close(bgenfile);
 }
-
-// gcc example.c -lbgen_reader -o example
-// ./example

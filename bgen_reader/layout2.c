@@ -51,7 +51,7 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
     uint32_t ui_prob;
     uint32_t ui_prob_sum;
 
-    uint32_t ncombs =
+    int64_t ncombs =
         bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
     vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
