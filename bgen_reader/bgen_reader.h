@@ -60,4 +60,6 @@ int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
                                   uint64_t  *ploidy,
                                   uint64_t  *nalleles);
 
+int64_t bgen_reader_choose(uint64_t n, uint64_t k);
+
 #endif /* end of include guard: BGEN_READER_H */

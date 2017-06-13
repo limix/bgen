@@ -4,10 +4,10 @@
 #include "layout2.h"
 #include "bgen_file.h"
 #include "variant.h"
-#include "util/choose.h"
 #include "util/bits.h"
 #include "util/zlib_wrapper.h"
 #include "util/mem.h"
+#include "util/choose.h"
 
 #define FREAD bgen_reader_fread
 #define FAIL EXIT_FAILURE
@@ -52,7 +52,7 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
     uint32_t ui_prob_sum;
 
     uint32_t ncombs =
-        choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
+        bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
     vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
 
@@ -63,7 +63,7 @@ int64_t bgen_reader_read_unphased_genotype(const BYTE           *chunk,
         miss   = bgen_read_missingness(vpb->missingness[j]);
         assert(miss == 0);
 
-        ncombs = choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
+        ncombs = bgen_reader_choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
 
         ui_prob_sum = 0;
 
