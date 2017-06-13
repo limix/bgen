@@ -33,10 +33,9 @@
 // | LaK   | last allele                       |
 // ---------------------------------------------
 int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
-                                                 VariantBlock *vb)
+                                                 VariantIdBlock *vib)
 {
     int64_t layout      = bgen_reader_layout(bgenfile);
-    VariantIdBlock *vib = &(vb->id_block);
 
     if (layout == 1)
     {
@@ -93,13 +92,13 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 
     fseek(bgenfile->file, bgenfile->variants_start, SEEK_SET);
 
-    VariantBlock vb;
+    VariantIdBlock vib;
 
     size_t i;
 
     for (i = 0; i < variant_idx; ++i)
     {
-        bgen_reader_read_current_variantid_block(bgenfile, &vb);
+        bgen_reader_read_current_variantid_block(bgenfile, &vib);
         bgen_reader_read_genotype_layout2_skip(bgenfile);
     }
     return EXIT_SUCCESS;
@@ -127,13 +126,13 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx)
 // ---------------------------------------------
 int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
                                          uint64_t      variant_idx,
-                                         VariantBlock *vb)
+                                         VariantIdBlock *vib)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
     bgen_reader_seek_variant_block(bgenfile, variant_idx);
 
-    bgen_reader_read_current_variantid_block(bgenfile, vb);
+    bgen_reader_read_current_variantid_block(bgenfile, vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
