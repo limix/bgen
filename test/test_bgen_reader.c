@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define BYTE unsigned char
+
 static inline int bytencmp(const BYTE *s1, const char *s2, size_t n)
 {
     return strncmp((const char *)s1, s2, n);

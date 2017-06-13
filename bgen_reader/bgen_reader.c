@@ -17,7 +17,7 @@
 #define NVARIANTS bgen_reader_nvariants
 
 // Is sample identifier block present?
-int64_t bgen_reader_sampleids(BGenFile *bgenfile)
+int64_t bgen_reader_is_sampleids_block_present(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
@@ -49,7 +49,7 @@ BGenFile* bgen_reader_open(const char *filepath)
         return NULL;
     }
 
-    if (bgen_reader_sampleids(bgenfile))
+    if (bgen_reader_is_sampleids_block_present(bgenfile))
     {
         bgenfile->sampleid_block = malloc(sizeof(SampleIdBlock));
 
@@ -81,9 +81,22 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
     free(bgenfile->filepath);
     bgenfile->filepath = NULL;
 
-    assert(bgenfile->sampleid_block != NULL);
-    free(bgenfile->sampleid_block);
-    bgenfile->sampleid_block = NULL;
+    uint64_t i;
+    uint64_t nsamples = bgenfile->sampleid_block->nsamples;
+
+    if (bgen_reader_is_sampleids_block_present(bgenfile))
+    {
+        assert(bgenfile->sampleid_block != NULL);
+
+        for (i = 0; i < nsamples; ++i)
+        {
+            free(bgenfile->sampleid_block->sampleids[i].id);
+        }
+
+        free(bgenfile->sampleid_block->sampleids);
+        free(bgenfile->sampleid_block);
+        bgenfile->sampleid_block = NULL;
+    }
 
     free(bgenfile);
     return EXIT_SUCCESS;
