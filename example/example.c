@@ -4,6 +4,20 @@
 
 #include "bgen_reader/bgen_reader.h"
 
+void print_variantids(VariantIdBlock *root)
+{
+    VariantIdBlock *vib;
+
+    while (root != NULL)
+    {
+        printf("%.*s ", (int)root->id_length, root->id);
+
+        vib  = root;
+        root = root->next;
+        bgen_reader_free_variantid_block(vib);
+    }
+}
+
 void print_genotypes(inti *genotypes,
                      inti  nsamples,
                      inti  ngenotypes,
@@ -11,13 +25,15 @@ void print_genotypes(inti *genotypes,
 {
     inti i, j;
     uint32_t precision = 1;
+
     precision <<= nbits;
-    precision -= 1;
+    precision  -= 1;
     uint32_t sum;
 
     for (i = 0; i < nsamples / 50; ++i)
     {
         sum = 0;
+
         for (j = 0; j < ngenotypes - 1; ++j)
         {
             sum += genotypes[i * (ngenotypes - 1) + j];
@@ -35,17 +51,19 @@ void print_genotypes_probabilities(inti *genotypes,
 {
     inti i, j;
     inti precision = 1;
+
     precision <<= nbits;
-    precision -= 1;
+    precision  -= 1;
     double denom = precision;
-    inti sum, s;
+    inti   sum, s;
 
     for (i = 0; i < nsamples / 50; ++i)
     {
         sum = 0;
+
         for (j = 0; j < ngenotypes - 1; ++j)
         {
-            s = genotypes[i * (ngenotypes - 1) + j];
+            s    = genotypes[i * (ngenotypes - 1) + j];
             sum += s;
             printf("%.8f ", s / denom);
         }
@@ -54,15 +72,15 @@ void print_genotypes_probabilities(inti *genotypes,
     }
 }
 
-void print_bgen(const char* filepath)
+void print_bgen(const char *filepath)
 {
     printf("---- File name: %s ----\n", filepath);
     BGenFile *bgenfile = bgen_reader_open(filepath);
     byte     *id;
-    inti  len;
-    inti  sampleidx = 350;
-    inti  variantidx = 187;
-    inti  position, nalleles;
+    inti      len;
+    inti      sampleidx = 350;
+    inti      variantidx = 187;
+    inti      position, nalleles;
 
     printf("Number of samples: %lld\n",  bgen_reader_nsamples(bgenfile));
     printf("Number of variants: %lld\n", bgen_reader_nvariants(bgenfile));
@@ -129,6 +147,12 @@ void print_bgen(const char* filepath)
 
     print_genotypes(genotypes, nsamples, ngenotypes, nbits);
     print_genotypes_probabilities(genotypes, nsamples, ngenotypes, nbits);
+
+    VariantIdBlock *root = NULL;
+
+    if (bgen_reader_read_variantid_blocks(bgenfile, &root) == FAIL) return FAIL;
+
+    print_variantids(root);
 
     free(genotypes);
 
