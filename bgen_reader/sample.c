@@ -26,7 +26,7 @@ inti bgen_read_sampleid_block(BGenFile *bgenfile)
 
     block->sampleids = malloc(block->nsamples * sizeof(SampleId));
 
-    for (size_t i = 0; i < block->nsamples; i++)
+    for (inti i = 0; i < block->nsamples; i++)
     {
         uint16_t *length = &(block->sampleids[i].length);
 

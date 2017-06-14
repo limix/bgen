@@ -51,9 +51,9 @@ inti bgen_reader_fclose(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-inti bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size)
+inti bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, inti size)
 {
-    size_t err = fread(buffer, size, 1, bgenfile->file);
+    inti err = fread(buffer, size, 1, bgenfile->file);
 
     if (err != 1)
     {

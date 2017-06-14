@@ -16,7 +16,7 @@ typedef struct VariantIdBlock
     inti                   nalleles;
     inti                  *allele_lengths;
     byte                 **alleleids;
-    long                   genotype_start;
+    inti                   genotype_start;
     struct VariantIdBlock *next;
 } VariantIdBlock;
 

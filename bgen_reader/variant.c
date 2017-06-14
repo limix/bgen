@@ -71,7 +71,7 @@ inti bgen_reader_read_current_variantid_block(BGenFile       *bgenfile,
     vib->allele_lengths = calloc(vib->nalleles, sizeof(inti));
     vib->alleleids      = malloc(vib->nalleles * sizeof(unsigned char *));
 
-    size_t i;
+    inti i;
 
     for (i = 0; i < vib->nalleles; ++i)
     {
@@ -97,7 +97,7 @@ inti bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
 
     VariantIdBlock vib;
 
-    size_t i;
+    inti i;
 
     for (i = 0; i < variant_idx; ++i)
     {

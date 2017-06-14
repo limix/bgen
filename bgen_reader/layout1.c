@@ -1,4 +1,5 @@
 // #include "bgen_reader.h"
+
 //
 // #include <stdlib.h>
 //
@@ -29,13 +30,15 @@
 //     //
 //     // if (compression == 0)
 //     // {
-//     //     if (bgen_reader_fread(bgenfile, uchunk, ulength)) return EXIT_FAILURE;
+//     //     if (bgen_reader_fread(bgenfile, uchunk, ulength)) return
+// EXIT_FAILURE;
 //     // } else {
 //     //     if (bgen_reader_fread(bgenfile, &clength, 4)) return EXIT_FAILURE;
 //     //
 //     //     cchunk = malloc(clength);
 //     //
-//     //     if (bgen_reader_fread(bgenfile, cchunk, clength)) return EXIT_FAILURE;
+//     //     if (bgen_reader_fread(bgenfile, cchunk, clength)) return
+// EXIT_FAILURE;
 //     //
 //     //     zlib_uncompress(cchunk, clength, &uchunk, &ulength);
 //     //
@@ -44,10 +47,10 @@
 //     //
 //     // uint16_t *ui_uchunk = (uint16_t *)uchunk;
 //     //
-//     // size_t nprobs = 3 * nsamples;
+//     // inti nprobs = 3 * nsamples;
 //     // *probabilities = malloc(sizeof(double) * nprobs);
 //     //
-//     // size_t i;
+//     // inti i;
 //     //
 //     // for (i = 0; i < nprobs; ++i)
 //     // {

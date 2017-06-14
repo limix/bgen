@@ -22,37 +22,38 @@ inline static uint8_t bgen_read_missingness(byte ploidy_miss)
     return (ploidy_miss & 256) >> 7;
 }
 
-inline static size_t bit_sample_start(size_t sample_idx, uint8_t nbits,
-                                      uint32_t ncomb)
+inline static inti bit_sample_start(inti sample_idx, uint8_t nbits,
+                                    uint32_t ncomb)
 {
     return sample_idx * (nbits * (ncomb - 1));
 }
 
-inline static size_t bit_geno_start(size_t geno_idx, uint8_t nbits)
+inline static inti bit_geno_start(inti geno_idx, uint8_t nbits)
 {
     return geno_idx * nbits;
 }
 
-inline static int get_bit(const byte *mem, size_t bit_idx)
+inline static int get_bit(const byte *mem, inti bit_idx)
 {
-    size_t bytes = bit_idx / 8;
+    inti bytes = bit_idx / 8;
 
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
 inti bgen_reader_read_unphased_genotype(const byte           *chunk,
-                                           VariantGenotypeBlock *vpb)
+                                        VariantGenotypeBlock *vpb)
 {
-    size_t   i, j;
-    size_t   bi;
-    size_t   sample_start, geno_start, bit_idx;
+    inti i, j;
+    inti bi;
+    inti sample_start, geno_start, bit_idx;
     uint8_t  ploidy;
     uint8_t  miss;
     uint32_t ui_prob;
     uint32_t ui_prob_sum;
 
     inti ncombs =
-        bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
+        bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1,
+                           vpb->nalleles - 1);
 
     vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
 
@@ -63,7 +64,8 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
         miss   = bgen_read_missingness(vpb->missingness[j]);
         assert(miss == 0);
 
-        ncombs = bgen_reader_choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
+        ncombs =
+            bgen_reader_choose(vpb->nalleles + ploidy - 1, vpb->nalleles - 1);
 
         ui_prob_sum = 0;
 
@@ -147,10 +149,10 @@ inti bgen_reader_uncompress(BGenFile *bgenfile, byte **uchunk)
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
 inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
-                                          VariantGenotypeBlock *vpb)
+                                       VariantGenotypeBlock *vpb)
 {
-    byte   *chunk;
-    inti e;
+    byte *chunk;
+    inti  e;
 
     e = bgen_reader_uncompress(bgenfile, &chunk);
 

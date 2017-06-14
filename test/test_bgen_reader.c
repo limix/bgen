@@ -8,7 +8,7 @@
 #define byte unsigned char
 #define FAIL EXIT_FAILURE
 
-static inline int bytencmp(const byte *s1, const char *s2, size_t n)
+static inline int bytencmp(const byte *s1, const char *s2, inti n)
 {
     return strncmp((const char *)s1, s2, n);
 }

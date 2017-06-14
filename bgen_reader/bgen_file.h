@@ -40,14 +40,14 @@ typedef struct BGenFile
 } BGenFile;
 
 inti bgen_reader_read_header(BGenFile *bgenfile,
-                                Header   *header);
+                             Header   *header);
 
 inti bgen_reader_fopen(BGenFile *bgenfile);
 inti bgen_reader_fclose(BGenFile *bgenfile);
 
 inti bgen_reader_fread(BGenFile      *bgenfile,
-                          void *restrict buffer,
-                          size_t         size);
+                       void *restrict buffer,
+                       inti           size);
 
 inti bgen_reader_layout(BGenFile *bgenfile);
 inti bgen_reader_compression(BGenFile *bgenfile);
