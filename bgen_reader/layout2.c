@@ -50,12 +50,13 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
     inti miss;
     inti ui_prob;
     inti ui_prob_sum;
+    inti tmp;
 
     inti ncombs =
         bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1,
                            vpb->nalleles - 1);
 
-    vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
+    vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(inti));
 
     // nsamples
     for (j = 0; j < vpb->nsamples; ++j)
@@ -79,8 +80,17 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
                 geno_start   = bit_geno_start(i, vpb->nbits);
                 bit_idx      = sample_start + geno_start + bi;
 
-                if (get_bit(chunk, bit_idx)) SetBit(ui_prob, bi);
+
+                if (get_bit(chunk, bit_idx))
+                {
+                    tmp      = 1;
+                    tmp    <<= bi;
+                    ui_prob |= tmp;
+
+                    // SetBit(ui_prob, bi);
+                }
             }
+            printf("%lld\n", ui_prob);
 
             vpb->genotypes[j * (ncombs - 1) + i] = ui_prob;
             ui_prob_sum                         += ui_prob;
