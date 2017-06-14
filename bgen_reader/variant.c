@@ -143,7 +143,7 @@ inti bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
                                                 inti  *ploidy,
                                                 inti  *nalleles,
                                                 inti  *nbits,
-                                                uint32_t **ui_probs)
+                                                inti **ui_probs)
 {
     inti layout = bgen_reader_layout(bgenfile);
 

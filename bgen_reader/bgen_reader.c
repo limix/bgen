@@ -241,7 +241,7 @@ inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
 }
 
 inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
-                                  uint32_t **ui_probs, inti  *ploidy,
+                                  inti **ui_probs, inti  *ploidy,
                                   inti  *nalleles, inti  *nbits)
 {
     VariantIdBlock vib;

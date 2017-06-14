@@ -4,7 +4,7 @@
 
 #include "bgen_reader/bgen_reader.h"
 
-void print_genotypes(uint32_t *genotypes,
+void print_genotypes(inti *genotypes,
                      inti  nsamples,
                      inti  ngenotypes,
                      inti  nbits)
@@ -28,7 +28,7 @@ void print_genotypes(uint32_t *genotypes,
     }
 }
 
-void print_genotypes_probabilities(uint32_t *genotypes,
+void print_genotypes_probabilities(inti *genotypes,
                                    inti  nsamples,
                                    inti  ngenotypes,
                                    inti  nbits)
@@ -114,7 +114,7 @@ void print_bgen(const char* filepath)
         free(id);
     }
 
-    uint32_t *genotypes;
+    inti *genotypes;
     inti  ploidy;
     inti  nbits;
     bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,

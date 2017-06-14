@@ -86,7 +86,7 @@ int test_genotype_reading(BGenFile *bgenfile)
 
     nsamples = bgen_reader_nsamples(bgenfile);
 
-    uint32_t *ui_probs;
+    inti *ui_probs;
 
     // first SNP
     bgen_reader_read_genotype(bgenfile, 0, &ui_probs, &ploidy, &nalleles,

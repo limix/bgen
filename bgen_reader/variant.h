@@ -15,7 +15,7 @@ typedef struct VariantGenotypeBlock
     uint8_t  *missingness;
     uint8_t   phased;
     uint8_t   nbits;
-    uint32_t *genotypes;
+    inti *genotypes;
 } VariantGenotypeBlock;
 
 // It represents both the variant identifying block
@@ -42,6 +42,6 @@ inti bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
                                                 inti  *ploidy,
                                                 inti  *nalleles,
                                                 inti  *nbits,
-                                                uint32_t **ui_probs);
+                                                inti **ui_probs);
 
 #endif /* end of include guard: VARIANT_H */
