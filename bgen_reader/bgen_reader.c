@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "bgen_reader.h"
 #include "bgen_file.h"
@@ -24,7 +25,7 @@ inti bgen_reader_is_sampleids_block_present(BGenFile *bgenfile)
 
 BGenFile* bgen_reader_open(const char *filepath)
 {
-    BGenFile *bgenfile = malloc(sizeof(BGenFile));
+    BGenFile *bgenfile = calloc(1, sizeof(BGenFile));
 
     bgenfile->filepath = ft_strdup(filepath);
 

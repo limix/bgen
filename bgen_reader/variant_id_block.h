@@ -1,21 +1,21 @@
 #ifndef VARIANT_ID_BLOCK_H
 #define VARIANT_ID_BLOCK_H
 
-#include <stdint.h>
+#include "types.h"
 
 typedef struct VariantIdBlock
 {
-    uint32_t               nsamples;
+    inti                   nsamples;
     uint16_t               id_length;
-    unsigned char         *id;
+    byte                  *id;
     uint16_t               rsid_length;
-    unsigned char         *rsid;
+    byte                  *rsid;
     uint16_t               chrom_length;
-    unsigned char         *chrom;
+    byte                  *chrom;
     uint32_t               position;
     uint16_t               nalleles;
     uint32_t              *allele_lengths;
-    unsigned char        **alleleids;
+    byte                 **alleleids;
     long                   genotype_start;
     struct VariantIdBlock *next;
 } VariantIdBlock;
