@@ -15,6 +15,7 @@ void print_variantids(VariantIdBlock *root)
         vib  = root;
         root = root->next;
         bgen_reader_free_variantid_block(vib);
+        free(vib);
     }
     printf("\n");
 }
