@@ -30,18 +30,18 @@ typedef struct VariantBlock
 typedef struct BGenFile BGenFile;
 
 int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
-                                         uint64_t      variant_idx,
+                                         inti      variant_idx,
                                          VariantIdBlock *vib);
 
-int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, uint64_t variant_idx);
+int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx);
 
 int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
                                                  VariantIdBlock *vib);
 
 int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
-                                                uint64_t  *ploidy,
-                                                uint64_t  *nalleles,
-                                                uint64_t  *nbits,
+                                                inti  *ploidy,
+                                                inti  *nalleles,
+                                                inti  *nbits,
                                                 uint32_t **ui_probs);
 
 #endif /* end of include guard: VARIANT_H */

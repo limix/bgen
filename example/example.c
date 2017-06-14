@@ -5,11 +5,11 @@
 #include "bgen_reader/bgen_reader.h"
 
 void print_genotypes(uint32_t *genotypes,
-                     uint64_t  nsamples,
-                     uint64_t  ngenotypes,
-                     uint64_t  nbits)
+                     inti  nsamples,
+                     inti  ngenotypes,
+                     inti  nbits)
 {
-    uint64_t i, j;
+    inti i, j;
     uint32_t precision = 1;
     precision <<= nbits;
     precision -= 1;
@@ -29,16 +29,16 @@ void print_genotypes(uint32_t *genotypes,
 }
 
 void print_genotypes_probabilities(uint32_t *genotypes,
-                                   uint64_t  nsamples,
-                                   uint64_t  ngenotypes,
-                                   uint64_t  nbits)
+                                   inti  nsamples,
+                                   inti  ngenotypes,
+                                   inti  nbits)
 {
-    uint64_t i, j;
-    uint64_t precision = 1;
+    inti i, j;
+    inti precision = 1;
     precision <<= nbits;
     precision -= 1;
     double denom = precision;
-    uint64_t sum, s;
+    inti sum, s;
 
     for (i = 0; i < nsamples / 50; ++i)
     {
@@ -59,10 +59,10 @@ void print_bgen(const char* filepath)
     printf("---- File name: %s ----\n", filepath);
     BGenFile *bgenfile = bgen_reader_open(filepath);
     byte     *id;
-    uint64_t  len;
-    uint64_t  sampleidx = 350;
-    uint64_t  variantidx = 187;
-    uint64_t  position, nalleles;
+    inti  len;
+    inti  sampleidx = 350;
+    inti  variantidx = 187;
+    inti  position, nalleles;
 
     printf("Number of samples: %lld\n",  bgen_reader_nsamples(bgenfile));
     printf("Number of variants: %lld\n", bgen_reader_nvariants(bgenfile));
@@ -115,8 +115,8 @@ void print_bgen(const char* filepath)
     }
 
     uint32_t *genotypes;
-    uint64_t  ploidy;
-    uint64_t  nbits;
+    inti  ploidy;
+    inti  nbits;
     bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,
                               &nalleles, &nbits);
 

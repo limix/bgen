@@ -2,10 +2,9 @@
 #define ZLIB_WRAPPER_H
 
 #include <zlib.h>
-#include <stdint.h>
 #include <stdlib.h>
 
-typedef unsigned char byte;
+#include "../types.h"
 
 inline static int64_t zlib_uncompress(const byte *src, size_t src_size,
                                       byte **dst, uint32_t *dst_size)

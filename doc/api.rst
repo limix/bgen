@@ -35,113 +35,113 @@ Functions description
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_sampleid(BGenFile* bgenfile,\
-                                             uint64_t  sample_idx,\
+                                             inti  sample_idx,\
                                              unsigned char** id,\
-                                             uint64_t* length)
+                                             inti* length)
 
   Get the sample id of the specified sample index.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Sample index.
+  :param inti: Sample index.
   :param unsigned char**: Identification.
-  :param uint64_t*: String length.
+  :param inti*: String length.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variantid(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
+                                             inti  variant_idx,\
                                              unsigned char** id,\
-                                             uint64_t* length)
+                                             inti* length)
 
   Get the variant id of the specified variant index.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
+  :param inti: Variant index.
   :param unsigned char**: Identification.
-  :param uint64_t*: String length.
+  :param inti*: String length.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variant_rsid(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
+                                             inti  variant_idx,\
                                              unsigned char** rsid,\
-                                             uint64_t* length)
+                                             inti* length)
 
   Get the variant RSID of the specified variant index.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
+  :param inti: Variant index.
   :param unsigned char**: RSID.
-  :param uint64_t*: String length.
+  :param inti*: String length.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variant_chrom(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
+                                             inti  variant_idx,\
                                              unsigned char** chrom,\
-                                             uint64_t* length)
+                                             inti* length)
 
   Get the chromossome name of the specified variant index.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
+  :param inti: Variant index.
   :param unsigned char**: Chromossome name.
-  :param uint64_t*: String length.
+  :param inti*: String length.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variant_position(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
-                                             uint64_t* position)
+                                             inti  variant_idx,\
+                                             inti* position)
 
   Get the position of the specified variant index.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
-  :param uint64_t*: Position.
+  :param inti: Variant index.
+  :param inti*: Position.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variant_nalleles(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
-                                             uint64_t* nalleles)
+                                             inti  variant_idx,\
+                                             inti* nalleles)
 
   Get the number of alleles the specified variant index has.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
+  :param inti: Variant index.
   :param nalleles*: Number of alleles.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_variant_alleleid(BGenFile* bgenfile,\
-                                             uint64_t  variant_idx,\
-                                             uint64_t  allele_idx,\
+                                             inti  variant_idx,\
+                                             inti  allele_idx,\
                                              unsigned char** id,\
-                                             uint64_t* length)
+                                             inti* length)
 
   Get the allele id of the specified allele.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
-  :param uint64_t: Allele index.
+  :param inti: Variant index.
+  :param inti: Allele index.
   :param unsigned char**: Identification.
-  :param uint64_t*: String length.
+  :param inti*: String length.
 
   :return: exit status.
   :rtype: int64_t
 
 .. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,\
-                                                  uint64_t   variant_idx,\
+                                                  inti   variant_idx,\
                                                   uint32_t** ui_probs,\
-                                                  uint64_t*  ploidy,\
-                                                  uint64_t*  nalleles)
+                                                  inti*  ploidy,\
+                                                  inti*  nalleles)
 
   Read the genotype probabilities of the specified variant index.
   Let :math:`n_a` and :math:`n_p` be the number of alleles and the ploidy.
@@ -153,10 +153,10 @@ Functions description
     k = {n_a + n_p - 1 \choose n_a - 1}.
 
   :param BGenFile*: Bgen file handler.
-  :param uint64_t: Variant index.
-  :param uint64_t**: Genotype probabilities.
-  :param uint64_t*: Ploidy.
-  :param uint64_t*: Number of alleles.
+  :param inti: Variant index.
+  :param inti**: Genotype probabilities.
+  :param inti*: Ploidy.
+  :param inti*: Number of alleles.
 
   :return: exit status.
   :rtype: int64_t

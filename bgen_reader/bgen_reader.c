@@ -81,8 +81,8 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
     free(bgenfile->filepath);
     bgenfile->filepath = NULL;
 
-    uint64_t i;
-    uint64_t nsamples = bgenfile->sampleid_block->nsamples;
+    inti i;
+    inti nsamples = bgenfile->sampleid_block->nsamples;
 
     if (bgen_reader_is_sampleids_block_present(bgenfile))
     {
@@ -112,8 +112,8 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
     return bgenfile->header.nvariants;
 }
 
-int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, byte **id,
-                             uint64_t *length)
+int64_t bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
+                             inti *length)
 {
     if (sample_idx >= bgenfile->header.nsamples) return FAIL;
 
@@ -125,8 +125,8 @@ int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, byte **id,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, byte **id,
-                              uint64_t *length)
+int64_t bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
+                              inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -144,9 +144,9 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, byte **i
 }
 
 int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
-                                 uint64_t  variant_idx,
+                                 inti  variant_idx,
                                  byte    **rsid,
-                                 uint64_t *length)
+                                 inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -164,9 +164,9 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
-                                  uint64_t  variant_idx,
+                                  inti  variant_idx,
                                   byte    **chrom,
-                                  uint64_t *length)
+                                  inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -184,7 +184,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_position(BGenFile *bgenfile,
-                                     uint64_t variant_idx, uint64_t *position)
+                                     inti variant_idx, inti *position)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -201,7 +201,7 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
-                                     uint64_t variant_idx, uint64_t *nalleles)
+                                     inti variant_idx, inti *nalleles)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -217,15 +217,15 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
-                                     uint64_t allele_idx, byte **id,
-                                     uint64_t *length)
+int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
+                                     inti allele_idx, byte **id,
+                                     inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
     if (variant_idx >= NVARIANTS(bgenfile)) return -1;
 
-    uint64_t nalleles;
+    inti nalleles;
     bgen_reader_variant_nalleles(bgenfile, variant_idx, &nalleles);
 
     if (allele_idx >= nalleles) return FAIL;
@@ -240,9 +240,9 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
-                                  uint32_t **ui_probs, uint64_t  *ploidy,
-                                  uint64_t  *nalleles, uint64_t  *nbits)
+int64_t bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
+                                  uint32_t **ui_probs, inti  *ploidy,
+                                  inti  *nalleles, inti  *nbits)
 {
     VariantIdBlock vib;
 

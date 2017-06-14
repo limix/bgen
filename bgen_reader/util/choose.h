@@ -1,8 +1,8 @@
 #ifndef CHOOSE_H
 #define CHOOSE_H
 
-#include <stdint.h>
+#include "../types.h"
 
-int64_t bgen_reader_choose(uint64_t n, uint64_t k);
+inti bgen_reader_choose(inti n, inti k);
 
 #endif /* end of include guard: CHOOSE_H */

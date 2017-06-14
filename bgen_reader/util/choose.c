@@ -1,8 +1,8 @@
 #include "choose.h"
 
-int64_t bgen_reader_choose(uint64_t n, uint64_t k)
+inti bgen_reader_choose(inti n, inti k)
 {
-    uint64_t ans = 1;
+    inti ans = 1;
 
     k = k > n - k ? n - k : k;
     int j = 1;
