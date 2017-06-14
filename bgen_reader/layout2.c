@@ -12,23 +12,23 @@
 #define FREAD bgen_reader_fread
 #define FAIL EXIT_FAILURE
 
-inline static uint8_t bgen_read_ploidy(byte ploidy_miss)
+inline static inti bgen_read_ploidy(byte ploidy_miss)
 {
     return ploidy_miss & 127;
 }
 
-inline static uint8_t bgen_read_missingness(byte ploidy_miss)
+inline static inti bgen_read_missingness(byte ploidy_miss)
 {
     return (ploidy_miss & 256) >> 7;
 }
 
-inline static inti bit_sample_start(inti sample_idx, uint8_t nbits,
-                                    uint32_t ncomb)
+inline static inti bit_sample_start(inti sample_idx, inti nbits,
+                                    inti ncomb)
 {
     return sample_idx * (nbits * (ncomb - 1));
 }
 
-inline static inti bit_geno_start(inti geno_idx, uint8_t nbits)
+inline static inti bit_geno_start(inti geno_idx, inti nbits)
 {
     return geno_idx * nbits;
 }
@@ -46,10 +46,10 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
     inti i, j;
     inti bi;
     inti sample_start, geno_start, bit_idx;
-    uint8_t  ploidy;
-    uint8_t  miss;
-    uint32_t ui_prob;
-    uint32_t ui_prob_sum;
+    inti ploidy;
+    inti miss;
+    inti ui_prob;
+    inti ui_prob_sum;
 
     inti ncombs =
         bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1,
@@ -91,8 +91,8 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
 
 inti bgen_reader_uncompress(BGenFile *bgenfile, byte **uchunk)
 {
-    uint32_t clength, ulength;
-    byte    *cchunk;
+    inti  clength = 0, ulength = 0;
+    byte *cchunk;
 
     if (bgen_reader_compression(bgenfile) == 0)
     {
@@ -185,7 +185,7 @@ inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
 
 inti bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile)
 {
-    uint32_t length;
+    inti length = 0;
 
     if (bgen_reader_compression(bgenfile) == 0)
     {
