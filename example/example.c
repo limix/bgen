@@ -16,6 +16,7 @@ void print_variantids(VariantIdBlock *root)
         root = root->next;
         bgen_reader_free_variantid_block(vib);
     }
+    printf("\n");
 }
 
 void print_genotypes(inti *genotypes,
@@ -37,7 +38,7 @@ void print_genotypes(inti *genotypes,
         for (j = 0; j < ngenotypes - 1; ++j)
         {
             sum += genotypes[i * (ngenotypes - 1) + j];
-            printf("%010u ", genotypes[i * (ngenotypes - 1) + j]);
+            printf("%010lld ", genotypes[i * (ngenotypes - 1) + j]);
         }
 
         printf("%010u \n", precision - sum);
@@ -150,7 +151,7 @@ void print_bgen(const char *filepath)
 
     VariantIdBlock *root = NULL;
 
-    if (bgen_reader_read_variantid_blocks(bgenfile, &root) == FAIL) return FAIL;
+    bgen_reader_read_variantid_blocks(bgenfile, &root);
 
     print_variantids(root);
 
