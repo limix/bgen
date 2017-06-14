@@ -253,6 +253,8 @@ inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
+    bgen_reader_free_variantid_block(&vib);
+
     return EXIT_SUCCESS;
 }
 
