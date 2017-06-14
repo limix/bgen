@@ -16,16 +16,16 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;
     strm.avail_in = 0;
-    strm.next_in  = Z_NULL;
+    strm.next_in  = (byte *)src;
     e             = inflateInit(&strm);
 
     if (e != Z_OK)
     {
-        printf("zlib failed to uncompress: %s.\n", zError(e));
+        printf("11 zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 
-    strm.next_in  = (byte *)src;
+
     strm.avail_in = src_size;
 
     strm.avail_out = *dst_size;
@@ -41,33 +41,11 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
     case Z_DATA_ERROR:
     case Z_MEM_ERROR:
         inflateEnd(&strm);
-        printf("zlib failed to uncompress: %s.\n", zError(e));
+        printf("22 zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 
-    unsigned int have = *dst_size - strm.avail_out;
     assert(strm.avail_out == 0);
-
-    if (have > 0)
-    {
-        printf("zlib failed to uncompress.\n");
-        inflateEnd(&strm);
-        return EXIT_FAILURE;
-    }
-
-    // uLongf z_dst_size = *dst_size;
-
-    // int e = uncompress(*dst, &z_dst_size, src, src_size);
-
-    // if (e != Z_OK)
-    // {
-    //     printf("zlib failed to uncompress: %s.\n", zError(e));
-    //     return EXIT_FAILURE;
-    // }
-    //
-    // *dst_size = z_dst_size;
-
-    // *dst = realloc(*dst, *dst_size);
 
     inflateEnd(&strm);
     return EXIT_SUCCESS;
