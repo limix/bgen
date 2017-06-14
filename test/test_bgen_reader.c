@@ -6,143 +6,157 @@
 #include <string.h>
 
 #define BYTE unsigned char
+#define FAIL EXIT_FAILURE
 
 static inline int bytencmp(const BYTE *s1, const char *s2, size_t n)
 {
     return strncmp((const char *)s1, s2, n);
 }
 
-static int test_sampleids_block(BGenFile *bgen_file)
+static int test_sampleids_block(BGenFile *bgenfile)
 {
     BYTE *sampleid;
     uint64_t sampleid_len;
 
-    if (bgen_reader_sampleid(bgen_file, 0, &sampleid,
-                             &sampleid_len)) return EXIT_FAILURE;
-
-    return EXIT_SUCCESS;
+    if (bgen_reader_sampleid(bgenfile, 0, &sampleid,
+                             &sampleid_len)) return FAIL;
 
     if (bytencmp(sampleid, "sample_001",
-                 sampleid_len) != 0) return EXIT_FAILURE;
+                 sampleid_len) != 0) return FAIL;
 
-    if (bgen_reader_sampleid(bgen_file, 499, &sampleid,
-                             &sampleid_len)) return EXIT_FAILURE;
+    if (bgen_reader_sampleid(bgenfile, 499, &sampleid,
+                             &sampleid_len)) return FAIL;
 
     if (bytencmp(sampleid, "sample_500",
-                 sampleid_len) != 0) return EXIT_FAILURE;
+                 sampleid_len) != 0) return FAIL;
 
-    if (bgen_reader_sampleid(bgen_file, 500, &sampleid,
+    if (bgen_reader_sampleid(bgenfile, 500, &sampleid,
                              &sampleid_len) !=
-        EXIT_FAILURE) return EXIT_FAILURE;
+        FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }
 
-static int test_variants_block(BGenFile *bgen_file)
+static int test_variants_block(BGenFile *bgenfile)
 {
     BYTE *varid, *var_rsid, *var_chrom, *alleleid;
     uint64_t varid_len, var_rsid_len, var_chrom_len, alleleid_len;
 
-    bgen_reader_variantid(bgen_file, 0, &varid, &varid_len);
+    bgen_reader_variantid(bgenfile, 0, &varid, &varid_len);
 
 
-    if (bytencmp(varid, "SNPID_2", varid_len) != 0) return EXIT_FAILURE;
+    if (bytencmp(varid, "SNPID_2", varid_len) != 0) return FAIL;
 
 
-    bgen_reader_variant_rsid(bgen_file, 0, &var_rsid, &var_rsid_len);
+    bgen_reader_variant_rsid(bgenfile, 0, &var_rsid, &var_rsid_len);
 
 
-    if (bytencmp(var_rsid, "RSID_2", var_rsid_len) != 0) return EXIT_FAILURE;
+    if (bytencmp(var_rsid, "RSID_2", var_rsid_len) != 0) return FAIL;
 
-    bgen_reader_variant_chrom(bgen_file, 0, &var_chrom, &var_chrom_len);
+    bgen_reader_variant_chrom(bgenfile, 0, &var_chrom, &var_chrom_len);
 
-    if (bytencmp(var_chrom, "01", var_chrom_len) != 0) return EXIT_FAILURE;
+    if (bytencmp(var_chrom, "01", var_chrom_len) != 0) return FAIL;
 
     uint64_t pos;
 
-    bgen_reader_variant_position(bgen_file, 0, &pos);
+    bgen_reader_variant_position(bgenfile, 0, &pos);
 
-    if (pos != 2000) return EXIT_FAILURE;
+    if (pos != 2000) return FAIL;
 
     uint64_t nalleles;
-    bgen_reader_variant_nalleles(bgen_file, 0, &nalleles);
+    bgen_reader_variant_nalleles(bgenfile, 0, &nalleles);
 
-    if (nalleles != 2) return EXIT_FAILURE;
+    if (nalleles != 2) return FAIL;
 
-    bgen_reader_variant_alleleid(bgen_file, 0, 0, &alleleid, &alleleid_len);
+    bgen_reader_variant_alleleid(bgenfile, 0, 0, &alleleid, &alleleid_len);
 
-    if (bytencmp(alleleid, "A", alleleid_len) != 0) return EXIT_FAILURE;
+    if (bytencmp(alleleid, "A", alleleid_len) != 0) return FAIL;
 
-    bgen_reader_variant_alleleid(bgen_file, 0, 1, &alleleid, &alleleid_len);
+    bgen_reader_variant_alleleid(bgenfile, 0, 1, &alleleid, &alleleid_len);
 
 
-    if (bytencmp(alleleid, "G", alleleid_len) != 0) return EXIT_FAILURE;
+    if (bytencmp(alleleid, "G", alleleid_len) != 0) return FAIL;
 
+    return EXIT_SUCCESS;
+}
+
+int test_genotype_reading(BGenFile *bgenfile)
+{
+    uint64_t nsamples, ploidy, nalleles, nbits;
+
+    nsamples = bgen_reader_nsamples(bgenfile);
+
+    uint32_t *ui_probs;
+
+    // first SNP
+    bgen_reader_read_genotype(bgenfile, 0, &ui_probs, &ploidy, &nalleles,
+                              &nbits);
+
+    if (nbits != 1) return FAIL;
+
+    // Sample 0 (sample_001)
+    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return FAIL;
+
+    // Sample 3 (sample_004)
+    if ((ui_probs[6] != 0) || (ui_probs[7] != 1)) return FAIL;
+
+    // Sample 498 (sample_499)
+    if ((ui_probs[498 * 2] != 1) ||
+        (ui_probs[498 * 2 + 1] != 0)) return FAIL;
+
+    free(ui_probs);
+
+    // second SNP
+    bgen_reader_read_genotype(bgenfile, 1, &ui_probs, &ploidy, &nalleles,
+                              &nbits);
+
+    if (nbits != 1) return FAIL;
+
+    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return FAIL;
+
+    if ((ui_probs[4] != 1) || (ui_probs[5] != 0)) return FAIL;
+
+    if ((ui_probs[12] != 0) || (ui_probs[13] != 1)) return FAIL;
+
+    free(ui_probs);
+
+    return EXIT_SUCCESS;
+}
+
+int test_variantid_blocks_reading(BGenFile *bgenfile)
+{
+    VariantIdBlock *head_ref = NULL;
+    if (bgen_reader_read_variantid_blocks(bgenfile, &head_ref) == FAIL) return FAIL;
     return EXIT_SUCCESS;
 }
 
 int main()
 {
     char *fp = "test/data/example.1bits.bgen";
-    BGenFile *bgen_file;
+    BGenFile *bgenfile;
 
-    bgen_file = bgen_reader_open(fp);
-
-
-    if (bgen_file == NULL) return EXIT_FAILURE;
+    bgenfile = bgen_reader_open(fp);
 
 
-    if (bgen_reader_nsamples(bgen_file) != 500) return EXIT_FAILURE;
+    if (bgenfile == NULL) return FAIL;
 
 
-    if (bgen_reader_nvariants(bgen_file) != 199) return EXIT_FAILURE;
+    if (bgen_reader_nsamples(bgenfile) != 500) return FAIL;
 
 
-    if (test_sampleids_block(bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
+    if (bgen_reader_nvariants(bgenfile) != 199) return FAIL;
 
 
-    if (test_variants_block(bgen_file) != EXIT_SUCCESS) return EXIT_FAILURE;
+    if (test_sampleids_block(bgenfile) != EXIT_SUCCESS) return FAIL;
 
-    uint64_t nsamples, ploidy, nalleles, nbits;
 
-    nsamples = bgen_reader_nsamples(bgen_file);
+    if (test_variants_block(bgenfile) != EXIT_SUCCESS) return FAIL;
 
-    uint32_t *ui_probs;
+    if (test_genotype_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
 
-    // first SNP
-    bgen_reader_read_genotype(bgen_file, 0, &ui_probs, &ploidy, &nalleles,
-                              &nbits);
+    if (test_variantid_blocks_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
 
-    if (nbits != 1) return EXIT_FAILURE;
-
-    // Sample 0 (sample_001)
-    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
-
-    // Sample 3 (sample_004)
-    if ((ui_probs[6] != 0) || (ui_probs[7] != 1)) return EXIT_FAILURE;
-
-    // Sample 498 (sample_499)
-    if ((ui_probs[498 * 2] != 1) ||
-        (ui_probs[498 * 2 + 1] != 0)) return EXIT_FAILURE;
-
-    free(ui_probs);
-
-    // second SNP
-    bgen_reader_read_genotype(bgen_file, 1, &ui_probs, &ploidy, &nalleles,
-                              &nbits);
-
-    if (nbits != 1) return EXIT_FAILURE;
-
-    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return EXIT_FAILURE;
-
-    if ((ui_probs[4] != 1) || (ui_probs[5] != 0)) return EXIT_FAILURE;
-
-    if ((ui_probs[12] != 0) || (ui_probs[13] != 1)) return EXIT_FAILURE;
-
-    free(ui_probs);
-
-    bgen_reader_close(bgen_file);
-
+    bgen_reader_close(bgenfile);
 
     return EXIT_SUCCESS;
 }

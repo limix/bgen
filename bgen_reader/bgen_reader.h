@@ -64,7 +64,7 @@ int64_t bgen_reader_read_genotype(BGenFile  *bgenfile,
 int64_t bgen_reader_choose(uint64_t n,
                            uint64_t k);
 
-int64_t bgen_reader_read_all_variantid_data(BGenFile        *bgenfile,
-                                            VariantIdBlock **head_ref);
+int64_t bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
+                                          VariantIdBlock **head_ref);
 
 #endif /* end of include guard: BGEN_READER_H */

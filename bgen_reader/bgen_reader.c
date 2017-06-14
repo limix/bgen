@@ -265,10 +265,12 @@ int64_t bgen_reader_read_genotype(BGenFile *bgenfile, uint64_t variant_idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_all_variantid_data(BGenFile      *bgenfile,
+int64_t bgen_reader_read_variantid_blocks(BGenFile      *bgenfile,
                                             VariantIdBlock **head_ref)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    // int64_t nsamples = bgen_reader_nsamples(bgenfile);
 
     bgen_reader_seek_variant_block(bgenfile, 0);
 
