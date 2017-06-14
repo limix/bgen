@@ -6,7 +6,7 @@
 typedef struct VariantIdBlock
 {
     inti                   nsamples;
-    uint16_t               id_length;
+    inti                   id_length;
     byte                  *id;
     uint16_t               rsid_length;
     byte                  *rsid;

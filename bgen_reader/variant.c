@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "variant.h"
 #include "bgen_file.h"
@@ -35,6 +36,7 @@
 inti bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
                                                  VariantIdBlock *vib)
 {
+    memset(vib, 0, sizeof(VariantIdBlock));
     inti layout      = bgen_reader_layout(bgenfile);
 
     if (layout == 1)
@@ -42,6 +44,7 @@ inti bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
         if (FREAD(bgenfile, &(vib->nsamples), 4)) return FAIL;
     }
 
+    // vib->id_length = 0;
     if (FREAD(bgenfile, &(vib->id_length), 2)) return FAIL;
 
     vib->id = malloc(vib->id_length);

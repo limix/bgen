@@ -114,7 +114,7 @@ inti bgen_reader_nvariants(BGenFile *bgenfile)
 }
 
 inti bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
-                             inti *length)
+                          inti *length)
 {
     if (sample_idx >= bgenfile->header.nsamples) return FAIL;
 
@@ -127,13 +127,14 @@ inti bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
 }
 
 inti bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
-                              inti *length)
+                           inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
 
     VariantIdBlock vib;
+
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.id_length;
@@ -145,9 +146,9 @@ inti bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
 }
 
 inti bgen_reader_variant_rsid(BGenFile *bgenfile,
-                                 inti  variant_idx,
-                                 byte    **rsid,
-                                 inti *length)
+                              inti      variant_idx,
+                              byte    **rsid,
+                              inti     *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -165,9 +166,9 @@ inti bgen_reader_variant_rsid(BGenFile *bgenfile,
 }
 
 inti bgen_reader_variant_chrom(BGenFile *bgenfile,
-                                  inti  variant_idx,
-                                  byte    **chrom,
-                                  inti *length)
+                               inti      variant_idx,
+                               byte    **chrom,
+                               inti     *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -185,7 +186,7 @@ inti bgen_reader_variant_chrom(BGenFile *bgenfile,
 }
 
 inti bgen_reader_variant_position(BGenFile *bgenfile,
-                                     inti variant_idx, inti *position)
+                                  inti variant_idx, inti *position)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -202,7 +203,7 @@ inti bgen_reader_variant_position(BGenFile *bgenfile,
 }
 
 inti bgen_reader_variant_nalleles(BGenFile *bgenfile,
-                                     inti variant_idx, inti *nalleles)
+                                  inti variant_idx, inti *nalleles)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -219,8 +220,8 @@ inti bgen_reader_variant_nalleles(BGenFile *bgenfile,
 }
 
 inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
-                                     inti allele_idx, byte **id,
-                                     inti *length)
+                                  inti allele_idx, byte **id,
+                                  inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -242,8 +243,8 @@ inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
 }
 
 inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
-                                  inti **ui_probs, inti  *ploidy,
-                                  inti  *nalleles, inti  *nbits)
+                               inti **ui_probs, inti  *ploidy,
+                               inti  *nalleles, inti  *nbits)
 {
     VariantIdBlock vib;
 
@@ -254,10 +255,10 @@ inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
     fseek(bgenfile->file, vib.genotype_start, SEEK_SET);
 
     inti e = bgen_reader_read_current_genotype_block(bgenfile,
-                                                        ploidy,
-                                                        nalleles,
-                                                        nbits,
-                                                        ui_probs);
+                                                     ploidy,
+                                                     nalleles,
+                                                     nbits,
+                                                     ui_probs);
 
     if (e == FAIL) return FAIL;
 
@@ -266,8 +267,8 @@ inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
     return EXIT_SUCCESS;
 }
 
-inti bgen_reader_read_variantid_blocks(BGenFile      *bgenfile,
-                                            VariantIdBlock **head_ref)
+inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
+                                       VariantIdBlock **head_ref)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -275,7 +276,7 @@ inti bgen_reader_read_variantid_blocks(BGenFile      *bgenfile,
 
     bgen_reader_seek_variant_block(bgenfile, 0);
 
-    VariantIdBlock *vib  = malloc(sizeof(VariantIdBlock));
+    VariantIdBlock *vib = malloc(sizeof(VariantIdBlock));
     bgen_reader_read_current_variantid_block(bgenfile, vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
