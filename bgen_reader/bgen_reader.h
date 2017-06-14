@@ -67,4 +67,6 @@ inti bgen_reader_choose(inti n,
 inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
                                        VariantIdBlock **head_ref);
 
+inti bgen_reader_free_variantid_block(VariantIdBlock *vib);
+
 #endif /* end of include guard: BGEN_READER_H */

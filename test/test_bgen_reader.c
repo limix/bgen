@@ -16,7 +16,7 @@ static inline int bytencmp(const byte *s1, const char *s2, inti n)
 static int test_sampleids_block(BGenFile *bgenfile)
 {
     byte *sampleid;
-    inti sampleid_len;
+    inti  sampleid_len;
 
     if (bgen_reader_sampleid(bgenfile, 0, &sampleid,
                              &sampleid_len)) return FAIL;
@@ -40,7 +40,7 @@ static int test_sampleids_block(BGenFile *bgenfile)
 static int test_variants_block(BGenFile *bgenfile)
 {
     byte *varid, *var_rsid, *var_chrom, *alleleid;
-    inti varid_len, var_rsid_len, var_chrom_len, alleleid_len;
+    inti  varid_len, var_rsid_len, var_chrom_len, alleleid_len;
 
     bgen_reader_variantid(bgenfile, 0, &varid, &varid_len);
 
@@ -126,7 +126,27 @@ int test_genotype_reading(BGenFile *bgenfile)
 int test_variantid_blocks_reading(BGenFile *bgenfile)
 {
     VariantIdBlock *head_ref = NULL;
+
     if (bgen_reader_read_variantid_blocks(bgenfile, &head_ref) == FAIL) return FAIL;
+
+    VariantIdBlock *vib;
+    char snp_name[32];
+
+    inti i = 200;
+    inti length;
+
+    while (head_ref != NULL)
+    {
+        length = sprintf(snp_name, "SNPID_%d", (int)i);
+
+        if (strncmp((char *)snp_name, (char *)head_ref->id, length) != 0) return FAIL;
+
+        vib      = head_ref;
+        head_ref = head_ref->next;
+        bgen_reader_free_variantid_block(vib);
+        --i;
+    }
+
     return EXIT_SUCCESS;
 }
 
