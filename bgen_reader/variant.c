@@ -44,7 +44,6 @@ inti bgen_reader_read_current_variantid_block(BGenFile       *bgenfile,
         if (FREAD(bgenfile, &(vib->nsamples), 4)) return FAIL;
     }
 
-    // vib->id_length = 0;
     if (FREAD(bgenfile, &(vib->id_length), 2)) return FAIL;
 
     vib->id = malloc(vib->id_length);
@@ -102,7 +101,7 @@ inti bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
     for (i = 0; i < variant_idx; ++i)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vib);
-        bgen_reader_read_genotype_layout2_skip(bgenfile);
+        bgen_reader_layout2_genotype_skip(bgenfile);
     }
     return EXIT_SUCCESS;
 }
@@ -165,4 +164,9 @@ inti bgen_reader_read_current_genotype_block(BGenFile *bgenfile,
     *ui_probs = vpb.genotypes;
 
     return EXIT_SUCCESS;
+}
+
+inti bgen_reader_genotype_skip(BGenFile *bgenfile)
+{
+    return bgen_reader_layout2_genotype_skip(bgenfile);
 }

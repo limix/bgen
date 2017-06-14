@@ -45,4 +45,6 @@ inti bgen_reader_read_current_genotype_block(BGenFile *bgenfile,
                                              inti     *nbits,
                                              inti    **ui_probs);
 
+inti bgen_reader_genotype_skip(BGenFile *bgenfile);
+
 #endif /* end of include guard: VARIANT_H */

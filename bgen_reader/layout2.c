@@ -183,7 +183,7 @@ inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     return EXIT_SUCCESS;
 }
 
-inti bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile)
+inti bgen_reader_layout2_genotype_skip(BGenFile *bgenfile)
 {
     inti length = 0;
 

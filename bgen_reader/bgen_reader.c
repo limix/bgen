@@ -272,12 +272,22 @@ inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    // inti nsamples = bgen_reader_nsamples(bgenfile);
+    inti nsamples = bgen_reader_nsamples(bgenfile);
 
     bgen_reader_seek_variant_block(bgenfile, 0);
 
-    VariantIdBlock *vib = malloc(sizeof(VariantIdBlock));
-    bgen_reader_read_current_variantid_block(bgenfile, vib);
+    VariantIdBlock *vib;
+    VariantIdBlock *root = NULL;
+    inti i;
+
+    for (i = 0; i < nsamples; ++i)
+    {
+        VariantIdBlock *vib = malloc(sizeof(VariantIdBlock));
+        bgen_reader_read_current_variantid_block(bgenfile, vib);
+        vib->next = root;
+        bgen_reader_genotype_skip(bgenfile);
+        root = vib;
+    }
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
