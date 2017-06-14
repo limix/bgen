@@ -5,17 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BYTE unsigned char
+#define byte unsigned char
 #define FAIL EXIT_FAILURE
 
-static inline int bytencmp(const BYTE *s1, const char *s2, size_t n)
+static inline int bytencmp(const byte *s1, const char *s2, size_t n)
 {
     return strncmp((const char *)s1, s2, n);
 }
 
 static int test_sampleids_block(BGenFile *bgenfile)
 {
-    BYTE *sampleid;
+    byte *sampleid;
     uint64_t sampleid_len;
 
     if (bgen_reader_sampleid(bgenfile, 0, &sampleid,
@@ -39,7 +39,7 @@ static int test_sampleids_block(BGenFile *bgenfile)
 
 static int test_variants_block(BGenFile *bgenfile)
 {
-    BYTE *varid, *var_rsid, *var_chrom, *alleleid;
+    byte *varid, *var_rsid, *var_chrom, *alleleid;
     uint64_t varid_len, var_rsid_len, var_chrom_len, alleleid_len;
 
     bgen_reader_variantid(bgenfile, 0, &varid, &varid_len);

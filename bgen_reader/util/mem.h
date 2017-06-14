@@ -20,7 +20,7 @@ inline static char* ft_strdup(const char *src)
     return str;
 }
 
-inline static void MEMCPY(void *dst, BYTE **src, size_t n)
+inline static void MEMCPY(void *dst, byte **src, size_t n)
 {
     memcpy(dst, *src, n);
     *src = *src + n;

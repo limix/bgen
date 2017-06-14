@@ -21,7 +21,7 @@
 //                                     uint32_t     *ui_probs)
 // {
 //     // uint32_t clength;
-//     // BYTE    *cchunk, *uchunk;
+//     // byte    *cchunk, *uchunk;
 //     //
 //     // uint32_t ulength = 6 * nsamples;
 //     //

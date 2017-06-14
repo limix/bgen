@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #include "variant_id_block.h"
-#include "util/byte.h"
+#include "types.h"
 
 typedef struct VariantGenotypeBlock
 {

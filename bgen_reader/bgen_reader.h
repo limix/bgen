@@ -6,6 +6,7 @@
 #include "variant_id_block.h"
 
 typedef struct BGenFile BGenFile;
+typedef unsigned char byte;
 
 BGenFile* bgen_reader_open(const char *filepath);
 int64_t   bgen_reader_close(BGenFile *bgenfile);

@@ -3,12 +3,12 @@
 
 #include <stdint.h>
 
-#include "util/byte.h"
+#include "types.h"
 
 typedef struct
 {
     uint16_t length;
-    BYTE    *id;
+    byte    *id;
 } SampleId;
 
 typedef struct SampleIdBlock

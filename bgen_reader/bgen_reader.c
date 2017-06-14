@@ -112,7 +112,7 @@ int64_t bgen_reader_nvariants(BGenFile *bgenfile)
     return bgenfile->header.nvariants;
 }
 
-int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, BYTE **id,
+int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, byte **id,
                              uint64_t *length)
 {
     if (sample_idx >= bgenfile->header.nsamples) return FAIL;
@@ -125,7 +125,7 @@ int64_t bgen_reader_sampleid(BGenFile *bgenfile, uint64_t sample_idx, BYTE **id,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, BYTE **id,
+int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, byte **id,
                               uint64_t *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -145,7 +145,7 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, uint64_t variant_idx, BYTE **i
 
 int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
                                  uint64_t  variant_idx,
-                                 BYTE    **rsid,
+                                 byte    **rsid,
                                  uint64_t *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -165,7 +165,7 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
 
 int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
                                   uint64_t  variant_idx,
-                                  BYTE    **chrom,
+                                  byte    **chrom,
                                   uint64_t *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -218,7 +218,7 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
 }
 
 int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, uint64_t variant_idx,
-                                     uint64_t allele_idx, BYTE **id,
+                                     uint64_t allele_idx, byte **id,
                                      uint64_t *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;

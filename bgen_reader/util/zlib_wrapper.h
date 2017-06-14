@@ -5,10 +5,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "byte.h"
+typedef unsigned char byte;
 
-inline static int64_t zlib_uncompress(const BYTE *src, size_t src_size,
-                                      BYTE **dst, uint32_t *dst_size)
+inline static int64_t zlib_uncompress(const byte *src, size_t src_size,
+                                      byte **dst, uint32_t *dst_size)
 {
     uLongf z_dst_size = *dst_size;
 

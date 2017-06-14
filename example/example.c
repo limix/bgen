@@ -58,7 +58,7 @@ void print_bgen(const char* filepath)
 {
     printf("---- File name: %s ----\n", filepath);
     BGenFile *bgenfile = bgen_reader_open(filepath);
-    BYTE     *id;
+    byte     *id;
     uint64_t  len;
     uint64_t  sampleidx = 350;
     uint64_t  variantidx = 187;
