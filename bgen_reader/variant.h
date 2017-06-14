@@ -47,4 +47,6 @@ inti bgen_reader_read_current_genotype_block(BGenFile *bgenfile,
 
 inti bgen_reader_genotype_skip(BGenFile *bgenfile);
 
+inti bgen_reader_free_variantid_block(VariantIdBlock *vib);
+
 #endif /* end of include guard: VARIANT_H */

@@ -282,22 +282,3 @@ inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
 
     return EXIT_SUCCESS;
 }
-
-inti bgen_reader_free_variantid_block(VariantIdBlock *vib)
-{
-    free(vib->id);
-    free(vib->rsid);
-    free(vib->chrom);
-    free(vib->allele_lengths);
-    inti i;
-
-    for (i = 0; i < vib->nalleles; ++i)
-    {
-        free(vib->alleleids[i]);
-    }
-    free(vib->alleleids);
-
-    vib->next = NULL;
-
-    return EXIT_SUCCESS;
-}

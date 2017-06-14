@@ -102,6 +102,7 @@ inti bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
     {
         bgen_reader_read_current_variantid_block(bgenfile, &vib);
         bgen_reader_layout2_genotype_skip(bgenfile);
+        bgen_reader_free_variantid_block(&vib);
     }
     return EXIT_SUCCESS;
 }
@@ -169,4 +170,23 @@ inti bgen_reader_read_current_genotype_block(BGenFile *bgenfile,
 inti bgen_reader_genotype_skip(BGenFile *bgenfile)
 {
     return bgen_reader_layout2_genotype_skip(bgenfile);
+}
+
+inti bgen_reader_free_variantid_block(VariantIdBlock *vib)
+{
+    free(vib->id);
+    free(vib->rsid);
+    free(vib->chrom);
+    free(vib->allele_lengths);
+    inti i;
+
+    for (i = 0; i < vib->nalleles; ++i)
+    {
+        free(vib->alleleids[i]);
+    }
+    free(vib->alleleids);
+
+    vib->next = NULL;
+
+    return EXIT_SUCCESS;
 }
