@@ -27,7 +27,7 @@ BGenFile* bgen_reader_open(const char *filepath)
 {
     BGenFile *bgenfile = calloc(1, sizeof(BGenFile));
 
-    bgenfile->filepath = ft_strdup(filepath);
+    bgenfile->filepath = (char *)ft_strdup((const byte *)filepath);
 
     if (FOPEN(bgenfile) == FAIL) return NULL;
 
@@ -138,7 +138,9 @@ inti bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.id_length;
-    *id     = vib.id;
+    *id     = ft_strndup(vib.id, *length);
+
+    bgen_reader_free_variantid_block(&vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
@@ -158,7 +160,9 @@ inti bgen_reader_variant_rsid(BGenFile *bgenfile,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.rsid_length;
-    *rsid   = vib.rsid;
+    *rsid   = ft_strndup(vib.rsid, *length);
+
+    bgen_reader_free_variantid_block(&vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
@@ -178,7 +182,9 @@ inti bgen_reader_variant_chrom(BGenFile *bgenfile,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.chrom_length;
-    *chrom  = vib.chrom;
+    *chrom  = ft_strndup(vib.chrom, *length);
+
+    bgen_reader_free_variantid_block(&vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
@@ -199,6 +205,8 @@ inti bgen_reader_variant_position(BGenFile *bgenfile,
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 
+    bgen_reader_free_variantid_block(&vib);
+
     return EXIT_SUCCESS;
 }
 
@@ -215,6 +223,8 @@ inti bgen_reader_variant_nalleles(BGenFile *bgenfile,
     *nalleles = vib.nalleles;
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    bgen_reader_free_variantid_block(&vib);
 
     return EXIT_SUCCESS;
 }
@@ -235,7 +245,10 @@ inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
     VariantIdBlock vib;
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
-    *id = vib.alleleids[allele_idx];
+    *length = vib.allele_lengths[allele_idx];
+    *id     = ft_strndup(vib.alleleids[allele_idx], *length);
+
+    bgen_reader_free_variantid_block(&vib);
 
     if (FCLOSE(bgenfile) == FAIL) return FAIL;
 

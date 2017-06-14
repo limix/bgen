@@ -86,12 +86,8 @@ inti bgen_reader_read_unphased_genotype(const byte           *chunk,
                     tmp      = 1;
                     tmp    <<= bi;
                     ui_prob |= tmp;
-
-                    // SetBit(ui_prob, bi);
                 }
             }
-            printf("%lld\n", ui_prob);
-
             vpb->genotypes[j * (ncombs - 1) + i] = ui_prob;
             ui_prob_sum                         += ui_prob;
         }

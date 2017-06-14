@@ -89,24 +89,28 @@ void print_bgen(const char *filepath)
     bgen_reader_sampleid(bgenfile, sampleidx, &id, &len);
 
     printf("Sample ID of sample index %llu: %.*s\n", sampleidx, (int)len, id);
+
     free(id);
 
     bgen_reader_variantid(bgenfile, variantidx, &id, &len);
 
     printf("Variant ID of variant index %llu: %.*s\n", variantidx, (int)len,
            id);
+
     free(id);
 
     bgen_reader_variant_rsid(bgenfile, variantidx, &id, &len);
 
     printf("Variant RSID of variant index %llu: %.*s\n", variantidx, (int)len,
            id);
+
     free(id);
 
     bgen_reader_variant_chrom(bgenfile, variantidx, &id, &len);
 
     printf("Chromossome of variant index %llu: %.*s\n", variantidx, (int)len,
            id);
+
     free(id);
 
     bgen_reader_variant_position(bgenfile, variantidx, &position);
@@ -117,7 +121,6 @@ void print_bgen(const char *filepath)
 
     printf("Number of alleles of variant index %llu: %llu\n", variantidx,
            nalleles);
-    free(id);
 
     int alleleidx;
 
