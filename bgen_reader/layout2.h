@@ -3,11 +3,11 @@
 
 #include "types.h"
 
-typedef struct BGenFile BGenFile;
+typedef struct BGenFile             BGenFile;
 typedef struct VariantGenotypeBlock VariantGenotypeBlock;
 
 inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
-                                          VariantGenotypeBlock *vpb);
+                                       VariantGenotypeBlock *vpb);
 
 inti bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile);
 

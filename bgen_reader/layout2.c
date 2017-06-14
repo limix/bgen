@@ -152,21 +152,30 @@ inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
                                        VariantGenotypeBlock *vpb)
 {
     byte *chunk;
-    inti  e;
+    inti  e, i;
 
     e = bgen_reader_uncompress(bgenfile, &chunk);
 
     if (e == FAIL) return FAIL;
+
+    memset(vpb, 0, sizeof(VariantGenotypeBlock));
 
     MEMCPY(&(vpb->nsamples),   &chunk, 4);
     MEMCPY(&(vpb->nalleles),   &chunk, 2);
     MEMCPY(&(vpb->min_ploidy), &chunk, 1);
     MEMCPY(&(vpb->max_ploidy), &chunk, 1);
 
-    vpb->missingness = malloc(vpb->nsamples);
-    MEMCPY(vpb->missingness,   &chunk, vpb->nsamples);
-    MEMCPY(&(vpb->phased),     &chunk, 1);
-    MEMCPY(&(vpb->nbits),      &chunk, 1);
+    vpb->missingness = malloc(vpb->nsamples * sizeof(inti));
+
+    for (i = 0; i < vpb->nsamples; ++i)
+    {
+        vpb->missingness[i] = chunk[i];
+    }
+    chunk += vpb->nsamples;
+
+    // MEMCPY(vpb->missingness,   &chunk, vpb->nsamples);
+    MEMCPY(&(vpb->phased), &chunk, 1);
+    MEMCPY(&(vpb->nbits),  &chunk, 1);
 
     assert(vpb->phased == 0);
     bgen_reader_read_unphased_genotype(chunk, vpb);
