@@ -90,8 +90,6 @@ void print_bgen(const char *filepath)
 
     printf("Sample ID of sample index %llu: %.*s\n", sampleidx, (int)len, id);
 
-    free(id);
-
     bgen_reader_variantid(bgenfile, variantidx, &id, &len);
 
     printf("Variant ID of variant index %llu: %.*s\n", variantidx, (int)len,
