@@ -177,14 +177,18 @@ inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     {
         vpb->missingness[i] = chunk[i];
     }
-    chunk += vpb->nsamples;
+    byte *cc = chunk + vpb->nsamples;
+
+    // chunk += vpb->nsamples;
 
     // MEMCPY(vpb->missingness,   &chunk, vpb->nsamples);
-    MEMCPY(&(vpb->phased), &chunk, 1);
-    MEMCPY(&(vpb->nbits),  &chunk, 1);
+    MEMCPY(&(vpb->phased), &cc, 1);
+    MEMCPY(&(vpb->nbits),  &cc, 1);
 
     assert(vpb->phased == 0);
-    bgen_reader_read_unphased_genotype(chunk, vpb);
+    bgen_reader_read_unphased_genotype(cc, vpb);
+
+    // free(chunk);
 
     return EXIT_SUCCESS;
 }
