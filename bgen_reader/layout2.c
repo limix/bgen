@@ -161,34 +161,33 @@ inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     inti  e, i;
 
     e = bgen_reader_uncompress(bgenfile, &chunk);
+    byte *c = chunk;
 
     if (e == FAIL) return FAIL;
 
     memset(vpb, 0, sizeof(VariantGenotypeBlock));
 
-    MEMCPY(&(vpb->nsamples),   &chunk, 4);
-    MEMCPY(&(vpb->nalleles),   &chunk, 2);
-    MEMCPY(&(vpb->min_ploidy), &chunk, 1);
-    MEMCPY(&(vpb->max_ploidy), &chunk, 1);
+    MEMCPY(&(vpb->nsamples),   &c, 4);
+    MEMCPY(&(vpb->nalleles),   &c, 2);
+    MEMCPY(&(vpb->min_ploidy), &c, 1);
+    MEMCPY(&(vpb->max_ploidy), &c, 1);
 
     vpb->missingness = malloc(vpb->nsamples * sizeof(inti));
 
     for (i = 0; i < vpb->nsamples; ++i)
     {
-        vpb->missingness[i] = chunk[i];
+        vpb->missingness[i] = c[i];
     }
-    byte *cc = chunk + vpb->nsamples;
+    c += vpb->nsamples;
 
-    // chunk += vpb->nsamples;
-
-    // MEMCPY(vpb->missingness,   &chunk, vpb->nsamples);
-    MEMCPY(&(vpb->phased), &cc, 1);
-    MEMCPY(&(vpb->nbits),  &cc, 1);
+    MEMCPY(&(vpb->phased), &c, 1);
+    MEMCPY(&(vpb->nbits),  &c, 1);
 
     assert(vpb->phased == 0);
-    bgen_reader_read_unphased_genotype(cc, vpb);
+    bgen_reader_read_unphased_genotype(c, vpb);
 
-    // free(chunk);
+    free(chunk);
+    free(vpb->missingness);
 
     return EXIT_SUCCESS;
 }
