@@ -92,17 +92,29 @@ int test_genotype_reading(BGenFile *bgenfile)
     bgen_reader_read_genotype(bgenfile, 0, &ui_probs, &ploidy, &nalleles,
                               &nbits);
 
-    if (nbits != 1) return FAIL;
+    if (nbits < 1) return FAIL;
+
+    inti precision = 1;
+    precision <<= nbits;
+    precision  -= 1;
+    inti sum;
 
     // Sample 0 (sample_001)
-    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return FAIL;
+    sum = ui_probs[0] + ui_probs[1];
+
+    if ((ui_probs[0] > precision - sum) || (ui_probs[1] > precision - sum)) return FAIL;
 
     // Sample 3 (sample_004)
-    if ((ui_probs[6] != 0) || (ui_probs[7] != 1)) return FAIL;
+    sum = ui_probs[6] + ui_probs[7];
+
+    if ((ui_probs[6] > ui_probs[7]) || (precision - sum > ui_probs[7])) return FAIL;
 
     // Sample 498 (sample_499)
-    if ((ui_probs[498 * 2] != 1) ||
-        (ui_probs[498 * 2 + 1] != 0)) return FAIL;
+    sum = ui_probs[498 * 2] + ui_probs[498 * 2 + 1];
+
+    if (ui_probs[498 * 2] < ui_probs[498 * 2 + 1]) return FAIL;
+
+    if (ui_probs[498 * 2] < precision - sum) return FAIL;
 
     free(ui_probs);
 
@@ -110,13 +122,27 @@ int test_genotype_reading(BGenFile *bgenfile)
     bgen_reader_read_genotype(bgenfile, 1, &ui_probs, &ploidy, &nalleles,
                               &nbits);
 
-    if (nbits != 1) return FAIL;
+    if (nbits < 1) return FAIL;
 
-    if ((ui_probs[0] != 0) || (ui_probs[0] != 0)) return FAIL;
+    precision   = 1;
+    precision <<= nbits;
+    precision  -= 1;
 
-    if ((ui_probs[4] != 1) || (ui_probs[5] != 0)) return FAIL;
+    sum = ui_probs[0] + ui_probs[1];
 
-    if ((ui_probs[12] != 0) || (ui_probs[13] != 1)) return FAIL;
+    if ((precision - sum < ui_probs[0]) || (precision - sum < ui_probs[1])) return FAIL;
+
+    sum = ui_probs[4] + ui_probs[5];
+
+    if (ui_probs[4] < precision - sum) return FAIL;
+
+    if (ui_probs[4] < ui_probs[5]) return FAIL;
+
+    sum = ui_probs[12] + ui_probs[13];
+
+    if (ui_probs[13] < ui_probs[12]) return FAIL;
+
+    if (ui_probs[13] < precision - sum) return FAIL;
 
     free(ui_probs);
 
@@ -150,25 +176,20 @@ int test_variantid_blocks_reading(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int main()
+int test_filepath(const char *filepath)
 {
-    char *fp = "test/data/example.1bits.bgen";
     BGenFile *bgenfile;
 
-    bgenfile = bgen_reader_open(fp);
-
+    bgenfile = bgen_reader_open(filepath);
 
     if (bgenfile == NULL) return FAIL;
 
-
     if (bgen_reader_nsamples(bgenfile) != 500) return FAIL;
-
 
     if (bgen_reader_nvariants(bgenfile) != 199) return FAIL;
 
 
     if (test_sampleids_block(bgenfile) != EXIT_SUCCESS) return FAIL;
-
 
     if (test_variants_block(bgenfile) != EXIT_SUCCESS) return FAIL;
 
@@ -177,6 +198,15 @@ int main()
     if (test_variantid_blocks_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
 
     bgen_reader_close(bgenfile);
+
+    return EXIT_SUCCESS;
+}
+
+int main()
+{
+    if (test_filepath("test/data/example.1bits.bgen") == FAIL) return FAIL;
+
+    if (test_filepath("test/data/example.32bits.bgen") == FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }

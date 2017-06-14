@@ -8,3 +8,4 @@ else()
 endif()
 
 file(COPY data/example.1bits.bgen DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
+file(COPY data/example.32bits.bgen DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
