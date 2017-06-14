@@ -7,14 +7,14 @@
 
 typedef struct
 {
-    uint16_t length;
-    byte    *id;
+    inti  length;
+    byte *id;
 } SampleId;
 
 typedef struct SampleIdBlock
 {
-    uint32_t  length;
-    uint32_t  nsamples;
+    inti      length;
+    inti      nsamples;
     SampleId *sampleids;
 } SampleIdBlock;
 

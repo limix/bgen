@@ -52,7 +52,7 @@ BGenFile* bgen_reader_open(const char *filepath)
 
     if (bgen_reader_is_sampleids_block_present(bgenfile))
     {
-        bgenfile->sampleid_block = malloc(sizeof(SampleIdBlock));
+        bgenfile->sampleid_block = calloc(1, sizeof(SampleIdBlock));
 
         if (bgen_read_sampleid_block(bgenfile) == FAIL)
         {

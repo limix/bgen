@@ -24,11 +24,11 @@ inti bgen_read_sampleid_block(BGenFile *bgenfile)
 
     if (bgen_reader_fread(bgenfile, &(block->nsamples), 4)) return EXIT_FAILURE;
 
-    block->sampleids = malloc(block->nsamples * sizeof(SampleId));
+    block->sampleids = calloc(block->nsamples, sizeof(SampleId));
 
     for (inti i = 0; i < block->nsamples; i++)
     {
-        uint16_t *length = &(block->sampleids[i].length);
+        inti *length = &(block->sampleids[i].length);
 
         if (bgen_reader_fread(bgenfile, length, 2)) return EXIT_FAILURE;
 
