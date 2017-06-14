@@ -16,7 +16,7 @@
 // | 2   | length of sample N id |
 // | LsN | sample N id           |
 // -------------------------------
-int64_t bgen_read_sampleid_block(BGenFile *bgenfile)
+inti bgen_read_sampleid_block(BGenFile *bgenfile)
 {
     SampleIdBlock *block = bgenfile->sampleid_block;
 

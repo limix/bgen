@@ -13,7 +13,7 @@
 // | Lh - 20 | free data area   |
 // | 4       | flags            |
 // ------------------------------
-int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header)
+inti bgen_reader_read_header(BGenFile *bgenfile, Header *header)
 {
     if (bgen_reader_fread(bgenfile, &(header->header_length), 4)) return EXIT_FAILURE;
 
@@ -30,7 +30,7 @@ int64_t bgen_reader_read_header(BGenFile *bgenfile, Header *header)
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_fopen(BGenFile *bgenfile)
+inti bgen_reader_fopen(BGenFile *bgenfile)
 {
     assert(bgenfile->file == NULL);
     bgenfile->file = fopen(bgenfile->filepath, "rb");
@@ -43,7 +43,7 @@ int64_t bgen_reader_fopen(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_fclose(BGenFile *bgenfile)
+inti bgen_reader_fclose(BGenFile *bgenfile)
 {
     assert(bgenfile->file != NULL);
     fclose(bgenfile->file);
@@ -51,7 +51,7 @@ int64_t bgen_reader_fclose(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size)
+inti bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size)
 {
     size_t err = fread(buffer, size, 1, bgenfile->file);
 
@@ -72,9 +72,9 @@ int64_t bgen_reader_fread(BGenFile *bgenfile, void *restrict buffer, size_t size
 
 // What layout is that?
 // Possible values are 1 and 2.
-int64_t bgen_reader_layout(BGenFile *bgenfile)
+inti bgen_reader_layout(BGenFile *bgenfile)
 {
-    int64_t l = (bgenfile->header.flags & (15 << 2)) >> 2;
+    inti l = (bgenfile->header.flags & (15 << 2)) >> 2;
 
     assert(l != 0);
     return l;
@@ -84,7 +84,7 @@ int64_t bgen_reader_layout(BGenFile *bgenfile)
 // 0: no compression
 // 1: zlib's compress()
 // 2: zstandard's ZSTD_compress()
-int64_t bgen_reader_compression(BGenFile *bgenfile)
+inti bgen_reader_compression(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & 60) >> 2;
 }

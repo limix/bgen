@@ -10,31 +10,31 @@ Functions description
   :return: bgen file handler.
   :rtype: BGenFile*
 
-.. c:function:: int64_t bgen_reader_close(BGenFile* bgenfile)
+.. c:function:: inti bgen_reader_close(BGenFile* bgenfile)
 
   Close a bgen file handler.
 
   :param BGenFile*: Bgen file handler.
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_nsamples(BGenFile* bgenfile)
+.. c:function:: inti bgen_reader_nsamples(BGenFile* bgenfile)
 
   Get the number of samples.
 
   :param BGenFile*: Bgen file handler.
   :return: number of samples.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_nvariants(BGenFile* bgenfile)
+.. c:function:: inti bgen_reader_nvariants(BGenFile* bgenfile)
 
   Get the number of variants.
 
   :param BGenFile*: Bgen file handler.
   :return: number of variants.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_sampleid(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_sampleid(BGenFile* bgenfile,\
                                              inti  sample_idx,\
                                              unsigned char** id,\
                                              inti* length)
@@ -47,9 +47,9 @@ Functions description
   :param inti*: String length.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variantid(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variantid(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              unsigned char** id,\
                                              inti* length)
@@ -62,9 +62,9 @@ Functions description
   :param inti*: String length.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variant_rsid(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variant_rsid(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              unsigned char** rsid,\
                                              inti* length)
@@ -77,9 +77,9 @@ Functions description
   :param inti*: String length.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variant_chrom(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variant_chrom(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              unsigned char** chrom,\
                                              inti* length)
@@ -92,9 +92,9 @@ Functions description
   :param inti*: String length.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variant_position(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variant_position(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              inti* position)
 
@@ -105,9 +105,9 @@ Functions description
   :param inti*: Position.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variant_nalleles(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variant_nalleles(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              inti* nalleles)
 
@@ -118,9 +118,9 @@ Functions description
   :param nalleles*: Number of alleles.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_variant_alleleid(BGenFile* bgenfile,\
+.. c:function:: inti bgen_reader_variant_alleleid(BGenFile* bgenfile,\
                                              inti  variant_idx,\
                                              inti  allele_idx,\
                                              unsigned char** id,\
@@ -135,9 +135,9 @@ Functions description
   :param inti*: String length.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti
 
-.. c:function:: int64_t bgen_reader_read_genotype(BGenFile*  bgenfile,\
+.. c:function:: inti bgen_reader_read_genotype(BGenFile*  bgenfile,\
                                                   inti   variant_idx,\
                                                   uint32_t** ui_probs,\
                                                   inti*  ploidy,\
@@ -159,4 +159,4 @@ Functions description
   :param inti*: Number of alleles.
 
   :return: exit status.
-  :rtype: int64_t
+  :rtype: inti

@@ -40,7 +40,7 @@ inline static int get_bit(const byte *mem, size_t bit_idx)
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-int64_t bgen_reader_read_unphased_genotype(const byte           *chunk,
+inti bgen_reader_read_unphased_genotype(const byte           *chunk,
                                            VariantGenotypeBlock *vpb)
 {
     size_t   i, j;
@@ -51,7 +51,7 @@ int64_t bgen_reader_read_unphased_genotype(const byte           *chunk,
     uint32_t ui_prob;
     uint32_t ui_prob_sum;
 
-    int64_t ncombs =
+    inti ncombs =
         bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1, vpb->nalleles - 1);
 
     vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(char));
@@ -87,7 +87,7 @@ int64_t bgen_reader_read_unphased_genotype(const byte           *chunk,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_uncompress(BGenFile *bgenfile, byte **uchunk)
+inti bgen_reader_uncompress(BGenFile *bgenfile, byte **uchunk)
 {
     uint32_t clength, ulength;
     byte    *cchunk;
@@ -146,11 +146,11 @@ int64_t bgen_reader_uncompress(BGenFile *bgenfile, byte **uchunk)
 // | 1     | # bits per probability               |
 // | C+N+6 | probabilities for each genotype      |
 // ------------------------------------------------
-int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
+inti bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
                                           VariantGenotypeBlock *vpb)
 {
     byte   *chunk;
-    int64_t e;
+    inti e;
 
     e = bgen_reader_uncompress(bgenfile, &chunk);
 
@@ -172,7 +172,7 @@ int64_t bgen_reader_read_genotype_layout2(BGenFile             *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile)
+inti bgen_reader_read_genotype_layout2_skip(BGenFile *bgenfile)
 {
     uint32_t length;
 

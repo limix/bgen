@@ -17,7 +17,7 @@
 #define NVARIANTS bgen_reader_nvariants
 
 // Is sample identifier block present?
-int64_t bgen_reader_is_sampleids_block_present(BGenFile *bgenfile)
+inti bgen_reader_is_sampleids_block_present(BGenFile *bgenfile)
 {
     return (bgenfile->header.flags & (1 << 31)) >> 31;
 }
@@ -74,7 +74,7 @@ BGenFile* bgen_reader_open(const char *filepath)
     return bgenfile;
 }
 
-int64_t bgen_reader_close(BGenFile *bgenfile)
+inti bgen_reader_close(BGenFile *bgenfile)
 {
     assert(bgenfile->file == NULL);
 
@@ -102,17 +102,17 @@ int64_t bgen_reader_close(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_nsamples(BGenFile *bgenfile)
+inti bgen_reader_nsamples(BGenFile *bgenfile)
 {
     return bgenfile->header.nsamples;
 }
 
-int64_t bgen_reader_nvariants(BGenFile *bgenfile)
+inti bgen_reader_nvariants(BGenFile *bgenfile)
 {
     return bgenfile->header.nvariants;
 }
 
-int64_t bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
+inti bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
                              inti *length)
 {
     if (sample_idx >= bgenfile->header.nsamples) return FAIL;
@@ -125,7 +125,7 @@ int64_t bgen_reader_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
+inti bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
                               inti *length)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -143,7 +143,7 @@ int64_t bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
+inti bgen_reader_variant_rsid(BGenFile *bgenfile,
                                  inti  variant_idx,
                                  byte    **rsid,
                                  inti *length)
@@ -163,7 +163,7 @@ int64_t bgen_reader_variant_rsid(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
+inti bgen_reader_variant_chrom(BGenFile *bgenfile,
                                   inti  variant_idx,
                                   byte    **chrom,
                                   inti *length)
@@ -183,7 +183,7 @@ int64_t bgen_reader_variant_chrom(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_position(BGenFile *bgenfile,
+inti bgen_reader_variant_position(BGenFile *bgenfile,
                                      inti variant_idx, inti *position)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -200,7 +200,7 @@ int64_t bgen_reader_variant_position(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
+inti bgen_reader_variant_nalleles(BGenFile *bgenfile,
                                      inti variant_idx, inti *nalleles)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
@@ -217,7 +217,7 @@ int64_t bgen_reader_variant_nalleles(BGenFile *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
+inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
                                      inti allele_idx, byte **id,
                                      inti *length)
 {
@@ -240,7 +240,7 @@ int64_t bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
+inti bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
                                   uint32_t **ui_probs, inti  *ploidy,
                                   inti  *nalleles, inti  *nbits)
 {
@@ -252,7 +252,7 @@ int64_t bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
 
     fseek(bgenfile->file, vib.genotype_start, SEEK_SET);
 
-    int64_t e = bgen_reader_read_current_genotype_block(bgenfile,
+    inti e = bgen_reader_read_current_genotype_block(bgenfile,
                                                         ploidy,
                                                         nalleles,
                                                         nbits,
@@ -265,12 +265,12 @@ int64_t bgen_reader_read_genotype(BGenFile *bgenfile, inti variant_idx,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_variantid_blocks(BGenFile      *bgenfile,
+inti bgen_reader_read_variantid_blocks(BGenFile      *bgenfile,
                                             VariantIdBlock **head_ref)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
-    // int64_t nsamples = bgen_reader_nsamples(bgenfile);
+    // inti nsamples = bgen_reader_nsamples(bgenfile);
 
     bgen_reader_seek_variant_block(bgenfile, 0);
 

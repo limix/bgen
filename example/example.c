@@ -120,8 +120,8 @@ void print_bgen(const char* filepath)
     bgen_reader_read_genotype(bgenfile, variantidx, &genotypes, &ploidy,
                               &nalleles, &nbits);
 
-    int64_t nsamples   = bgen_reader_nsamples(bgenfile);
-    int64_t ngenotypes = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
+    inti nsamples   = bgen_reader_nsamples(bgenfile);
+    inti ngenotypes = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
 
     printf("Number of genotypes of variant index %llu: %lld\n",
            variantidx,

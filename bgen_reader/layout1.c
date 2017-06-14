@@ -14,9 +14,9 @@
 // //     | 4 | genotype chunk length, C |
 // //     | C | genotype probabilities   |
 // //     --------------------------------
-// int64_t bgen_genotype_block_layout1(BGenFile     *bgenfile,
-//                                     int64_t       compression,
-//                                     int64_t       nsamples,
+// inti bgen_genotype_block_layout1(BGenFile     *bgenfile,
+//                                     inti       compression,
+//                                     inti       nsamples,
 //                                     VariantBlock *vb,
 //                                     uint32_t     *ui_probs)
 // {

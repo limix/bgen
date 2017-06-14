@@ -6,7 +6,7 @@
 
 #include "../types.h"
 
-inline static int64_t zlib_uncompress(const byte *src, size_t src_size,
+inline static inti zlib_uncompress(const byte *src, size_t src_size,
                                       byte **dst, uint32_t *dst_size)
 {
     uLongf z_dst_size = *dst_size;

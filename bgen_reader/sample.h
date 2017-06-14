@@ -20,6 +20,6 @@ typedef struct SampleIdBlock
 
 typedef struct BGenFile BGenFile;
 
-int64_t bgen_read_sampleid_block(BGenFile *bgenfile);
+inti bgen_read_sampleid_block(BGenFile *bgenfile);
 
 #endif /* end of include guard: SAMPLE_H */

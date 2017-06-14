@@ -32,10 +32,10 @@
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
+inti bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
                                                  VariantIdBlock *vib)
 {
-    int64_t layout      = bgen_reader_layout(bgenfile);
+    inti layout      = bgen_reader_layout(bgenfile);
 
     if (layout == 1)
     {
@@ -86,7 +86,7 @@ int64_t bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
 }
 
 // fseek to the file position from which the variant block can be read
-int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
+inti bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
 {
     assert(bgen_reader_layout(bgenfile) == 2);
 
@@ -124,7 +124,7 @@ int64_t bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
+inti bgen_reader_read_variantid_block(BGenFile     *bgenfile,
                                          inti      variant_idx,
                                          VariantIdBlock *vib)
 {
@@ -139,20 +139,20 @@ int64_t bgen_reader_read_variantid_block(BGenFile     *bgenfile,
     return EXIT_SUCCESS;
 }
 
-int64_t bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
+inti bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
                                                 inti  *ploidy,
                                                 inti  *nalleles,
                                                 inti  *nbits,
                                                 uint32_t **ui_probs)
 {
-    int64_t layout = bgen_reader_layout(bgenfile);
+    inti layout = bgen_reader_layout(bgenfile);
 
     assert(layout == 2);
 
     VariantGenotypeBlock vpb;
-    int64_t compression = bgen_reader_compression(bgenfile);
+    inti compression = bgen_reader_compression(bgenfile);
 
-    int64_t e = bgen_reader_read_genotype_layout2(bgenfile, &vpb);
+    inti e = bgen_reader_read_genotype_layout2(bgenfile, &vpb);
 
     if (e == FAIL) return FAIL;
 
