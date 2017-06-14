@@ -33,11 +33,11 @@
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-inti bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
-                                                 VariantIdBlock *vib)
+inti bgen_reader_read_current_variantid_block(BGenFile       *bgenfile,
+                                              VariantIdBlock *vib)
 {
     memset(vib, 0, sizeof(VariantIdBlock));
-    inti layout      = bgen_reader_layout(bgenfile);
+    inti layout = bgen_reader_layout(bgenfile);
 
     if (layout == 1)
     {
@@ -68,8 +68,8 @@ inti bgen_reader_read_current_variantid_block(BGenFile     *bgenfile,
     if (layout == 1) vib->nalleles = 2;
     else if (FREAD(bgenfile, &(vib->nalleles), 2)) return FAIL;
 
-    vib->allele_lengths = malloc(vib->nalleles * sizeof(uint32_t));
-    vib->alleleids      = malloc(vib->nalleles * sizeof(unsigned char*));
+    vib->allele_lengths = calloc(vib->nalleles, sizeof(inti));
+    vib->alleleids      = malloc(vib->nalleles * sizeof(unsigned char *));
 
     size_t i;
 
@@ -127,9 +127,9 @@ inti bgen_reader_seek_variant_block(BGenFile *bgenfile, inti variant_idx)
 // | 4     | last allele length, LaK           |
 // | LaK   | last allele                       |
 // ---------------------------------------------
-inti bgen_reader_read_variantid_block(BGenFile     *bgenfile,
-                                         inti      variant_idx,
-                                         VariantIdBlock *vib)
+inti bgen_reader_read_variantid_block(BGenFile       *bgenfile,
+                                      inti            variant_idx,
+                                      VariantIdBlock *vib)
 {
     if (FOPEN(bgenfile) == FAIL) return FAIL;
 
@@ -142,11 +142,11 @@ inti bgen_reader_read_variantid_block(BGenFile     *bgenfile,
     return EXIT_SUCCESS;
 }
 
-inti bgen_reader_read_current_genotype_block(BGenFile  *bgenfile,
-                                                inti  *ploidy,
-                                                inti  *nalleles,
-                                                inti  *nbits,
-                                                inti **ui_probs)
+inti bgen_reader_read_current_genotype_block(BGenFile *bgenfile,
+                                             inti     *ploidy,
+                                             inti     *nalleles,
+                                             inti     *nbits,
+                                             inti    **ui_probs)
 {
     inti layout = bgen_reader_layout(bgenfile);
 
