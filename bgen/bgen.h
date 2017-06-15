@@ -1,12 +1,9 @@
 #ifndef BGEN_READER_H
 #define BGEN_READER_H
 
-#include <stdint.h>
+#include <stdlib.h>
 
 #include "types.h"
-#include "user_structs.h"
-#include "impl_structs.h"
-#include "variant_id_block.h"
 
 typedef struct Variant
 {
@@ -26,24 +23,43 @@ typedef struct VariantGenotype
 
 typedef struct VariantIndexing
 {
-    char *filename;
+    byte *filepath;
     inti  compression;
     inti  layout;
     inti *start;
 } VariantIndexing;
 
-BGenFile       * bgen_open(const char *filepath);
-inti             bgen_close(BGenFile *bgen);
+typedef struct BGenFile
+{
+    byte          *filepath;
+    FILE *restrict file;
+    inti           nvariants;
+    inti           nsamples;
 
-inti             bgen_nsamples(BGenFile *bgen);
-inti             bgen_nvariants(BGenFile *bgen);
+    // 0: no compression
+    // 1: zlib's compress()
+    // 2: zstandard's ZSTD_compress()
+    inti compression;
 
-string         * bgen_read_samples(BGenFile *bgen);
-Variant        * bgen_read_variants(BGenFile        *bgen,
-                                    VariantIndexing *index);
+    // Possible values are 1 and 2.
+    inti layout;
+    inti sample_ids_presence;
+    inti samples_start;
+    inti variants_start;
+} BGenFile;
 
-VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
-                                             inti             variant_start,
-                                             inti             variant_end);
+BGenFile* bgen_open(const byte *filepath);
+void      bgen_close(BGenFile *bgen);
+
+inti      bgen_nsamples(BGenFile *bgen);
+inti      bgen_nvariants(BGenFile *bgen);
+
+string  * bgen_read_samples(BGenFile *bgen);
+Variant * bgen_read_variants(BGenFile        *bgen,
+                             VariantIndexing *index);
+
+// VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
+//                                              inti             variant_start,
+//                                              inti             variant_end);
 
 #endif /* end of include guard: BGEN_READER_H */

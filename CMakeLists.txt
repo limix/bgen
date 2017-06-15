@@ -26,8 +26,8 @@ add_library(bgen_static STATIC $<TARGET_OBJECTS:bgen_objs>)
 
 set_target_properties(bgen
   PROPERTIES
-    VERSION ${BGEN_READER_VERSION}
-PUBLIC_HEADER include/bgen/bgen.h)
+    VERSION ${BGEN_VERSION}
+    PUBLIC_HEADER include/bgen/bgen.h)
 
 install(TARGETS bgen
         ARCHIVE DESTINATION lib

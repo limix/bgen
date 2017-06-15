@@ -1,6 +1,7 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#include <stdlib.h>
 #include <inttypes.h>
 #include <assert.h>
 
