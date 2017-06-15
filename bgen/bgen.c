@@ -174,7 +174,7 @@ inti bgen_nsamples(BGenFile *bgen)
 
 inti bgen_nvariants(BGenFile *bgen)
 {
-    bgen->nvariants;
+    return bgen->nvariants;
 }
 
 string* bgen_read_samples(BGenFile *bgen)
@@ -182,6 +182,8 @@ string* bgen_read_samples(BGenFile *bgen)
     if (bgen->sample_ids_presence == 0) return NULL;
 
     bgen->file = fopen(bgenfile->filepath, "rb");
+
+    fseek(bgen->samples_start);
 
     string *sample_ids = malloc(bgen->nsamples * sizeof(string));
 
@@ -207,6 +209,8 @@ string* bgen_read_samples(BGenFile *bgen)
         perror("Could not close the file.")
         goto err;
     }
+
+    bgen->variants_start = ftell(bgen->file);
 
     return sample_ids;
 
@@ -295,7 +299,7 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing *index)
 
     bgen->file = fopen(bgen->filepath, "rb");
 
-    fseek(bgen->);
+    fseek(bgen->variant_start);
 
     index->filepath    = bgen_strdup(bgen->filepath);
     index->compression = bgen->compression;
