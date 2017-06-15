@@ -20,4 +20,11 @@ typedef struct VariantIdBlock
     struct VariantIdBlock *next;
 } VariantIdBlock;
 
+typedef struct BGenIndexing
+{
+    inti  compression;
+    inti  layout;
+    inti *variantid_block_start;
+} BGenIndexing;
+
 #endif /* end of include guard: VARIANT_ID_BLOCK_H */

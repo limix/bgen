@@ -284,3 +284,36 @@ inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
 
     return EXIT_SUCCESS;
 }
+
+inti bgen_reader_create_variantid_block_indexing(BGenFile     *bgenfile,
+                                                 BGenIndexing *index)
+{
+    if (FOPEN(bgenfile) == FAIL) return FAIL;
+
+    inti nvariants = bgen_reader_nvariants(bgenfile);
+
+    bgen_reader_seek_variant_block(bgenfile, 0);
+
+    index->compression = bgen_reader_compression(bgenfile);
+    index->layout      = bgen_reader_layout(bgenfile);
+
+    index->variantid_block_start = malloc(nvariants * sizeof(inti));
+
+    inti i;
+    VariantIdBlock vib;
+
+    for (i = 0; i < nvariants; ++i)
+    {
+        index->variantid_block_start[i] = ftell(bgenfile->file);
+
+        bgen_reader_read_current_variantid_block(bgenfile, &vib);
+
+        bgen_reader_genotype_skip(bgenfile);
+
+        bgen_reader_free_variantid_block(&vib);
+    }
+
+    if (FCLOSE(bgenfile) == FAIL) return FAIL;
+
+    return EXIT_SUCCESS;
+}

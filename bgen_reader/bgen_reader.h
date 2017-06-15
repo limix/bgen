@@ -69,4 +69,7 @@ inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
 
 inti bgen_reader_free_variantid_block(VariantIdBlock *vib);
 
+inti bgen_reader_create_variantid_block_indexing(BGenFile     *bgenfile,
+                                                 BGenIndexing *index);
+
 #endif /* end of include guard: BGEN_READER_H */

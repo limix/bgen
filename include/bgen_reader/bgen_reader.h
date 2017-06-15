@@ -8,6 +8,13 @@ typedef unsigned char byte;
 typedef int_fast64_t  inti;
 typedef double        real;
 
+typedef struct BGenIndexing
+{
+    inti  compression;
+    inti  layout;
+    inti *variantid_block_start;
+} BGenIndexing;
+
 typedef struct VariantIdBlock
 {
     inti                   nsamples;
@@ -91,5 +98,8 @@ inti  bgen_reader_free_variantid_block(VariantIdBlock *vib);
 
 byte* bgen_reader_strndup(const byte *src,
                           inti        size);
+
+inti  bgen_reader_create_variantid_block_indexing(BGenFile     *bgenfile,
+                                                  BGenIndexing *index);
 
 #endif /* end of include guard: BGEN_READER_H */

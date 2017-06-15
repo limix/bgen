@@ -176,6 +176,33 @@ int test_variantid_blocks_reading(BGenFile *bgenfile)
     return EXIT_SUCCESS;
 }
 
+int test_indexing(BGenFile *bgenfile)
+{
+    inti nvariants = bgen_reader_nvariants(bgenfile);
+
+    BGenIndexing index;
+
+    index.variantid_block_start = malloc(nvariants * sizeof(inti));
+
+    inti e = bgen_reader_create_variantid_block_indexing(bgenfile, &index);
+
+    if (e != EXIT_SUCCESS) return FAIL;
+
+    if (index.compression != 2) return FAIL;
+
+    if (index.layout != 2) return FAIL;
+
+    if (index.variantid_block_start[0] != 6032) return FAIL;
+
+    inti pos = index.variantid_block_start[172];
+
+    if ((pos != 34613) && (pos != 574446)) return FAIL;
+
+    free(index.variantid_block_start);
+
+    return EXIT_SUCCESS;
+}
+
 int test_filepath(const char *filepath)
 {
     BGenFile *bgenfile;
@@ -196,6 +223,8 @@ int test_filepath(const char *filepath)
     if (test_genotype_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
 
     if (test_variantid_blocks_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
+
+    if (test_indexing(bgenfile) != EXIT_SUCCESS) return FAIL;
 
     bgen_reader_close(bgenfile);
 
