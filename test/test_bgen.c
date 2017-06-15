@@ -209,7 +209,8 @@ int test_filepath(const byte *filepath)
 
     if (e != 0) return FAIL;
 
-    // printf("%.*s\n", samples[0].len, samples[0].str);
+    VariantIndexing *index = NULL;
+    Variant *variants      = bgen_read_variants(bgen, &index);
 
     // if (test_sampleids_block(bgen) != EXIT_SUCCESS) return FAIL;
     //
