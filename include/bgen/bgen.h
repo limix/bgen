@@ -19,7 +19,7 @@ typedef struct Variant         Variant;
 typedef struct VariantGenotype VariantGenotype;
 typedef struct VariantIndexing VariantIndexing;
 
-BGenFile* bgen_open(const char *filepath);
+BGenFile* bgen_open(const byte *filepath);
 void      bgen_close(BGenFile *bgen);
 
 inti      bgen_nsamples(BGenFile *bgen);

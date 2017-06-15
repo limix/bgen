@@ -15,66 +15,66 @@
 //     return strncmp((const char *)s1, s2, n);
 // }
 //
-// static int test_sampleids_block(BGenFile *bgenfile)
+// static int test_sampleids_block(BGenFile *bgen)
 // {
 //     byte *sampleid;
 //     inti  sampleid_len;
 //
-//     if (bgen_reader_sampleid(bgenfile, 0, &sampleid,
+//     if (bgen_reader_sampleid(bgen, 0, &sampleid,
 //                              &sampleid_len)) return FAIL;
 //
 //     if (bytencmp(sampleid, "sample_001",
 //                  sampleid_len) != 0) return FAIL;
 //
-//     if (bgen_reader_sampleid(bgenfile, 499, &sampleid,
+//     if (bgen_reader_sampleid(bgen, 499, &sampleid,
 //                              &sampleid_len)) return FAIL;
 //
 //     if (bytencmp(sampleid, "sample_500",
 //                  sampleid_len) != 0) return FAIL;
 //
-//     if (bgen_reader_sampleid(bgenfile, 500, &sampleid,
+//     if (bgen_reader_sampleid(bgen, 500, &sampleid,
 //                              &sampleid_len) !=
 //         FAIL) return FAIL;
 //
 //     return EXIT_SUCCESS;
 // }
 //
-// static int test_variants_block(BGenFile *bgenfile)
+// static int test_variants_block(BGenFile *bgen)
 // {
 //     byte *varid, *var_rsid, *var_chrom, *alleleid;
 //     inti  varid_len, var_rsid_len, var_chrom_len, alleleid_len;
 //
-//     bgen_reader_variantid(bgenfile, 0, &varid, &varid_len);
+//     bgen_reader_variantid(bgen, 0, &varid, &varid_len);
 //
 //
 //     if (bytencmp(varid, "SNPID_2", varid_len) != 0) return FAIL;
 //
 //
-//     bgen_reader_variant_rsid(bgenfile, 0, &var_rsid, &var_rsid_len);
+//     bgen_reader_variant_rsid(bgen, 0, &var_rsid, &var_rsid_len);
 //
 //
 //     if (bytencmp(var_rsid, "RSID_2", var_rsid_len) != 0) return FAIL;
 //
-//     bgen_reader_variant_chrom(bgenfile, 0, &var_chrom, &var_chrom_len);
+//     bgen_reader_variant_chrom(bgen, 0, &var_chrom, &var_chrom_len);
 //
 //     if (bytencmp(var_chrom, "01", var_chrom_len) != 0) return FAIL;
 //
 //     inti pos;
 //
-//     bgen_reader_variant_position(bgenfile, 0, &pos);
+//     bgen_reader_variant_position(bgen, 0, &pos);
 //
 //     if (pos != 2000) return FAIL;
 //
 //     inti nalleles;
-//     bgen_reader_variant_nalleles(bgenfile, 0, &nalleles);
+//     bgen_reader_variant_nalleles(bgen, 0, &nalleles);
 //
 //     if (nalleles != 2) return FAIL;
 //
-//     bgen_reader_variant_alleleid(bgenfile, 0, 0, &alleleid, &alleleid_len);
+//     bgen_reader_variant_alleleid(bgen, 0, 0, &alleleid, &alleleid_len);
 //
 //     if (bytencmp(alleleid, "A", alleleid_len) != 0) return FAIL;
 //
-//     bgen_reader_variant_alleleid(bgenfile, 0, 1, &alleleid, &alleleid_len);
+//     bgen_reader_variant_alleleid(bgen, 0, 1, &alleleid, &alleleid_len);
 //
 //
 //     if (bytencmp(alleleid, "G", alleleid_len) != 0) return FAIL;
@@ -82,16 +82,16 @@
 //     return EXIT_SUCCESS;
 // }
 //
-// int test_genotype_reading(BGenFile *bgenfile)
+// int test_genotype_reading(BGenFile *bgen)
 // {
 //     inti nsamples, ploidy, nalleles, nbits;
 //
-//     nsamples = bgen_reader_nsamples(bgenfile);
+//     nsamples = bgen_reader_nsamples(bgen);
 //
 //     inti *ui_probs;
 //
 //     // first SNP
-//     bgen_reader_read_genotype(bgenfile, 0, &ui_probs, &ploidy, &nalleles,
+//     bgen_reader_read_genotype(bgen, 0, &ui_probs, &ploidy, &nalleles,
 //                               &nbits);
 //
 //     if (nbits < 1) return FAIL;
@@ -123,7 +123,7 @@
 //     free(ui_probs);
 //
 //     // second SNP
-//     bgen_reader_read_genotype(bgenfile, 1, &ui_probs, &ploidy, &nalleles,
+//     bgen_reader_read_genotype(bgen, 1, &ui_probs, &ploidy, &nalleles,
 //                               &nbits);
 //
 //     if (nbits < 1) return FAIL;
@@ -154,11 +154,11 @@
 //     return EXIT_SUCCESS;
 // }
 //
-// int test_variantid_blocks_reading(BGenFile *bgenfile)
+// int test_variantid_blocks_reading(BGenFile *bgen)
 // {
 //     VariantIdBlock *head_ref = NULL;
 //
-//     if (bgen_reader_read_variantid_blocks(bgenfile, &head_ref) == FAIL)
+//     if (bgen_reader_read_variantid_blocks(bgen, &head_ref) == FAIL)
 // return FAIL;
 //
 //     VariantIdBlock *vib;
@@ -185,26 +185,27 @@
 
 int test_filepath(const byte *filepath)
 {
-    BGenFile *bgenfile;
+    BGenFile *bgen;
 
-    // bgenfile = bgen_reader_open(filepath);
+    bgen = bgen_open(filepath);
+
     //
-    // if (bgenfile == NULL) return FAIL;
+    // if (bgen == NULL) return FAIL;
     //
-    // if (bgen_reader_nsamples(bgenfile) != 500) return FAIL;
+    // if (bgen_reader_nsamples(bgen) != 500) return FAIL;
     //
-    // if (bgen_reader_nvariants(bgenfile) != 199) return FAIL;
+    // if (bgen_reader_nvariants(bgen) != 199) return FAIL;
     //
     //
-    // if (test_sampleids_block(bgenfile) != EXIT_SUCCESS) return FAIL;
+    // if (test_sampleids_block(bgen) != EXIT_SUCCESS) return FAIL;
     //
-    // if (test_variants_block(bgenfile) != EXIT_SUCCESS) return FAIL;
+    // if (test_variants_block(bgen) != EXIT_SUCCESS) return FAIL;
     //
-    // if (test_genotype_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
+    // if (test_genotype_reading(bgen) != EXIT_SUCCESS) return FAIL;
     //
-    // if (test_variantid_blocks_reading(bgenfile) != EXIT_SUCCESS) return FAIL;
+    // if (test_variantid_blocks_reading(bgen) != EXIT_SUCCESS) return FAIL;
     //
-    // bgen_reader_close(bgenfile);
+    bgen_close(bgen);
 
     return EXIT_SUCCESS;
 }
