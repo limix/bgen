@@ -212,14 +212,14 @@ int test_filepath(const byte *filepath)
     VariantIndexing *index = NULL;
     Variant *variants      = bgen_read_variants(bgen, &index);
 
-    // if (test_sampleids_block(bgen) != EXIT_SUCCESS) return FAIL;
-    //
-    // if (test_variants_block(bgen) != EXIT_SUCCESS) return FAIL;
-    //
-    // if (test_genotype_reading(bgen) != EXIT_SUCCESS) return FAIL;
-    //
-    // if (test_variantid_blocks_reading(bgen) != EXIT_SUCCESS) return FAIL;
-    //
+    e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
+
+    if (e != 0) return FAIL;
+
+    e = strncmp("SNPID_200", (char *)variants[198].id.str, variants[198].id.len);
+
+    if (e != 0) return FAIL;
+
     bgen_free_samples(bgen, samples);
 
     bgen_close(bgen);

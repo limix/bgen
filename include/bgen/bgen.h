@@ -14,8 +14,16 @@ typedef struct string {
     byte *str;
 } string;
 
-typedef struct BGenFile        BGenFile;
-typedef struct Variant         Variant;
+typedef struct BGenFile BGenFile;
+typedef struct Variant
+{
+    string  id;
+    string  rsid;
+    string  chrom;
+    inti    position;
+    inti    nalleles;
+    string *allele_ids;
+} Variant;
 typedef struct VariantGenotype VariantGenotype;
 typedef struct VariantIndexing VariantIndexing;
 

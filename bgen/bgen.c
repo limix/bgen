@@ -286,6 +286,8 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
         goto err;
     }
 
+    return variants;
+
 err:
 
     if (bgen->file) fclose(bgen->file);
