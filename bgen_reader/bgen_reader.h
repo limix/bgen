@@ -3,70 +3,48 @@
 
 #include <stdint.h>
 
+#include "types.h"
+#include "user_structs.h"
+#include "impl_structs.h"
 #include "variant_id_block.h"
 
-typedef struct BGenFile BGenFile;
+typedef struct Variant
+{
+    string  id;
+    string  rsid;
+    string  chrom;
+    inti    position;
+    inti    nalleles;
+    string *allele_ids;
+} Variant;
 
-BGenFile* bgen_reader_open(const char *filepath);
-inti      bgen_reader_close(BGenFile *bgenfile);
+typedef struct VariantGenotype
+{
+    inti  ploidy;
+    real *probabilities;
+} VariantGenotype;
 
-inti      bgen_reader_nsamples(BGenFile *bgenfile);
-inti      bgen_reader_nvariants(BGenFile *bgenfile);
+typedef struct VariantIndexing
+{
+    char *filename;
+    inti  compression;
+    inti  layout;
+    inti *start;
+} VariantIndexing;
 
-// Get sample identification
-inti      bgen_reader_sampleid(BGenFile *bgenfile,
-                               inti      sample_idx,
-                               byte    **id,
-                               inti     *length);
+BGenFile       * bgen_open(const char *filepath);
+inti             bgen_close(BGenFile *bgen);
 
-// Get variant identification
-inti bgen_reader_variantid(BGenFile *bgenfile,
-                           inti      variant_idx,
-                           byte    **id,
-                           inti     *length);
+inti             bgen_nsamples(BGenFile *bgen);
+inti             bgen_nvariants(BGenFile *bgen);
 
-// Get the variant rsid
-inti bgen_reader_variant_rsid(BGenFile *bgenfile,
-                              inti      variant_idx,
-                              byte    **rsid,
-                              inti     *length);
+string         * bgen_read_samples(BGenFile *bgen);
+Variant        * bgen_read_variants(BGenFile *bgen);
 
-// Get identification of the variant's chromossome
-inti bgen_reader_variant_chrom(BGenFile *bgenfile,
-                               inti      variant_idx,
-                               byte    **chrom,
-                               inti     *length);
+VariantIndexing* bgen_create_variant_index(BGenFile *bgen);
 
-// Get variant's position
-inti bgen_reader_variant_position(BGenFile *bgenfile,
-                                  inti      variant_idx,
-                                  inti     *position);
-
-// Get the number of alleles a variant has
-inti bgen_reader_variant_nalleles(BGenFile *bgenfile,
-                                  inti      variant_idx,
-                                  inti     *nalleles);
-
-// Returns the allele identification of a variant
-inti bgen_reader_variant_alleleid(BGenFile *bgenfile,
-                                  inti      variant_idx,
-                                  inti      allele_idx,
-                                  byte    **id,
-                                  inti     *length);
-
-inti bgen_reader_read_genotype(BGenFile *bgenfile,
-                               inti      variant_idx,
-                               inti    **ui_probs,
-                               inti     *ploidy,
-                               inti     *nalleles,
-                               inti     *nbits);
-
-inti bgen_reader_choose(inti n,
-                        inti k);
-
-inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
-                                       VariantIdBlock **head_ref);
-
-inti bgen_reader_free_variantid_block(VariantIdBlock *vib);
+VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
+                                             inti             variant_start,
+                                             inti             variant_end);
 
 #endif /* end of include guard: BGEN_READER_H */
