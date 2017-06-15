@@ -300,6 +300,23 @@ err:
     return NULL;
 }
 
+void bgen_free_variants(const BGenFile *bgen,
+                        Variant        *variants)
+{
+    for (inti i = 0; i < bgen->nvariants; ++i)
+    {
+        for (inti j = 0; j < variants[i].nalleles; ++j)
+        {
+            free(variants[i].allele_ids[j].str);
+        }
+        free(variants[i].allele_ids);
+        free(variants[i].id.str);
+        free(variants[i].rsid.str);
+        free(variants[i].chrom.str);
+    }
+    free(variants);
+}
+
 void bgen_free_indexing(VariantIndexing *index)
 {
     free(index->filepath);
