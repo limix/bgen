@@ -169,63 +169,33 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
     uint32_t nsamples, position, allele_len;
     uint16_t id_len, rsid_len, chrom_len, nalleles;
 
-    // printf("bgen->layout: %lld\n", bgen->layout);
-    // fflush(stdout);
-
     if (bgen->layout == 1)
     {
         if (bgen_read(bgen->file, &nsamples, 4) == FAIL) return FAIL;
-
-        // printf("nsamples: %u\n", nsamples);
-        // fflush(stdout);
     }
 
     if (bgen_read(bgen->file, &id_len, 2) == FAIL) return FAIL;
-
-    // printf("id_len: %u\n", id_len);
-    // fflush(stdout);
 
     string_alloc(&(v->id), id_len);
 
     if (bgen_read(bgen->file, v->id.str, v->id.len) == FAIL) return FAIL;
 
-    // printf("v->id: %.*s\n", id_len, v->id.str);
-    // fflush(stdout);
-
     if (bgen_read(bgen->file, &rsid_len, 2) == FAIL) return FAIL;
-
-    // printf("rsid_len: %u\n", rsid_len);
-    // fflush(stdout);
 
     string_alloc(&(v->rsid), rsid_len);
 
     if (bgen_read(bgen->file, v->rsid.str, v->rsid.len) == FAIL) return FAIL;
 
-    // printf("v->rsid: %.*s\n", rsid_len, v->rsid.str);
-    // fflush(stdout);
-
     if (bgen_read(bgen->file, &chrom_len, 2) == FAIL) return FAIL;
-
-    // printf("chrom_len: %u\n", chrom_len);
-    // fflush(stdout);
 
     string_alloc(&(v->chrom), chrom_len);
 
     if (bgen_read(bgen->file, v->chrom.str, v->chrom.len) == FAIL) return FAIL;
 
-    // printf("v->chrom: %.*s\n", chrom_len, v->chrom.str);
-    // fflush(stdout);
-
     if (bgen_read(bgen->file, &position, 4) == FAIL) return FAIL;
-
-    // printf("position: %u\n", position);
-    // fflush(stdout);
 
     if (bgen->layout == 1) nalleles = 2;
     else if (bgen_read(bgen->file, &nalleles, 2) == FAIL) return FAIL;
-
-    // printf("nalleles: %u\n", nalleles);
-    // fflush(stdout);
 
     v->nalleles = nalleles;
 
@@ -235,16 +205,9 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
     {
         if (bgen_read(bgen->file, &allele_len, 4) == FAIL) return FAIL;
 
-        // printf("allele_len: %u\n", allele_len);
-        // fflush(stdout);
-
         string_alloc(v->allele_ids + i, allele_len);
 
         if (bgen_read(bgen->file, v->allele_ids[i].str, allele_len) == FAIL) return FAIL;
-
-        // printf("v->dallele_ids[i].str: %.*s\n", allele_len,
-        // v->allele_ids[i].str);
-        // fflush(stdout);
     }
 
     return SUCCESS;
@@ -322,4 +285,47 @@ void bgen_free_indexing(VariantIndexing *index)
     free(index->filepath);
     free(index->start);
     free(index);
+}
+
+void bgen_read_variant_genotype(VariantIndexing *indexing,
+                                VariantGenotype *vg)
+{
+    assert(indexing->layout == 2);
+    bgen_read_layout2_genotype(indexing, vg);
+}
+
+VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
+                                             inti             variant_start,
+                                             inti             variant_end)
+{
+    FILE *file = fopen((const char *)indexing->filepath, "rb");
+
+    if (file == NULL) {
+        fprintf(stderr, "Could not open: %s\n", indexing->filepath);
+        goto err;
+    }
+
+    inti n              = variant_end - variant_start;
+    VariantGenotype *vg = malloc(n * sizeof(VariantGenotype));
+
+    fseek(file, indexing->start[variant_start], SEEK_SET);
+
+    for (inti i = 0; i < n; ++i)
+    {
+        bgen_read_variant_genotype(indexing, vg + i);
+    }
+
+    // typedef struct VariantIndexing
+    // {
+    //     byte *filepath;
+    //     inti  compression;
+    //     inti  layout;
+    //     inti *start;
+    // } VariantIndexing;
+err:
+
+    if (file) fclose(file);
+
+    if (vg != NULL) free(vg);
+    return NULL;
 }
