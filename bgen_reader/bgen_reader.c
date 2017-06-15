@@ -155,7 +155,33 @@ inti bgen_nvariants(BGenFile *bgen)
 }
 
 string* bgen_read_samples(BGenFile *bgen)
-{}
+{
+    if (bgen->sample_ids_presence == 0) return NULL;
+
+    string *sample_ids = malloc(bgen->nsamples * sizeof(string));
+
+    uint32_t length, nsamples;
+    uint16_t len;
+
+    if (bgen_fread(bgen, &length, 4)) goto err;
+
+    if (bgen_fread(bgen, &nsamples, 4)) goto err;
+
+    for (inti i = 0; i < bgen->nsamples; ++i)
+    {
+        if (bgen_fread(bgen, &len, 2)) goto err;
+
+        sample_ids[i].str = malloc(len);
+        sample_ids[i].len = len;
+
+        if (bgen_fread(bgen, sample_ids[i].str, len)) return NULL;
+    }
+    return sample_ids;
+
+err:
+    free(sample_ids);
+    return NULL;
+}
 
 // inti bgen_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
 //                    inti *length)

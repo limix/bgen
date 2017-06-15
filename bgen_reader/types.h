@@ -8,6 +8,11 @@ typedef unsigned char byte;
 typedef int_fast64_t  inti;
 typedef double        real;
 
+typedef struct string {
+    inti  len;
+    byte *str;
+} string;
+
 static_assert(sizeof(byte) == 1, "size of 'byte' should be 1 byte.");
 static_assert(sizeof(inti) >= 8, "size of 'inti' should be at least 8 bytes.");
 static_assert(sizeof(real) >= 8, "size of 'real' should be at least 8 bytes.");
