@@ -219,6 +219,8 @@ int test_filepath(const byte *filepath)
     //
     // if (test_variantid_blocks_reading(bgen) != EXIT_SUCCESS) return FAIL;
     //
+    bgen_free_samples(bgen, samples);
+
     bgen_close(bgen);
 
     return EXIT_SUCCESS;

@@ -55,6 +55,8 @@ inti      bgen_nsamples(BGenFile *bgen);
 inti      bgen_nvariants(BGenFile *bgen);
 
 string  * bgen_read_samples(BGenFile *bgen);
+void      bgen_free_samples(const BGenFile *bgen,
+                            string         *samples);
 Variant * bgen_read_variants(BGenFile        *bgen,
                              VariantIndexing *index);
 

@@ -151,6 +151,19 @@ err:
     return NULL;
 }
 
+void bgen_free_samples(const BGenFile *bgen, string *samples)
+{
+    if (bgen->sample_ids_presence == 0) return;
+
+    if (samples == NULL) return;
+
+    for (inti i = 0; i < bgen->nsamples; ++i)
+    {
+        free(samples[i].str);
+    }
+    free(samples);
+}
+
 inti bgen_read_variant(BGenFile *bgen, Variant *v)
 {
     uint32_t nsamples, position, allele_len;
