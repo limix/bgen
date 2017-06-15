@@ -23,13 +23,8 @@ inline static byte* ft_strdup(const byte *src)
 }
 
 // Duplicate a string.
-inline static byte* ft_strndup(const byte *src, inti size)
-{
-    byte *str = malloc(size);
-
-    memcpy(str, src, size);
-    return str;
-}
+byte             * bgen_reader_strndup(const byte *src,
+                                       inti        size);
 
 inline static void MEMCPY(void *dst, byte **src, inti n)
 {

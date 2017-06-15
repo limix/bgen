@@ -81,12 +81,15 @@ inti bgen_reader_read_genotype(BGenFile *bgenfile,
                                inti     *nalleles,
                                inti     *nbits);
 
-inti bgen_reader_choose(inti n,
-                        inti k);
+inti  bgen_reader_choose(inti n,
+                         inti k);
 
-inti bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
-                                       VariantIdBlock **head_ref);
+inti  bgen_reader_read_variantid_blocks(BGenFile        *bgenfile,
+                                        VariantIdBlock **head_ref);
 
-inti bgen_reader_free_variantid_block(VariantIdBlock *vib);
+inti  bgen_reader_free_variantid_block(VariantIdBlock *vib);
+
+byte* bgen_reader_strndup(const byte *src,
+                          inti        size);
 
 #endif /* end of include guard: BGEN_READER_H */

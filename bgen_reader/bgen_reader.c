@@ -136,7 +136,7 @@ inti bgen_reader_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.id_length;
-    *id     = ft_strndup(vib.id, *length);
+    *id     = bgen_reader_strndup(vib.id, *length);
 
     bgen_reader_free_variantid_block(&vib);
 
@@ -154,7 +154,7 @@ inti bgen_reader_variant_rsid(BGenFile *bgenfile,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.rsid_length;
-    *rsid   = ft_strndup(vib.rsid, *length);
+    *rsid   = bgen_reader_strndup(vib.rsid, *length);
 
     bgen_reader_free_variantid_block(&vib);
 
@@ -172,7 +172,7 @@ inti bgen_reader_variant_chrom(BGenFile *bgenfile,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.chrom_length;
-    *chrom  = ft_strndup(vib.chrom, *length);
+    *chrom  = bgen_reader_strndup(vib.chrom, *length);
 
     bgen_reader_free_variantid_block(&vib);
 
@@ -224,7 +224,7 @@ inti bgen_reader_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
     bgen_reader_read_variantid_block(bgenfile, variant_idx, &vib);
 
     *length = vib.allele_lengths[allele_idx];
-    *id     = ft_strndup(vib.alleleids[allele_idx], *length);
+    *id     = bgen_reader_strndup(vib.alleleids[allele_idx], *length);
 
     bgen_reader_free_variantid_block(&vib);
 
