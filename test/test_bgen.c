@@ -221,6 +221,7 @@ int test_filepath(const byte *filepath)
     if (e != 0) return FAIL;
 
     bgen_free_samples(bgen, samples);
+    bgen_free_indexing(index);
 
     bgen_close(bgen);
 

@@ -299,3 +299,10 @@ err:
     if ((*index)->start != NULL) free((*index)->start);
     return NULL;
 }
+
+void bgen_free_indexing(VariantIndexing *index)
+{
+    free(index->filepath);
+    free(index->start);
+    free(index);
+}

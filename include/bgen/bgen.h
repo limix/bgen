@@ -39,6 +39,8 @@ void      bgen_free_samples(const BGenFile *bgen,
 Variant * bgen_read_variants(BGenFile         *bgen,
                              VariantIndexing **index);
 
+void      bgen_free_indexing(VariantIndexing *index);
+
 // VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
 //                                              inti             variant_start,
 //                                              inti             variant_end);
