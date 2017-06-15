@@ -39,9 +39,8 @@ inti             bgen_nsamples(BGenFile *bgen);
 inti             bgen_nvariants(BGenFile *bgen);
 
 string         * bgen_read_samples(BGenFile *bgen);
-Variant        * bgen_read_variants(BGenFile *bgen);
-
-VariantIndexing* bgen_create_variant_index(BGenFile *bgen);
+Variant        * bgen_read_variants(BGenFile        *bgen,
+                                    VariantIndexing *index);
 
 VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
                                              inti             variant_start,

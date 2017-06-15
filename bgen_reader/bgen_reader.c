@@ -6,12 +6,35 @@
 #include <string.h>
 
 #include "bgen.h"
-#include "user_structs.h"
 
 // #include "bgen_file.h"
 // #include "variant.h"
 // #include "sample.h"
 #include "util/mem.h"
+
+typedef struct Variant
+{
+    string  id;
+    string  rsid;
+    string  chrom;
+    inti    position;
+    inti    nalleles;
+    string *allele_ids;
+} Variant;
+
+typedef struct VariantGenotype
+{
+    inti  ploidy;
+    real *probabilities;
+} VariantGenotype;
+
+typedef struct VariantIndexing
+{
+    char *filename;
+    inti  compression;
+    inti  layout;
+    inti *start;
+} VariantIndexing;
 
 // flags definition:
 // bit | name                | value | description
@@ -44,6 +67,7 @@ typedef struct BGenFile
     // Possible values are 1 and 2.
     inti layout;
     inti sample_ids_presence;
+    inti samples_start;
     inti variants_start;
 } BGenFile;
 
@@ -106,6 +130,9 @@ BGenFile* bgen_open(const char *filepath)
         goto err;
     }
 
+    bgen->samples_start  = -1;
+    bgen->variants_start = -1;
+
     uint32_t offset;
 
     // First four bytes (offset)
@@ -113,11 +140,11 @@ BGenFile* bgen_open(const char *filepath)
 
     if (bgen_read_header(bgen) == FAIL) goto err;
 
-    bgen->variants_start = ftell(bgen->file);
+    bgen->samples_start = ftell(bgen->file);
 
-    if (bgen->variants_start == EOF)
+    if (bgen->samples_start == EOF)
     {
-        perror("Could not find variant blocks.");
+        perror("Could not find sample blocks.");
         goto err;
     }
 
@@ -158,6 +185,8 @@ string* bgen_read_samples(BGenFile *bgen)
 {
     if (bgen->sample_ids_presence == 0) return NULL;
 
+    bgen->file = fopen(bgenfile->filepath, "rb");
+
     string *sample_ids = malloc(bgen->nsamples * sizeof(string));
 
     uint32_t length, nsamples;
@@ -176,181 +205,126 @@ string* bgen_read_samples(BGenFile *bgen)
 
         if (bgen_fread(bgen, sample_ids[i].str, len)) return NULL;
     }
+
+    if (fclose(bgen->file))
+    {
+        perror("Could not close the file.")
+        goto err;
+    }
+
     return sample_ids;
 
 err:
+
+    if (bgen->file) fclose(bgen->file);
     free(sample_ids);
     return NULL;
 }
 
-// inti bgen_sampleid(BGenFile *bgenfile, inti sample_idx, byte **id,
-//                    inti *length)
-// {
-//     if (sample_idx >= bgenfile->header.nsamples) return FAIL;
+// Variant identifying data
 //
-//     SampleId *sampleid = &(bgenfile->sampleid_block->sampleids[sample_idx]);
-//
-//     *length = sampleid->length;
-//     *id     = sampleid->id;
-//
-//     return EXIT_SUCCESS;
-// }
+// ---------------------------------------------
+// | 4     | # samples (layout > 1)            |
+// | 2     | # variant id length, Lid          |
+// | Lid   | variant id                        |
+// | 2     | variant rsid length, Lrsid        |
+// | Lrsid | rsid                              |
+// | 2     | chrom length, Lchr                |
+// | Lchr  | chromossome                       |
+// | 4     | variant position                  |
+// | 2     | number of alleles, K (layout > 1) |
+// | 4     | first allele length, La1          |
+// | La1   | first allele                      |
+// | 4     | second allele length, La2         |
+// | La2   | second allele                     |
+// | ...   |                                   |
+// | 4     | last allele length, LaK           |
+// | LaK   | last allele                       |
+// ---------------------------------------------
+inti bgen_read_variant(BGenFile *bgen, Variant *v)
+{
+    uint32_t nsamples, position, allele_len;
+    uint16_t id_len, rsid_len, chrom_len, nalleles;
 
-// inti bgen_variantid(BGenFile *bgenfile, inti variant_idx, byte **id,
-//                     inti *length)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-//
-//     VariantIdBlock vib;
-//
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *length = vib.id_length;
-//     *id     = bgen_strndup(vib.id, *length);
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
-//
-// inti bgen_variant_rsid(BGenFile *bgenfile,
-//                        inti      variant_idx,
-//                        byte    **rsid,
-//                        inti     *length)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-//
-//     VariantIdBlock vib;
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *length = vib.rsid_length;
-//     *rsid   = bgen_strndup(vib.rsid, *length);
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
-//
-// inti bgen_variant_chrom(BGenFile *bgenfile,
-//                         inti      variant_idx,
-//                         byte    **chrom,
-//                         inti     *length)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-//
-//     VariantIdBlock vib;
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *length = vib.chrom_length;
-//     *chrom  = bgen_strndup(vib.chrom, *length);
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
-//
-// inti bgen_variant_position(BGenFile *bgenfile,
-//                            inti variant_idx, inti *position)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-//
-//     VariantIdBlock vib;
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *position = vib.position;
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
+    if (bgen->layout == 1)
+    {
+        if (bgen_fread(bgen, &nsamples, 4) == FAIL) return FAIL;
+    }
 
-// inti bgen_variant_nalleles(BGenFile *bgenfile,
-//                            inti variant_idx, inti *nalleles)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return FAIL;
-//
-//     VariantIdBlock vib;
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *nalleles = vib.nalleles;
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
+    if (bgen_fread(bgen, &id_len, 2) == FAIL) return FAIL;
 
-// inti bgen_variant_alleleid(BGenFile *bgenfile, inti variant_idx,
-//                            inti allele_idx, byte **id,
-//                            inti *length)
-// {
-//     if (variant_idx >= NVARIANTS(bgenfile)) return -1;
-//
-//     inti nalleles;
-//     bgen_variant_nalleles(bgenfile, variant_idx, &nalleles);
-//
-//     if (allele_idx >= nalleles) return FAIL;
-//
-//     VariantIdBlock vib;
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     *length = vib.allele_lengths[allele_idx];
-//     *id     = bgen_strndup(vib.alleleids[allele_idx], *length);
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
+    string_alloc(v->id, id_len);
 
-// inti bgen_read_genotype(BGenFile *bgenfile, inti variant_idx,
-//                         inti **ui_probs, inti  *ploidy,
-//                         inti  *nalleles, inti  *nbits)
-// {
-//     VariantIdBlock vib;
-//
-//     bgen_read_variantid_block(bgenfile, variant_idx, &vib);
-//
-//     if (FOPEN(bgenfile) == FAIL) return FAIL;
-//
-//     fseek(bgenfile->file, vib.genotype_start, SEEK_SET);
-//
-//     inti e = bgen_read_current_genotype_block(bgenfile,
-//                                               ploidy,
-//                                               nalleles,
-//                                               nbits,
-//                                               ui_probs);
-//
-//     if (e == FAIL) return FAIL;
-//
-//     if (FCLOSE(bgenfile) == FAIL) return FAIL;
-//
-//     bgen_free_variantid_block(&vib);
-//
-//     return EXIT_SUCCESS;
-// }
-//
-// inti bgen_read_variantid_blocks(BGenFile        *bgenfile,
-//                                 VariantIdBlock **head_ref)
-// {
-//     if (FOPEN(bgenfile) == FAIL) return FAIL;
-//
-//     inti nvariants = bgen_nvariants(bgenfile);
-//
-//     bgen_seek_variant_block(bgenfile, 0);
-//
-//     VariantIdBlock *vib;
-//     *head_ref = NULL;
-//     inti i;
-//
-//     for (i = 0; i < nvariants; ++i)
-//     {
-//         VariantIdBlock *vib = malloc(sizeof(VariantIdBlock));
-//         bgen_read_current_variantid_block(bgenfile, vib);
-//         vib->next = *head_ref;
-//         bgen_genotype_skip(bgenfile);
-//         *head_ref = vib;
-//     }
-//
-//     if (FCLOSE(bgenfile) == FAIL) return FAIL;
-//
-//     return EXIT_SUCCESS;
-// }
+    if (bgen_fread(bgen, v->id.str, v->id.len) == FAIL) return FAIL;
+
+    if (bgen_fread(bgen, rsid_len, 2) == FAIL) return FAIL;
+
+    string_alloc(v->rsid, &rsid_len);
+
+    if (bgen_fread(bgen, v->rsid.str, v->rsid.len) == FAIL) return FAIL;
+
+    if (bgen_fread(bgen, &chrom_len, 2) == FAIL) return FAIL;
+
+    string_alloc(v->chrom, chrom_len);
+
+    if (bgen_fread(bgen, v->chrom.str, v->chrom.len) == FAIL) return FAIL;
+
+    if (bgen_fread(bgen, &position, 4) == FAIL) return FAIL;
+
+
+    if (bgen->layout == 1) nalleles = 2;
+    else if (bgen_fread(bgen, &nalleles, 2) == FAIL) return FAIL;
+
+    v->nalleles = nalleles;
+
+    v->allele_ids = malloc(nalleles * sizeof(string));
+
+    for (inti i = 0; i < v->nalleles; ++i)
+    {
+        if (bgen_read(bgen, &allele_len, 4) == FAIL) return FAIL;
+
+        string_alloc(v->allele_ids + i, allele_len);
+
+        if (bgen_read(bgen, v->allele_ids[i].str, allele_len) == FAIL) return FAIL;
+    }
+
+    // vib->genotype_start = ftell(bgen->file);
+
+    return EXIT_SUCCESS;
+}
+
+Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing *index)
+{
+    Variant *variants = NULL;
+
+    bgen->file = fopen(bgen->filepath, "rb");
+
+    fseek(bgen->);
+
+    index->filepath    = bgen_strdup(bgen->filepath);
+    index->compression = bgen->compression;
+    index->layout      = bgen->layout;
+
+    inti nvariants = bgen->nvariants;
+
+    variants = malloc(nvariants * sizeof(Variant));
+
+
+    for (inti i = 0; i < nvariants; ++i)
+    {
+        if (bgen_read_variant(bgen, variants + i) == FAIL) goto err;
+    }
+
+    if (fclose(bgen->file))
+    {
+        perror("Could not close the file.")
+        goto err;
+    }
+
+err:
+
+    if (bgen->file) fclose(bgen->file);
+
+    if (variants != NULL) free(variants);
+    return NULL;
+}

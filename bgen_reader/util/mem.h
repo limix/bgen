@@ -7,7 +7,7 @@
 #include "../types.h"
 
 // Duplicate a string.
-inline static byte* ft_strdup(const byte *src)
+inline static byte* bgen_strdup(const byte *src)
 {
     byte *str;
     byte *p;

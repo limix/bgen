@@ -13,6 +13,12 @@ typedef struct string {
     byte *str;
 } string;
 
+static inline void string_alloc(string *v, inti len)
+{
+    v->len = len;
+    v->str = malloc(len);
+}
+
 static_assert(sizeof(byte) == 1, "size of 'byte' should be 1 byte.");
 static_assert(sizeof(inti) >= 8, "size of 'inti' should be at least 8 bytes.");
 static_assert(sizeof(real) >= 8, "size of 'real' should be at least 8 bytes.");
