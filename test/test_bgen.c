@@ -1,10 +1,12 @@
 #include "bgen/bgen.h"
 
+#include <stdio.h>
+#include <string.h>
+
 // #include <assert.h>
 // #include <math.h>
 // #include <stdio.h>
 // #include <stdlib.h>
-// #include <string.h>
 
 
 #define SUCCESS EXIT_SUCCESS
@@ -189,14 +191,26 @@ int test_filepath(const byte *filepath)
 
     bgen = bgen_open(filepath);
 
-    //
-    // if (bgen == NULL) return FAIL;
-    //
-    // if (bgen_reader_nsamples(bgen) != 500) return FAIL;
-    //
-    // if (bgen_reader_nvariants(bgen) != 199) return FAIL;
-    //
-    //
+    if (bgen == NULL) return FAIL;
+
+    if (bgen_nsamples(bgen) != 500) return FAIL;
+
+    if (bgen_nvariants(bgen) != 199) return FAIL;
+
+    string *samples = bgen_read_samples(bgen);
+
+    if (samples == NULL) return FAIL;
+
+    inti e = strncmp("sample_001", (char *)samples[0].str, samples[0].len);
+
+    if (e != 0) return FAIL;
+
+    e = strncmp("sample_500", (char *)samples[499].str, samples[0].len);
+
+    if (e != 0) return FAIL;
+
+    // printf("%.*s\n", samples[0].len, samples[0].str);
+
     // if (test_sampleids_block(bgen) != EXIT_SUCCESS) return FAIL;
     //
     // if (test_variants_block(bgen) != EXIT_SUCCESS) return FAIL;
