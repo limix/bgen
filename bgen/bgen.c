@@ -6,10 +6,6 @@
 #include <string.h>
 
 #include "bgen.h"
-
-// #include "bgen_file.h"
-// #include "variant.h"
-// #include "sample.h"
 #include "util/mem.h"
 
 typedef struct Variant
