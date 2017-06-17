@@ -15,6 +15,7 @@ typedef struct string {
 } string;
 
 typedef struct BGenFile BGenFile;
+
 typedef struct Variant
 {
     string  id;
@@ -24,7 +25,13 @@ typedef struct Variant
     inti    nalleles;
     string *allele_ids;
 } Variant;
-typedef struct VariantGenotype VariantGenotype;
+
+typedef struct VariantGenotype
+{
+    inti  ploidy;
+    real *probabilities;
+} VariantGenotype;
+
 typedef struct VariantIndexing VariantIndexing;
 
 BGenFile       * bgen_open(const byte *filepath);

@@ -49,9 +49,20 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
 {
     inti ncombs = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
 
-    vg->probabilities = malloc((ncombs - 1) * nsamples * sizeof(real));
+    vg->probabilities = malloc(ncombs * nsamples * sizeof(real));
 
     real denom = (((inti)1 << nbits)) - 1;
+
+    // printf("First byte: %lld\n",   chunk[0]);
+    // printf("Second byte: %lld\n",  chunk[1]);
+    // printf("Third byte: %lld\n",   chunk[2]);
+    // printf("Fourth byte: %lld\n",  chunk[3]);
+    // printf("Fifth byte: %lld\n",   chunk[4]);
+    // printf("Sixth byte: %lld\n",   chunk[5]);
+    // printf("Seventh byte: %lld\n", chunk[6]);
+    // printf("Eight byte: %lld\n",   chunk[7]);
+    // printf("Nineth byte: %lld\n",  chunk[8]);
+    // printf("Tenth byte: %lld\n",   chunk[9]);
 
     for (inti j = 0; j < nsamples; ++j)
     {
@@ -59,6 +70,10 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
         assert(bgen_read_missingness(plo_miss[j]) == 0);
 
         ncombs = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
+
+        // printf("ncombs inside: %lld\n", ncombs);
+
+        inti uip_sum = 0;
 
         for (inti i = 0; i < ncombs - 1; ++i)
         {
@@ -70,10 +85,20 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
                 inti geno_start   = bit_geno_start(i, nbits);
                 inti bit_idx      = sample_start + geno_start + bi;
 
-                if (get_bit(chunk, bit_idx)) ui_prob |= ((inti)1 << bi);
+                // printf("bit_idx: %lld\n", bit_idx);
+
+                if (get_bit(chunk, bit_idx))
+                {
+                    // printf("got bit\n");
+                    ui_prob |= ((inti)1 << bi);
+                }
             }
-            vg->probabilities[j * (ncombs - 1) + i] = ui_prob / denom;
+
+            // printf("%lld\n", ui_prob);
+            vg->probabilities[j * ncombs + i] = ui_prob / denom;
+            uip_sum                          += ui_prob;
         }
+        vg->probabilities[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
     }
     return EXIT_SUCCESS;
 }
@@ -151,6 +176,14 @@ inti bgen_read_layout2_genotype(VariantIndexing *indexing,
     MEMCPY(&nbits,  &c, 1);
 
     assert(phased == 0);
+
+    // printf("%u, %u, %u, %u, %u, %u\n",
+    //        nsamples,
+    //        nalleles,
+    //        min_ploidy,
+    //        max_ploidy,
+    //        phased,
+    //        nbits);
 
     bgen_read_unphased_genotype(c, vg, nsamples, nalleles, nbits, plo_miss);
 

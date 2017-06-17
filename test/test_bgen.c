@@ -222,6 +222,15 @@ int test_filepath(const byte *filepath)
 
     VariantGenotype *vg = bgen_read_variant_genotypes(index, 0, 2);
 
+    printf("%.10f, %.10f, %.10f\n",
+           vg[0].probabilities[0],
+           vg[0].probabilities[1],
+           vg[0].probabilities[2]);
+    printf("%.10f, %.10f, %.10f\n",
+           vg[0].probabilities[3],
+           vg[0].probabilities[4],
+           vg[0].probabilities[5]);
+
     bgen_free_samples(bgen, samples);
     bgen_free_variants(bgen, variants);
     bgen_free_indexing(index);
@@ -233,9 +242,11 @@ int test_filepath(const byte *filepath)
 
 int main()
 {
-    if (test_filepath((byte *)"test/data/example.1bits.bgen") == FAIL) return FAIL;
+    // if (test_filepath((byte *)"test/data/example.1bits.bgen") ==
+    // FAIL) return FAIL;
 
-    if (test_filepath((byte *)"test/data/example.32bits.bgen") == FAIL) return FAIL;
+    if (test_filepath((byte *)"test/data/example.32bits.bgen") ==
+        FAIL) return FAIL;
 
     return EXIT_SUCCESS;
 }

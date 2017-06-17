@@ -315,6 +315,8 @@ VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
         bgen_read_variant_genotype(indexing, vg + i);
     }
 
+    return vg;
+
 err:
 
     if (indexing->file) fclose(indexing->file);
