@@ -220,6 +220,8 @@ int test_filepath(const byte *filepath)
 
     if (e != 0) return FAIL;
 
+    VariantGenotype *vg = bgen_read_variant_genotypes(index, 0, 2);
+
     bgen_free_samples(bgen, samples);
     bgen_free_variants(bgen, variants);
     bgen_free_indexing(index);

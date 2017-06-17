@@ -3,6 +3,6 @@
 
 #include "../types.h"
 
-inti bgen_reader_choose(inti n, inti k);
+inti bgen_choose(inti n, inti k);
 
 #endif /* end of include guard: CHOOSE_H */

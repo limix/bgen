@@ -142,7 +142,7 @@ void print_bgen(const char *filepath)
                               &nalleles, &nbits);
 
     inti nsamples   = bgen_reader_nsamples(bgenfile);
-    inti ngenotypes = bgen_reader_choose(nalleles + ploidy - 1, nalleles - 1);
+    inti ngenotypes = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
 
     printf("Number of genotypes of variant index %llu: %lld\n",
            variantidx,

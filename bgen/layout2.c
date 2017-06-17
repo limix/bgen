@@ -47,53 +47,32 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
                                  inti             nbits,
                                  uint8_t         *plo_miss)
 {
-    inti i, j;
-    inti bi;
-    inti sample_start, geno_start, bit_idx;
-    inti ploidy;
-    inti miss;
-    inti ui_prob;
-    inti ui_prob_sum;
-    inti tmp;
+    inti ncombs = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
 
-    inti ncombs =
-        bgen_reader_choose(nalleles + vg->ploidy - 1,
-                           nalleles - 1);
+    vg->probabilities = malloc((ncombs - 1) * nsamples * sizeof(real));
 
-    vg->probabilities = malloc((ncombs - 1) * nsamples * sizeof(inti));
+    real denom = (((inti)1 << nbits)) - 1;
 
-    for (j = 0; j < nsamples; ++j)
+    for (inti j = 0; j < nsamples; ++j)
     {
-        ploidy = bgen_read_ploidy(plo_miss[j]);
-        miss   = bgen_read_missingness(plo_miss[j]);
-        assert(miss == 0);
+        inti ploidy = bgen_read_ploidy(plo_miss[j]);
+        assert(bgen_read_missingness(plo_miss[j]) == 0);
 
-        ncombs =
-            bgen_reader_choose(nalleles + ploidy - 1, nalleles -
-                               1);
+        ncombs = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
 
-        ui_prob_sum = 0;
-
-        for (i = 0; i < ncombs - 1; ++i)
+        for (inti i = 0; i < ncombs - 1; ++i)
         {
-            ui_prob = 0;
+            inti ui_prob = 0;
 
-            for (bi = 0; bi < nbits; ++bi)
+            for (inti bi = 0; bi < nbits; ++bi)
             {
-                sample_start = bit_sample_start(j, nbits, ncombs);
-                geno_start   = bit_geno_start(i, nbits);
-                bit_idx      = sample_start + geno_start + bi;
+                inti sample_start = bit_sample_start(j, nbits, ncombs);
+                inti geno_start   = bit_geno_start(i, nbits);
+                inti bit_idx      = sample_start + geno_start + bi;
 
-
-                if (get_bit(chunk, bit_idx))
-                {
-                    tmp      = 1;
-                    tmp    <<= bi;
-                    ui_prob |= tmp;
-                }
+                if (get_bit(chunk, bit_idx)) ui_prob |= ((inti)1 << bi);
             }
-            vg->probabilities[j * (ncombs - 1) + i] = ui_prob;
-            ui_prob_sum                            += ui_prob;
+            vg->probabilities[j * (ncombs - 1) + i] = ui_prob / denom;
         }
     }
     return EXIT_SUCCESS;

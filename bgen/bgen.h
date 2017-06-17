@@ -37,17 +37,11 @@ typedef struct BGenFile
     FILE *restrict file;
     inti           nvariants;
     inti           nsamples;
-
-    // 0: no compression
-    // 1: zlib's compress()
-    // 2: zstandard's ZSTD_compress()
-    inti compression;
-
-    // Possible values are 1 and 2.
-    inti layout;
-    inti sample_ids_presence;
-    inti samples_start;
-    inti variants_start;
+    inti           compression;
+    inti           layout;
+    inti           sample_ids_presence;
+    inti           samples_start;
+    inti           variants_start;
 } BGenFile;
 
 BGenFile       * bgen_open(const byte *filepath);

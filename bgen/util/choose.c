@@ -1,6 +1,6 @@
 #include "choose.h"
 
-inti bgen_reader_choose(inti n, inti k)
+inti bgen_choose(inti n, inti k)
 {
     inti ans = 1;
 
