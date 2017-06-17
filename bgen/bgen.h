@@ -1,6 +1,7 @@
 #ifndef BGEN_READER_H
 #define BGEN_READER_H
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "types.h"
@@ -23,10 +24,11 @@ typedef struct VariantGenotype
 
 typedef struct VariantIndexing
 {
-    byte *filepath;
-    inti  compression;
-    inti  layout;
-    inti *start;
+    byte          *filepath;
+    FILE *restrict file;
+    inti           compression;
+    inti           layout;
+    inti          *start;
 } VariantIndexing;
 
 typedef struct BGenFile

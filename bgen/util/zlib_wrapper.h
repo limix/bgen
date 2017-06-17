@@ -3,6 +3,7 @@
 
 #include <zlib.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "../types.h"
 
@@ -21,7 +22,7 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
 
     if (e != Z_OK)
     {
-        printf("11 zlib failed to uncompress: %s.\n", zError(e));
+        printf("zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 
@@ -41,7 +42,7 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
     case Z_DATA_ERROR:
     case Z_MEM_ERROR:
         inflateEnd(&strm);
-        printf("22 zlib failed to uncompress: %s.\n", zError(e));
+        printf("zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 

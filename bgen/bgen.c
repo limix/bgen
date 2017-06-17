@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "bgen.h"
+#include "layout2.h"
 #include "util/mem.h"
 #include "util/file.h"
 
@@ -298,9 +299,9 @@ VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
                                              inti             variant_start,
                                              inti             variant_end)
 {
-    FILE *file = fopen((const char *)indexing->filepath, "rb");
+    indexing->file = fopen((const char *)indexing->filepath, "rb");
 
-    if (file == NULL) {
+    if (indexing->file == NULL) {
         fprintf(stderr, "Could not open: %s\n", indexing->filepath);
         goto err;
     }
@@ -308,23 +309,15 @@ VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
     inti n              = variant_end - variant_start;
     VariantGenotype *vg = malloc(n * sizeof(VariantGenotype));
 
-    fseek(file, indexing->start[variant_start], SEEK_SET);
-
     for (inti i = 0; i < n; ++i)
     {
+        fseek(indexing->file, indexing->start[variant_start + i], SEEK_SET);
         bgen_read_variant_genotype(indexing, vg + i);
     }
 
-    // typedef struct VariantIndexing
-    // {
-    //     byte *filepath;
-    //     inti  compression;
-    //     inti  layout;
-    //     inti *start;
-    // } VariantIndexing;
 err:
 
-    if (file) fclose(file);
+    if (indexing->file) fclose(indexing->file);
 
     if (vg != NULL) free(vg);
     return NULL;

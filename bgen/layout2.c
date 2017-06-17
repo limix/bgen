@@ -4,6 +4,7 @@
 #include "layout2.h"
 
 #include "bgen.h"
+#include "util/file.h"
 #include "util/bits.h"
 #include "util/zlib_wrapper.h"
 #include "util/mem.h"
@@ -40,7 +41,11 @@ inline static int get_bit(const byte *mem, inti bit_idx)
 }
 
 inti bgen_read_unphased_genotype(const byte      *chunk,
-                                 VariantGenotype *vg)
+                                 VariantGenotype *vg,
+                                 inti             nsamples,
+                                 inti             nalleles,
+                                 inti             nbits,
+                                 uint8_t         *plo_miss)
 {
     inti i, j;
     inti bi;
@@ -52,20 +57,19 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
     inti tmp;
 
     inti ncombs =
-        bgen_reader_choose(vpb->nalleles + vpb->max_ploidy - 1,
-                           vpb->nalleles - 1);
+        bgen_reader_choose(nalleles + vg->ploidy - 1,
+                           nalleles - 1);
 
-    vpb->genotypes = calloc((ncombs - 1) * vpb->nsamples, sizeof(inti));
+    vg->probabilities = malloc((ncombs - 1) * nsamples * sizeof(inti));
 
-    // nsamples
-    for (j = 0; j < vpb->nsamples; ++j)
+    for (j = 0; j < nsamples; ++j)
     {
-        ploidy = bgen_read_ploidy(vpb->missingness[j]);
-        miss   = bgen_read_missingness(vpb->missingness[j]);
+        ploidy = bgen_read_ploidy(plo_miss[j]);
+        miss   = bgen_read_missingness(plo_miss[j]);
         assert(miss == 0);
 
         ncombs =
-            bgen_reader_choose(vpb->nalleles + ploidy - 1, vpb->nalleles -
+            bgen_reader_choose(nalleles + ploidy - 1, nalleles -
                                1);
 
         ui_prob_sum = 0;
@@ -74,10 +78,10 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
         {
             ui_prob = 0;
 
-            for (bi = 0; bi < vpb->nbits; ++bi)
+            for (bi = 0; bi < nbits; ++bi)
             {
-                sample_start = bit_sample_start(j, vpb->nbits, ncombs);
-                geno_start   = bit_geno_start(i, vpb->nbits);
+                sample_start = bit_sample_start(j, nbits, ncombs);
+                geno_start   = bit_geno_start(i, nbits);
                 bit_idx      = sample_start + geno_start + bi;
 
 
@@ -88,128 +92,91 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
                     ui_prob |= tmp;
                 }
             }
-            vpb->genotypes[j * (ncombs - 1) + i] = ui_prob;
-            ui_prob_sum                         += ui_prob;
+            vg->probabilities[j * (ncombs - 1) + i] = ui_prob;
+            ui_prob_sum                            += ui_prob;
         }
     }
     return EXIT_SUCCESS;
 }
 
-inti bgen_reader_uncompress(VariantIndexing *indexing, byte **uchunk)
+byte* bgen_uncompress(VariantIndexing *indexing)
 {
     inti  clength = 0, ulength = 0;
     byte *cchunk;
+    byte *uchunk;
 
-    if (indexing->compression == 0)
+    assert(indexing->compression == 2);
+
+    if (bgen_read(indexing->file, &clength, 4)) return NULL;
+
+    clength -= 4;
+
+    if (bgen_read(indexing->file, &ulength, 4)) return NULL;
+
+    cchunk = malloc(clength);
+
+    if (bgen_read(indexing->file, cchunk, clength))
     {
-        ulength = 6 * indexing->nsamples;
-
-        *uchunk = malloc(ulength);
-
-        if (bgen_read(indexing->file, *uchunk, ulength)) return FAIL;
-    } else {
-        if (bgen_read(indexing->file, &clength, 4)) return FAIL;
-
-        clength -= 4;
-
-        if (bgen_read(indexing->file, &ulength, 4)) return FAIL;
-
-        cchunk = malloc(clength);
-
-        if (bgen_read(indexing->file, cchunk, clength)) return FAIL;
-
-        *uchunk = malloc(ulength);
-        assert(compression == 2);
-        zlib_uncompress(cchunk, clength, uchunk, &ulength);
-
         free(cchunk);
+        return NULL;
     }
 
-    return EXIT_SUCCESS;
+    uchunk = malloc(ulength);
+    zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+
+    free(cchunk);
+
+    return uchunk;
 }
 
-//
-// // Genotype data block (Layout 2)
-// //
-// //   1) No compression
-// //     -------------------------------
-// //     | 4 | block length minus 4, C |
-// //     | C | genotype probabilities  |
-// //     -------------------------------
-// //
-// //   2) Compressed
-// //     -------------------------------------------
-// //     | 4   | block length minus 4, C           |
-// //     | 4   | uncompressed data length, D       |
-// //     | C-4 | compressed genotype probabilities |
-// //     -------------------------------------------
-// //
-// // Probabilities block
-// // ------------------------------------------------
-// // | 4     | # samples                            |
-// // | 2     | # alleles                            |
-// // | 1     | minimum ploidy                       |
-// // | 1     | maximum ploidy                       |
-// // | N     | ploidy and missigness of each sample |
-// // | 1     | phased or not                        |
-// // | 1     | # bits per probability               |
-// // | C+N+6 | probabilities for each genotype      |
-// // ------------------------------------------------
 inti bgen_read_layout2_genotype(VariantIndexing *indexing,
                                 VariantGenotype *vg)
 {
-    byte *chunk;
-    inti  e, i;
-
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t  min_ploidy, max_ploidy, phased, nbits;
 
-    e = bgen_reader_uncompress(indexing, &chunk);
-    byte *c = chunk;
+    byte *c;
+    byte *chunk;
 
-    if (e == FAIL) return FAIL;
+    if (indexing->compression > 0)
+    {
+        chunk = bgen_uncompress(indexing);
+        c     = chunk;
+        MEMCPY(&nsamples, &c, 4);
+    }
+    else {
+        if (bgen_read(indexing->file, &nsamples, 4)) return FAIL;
 
-    memset(vpb, 0, sizeof(VariantGenotypeBlock));
+        chunk = malloc(6 * nsamples);
 
-    MEMCPY(&nsamples,   &c, 4);
+        if (bgen_read(indexing->file, chunk, 6 * nsamples)) return FAIL;
+
+        c = chunk;
+    }
+
     MEMCPY(&nalleles,   &c, 2);
     MEMCPY(&min_ploidy, &c, 1);
     MEMCPY(&max_ploidy, &c, 1);
+    vg->ploidy = max_ploidy;
 
-    vpb->missingness = malloc(nsamples * sizeof(inti));
+    uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
 
-    for (i = 0; i < vpb->nsamples; ++i)
+    for (inti i = 0; i < nsamples; ++i)
     {
-        vpb->missingness[i] = c[i];
+        plo_miss[i] = c[i];
     }
-    c += vpb->nsamples;
+    c += nsamples;
 
     MEMCPY(&phased, &c, 1);
     MEMCPY(&nbits,  &c, 1);
 
     assert(phased == 0);
-    bgen_read_unphased_genotype(c, vg);
+
+    bgen_read_unphased_genotype(c, vg, nsamples, nalleles, nbits, plo_miss);
 
     free(chunk);
-    free(vpb->missingness);
+    free(plo_miss);
 
     return EXIT_SUCCESS;
 }
-
-//
-// inti bgen_reader_layout2_genotype_skip(BGenFile *bgenfile)
-// {
-//     inti length = 0;
-//
-//     if (bgen_reader_compression(bgenfile) == 0)
-//     {
-//         length = 6 * bgenfile->header.nsamples;
-//     } else {
-//         if (bgen_read(bgenfile, &length, 4)) return FAIL;
-//     }
-//
-//     fseek(bgenfile->file, length, SEEK_CUR);
-//
-//     return EXIT_SUCCESS;
-// }
