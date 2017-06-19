@@ -340,3 +340,8 @@ void bgen_free_variant_genotypes(VariantGenotype *vg, inti nvariants)
     }
     free(vg);
 }
+
+inti bgen_sample_ids_presence(BGenFile *bgen)
+{
+    return bgen->sample_ids_presence;
+}
