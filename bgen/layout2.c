@@ -53,7 +53,8 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
 
     real denom = (((inti)1 << nbits)) - 1;
 
-    for (inti j = 0; j < nsamples; ++j)
+    inti i, j, bi;
+    for (j = 0; j < nsamples; ++j)
     {
         inti ploidy = bgen_read_ploidy(plo_miss[j]);
         assert(bgen_read_missingness(plo_miss[j]) == 0);
@@ -64,11 +65,11 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
 
         inti uip_sum = 0;
 
-        for (inti i = 0; i < ncombs - 1; ++i)
+        for (i = 0; i < ncombs - 1; ++i)
         {
             inti ui_prob = 0;
 
-            for (inti bi = 0; bi < nbits; ++bi)
+            for (bi = 0; bi < nbits; ++bi)
             {
                 inti sample_start = bit_sample_start(j, nbits, ncombs);
                 inti geno_start   = bit_geno_start(i, nbits);
@@ -155,7 +156,8 @@ inti bgen_read_layout2_genotype(VariantIndexing *indexing,
 
     uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
 
-    for (inti i = 0; i < nsamples; ++i)
+    inti i;
+    for (i = 0; i < nsamples; ++i)
     {
         plo_miss[i] = c[i];
     }

@@ -6,7 +6,7 @@
 #include "../types.h"
 
 static inline inti bgen_read(FILE          *file,
-                             void *restrict buffer,
+                             void          *buffer,
                              inti           size)
 {
     inti e = fread(buffer, size, 1, file);

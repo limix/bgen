@@ -25,7 +25,7 @@ typedef struct VariantGenotype
 typedef struct VariantIndexing
 {
     byte          *filepath;
-    FILE *restrict file;
+    FILE          *file;
     inti           compression;
     inti           layout;
     inti          *start;
@@ -34,7 +34,7 @@ typedef struct VariantIndexing
 typedef struct BGenFile
 {
     byte          *filepath;
-    FILE *restrict file;
+    FILE          *file;
     inti           nvariants;
     inti           nsamples;
     inti           compression;

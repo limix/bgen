@@ -63,16 +63,18 @@ int test_probabilities(VariantIndexing *indexing)
     char   line[65536];
     double prob[3];
     double eps = 1e-4;
+    int tmp;
 
-    for (inti i = 0; i < 199; ++i)
+    inti i, j;
+    for (i = 0; i < 199; ++i)
     {
         if (vg[i].ploidy != 2) return FAIL;
 
-        for (inti j = 0; j < 500; ++j)
+        for (j = 0; j < 500; ++j)
         {
-            fscanf(f, "%lf", prob + 0);
-            fscanf(f, "%lf", prob + 1);
-            fscanf(f, "%lf", prob + 2);
+            tmp = fscanf(f, "%lf", prob + 0);
+            tmp = fscanf(f, "%lf", prob + 1);
+            tmp = fscanf(f, "%lf", prob + 2);
 
             if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) prob[2] = 1.0;
 
