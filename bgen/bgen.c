@@ -325,8 +325,11 @@ err:
     return NULL;
 }
 
-void bgen_free_variant_genotypes(VariantGenotype *vg)
+void bgen_free_variant_genotypes(VariantGenotype *vg, inti nvariants)
 {
-    free(vg->probabilities);
+    for (inti i = 0; i < nvariants; ++i)
+    {
+        free(vg[i].probabilities);
+    }
     free(vg);
 }

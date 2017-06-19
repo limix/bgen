@@ -53,17 +53,6 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
 
     real denom = (((inti)1 << nbits)) - 1;
 
-    // printf("First byte: %lld\n",   chunk[0]);
-    // printf("Second byte: %lld\n",  chunk[1]);
-    // printf("Third byte: %lld\n",   chunk[2]);
-    // printf("Fourth byte: %lld\n",  chunk[3]);
-    // printf("Fifth byte: %lld\n",   chunk[4]);
-    // printf("Sixth byte: %lld\n",   chunk[5]);
-    // printf("Seventh byte: %lld\n", chunk[6]);
-    // printf("Eight byte: %lld\n",   chunk[7]);
-    // printf("Nineth byte: %lld\n",  chunk[8]);
-    // printf("Tenth byte: %lld\n",   chunk[9]);
-
     for (inti j = 0; j < nsamples; ++j)
     {
         inti ploidy = bgen_read_ploidy(plo_miss[j]);
@@ -176,14 +165,6 @@ inti bgen_read_layout2_genotype(VariantIndexing *indexing,
     MEMCPY(&nbits,  &c, 1);
 
     assert(phased == 0);
-
-    // printf("%u, %u, %u, %u, %u, %u\n",
-    //        nsamples,
-    //        nalleles,
-    //        min_ploidy,
-    //        max_ploidy,
-    //        phased,
-    //        nbits);
 
     bgen_read_unphased_genotype(c, vg, nsamples, nalleles, nbits, plo_miss);
 
