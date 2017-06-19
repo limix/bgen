@@ -63,4 +63,6 @@ VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
                                              inti             variant_start,
                                              inti             variant_end);
 
+void bgen_free_variant_genotypes(VariantGenotype *vg);
+
 #endif /* end of include guard: BGEN_READER_H */

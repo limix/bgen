@@ -324,3 +324,9 @@ err:
     if (vg != NULL) free(vg);
     return NULL;
 }
+
+void bgen_free_variant_genotypes(VariantGenotype *vg)
+{
+    free(vg->probabilities);
+    free(vg);
+}

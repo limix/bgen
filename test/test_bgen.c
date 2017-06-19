@@ -87,6 +87,7 @@ int test_probabilities(VariantIndexing *indexing)
     }
 
     fclose(f);
+    bgen_free_variant_genotypes(vg);
     return SUCCESS;
 }
 
