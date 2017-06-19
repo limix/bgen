@@ -65,7 +65,9 @@ BGenFile* bgen_open(const byte *filepath)
 
     if (bgen_read_header(bgen) == FAIL) goto err;
 
-    bgen->samples_start = ftell(bgen->file);
+
+    if (bgen->sample_ids_presence == 0) bgen->variants_start = ftell(bgen->file);
+    else bgen->samples_start = ftell(bgen->file);
 
     if (bgen->samples_start == EOF)
     {
