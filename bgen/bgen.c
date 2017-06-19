@@ -203,6 +203,8 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
     if (bgen_read(bgen->file, &position, 4) == FAIL) return FAIL;
 
+    v->position = position;
+
     if (bgen->layout == 1) nalleles = 2;
     else if (bgen_read(bgen->file, &nalleles, 2) == FAIL) return FAIL;
 
