@@ -174,6 +174,8 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
     uint32_t nsamples, position, allele_len;
     uint16_t id_len, rsid_len, chrom_len, nalleles;
 
+    printf("Layout: %d\n", bgen->layout);
+
     if (bgen->layout == 1)
     {
         if (bgen_read(bgen->file, &nsamples, 4) == FAIL) return FAIL;
@@ -185,11 +187,15 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
     if (bgen_read(bgen->file, v->id.str, v->id.len) == FAIL) return FAIL;
 
+    printf("id: %.*s\n", v->id.len, v->id.str);
+
     if (bgen_read(bgen->file, &rsid_len, 2) == FAIL) return FAIL;
 
     string_alloc(&(v->rsid), rsid_len);
 
     if (bgen_read(bgen->file, v->rsid.str, v->rsid.len) == FAIL) return FAIL;
+
+    printf("rsid: %.*s\n", v->rsid.len, v->rsid.str);
 
     if (bgen_read(bgen->file, &chrom_len, 2) == FAIL) return FAIL;
 
@@ -197,10 +203,16 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
     if (bgen_read(bgen->file, v->chrom.str, v->chrom.len) == FAIL) return FAIL;
 
+    printf("chrom: %.*s\n", v->chrom.len, v->chrom.str);
+
     if (bgen_read(bgen->file, &position, 4) == FAIL) return FAIL;
+
+    printf("position: %ld\n", position);
 
     if (bgen->layout == 1) nalleles = 2;
     else if (bgen_read(bgen->file, &nalleles, 2) == FAIL) return FAIL;
+
+    printf("nalleles: %ld\n", nalleles);
 
     v->nalleles = nalleles;
 
