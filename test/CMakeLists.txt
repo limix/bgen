@@ -7,5 +7,6 @@ else()
   target_link_libraries (test_bgen LINK_PUBLIC bgen m)
 endif()
 
+file(COPY data/example.matrix DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
 file(COPY data/example.1bits.bgen DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
 file(COPY data/example.32bits.bgen DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
