@@ -101,8 +101,6 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     byte *cchunk;
     byte *uchunk;
 
-    assert(indexing->compression == 2);
-
     if (bgen_read(indexing->file, &clength, 4)) return NULL;
 
     clength -= 4;
@@ -122,13 +120,13 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     if (indexing->compression == 1)
     {
         printf("COMPRESSION 1\n");
-        zstd_uncompress(cchunk, clength, &uchunk, &ulength);
+        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
     }
 
     if (indexing->compression == 2)
     {
         printf("COMPRESSION 2\n");
-        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+        zstd_uncompress(cchunk, clength, &uchunk, &ulength);
     }
 
 

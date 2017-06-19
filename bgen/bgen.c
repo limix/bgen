@@ -35,7 +35,7 @@ inti bgen_read_header(BGenFile *bgen)
 
     bgen->nvariants           = nvariants;
     bgen->nsamples            = nsamples;
-    bgen->compression         = (flags & 60) >> 2;
+    bgen->compression         = flags & 3;
     bgen->layout              = (flags & (15 << 2)) >> 2;
     bgen->sample_ids_presence = (flags & (1 << 31)) >> 31;
 
