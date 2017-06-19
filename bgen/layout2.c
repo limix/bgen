@@ -7,6 +7,7 @@
 #include "util/file.h"
 #include "util/bits.h"
 #include "util/zlib_wrapper.h"
+#include "util/zstd_wrapper.h"
 #include "util/mem.h"
 #include "util/choose.h"
 
@@ -54,6 +55,7 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
     real denom = (((inti)1 << nbits)) - 1;
 
     inti i, j, bi;
+
     for (j = 0; j < nsamples; ++j)
     {
         inti ploidy = bgen_read_ploidy(plo_miss[j]);
@@ -116,7 +118,19 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     }
 
     uchunk = malloc(ulength);
-    zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+
+    if (indexing->compression == 1)
+    {
+        printf("COMPRESSION 1\n");
+        zstd_uncompress(cchunk, clength, &uchunk, &ulength);
+    }
+
+    if (indexing->compression == 2)
+    {
+        printf("COMPRESSION 2\n");
+        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
+    }
+
 
     free(cchunk);
 
@@ -157,6 +171,7 @@ inti bgen_read_layout2_genotype(VariantIndexing *indexing,
     uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
 
     inti i;
+
     for (i = 0; i < nsamples; ++i)
     {
         plo_miss[i] = c[i];

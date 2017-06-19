@@ -126,6 +126,7 @@ string* bgen_read_samples(BGenFile *bgen)
     if (bgen_read(bgen->file, &nsamples, 4)) goto err;
 
     inti i;
+
     for (i = 0; i < bgen->nsamples; ++i)
     {
         if (bgen_read(bgen->file, &len, 2)) goto err;
@@ -160,6 +161,7 @@ void bgen_free_samples(const BGenFile *bgen, string *samples)
     if (samples == NULL) return;
 
     inti i;
+
     for (i = 0; i < bgen->nsamples; ++i)
     {
         free(samples[i].str);
@@ -205,6 +207,7 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
     v->allele_ids = malloc(nalleles * sizeof(string));
 
     inti i;
+
     for (i = 0; i < v->nalleles; ++i)
     {
         if (bgen_read(bgen->file, &allele_len, 4) == FAIL) return FAIL;
@@ -238,6 +241,7 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
     (*index)->start = malloc(nvariants * sizeof(inti));
 
     inti i;
+
     for (i = 0; i < nvariants; ++i)
     {
         if (bgen_read_variant(bgen, variants + i) == FAIL) goto err;
@@ -272,6 +276,7 @@ void bgen_free_variants(const BGenFile *bgen,
                         Variant        *variants)
 {
     inti i, j;
+
     for (i = 0; i < bgen->nvariants; ++i)
     {
         for (j = 0; j < variants[i].nalleles; ++j)
@@ -315,6 +320,7 @@ VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
     VariantGenotype *vg = malloc(n * sizeof(VariantGenotype));
 
     inti i;
+
     for (i = 0; i < n; ++i)
     {
         fseek(indexing->file, indexing->start[variant_start + i], SEEK_SET);
@@ -334,6 +340,7 @@ err:
 void bgen_free_variant_genotypes(VariantGenotype *vg, inti nvariants)
 {
     inti i;
+
     for (i = 0; i < nvariants; ++i)
     {
         free(vg[i].probabilities);

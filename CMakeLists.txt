@@ -5,6 +5,7 @@ project(bgen C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -15,6 +16,7 @@ file(STRINGS "VERSION" BGEN_VERSION)
 find_package( ZLIB REQUIRED )
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
+include_directories( ${ZSTD_INCLUDE_DIRS} )
 include_directories( include/ )
 include_directories(.)
 
@@ -34,13 +36,13 @@ install(TARGETS bgen
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen ${ZLIB_LIBRARIES} )
+target_link_libraries( bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen_static ${ZLIB_LIBRARIES} )
+target_link_libraries( bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 add_subdirectory(test)
 
