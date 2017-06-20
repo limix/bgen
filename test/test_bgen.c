@@ -11,7 +11,7 @@
 
 int test_filepath(const byte *filepath, VariantIndexing **indexing)
 {
-    printf("Ponto 1\n");
+    // printf("Ponto 1\n");
     BGenFile *bgen;
     inti e;
 
@@ -23,48 +23,51 @@ int test_filepath(const byte *filepath, VariantIndexing **indexing)
 
     if (bgen_nvariants(bgen) != 199) return FAIL;
 
-    printf("Ponto 2\n");
+    // printf("Ponto 2\n");
 
     string *samples = bgen_read_samples(bgen);
 
-    printf("Ponto 2.1\n");
+    // printf("Ponto 2.1\n");
 
     if (samples != NULL)
     {
-        printf("Ponto 2.2\n");
+        // printf("Ponto 2.2\n");
 
         e = strncmp("sample_001", (char *)samples[0].str, samples[0].len);
 
-        printf("Ponto 2.3\n");
+        // printf("Ponto 2.3\n");
 
         if (e != 0) return FAIL;
 
-        printf("Ponto 2.4\n");
+        // printf("Ponto 2.4\n");
 
         e = strncmp("sample_500", (char *)samples[499].str, samples[0].len);
 
-        printf("Ponto 2.5\n");
+        // printf("Ponto 2.5\n");
 
         if (e != 0) return FAIL;
     }
 
-    printf("Ponto 3\n"); fflush(stdout);
+    // printf("Ponto 3\n"); fflush(stdout);
     Variant *variants = bgen_read_variants(bgen, indexing);
-    printf("Ponto 3.1\n"); fflush(stdout);
+
+    // printf("Ponto 3.1\n"); fflush(stdout);
 
     e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
-    printf("Ponto 3.2\n"); fflush(stdout);
+
+    // printf("Ponto 3.2\n"); fflush(stdout);
 
     if (e != 0) return FAIL;
 
-    printf("Ponto 3.3\n"); fflush(stdout);
+    // printf("Ponto 3.3\n"); fflush(stdout);
 
     e = strncmp("SNPID_200", (char *)variants[198].id.str, variants[198].id.len);
-    printf("Ponto 3.4\n"); fflush(stdout);
+
+    // printf("Ponto 3.4\n"); fflush(stdout);
 
     if (e != 0) return FAIL;
 
-    printf("Ponto 4\n"); fflush(stdout);
+    // printf("Ponto 4\n"); fflush(stdout);
 
     bgen_free_samples(bgen, samples);
     bgen_free_variants(bgen, variants);
