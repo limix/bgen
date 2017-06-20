@@ -92,6 +92,7 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
     if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
+    printf("clength: %lld\n", clength); fflush(stdout);
 
     if (bgen_read(indexing->file, cchunk, clength) == FAIL)
     {
@@ -108,8 +109,10 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
         return NULL;
     }
 
+    ulength = clength;
     uchunk = malloc(ulength);
 
+    printf("before uncomp\n"); fflush(stdout);
     zlib_uncompress_chunked(cchunk, clength, &uchunk, &ulength);
 
     // if (indexing->compression == 2)
@@ -130,11 +133,14 @@ inti bgen_read_variant_genotype_header_layout1(
     uint16_t nalleles;
     uint8_t  min_ploidy, max_ploidy, phased, nbits;
 
+    printf("bgen_read_variant_genotype_header_layout1\n"); fflush(stdout);
+
     byte *c;
     byte *chunk;
 
     if (indexing->compression > 0)
     {
+        printf("indexing->compression > 0\n"); fflush(stdout);
         chunk = bgen_uncompress_layout1(indexing);
         c     = chunk;
         MEMCPY(&nsamples, &c, 4);
@@ -153,6 +159,10 @@ inti bgen_read_variant_genotype_header_layout1(
     MEMCPY(&min_ploidy, &c, 1);
     MEMCPY(&max_ploidy, &c, 1);
     vg->ploidy = max_ploidy;
+
+    printf("nalleles: %u\n", nalleles); fflush(stdout);
+    printf("min_ploidy: %u\n", min_ploidy); fflush(stdout);
+    printf("max_ploidy: %u\n", max_ploidy); fflush(stdout);
 
     uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
 

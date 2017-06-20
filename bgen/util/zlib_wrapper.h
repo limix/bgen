@@ -62,12 +62,15 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
     unsigned int unused = *dst_size;
     byte *cdst          = *dst;
 
+    printf("Ponto 1\n"); fflush(stdout);
+
     strm.zalloc   = Z_NULL;
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;
     strm.avail_in = 0;
     strm.next_in  = Z_NULL;
     ret           = inflateInit(&strm);
+    printf("Ponto 2\n"); fflush(stdout);
 
     if (ret != Z_OK)
     {
@@ -77,6 +80,7 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
 
     strm.avail_in = src_size;
     strm.next_in  = (byte *)src;
+    printf("Ponto 3\n"); fflush(stdout);
 
     while (1) {
         strm.avail_out = unused;
@@ -123,6 +127,7 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
         }
     }
 
+    printf("inflateEnd\n"); fflush(stdout);
     inflateEnd(&strm);
     return EXIT_SUCCESS;
 }
