@@ -54,45 +54,56 @@ int test_filepath(const byte *filepath, VariantIndexing **indexing)
 
 int test_probabilities(VariantIndexing *indexing)
 {
-    // VariantGenotype *vg = bgen_read_variant_genotypes(indexing, 0, 199);
-    //
-    // FILE *f = fopen("test/data/example.matrix", "r");
-    //
-    // if (f == NULL) return FAIL;
-    //
-    // char   line[65536];
-    // double prob[3];
-    // double eps = 1e-4;
-    // int    tmp;
-    //
-    // inti i, j;
-    //
-    // for (i = 0; i < 199; ++i)
-    // {
-    //     if (vg[i].ploidy != 2) return FAIL;
-    //
-    //     for (j = 0; j < 500; ++j)
-    //     {
-    //         tmp = fscanf(f, "%lf", prob + 0);
-    //         tmp = fscanf(f, "%lf", prob + 1);
-    //         tmp = fscanf(f, "%lf", prob + 2);
-    //
-    //         if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) prob[2] =
-    // 1.0;
-    //
-    //
-    //         if (fabs(prob[0] - vg[i].probabilities[j * 3 + 0]) >
-    //             eps) return FAIL;
-    //
-    //         if (fabs(prob[1] - vg[i].probabilities[j * 3 + 1]) > eps) return
-    // FAIL;
-    //
-    //         if (fabs(prob[2] - vg[i].probabilities[j * 3 + 2]) > eps) return
-    // FAIL;
-    //     }
-    // }
-    //
-    // fclose(f);
+    VariantGenotype *vg;
+
+
+    FILE *f = fopen("test/data/example.matrix", "r");
+
+    if (f == NULL) return FAIL;
+
+    char   line[65536];
+    double prob[3];
+    double eps = 1e-4;
+    int    tmp;
+    real  *probabilities;
+
+    inti i, j;
+
+    for (i = 0; i < 199; ++i)
+    {
+        vg = bgen_open_variant_genotype(indexing, i);
+
+        if (vg->ploidy != 2) return FAIL;
+
+        probabilities = calloc(vg->nsamples * vg->ncombs, sizeof(real));
+
+        bgen_read_variant_genotype(indexing, vg, probabilities);
+
+        for (j = 0; j < 500; ++j)
+        {
+            tmp = fscanf(f, "%lf", prob + 0);
+            tmp = fscanf(f, "%lf", prob + 1);
+            tmp = fscanf(f, "%lf", prob + 2);
+
+
+            if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) prob[2] = 1.0;
+
+
+            if (fabs(prob[0] - probabilities[j * 3 + 0]) > eps) return FAIL;
+
+
+            if (fabs(prob[1] - probabilities[j * 3 + 1]) > eps) return
+                    FAIL;
+
+            if (fabs(prob[2] - probabilities[j * 3 + 2]) > eps) return
+                    FAIL;
+        }
+        bgen_close_variant_genotype(indexing, vg);
+        free(probabilities);
+    }
+
+    fclose(f);
+
     // bgen_free_variant_genotypes(vg, 199);
     return SUCCESS;
 }
@@ -110,7 +121,7 @@ int main()
         FAIL) return FAIL;
 
     // VariantGenotype *vg = bgen_read_variant_genotypes(index, 0, 2);
-    // if (test_probabilities(indexing) == FAIL) return FAIL;
+    if (test_probabilities(indexing) == FAIL) return FAIL;
 
     bgen_free_indexing(indexing);
 
