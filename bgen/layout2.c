@@ -107,13 +107,11 @@ byte* bgen_uncompress(VariantIndexing *indexing)
 
     if (indexing->compression == 1)
     {
-        printf("COMPRESSION 1\n");
         zlib_uncompress(cchunk, clength, &uchunk, &ulength);
     }
 
     if (indexing->compression == 2)
     {
-        printf("COMPRESSION 2\n");
         zstd_uncompress(cchunk, clength, &uchunk, &ulength);
     }
 
