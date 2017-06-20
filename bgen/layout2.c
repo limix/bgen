@@ -121,7 +121,7 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     return uchunk;
 }
 
-inti bgen_read_variant_genotype_header(
+inti bgen_read_variant_genotype_header_layout2(
     VariantIndexing *indexing,
     VariantGenotype *vg)
 {
@@ -179,9 +179,9 @@ inti bgen_read_variant_genotype_header(
     return EXIT_SUCCESS;
 }
 
-void bgen_read_variant_genotype_probabilities(VariantIndexing *indexing,
-                                              VariantGenotype *vg,
-                                              real            *probabilities)
+void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
+                                                      VariantGenotype *vg,
+                                                      real            *probabilities)
 {
     bgen_read_unphased_genotype(vg, probabilities);
 }

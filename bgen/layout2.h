@@ -6,11 +6,11 @@
 typedef struct VariantIndexing VariantIndexing;
 typedef struct VariantGenotype VariantGenotype;
 
-inti bgen_read_variant_genotype_header(VariantIndexing *indexing,
-                                       VariantGenotype *vg);
+inti bgen_read_variant_genotype_header_layout2(VariantIndexing *indexing,
+                                               VariantGenotype *vg);
 
-void bgen_read_variant_genotype_probabilities(VariantIndexing *indexing,
-                                              VariantGenotype *vg,
-                                              real            *probabilities);
+void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
+                                                      VariantGenotype *vg,
+                                                      real            *probabilities);
 
 #endif /* ifndef LAYOUT2_H */

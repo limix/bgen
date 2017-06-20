@@ -26,18 +26,7 @@ typedef struct Variant
     string *allele_ids;
 } Variant;
 
-typedef struct VariantGenotype
-{
-    inti     nsamples;
-    inti     nalleles;
-    inti     nbits;
-    uint8_t *plo_miss;
-    inti     ncombs;
-    inti     ploidy;
-    byte    *chunk;
-    byte    *current_chunk;
-    inti     variant_idx;
-} VariantGenotype;
+typedef struct VariantGenotype VariantGenotype;
 
 typedef struct VariantIndexing VariantIndexing;
 

@@ -321,7 +321,7 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
     vg->variant_idx = variant_idx;
     fseek(indexing->file, indexing->start[variant_idx], SEEK_SET);
 
-    bgen_read_variant_genotype_header(indexing, vg);
+    bgen_read_variant_genotype_header_layout2(indexing, vg);
 
     return vg;
 }
@@ -329,8 +329,7 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
 void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
                                 real *probabilities)
 {
-    assert(indexing->layout == 2);
-    bgen_read_variant_genotype_probabilities(indexing, vg, probabilities);
+    bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities);
 }
 
 inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
