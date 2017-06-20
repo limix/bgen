@@ -109,10 +109,10 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
         return NULL;
     }
 
-    ulength = clength;
+    ulength = 10 * clength;
     uchunk = malloc(ulength);
 
-    printf("before uncomp\n"); fflush(stdout);
+    printf("before uncomp: %lld\n", ulength); fflush(stdout);
     zlib_uncompress_chunked(cchunk, clength, &uchunk, &ulength);
 
     // if (indexing->compression == 2)
@@ -129,10 +129,6 @@ inti bgen_read_variant_genotype_header_layout1(
     VariantIndexing *indexing,
     VariantGenotype *vg)
 {
-    uint32_t nsamples;
-    uint16_t nalleles;
-    uint8_t  min_ploidy, max_ploidy, phased, nbits;
-
     printf("bgen_read_variant_genotype_header_layout1\n"); fflush(stdout);
 
     byte *c;
@@ -143,47 +139,19 @@ inti bgen_read_variant_genotype_header_layout1(
         printf("indexing->compression > 0\n"); fflush(stdout);
         chunk = bgen_uncompress_layout1(indexing);
         c     = chunk;
-        MEMCPY(&nsamples, &c, 4);
     }
     else {
-        if (bgen_read(indexing->file, &nsamples, 4) == FAIL) return FAIL;
+        chunk = malloc(6 * indexing->nsamples);
 
-        chunk = malloc(6 * nsamples);
-
-        if (bgen_read(indexing->file, chunk, 6 * nsamples) == FAIL) return FAIL;
+        if (bgen_read(indexing->file, chunk, 6 * indexing->nsamples) == FAIL) return FAIL;
 
         c = chunk;
     }
+    printf("indexing->nsamples: %ld\n", indexing->nsamples); fflush(stdout);
 
-    MEMCPY(&nalleles,   &c, 2);
-    MEMCPY(&min_ploidy, &c, 1);
-    MEMCPY(&max_ploidy, &c, 1);
-    vg->ploidy = max_ploidy;
-
-    printf("nalleles: %u\n", nalleles); fflush(stdout);
-    printf("min_ploidy: %u\n", min_ploidy); fflush(stdout);
-    printf("max_ploidy: %u\n", max_ploidy); fflush(stdout);
-
-    uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
-
-    inti i;
-
-    for (i = 0; i < nsamples; ++i)
-    {
-        plo_miss[i] = c[i];
-    }
-    c += nsamples;
-
-    MEMCPY(&phased, &c, 1);
-    MEMCPY(&nbits,  &c, 1);
-
-    assert(phased == 0);
-
-    vg->nsamples      = nsamples;
-    vg->nalleles      = nalleles;
-    vg->nbits         = nbits;
-    vg->plo_miss      = plo_miss;
-    vg->ncombs        = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
+    vg->nsamples      = indexing->nsamples;
+    vg->nalleles      = 2;
+    vg->ncombs        = 3;
     vg->chunk         = chunk;
     vg->current_chunk = c;
 

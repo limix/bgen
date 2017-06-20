@@ -62,15 +62,12 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
     unsigned int unused = *dst_size;
     byte *cdst          = *dst;
 
-    printf("Ponto 1\n"); fflush(stdout);
-
     strm.zalloc   = Z_NULL;
     strm.zfree    = Z_NULL;
     strm.opaque   = Z_NULL;
     strm.avail_in = 0;
     strm.next_in  = Z_NULL;
     ret           = inflateInit(&strm);
-    printf("Ponto 2\n"); fflush(stdout);
 
     if (ret != Z_OK)
     {
@@ -80,7 +77,6 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
 
     strm.avail_in = src_size;
     strm.next_in  = (byte *)src;
-    printf("Ponto 3\n"); fflush(stdout);
 
     while (1) {
         strm.avail_out = unused;
@@ -104,9 +100,12 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
 
         cdst   += just_wrote;
         unused -= just_wrote;
+        
+        printf("strm.avail_out: %lld\n", strm.avail_out); fflush(stdout);
 
         if (ret == Z_STREAM_END)
         {
+            printf("1. unused: %lld\n", unused); fflush(stdout);
             *dst_size -= unused;
             *dst       = realloc(*dst, *dst_size);
             break;
@@ -114,6 +113,7 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
 
         if (strm.avail_out == 0)
         {
+            printf("2. unused: %lld\n", unused); fflush(stdout);
             if (unused > 0)
             {
                 fprintf(stderr, "zlib failed to uncompress: unknown error.\n");
@@ -127,8 +127,8 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
         }
     }
 
-    printf("inflateEnd\n"); fflush(stdout);
     inflateEnd(&strm);
+    printf("Final size: %lld\n", *dst_size);
     return EXIT_SUCCESS;
 }
 
