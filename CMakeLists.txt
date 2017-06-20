@@ -22,9 +22,9 @@ include_directories(.)
 
 add_subdirectory(bgen)
 
-add_library(bgen SHARED bgen/bgen.c bgen/layout2.c bgen/util/choose.c bgen/util/mem.c)
+add_library(bgen SHARED bgen/bgen.c bgen/layout1.c bgen/layout2.c bgen/util/choose.c bgen/util/mem.c)
 
-add_library(bgen_static STATIC bgen/bgen.c bgen/layout2.c bgen/util/choose.c bgen/util/mem.c)
+add_library(bgen_static STATIC bgen/bgen.c bgen/layout1.c bgen/layout2.c bgen/util/choose.c bgen/util/mem.c)
 
 set_target_properties(bgen
   PROPERTIES
