@@ -73,9 +73,11 @@ int test_probabilities(VariantIndexing *indexing)
     {
         vg = bgen_open_variant_genotype(indexing, i);
 
-        if (vg->ploidy != 2) return FAIL;
+        if (bgen_variant_genotype_ploidy(vg) != 2) return FAIL;
 
-        probabilities = calloc(vg->nsamples * vg->ncombs, sizeof(real));
+        probabilities = calloc(bgen_variant_genotype_nsamples(
+                                   vg) * bgen_variant_genotype_ncombs(
+                                   vg), sizeof(real));
 
         bgen_read_variant_genotype(indexing, vg, probabilities);
 
@@ -104,7 +106,6 @@ int test_probabilities(VariantIndexing *indexing)
 
     fclose(f);
 
-    // bgen_free_variant_genotypes(vg, 199);
     return SUCCESS;
 }
 
@@ -120,7 +121,6 @@ int main()
     if (test_filepath((byte *)"test/data/example.32bits.bgen", &indexing) ==
         FAIL) return FAIL;
 
-    // VariantGenotype *vg = bgen_read_variant_genotypes(index, 0, 2);
     if (test_probabilities(indexing) == FAIL) return FAIL;
 
     bgen_free_indexing(indexing);

@@ -333,12 +333,34 @@ void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
     bgen_read_variant_genotype_probabilities(indexing, vg, probabilities);
 }
 
+inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
+{
+    return vg->nsamples;
+}
+
+inti bgen_variant_genotype_nalleles(VariantGenotype *vg)
+{
+    return vg->nalleles;
+}
+
+inti bgen_variant_genotype_ploidy(VariantGenotype *vg)
+{
+    return vg->ploidy;
+}
+
+inti bgen_variant_genotype_ncombs(VariantGenotype *vg)
+{
+    return vg->ncombs;
+}
+
 void bgen_close_variant_genotype(VariantIndexing *indexing,
                                  VariantGenotype *vg)
 {
     if (indexing->file) fclose(indexing->file);
 
     if (vg->plo_miss != NULL) free(vg->plo_miss);
+
+    if (vg->chunk != NULL) free(vg->chunk);
 
     if (vg != NULL) free(vg);
 }
