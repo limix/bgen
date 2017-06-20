@@ -13,36 +13,36 @@
 
 #define FAIL EXIT_FAILURE
 
-inline static inti bgen_read_ploidy(byte ploidy_miss)
+inline static inti bgen_read_ploidy_layout1(byte ploidy_miss)
 {
     return ploidy_miss & 127;
 }
 
-inline static inti bgen_read_missingness(byte ploidy_miss)
+inline static inti bgen_read_missingness_layout1(byte ploidy_miss)
 {
     return (ploidy_miss & 256) >> 7;
 }
 
-inline static inti bit_sample_start(inti sample_idx, inti nbits,
-                                    inti ncomb)
+inline static inti bit_sample_start_layout1(inti sample_idx, inti nbits,
+                                            inti ncomb)
 {
     return sample_idx * (nbits * (ncomb - 1));
 }
 
-inline static inti bit_geno_start(inti geno_idx, inti nbits)
+inline static inti bit_geno_start_layout1(inti geno_idx, inti nbits)
 {
     return geno_idx * nbits;
 }
 
-inline static int get_bit(const byte *mem, inti bit_idx)
+inline static int get_bit_layout1(const byte *mem, inti bit_idx)
 {
     inti bytes = bit_idx / 8;
 
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-void bgen_read_unphased_genotype(VariantGenotype *vg,
-                                 real            *probabilities)
+void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
+                                         real            *probabilities)
 {
     inti ncombs, ploidy, uip_sum, ui_prob;
     inti sample_start, geno_start, bit_idx;
@@ -52,8 +52,8 @@ void bgen_read_unphased_genotype(VariantGenotype *vg,
 
     for (j = 0; j < vg->nsamples; ++j)
     {
-        ploidy = bgen_read_ploidy(vg->plo_miss[j]);
-        assert(bgen_read_missingness(vg->plo_miss[j]) == 0);
+        ploidy = bgen_read_ploidy_layout1(vg->plo_miss[j]);
+        assert(bgen_read_missingness_layout1(vg->plo_miss[j]) == 0);
 
         ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
 
@@ -65,12 +65,12 @@ void bgen_read_unphased_genotype(VariantGenotype *vg,
 
             for (bi = 0; bi < vg->nbits; ++bi)
             {
-                sample_start = bit_sample_start(j, vg->nbits, ncombs);
-                geno_start   = bit_geno_start(i, vg->nbits);
+                sample_start = bit_sample_start_layout1(j, vg->nbits, ncombs);
+                geno_start   = bit_geno_start_layout1(i, vg->nbits);
                 bit_idx      = sample_start + geno_start + bi;
 
 
-                if (get_bit(vg->current_chunk, bit_idx))
+                if (get_bit_layout1(vg->current_chunk, bit_idx))
                 {
                     ui_prob |= ((inti)1 << bi);
                 }
@@ -83,38 +83,39 @@ void bgen_read_unphased_genotype(VariantGenotype *vg,
     }
 }
 
-byte* bgen_uncompress(VariantIndexing *indexing)
+byte* bgen_uncompress_layout1(VariantIndexing *indexing)
 {
     inti  clength = 0, ulength = 0;
     byte *cchunk;
     byte *uchunk;
 
-    if (bgen_read(indexing->file, &clength, 4)) return NULL;
-
-    clength -= 4;
-
-    if (bgen_read(indexing->file, &ulength, 4)) return NULL;
+    if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(indexing->file, cchunk, clength))
+    if (bgen_read(indexing->file, cchunk, clength) == FAIL)
     {
         free(cchunk);
         return NULL;
     }
 
+    if (indexing->compression != 1)
+    {
+        free(cchunk);
+        fprintf(stderr,
+                "Compression flag should be 1; not %lld.\n",
+                indexing->compression);
+        return NULL;
+    }
+
     uchunk = malloc(ulength);
 
-    if (indexing->compression == 1)
-    {
-        zlib_uncompress(cchunk, clength, &uchunk, &ulength);
-    }
+    zlib_uncompress_chunked(cchunk, clength, &uchunk, &ulength);
 
-    if (indexing->compression == 2)
-    {
-        zstd_uncompress(cchunk, clength, &uchunk, &ulength);
-    }
-
+    // if (indexing->compression == 2)
+    // {
+    //     zstd_uncompress(cchunk, clength, &uchunk, &ulength);
+    // }
 
     free(cchunk);
 
@@ -134,16 +135,16 @@ inti bgen_read_variant_genotype_header_layout1(
 
     if (indexing->compression > 0)
     {
-        chunk = bgen_uncompress(indexing);
+        chunk = bgen_uncompress_layout1(indexing);
         c     = chunk;
         MEMCPY(&nsamples, &c, 4);
     }
     else {
-        if (bgen_read(indexing->file, &nsamples, 4)) return FAIL;
+        if (bgen_read(indexing->file, &nsamples, 4) == FAIL) return FAIL;
 
         chunk = malloc(6 * nsamples);
 
-        if (bgen_read(indexing->file, chunk, 6 * nsamples)) return FAIL;
+        if (bgen_read(indexing->file, chunk, 6 * nsamples) == FAIL) return FAIL;
 
         c = chunk;
     }
@@ -183,5 +184,5 @@ void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
                                                       VariantGenotype *vg,
                                                       real            *probabilities)
 {
-    bgen_read_unphased_genotype(vg, probabilities);
+    bgen_read_unphased_genotype_layout1(vg, probabilities);
 }

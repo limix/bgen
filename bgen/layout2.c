@@ -89,15 +89,15 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     byte *cchunk;
     byte *uchunk;
 
-    if (bgen_read(indexing->file, &clength, 4)) return NULL;
+    if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
 
     clength -= 4;
 
-    if (bgen_read(indexing->file, &ulength, 4)) return NULL;
+    if (bgen_read(indexing->file, &ulength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(indexing->file, cchunk, clength))
+    if (bgen_read(indexing->file, cchunk, clength) == FAIL)
     {
         free(cchunk);
         return NULL;
@@ -139,11 +139,11 @@ inti bgen_read_variant_genotype_header_layout2(
         MEMCPY(&nsamples, &c, 4);
     }
     else {
-        if (bgen_read(indexing->file, &nsamples, 4)) return FAIL;
+        if (bgen_read(indexing->file, &nsamples, 4) == FAIL) return FAIL;
 
         chunk = malloc(6 * nsamples);
 
-        if (bgen_read(indexing->file, chunk, 6 * nsamples)) return FAIL;
+        if (bgen_read(indexing->file, chunk, 6 * nsamples) == FAIL) return FAIL;
 
         c = chunk;
     }
