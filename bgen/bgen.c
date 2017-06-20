@@ -358,6 +358,8 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
     VariantGenotype *vg = malloc(sizeof(VariantGenotype));
 
     vg->variant_idx = variant_idx;
+    vg->plo_miss = NULL;
+    vg->chunk = NULL;
     fseek(indexing->file, indexing->start[variant_idx], SEEK_SET);
 
     if (indexing->layout == 1) bgen_read_variant_genotype_header_layout1(indexing, vg);
