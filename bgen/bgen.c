@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "bgen.h"
+#include "layout1.h"
 #include "layout2.h"
 #include "util/mem.h"
 #include "util/file.h"
@@ -329,7 +330,8 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
 void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
                                 real *probabilities)
 {
-    bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities);
+    if (indexing->layout == 1) bgen_read_variant_genotype_probabilities_layout1(indexing, vg, probabilities);
+    else bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities);
 }
 
 inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
