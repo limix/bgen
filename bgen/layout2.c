@@ -51,6 +51,7 @@ inti bgen_read_unphased_genotype(const byte      *chunk,
     inti ncombs = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
 
     vg->probabilities = malloc(ncombs * nsamples * sizeof(real));
+    vg->ncombs        = ncombs;
 
     real denom = (((inti)1 << nbits)) - 1;
 

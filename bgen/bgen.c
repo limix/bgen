@@ -240,6 +240,8 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
     (*index)->filepath    = bgen_strdup(bgen->filepath);
     (*index)->compression = bgen->compression;
     (*index)->layout      = bgen->layout;
+    (*index)->nsamples    = bgen->nsamples;
+    (*index)->nvariants   = bgen->nvariants;
 
     inti nvariants = bgen->nvariants;
 

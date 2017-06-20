@@ -29,6 +29,7 @@ typedef struct Variant
 typedef struct VariantGenotype
 {
     inti  ploidy;
+    inti  ncombs;
     real *probabilities;
 } VariantGenotype;
 

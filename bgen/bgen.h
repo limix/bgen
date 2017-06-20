@@ -19,29 +19,32 @@ typedef struct Variant
 typedef struct VariantGenotype
 {
     inti  ploidy;
+    inti  ncombs;
     real *probabilities;
 } VariantGenotype;
 
 typedef struct VariantIndexing
 {
-    byte          *filepath;
-    FILE          *file;
-    inti           compression;
-    inti           layout;
-    inti          *start;
+    byte *filepath;
+    FILE *file;
+    inti  compression;
+    inti  layout;
+    inti  nsamples;
+    inti  nvariants;
+    inti *start;
 } VariantIndexing;
 
 typedef struct BGenFile
 {
-    byte          *filepath;
-    FILE          *file;
-    inti           nvariants;
-    inti           nsamples;
-    inti           compression;
-    inti           layout;
-    inti           sample_ids_presence;
-    inti           samples_start;
-    inti           variants_start;
+    byte *filepath;
+    FILE *file;
+    inti  nvariants;
+    inti  nsamples;
+    inti  compression;
+    inti  layout;
+    inti  sample_ids_presence;
+    inti  samples_start;
+    inti  variants_start;
 } BGenFile;
 
 BGenFile       * bgen_open(const byte *filepath);
