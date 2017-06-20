@@ -64,10 +64,18 @@ BGenFile* bgen_open(const byte *filepath)
     // First four bytes (offset)
     if (bgen_read(bgen->file, &offset, 4) == FAIL) goto err;
 
+    bgen->variants_start = offset + 4;
+
     if (bgen_read_header(bgen) == FAIL) goto err;
 
+    printf("!bgen->sample_ids_presence: %lld\n", bgen->sample_ids_presence);
 
-    if (bgen->sample_ids_presence == 0) bgen->variants_start = ftell(bgen->file);
+    if (bgen->sample_ids_presence == 0)
+    {
+        bgen->samples_start = ftell(bgen->file);
+
+        // bgen->variants_start = ftell(bgen->file);
+    }
     else {
         bgen->samples_start = ftell(bgen->file);
 
@@ -115,11 +123,21 @@ inti bgen_nvariants(BGenFile *bgen)
 
 string* bgen_read_samples(BGenFile *bgen)
 {
-    if (bgen->sample_ids_presence == 0) return NULL;
-
     bgen->file = fopen((const char *)bgen->filepath, "rb");
 
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
+
+    if (bgen->sample_ids_presence == 0)
+    {
+        // bgen->variants_start = ftell(bgen->file);
+
+        if (fclose(bgen->file))
+        {
+            perror("Could not close the file.");
+            goto err;
+        }
+        return NULL;
+    }
 
     string *sample_ids = malloc(bgen->nsamples * sizeof(string));
 
@@ -179,12 +197,20 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
     uint32_t nsamples, position, allele_len;
     uint16_t id_len, rsid_len, chrom_len, nalleles;
 
+    printf("__ bgen_read_variant __\n"); fflush(stdout);
+
     if (bgen->layout == 1)
     {
+        printf("__ entrou __\n"); fflush(stdout);
+
         if (bgen_read(bgen->file, &nsamples, 4) == FAIL) return FAIL;
+
+        printf("nsamples: %lu\n", nsamples); fflush(stdout);
     }
 
     if (bgen_read(bgen->file, &id_len, 2) == FAIL) return FAIL;
+
+    printf("id_len: %u\n", id_len); fflush(stdout);
 
     string_alloc(&(v->id), id_len);
 
@@ -192,11 +218,15 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
     if (bgen_read(bgen->file, &rsid_len, 2) == FAIL) return FAIL;
 
+    printf("rsid_len: %u\n", rsid_len); fflush(stdout);
+
     string_alloc(&(v->rsid), rsid_len);
 
     if (bgen_read(bgen->file, v->rsid.str, v->rsid.len) == FAIL) return FAIL;
 
     if (bgen_read(bgen->file, &chrom_len, 2) == FAIL) return FAIL;
+
+    printf("chrom_len: %u\n", chrom_len); fflush(stdout);
 
     string_alloc(&(v->chrom), chrom_len);
 
@@ -236,6 +266,7 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
 
     bgen->file = fopen((const char *)bgen->filepath, "rb");
 
+    printf("bgen->variants_start: %lld\n", bgen->variants_start);
     fseek(bgen->file, bgen->variants_start, SEEK_SET);
 
     (*index)->filepath    = bgen_strdup(bgen->filepath);
@@ -246,6 +277,11 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
 
     inti nvariants = bgen->nvariants;
 
+    printf("bgen->compression: %lld\n", bgen->compression); fflush(stdout);
+    printf("bgen->layout: %lld\n",      bgen->layout); fflush(stdout);
+    printf("bgen->nsamples: %lld\n",    bgen->nsamples); fflush(stdout);
+    printf("bgen->nvariants: %lld\n",   bgen->nvariants); fflush(stdout);
+
     variants        = malloc(nvariants * sizeof(Variant));
     (*index)->start = malloc(nvariants * sizeof(inti));
 
@@ -253,6 +289,8 @@ Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
 
     for (i = 0; i < nvariants; ++i)
     {
+        printf("Reading variant: %lld\n", i); fflush(stdout);
+
         if (bgen_read_variant(bgen, variants + i) == FAIL) goto err;
         (*index)->start[i] = ftell(bgen->file);
 
