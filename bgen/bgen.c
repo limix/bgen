@@ -322,7 +322,8 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
     vg->variant_idx = variant_idx;
     fseek(indexing->file, indexing->start[variant_idx], SEEK_SET);
 
-    bgen_read_variant_genotype_header_layout2(indexing, vg);
+    if (indexing->layout == 1) bgen_read_variant_genotype_header_layout1(indexing, vg);
+    else bgen_read_variant_genotype_header_layout2(indexing, vg);
 
     return vg;
 }
