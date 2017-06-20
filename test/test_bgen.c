@@ -125,5 +125,8 @@ int main()
 
     bgen_free_indexing(indexing);
 
+    if (test_filepath((byte *)"test/data/example.v11.bgen", &indexing) ==
+        FAIL) return FAIL;
+
     return EXIT_SUCCESS;
 }
