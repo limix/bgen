@@ -18,9 +18,15 @@ typedef struct Variant
 
 typedef struct VariantGenotype
 {
-    inti  ploidy;
-    inti  ncombs;
-    real *probabilities;
+    inti     nsamples;
+    inti     nalleles;
+    inti     nbits;
+    uint8_t *plo_miss;
+    inti     ncombs;
+    inti     ploidy;
+    byte    *chunk;
+    byte    *current_chunk;
+    inti     variant_idx;
 } VariantGenotype;
 
 typedef struct VariantIndexing
@@ -62,12 +68,15 @@ void             bgen_free_variants(const BGenFile *bgen,
                                     Variant        *variants);
 void             bgen_free_indexing(VariantIndexing *index);
 
-VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
-                                             inti             variant_start,
-                                             inti             variant_end);
+VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
+                                            inti             variant_idx);
 
-void bgen_free_variant_genotypes(VariantGenotype *vg,
-                                 inti             nvariants);
+void             bgen_read_variant_genotype(VariantIndexing *indexing,
+                                            VariantGenotype *vg,
+                                            real            *probabilities);
+
+void bgen_close_variant_genotype(VariantIndexing *indexing,
+                                 VariantGenotype *vg);
 
 inti bgen_sample_ids_presence(BGenFile *bgen);
 

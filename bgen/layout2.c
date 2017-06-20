@@ -41,59 +41,46 @@ inline static int get_bit(const byte *mem, inti bit_idx)
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-inti bgen_read_unphased_genotype(const byte      *chunk,
-                                 VariantGenotype *vg,
-                                 inti             nsamples,
-                                 inti             nalleles,
-                                 inti             nbits,
-                                 uint8_t         *plo_miss)
+void bgen_read_unphased_genotype(VariantGenotype *vg,
+                                 real            *probabilities)
 {
-    inti ncombs = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
-
-    vg->probabilities = malloc(ncombs * nsamples * sizeof(real));
-    vg->ncombs        = ncombs;
-
-    real denom = (((inti)1 << nbits)) - 1;
+    inti ncombs, ploidy, uip_sum, ui_prob;
+    inti sample_start, geno_start, bit_idx;
+    real denom = (((inti)1 << vg->nbits)) - 1;
 
     inti i, j, bi;
 
-    for (j = 0; j < nsamples; ++j)
+    for (j = 0; j < vg->nsamples; ++j)
     {
-        inti ploidy = bgen_read_ploidy(plo_miss[j]);
-        assert(bgen_read_missingness(plo_miss[j]) == 0);
+        ploidy = bgen_read_ploidy(vg->plo_miss[j]);
+        assert(bgen_read_missingness(vg->plo_miss[j]) == 0);
 
-        ncombs = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
+        ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
 
-        // printf("ncombs inside: %lld\n", ncombs);
-
-        inti uip_sum = 0;
+        uip_sum = 0;
 
         for (i = 0; i < ncombs - 1; ++i)
         {
-            inti ui_prob = 0;
+            ui_prob = 0;
 
-            for (bi = 0; bi < nbits; ++bi)
+            for (bi = 0; bi < vg->nbits; ++bi)
             {
-                inti sample_start = bit_sample_start(j, nbits, ncombs);
-                inti geno_start   = bit_geno_start(i, nbits);
-                inti bit_idx      = sample_start + geno_start + bi;
+                sample_start = bit_sample_start(j, vg->nbits, ncombs);
+                geno_start   = bit_geno_start(i, vg->nbits);
+                bit_idx      = sample_start + geno_start + bi;
 
-                // printf("bit_idx: %lld\n", bit_idx);
 
-                if (get_bit(chunk, bit_idx))
+                if (get_bit(vg->current_chunk, bit_idx))
                 {
-                    // printf("got bit\n");
                     ui_prob |= ((inti)1 << bi);
                 }
             }
 
-            // printf("%lld\n", ui_prob);
-            vg->probabilities[j * ncombs + i] = ui_prob / denom;
-            uip_sum                          += ui_prob;
+            probabilities[j * ncombs + i] = ui_prob / denom;
+            uip_sum                      += ui_prob;
         }
-        vg->probabilities[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
+        probabilities[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
     }
-    return EXIT_SUCCESS;
 }
 
 byte* bgen_uncompress(VariantIndexing *indexing)
@@ -136,8 +123,9 @@ byte* bgen_uncompress(VariantIndexing *indexing)
     return uchunk;
 }
 
-inti bgen_read_layout2_genotype(VariantIndexing *indexing,
-                                VariantGenotype *vg)
+inti bgen_read_variant_genotype_header(
+    VariantIndexing *indexing,
+    VariantGenotype *vg)
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -182,10 +170,20 @@ inti bgen_read_layout2_genotype(VariantIndexing *indexing,
 
     assert(phased == 0);
 
-    bgen_read_unphased_genotype(c, vg, nsamples, nalleles, nbits, plo_miss);
-
-    free(chunk);
-    free(plo_miss);
+    vg->nsamples      = nsamples;
+    vg->nalleles      = nalleles;
+    vg->nbits         = nbits;
+    vg->plo_miss      = plo_miss;
+    vg->ncombs        = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
+    vg->chunk         = chunk;
+    vg->current_chunk = c;
 
     return EXIT_SUCCESS;
+}
+
+void bgen_read_variant_genotype_probabilities(VariantIndexing *indexing,
+                                              VariantGenotype *vg,
+                                              real            *probabilities)
+{
+    bgen_read_unphased_genotype(vg, probabilities);
 }

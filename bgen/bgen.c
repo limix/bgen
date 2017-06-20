@@ -306,54 +306,41 @@ void bgen_free_indexing(VariantIndexing *index)
     free(index);
 }
 
-void bgen_read_variant_genotype(VariantIndexing *indexing,
-                                VariantGenotype *vg)
-{
-    assert(indexing->layout == 2);
-    bgen_read_layout2_genotype(indexing, vg);
-}
-
-VariantGenotype* bgen_read_variant_genotypes(VariantIndexing *indexing,
-                                             inti             variant_start,
-                                             inti             variant_end)
+VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
+                                            inti             variant_idx)
 {
     indexing->file = fopen((const char *)indexing->filepath, "rb");
 
     if (indexing->file == NULL) {
         fprintf(stderr, "Could not open: %s\n", indexing->filepath);
-        goto err;
+        return NULL;
     }
 
-    inti n              = variant_end - variant_start;
-    VariantGenotype *vg = malloc(n * sizeof(VariantGenotype));
+    VariantGenotype *vg = malloc(sizeof(VariantGenotype));
 
-    inti i;
+    vg->variant_idx = variant_idx;
+    fseek(indexing->file, indexing->start[variant_idx], SEEK_SET);
 
-    for (i = 0; i < n; ++i)
-    {
-        fseek(indexing->file, indexing->start[variant_start + i], SEEK_SET);
-        bgen_read_variant_genotype(indexing, vg + i);
-    }
+    bgen_read_variant_genotype_header(indexing, vg);
 
     return vg;
-
-err:
-
-    if (indexing->file) fclose(indexing->file);
-
-    if (vg != NULL) free(vg);
-    return NULL;
 }
 
-void bgen_free_variant_genotypes(VariantGenotype *vg, inti nvariants)
+void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
+                                real *probabilities)
 {
-    inti i;
+    assert(indexing->layout == 2);
+    bgen_read_variant_genotype_probabilities(indexing, vg, probabilities);
+}
 
-    for (i = 0; i < nvariants; ++i)
-    {
-        free(vg[i].probabilities);
-    }
-    free(vg);
+void bgen_close_variant_genotype(VariantIndexing *indexing,
+                                 VariantGenotype *vg)
+{
+    if (indexing->file) fclose(indexing->file);
+
+    if (vg->plo_miss != NULL) free(vg->plo_miss);
+
+    if (vg != NULL) free(vg);
 }
 
 inti bgen_sample_ids_presence(BGenFile *bgen)
