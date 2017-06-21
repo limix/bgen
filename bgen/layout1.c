@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include "layout2.h"
 
@@ -42,9 +43,10 @@ inline static int get_bit_layout1(const byte *mem, inti bit_idx)
 }
 
 void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
-                                         real *probabilities, inti *missingness)
+                                         real            *probabilities)
 {
     uint16_t ui_prob;
+    inti     ui_prob_sum;
 
     inti sample_start, geno_start, bit_idx;
 
@@ -52,19 +54,31 @@ void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
 
     inti i, j;
 
-    printf("Ponto 1\n"); fflush(stdout);
-
     byte *chunk = vg->current_chunk;
 
     for (j = 0; j < vg->nsamples; ++j)
     {
+        ui_prob_sum = 0;
+
         for (i = 0; i < 3; ++i)
         {
             MEMCPY(&ui_prob, &chunk, 2);
             probabilities[j * 3 + i] = ui_prob / denom;
+            ui_prob_sum             += ui_prob;
+        }
+
+        if (ui_prob_sum == 0)
+        {
+            for (i = 0; i < 3; ++i) probabilities[j * 3 + i] = NAN;
         }
     }
-    printf("Ponto 2\n"); fflush(stdout);
+}
+
+void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
+                                                      VariantGenotype *vg,
+                                                      real            *probabilities)
+{
+    bgen_read_unphased_genotype_layout1(vg, probabilities);
 }
 
 byte* bgen_uncompress_layout1(VariantIndexing *indexing)
@@ -130,12 +144,4 @@ inti bgen_read_variant_genotype_header_layout1(
     vg->current_chunk = c;
 
     return EXIT_SUCCESS;
-}
-
-void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
-                                                      VariantGenotype *vg,
-                                                      real            *probabilities,
-                                                      inti            *missingness)
-{
-    bgen_read_unphased_genotype_layout1(vg, probabilities, missingness);
 }

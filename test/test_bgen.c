@@ -68,7 +68,6 @@ int test_probabilities(VariantIndexing *indexing)
     int    tmp;
     inti   nsamples, ncombs;
     real  *probabilities;
-    inti  *missingness;
 
     inti i, j;
 
@@ -83,15 +82,12 @@ int test_probabilities(VariantIndexing *indexing)
         }
 
         nsamples = bgen_variant_genotype_nsamples(vg);
-        printf("nsamples: %lld\n", nsamples);
 
         ncombs = bgen_variant_genotype_ncombs(vg);
-        printf("ncombs: %lld\n",   ncombs);
 
         probabilities = calloc(nsamples * ncombs, sizeof(real));
-        missingness   = calloc(nsamples, sizeof(real));
 
-        bgen_read_variant_genotype(indexing, vg, probabilities, missingness);
+        bgen_read_variant_genotype(indexing, vg, probabilities);
 
         for (j = 0; j < 500; ++j)
         {
@@ -99,26 +95,30 @@ int test_probabilities(VariantIndexing *indexing)
             tmp = fscanf(f, "%lf", prob + 1);
             tmp = fscanf(f, "%lf", prob + 2);
 
-            // printf("%lf ", probabilities[j * 3 + 0]);
-            // printf("%lf ", probabilities[j * 3 + 1]);
-            // printf("%lf ", probabilities[j * 3 + 2]);
+            if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0))
+            {
+                prob[0] = NAN;
+                prob[1] = NAN;
+                prob[2] = NAN;
 
-            // if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) prob[2] =
-            // 1.0;
+                if (!isnan(probabilities[j * 3 + 0])) return FAIL;
+
+                if (!isnan(probabilities[j * 3 + 1])) return FAIL;
+
+                if (!isnan(probabilities[j * 3 + 2])) return FAIL;
+            } else {
+                if (fabs(prob[0] - probabilities[j * 3 + 0]) > eps) return FAIL;
 
 
-            if (fabs(prob[0] - probabilities[j * 3 + 0]) > eps) return FAIL;
+                if (fabs(prob[1] - probabilities[j * 3 + 1]) > eps) return
+                        FAIL;
 
-
-            if (fabs(prob[1] - probabilities[j * 3 + 1]) > eps) return
-                    FAIL;
-
-            if (fabs(prob[2] - probabilities[j * 3 + 2]) > eps) return
-                    FAIL;
+                if (fabs(prob[2] - probabilities[j * 3 + 2]) > eps) return
+                        FAIL;
+            }
         }
         bgen_close_variant_genotype(indexing, vg);
         free(probabilities);
-        free(missingness);
     }
 
     fclose(f);
@@ -130,20 +130,23 @@ int main()
 {
     VariantIndexing *indexing;
 
-    // if (test_filepath((byte *)"test/data/example.1bits.bgen", &indexing) ==
-    //     FAIL) return FAIL;
-    //
-    // bgen_free_indexing(indexing);
-    //
-    // if (test_filepath((byte *)"test/data/example.32bits.bgen", &indexing) ==
-    //     FAIL) return FAIL;
-    //
-    // if (test_probabilities(indexing) == FAIL) return FAIL;
-    //
-    // bgen_free_indexing(indexing);
+    if (test_filepath((byte *)"test/data/example.1bits.bgen", &indexing) ==
+        FAIL) return FAIL;
+
+    bgen_free_indexing(indexing);
+
+
+    if (test_filepath((byte *)"test/data/example.32bits.bgen", &indexing) ==
+        FAIL) return FAIL;
+
+    if (test_probabilities(indexing) == FAIL) return FAIL;
+
+    bgen_free_indexing(indexing);
+
 
     if (test_filepath((byte *)"test/data/example.v11.bgen", &indexing) ==
         FAIL) return FAIL;
+
 
     if (test_probabilities(indexing) == FAIL) return FAIL;
 

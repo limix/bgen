@@ -50,8 +50,7 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
 
 void             bgen_read_variant_genotype(VariantIndexing *indexing,
                                             VariantGenotype *vg,
-                                            real            *probabilities,
-                                            inti            *missingness);
+                                            real            *probabilities);
 
 inti bgen_variant_genotype_nsamples(VariantGenotype *vg);
 inti bgen_variant_genotype_nalleles(VariantGenotype *vg);

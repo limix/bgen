@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
 #include "layout2.h"
 
@@ -20,7 +21,7 @@ inline static inti bgen_read_ploidy(byte ploidy_miss)
 
 inline static inti bgen_read_missingness(byte ploidy_miss)
 {
-    return (ploidy_miss & 256) >> 7;
+    return ploidy_miss >> 7;
 }
 
 inline static inti bit_sample_start(inti sample_idx, inti nbits,
@@ -42,8 +43,7 @@ inline static int get_bit(const byte *mem, inti bit_idx)
 }
 
 void bgen_read_unphased_genotype(VariantGenotype *vg,
-                                 real            *probabilities,
-                                 inti            *missingness)
+                                 real            *probabilities)
 {
     inti ncombs, ploidy, uip_sum, ui_prob;
     inti sample_start, geno_start, bit_idx;
@@ -54,9 +54,17 @@ void bgen_read_unphased_genotype(VariantGenotype *vg,
     for (j = 0; j < vg->nsamples; ++j)
     {
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
-        assert(bgen_read_missingness(vg->plo_miss[j]) == 0);
 
         ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
+
+        if (bgen_read_missingness(vg->plo_miss[j]) != 0)
+        {
+            for (i = 0; i < ncombs; ++i)
+            {
+                probabilities[j * ncombs + i] = NAN;
+            }
+            continue;
+        }
 
         uip_sum = 0;
 
@@ -182,8 +190,7 @@ inti bgen_read_variant_genotype_header_layout2(
 
 void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
                                                       VariantGenotype *vg,
-                                                      real            *probabilities,
-                                                      inti            *missingness)
+                                                      real            *probabilities)
 {
-    bgen_read_unphased_genotype(vg, probabilities, missingness);
+    bgen_read_unphased_genotype(vg, probabilities);
 }

@@ -11,7 +11,6 @@ inti bgen_read_variant_genotype_header_layout2(VariantIndexing *indexing,
 
 void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
                                                       VariantGenotype *vg,
-                                                      real            *probabilities,
-                                                      inti            *missingness);
+                                                      real            *probabilities);
 
 #endif /* ifndef LAYOUT2_H */
