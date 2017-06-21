@@ -7,7 +7,7 @@ compiler:
 before_script:
 - travis/install-zstd
 - find /home/travis/build/limix/bgen/zstd/lib
-- mkdir build && pushd build && cmake -DZSTD_LIBRARIES=/home/travis/build/limix/bgen/zstd/lib/libzstd.so.1.3.0 -DZSTD_INCLUDE_DIRS=/home/travis/build/limix/bgen/zstd/lib .. && make && make test && popd
+- mkdir build && pushd build && cmake .. -DZSTD_LIBRARIES=/home/travis/build/limix/bgen/zstd/lib/libzstd.so.1.3.0 -DZSTD_INCLUDE_DIRS=/home/travis/build/limix/bgen/zstd/lib && make && make test && popd
 - rm -rf build
 script:
 - mkdir dist && pushd dist && cmake .. && popd
