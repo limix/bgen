@@ -25,11 +25,12 @@ or by download one of the releases and building it
 
 ```bash
 git clone https://github.com/limix/bgen.git
-cd liknorm
+cd bgen
 mkdir build
 cd build
-cmake ..
+cmake .. -DZSTD_LIBRARIES=/path/to/libzstd.xxx -DZSTD_INCLUDE_DIRS=/path/to/include/dirs
 make
+make test
 sudo make install
 ```
 
