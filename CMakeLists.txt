@@ -14,6 +14,7 @@ endif()
 file(STRINGS "VERSION" BGEN_VERSION)
 
 find_package( ZLIB REQUIRED )
+find_package( ZSTD REQUIRED )
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
