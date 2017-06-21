@@ -1,0 +1,27 @@
+dist: trusty
+sudo: false
+language: c
+compiler:
+- clang
+- gcc
+before_script:
+- mkdir build && pushd build && cmake .. && make && make test && popd
+- rm -rf build
+script:
+- mkdir dist && pushd dist && cmake .. && popd
+- mv dist bgen-`cat VERSION`
+- tar czf bgen-`cat VERSION`.tar.gz bgen-`cat VERSION`
+- rm -rf dist
+after_failure:
+- rm -rf * && cmake .. && make && make test ARGS="-V"
+notifications:
+  email: false
+deploy:
+  provider: releases
+  skip_cleanup: true
+  api_key:
+    secure: nn2NYobqNL9erAWz7jdJp4uurjFzCM2PalDjTmO7GTZeywAkFhaV62+e7kum+VUAjdR667y4F8BhnAy5SAG7Rw1UlfQ3sAGySQc1DP22eHFca9WXoD1pW/BaoUV3M/HHmDOysdM3zMlsKb17IWd9yCU95N20gzIJmvgndlnASqtE+2LpX0ZRMrpWPsAj0SyDr1ojn953ua9sVqFcNSyrWJ2cSn3KZcEYJdVW5O5aCTkWyz/BsA1+T8PS8nxa6rnJk21WySZHMQUfHEWHg/EYB7Uj+eXUFMzopD8EI4G8Hdanbis3QfPtRyzO0HTAQbM9L3ll4FqTQUa8eY8AGgNNJaHMy++UZ4UGxoESnU1dUgtD0hpDX/JrQi0Tb45lebM7lPCNVERgFG011h+C+PDQWK/pMlUzzFmrJPzXApSMyDAxNjoLDTg4nukUATtrIcfYsSu6+dsX5RFTEKD43UXd9WAASGXR+D7MsDLNb95YJ+UMXFX0g6/YjsCQdPy98hhsJS6atuz36tSBunFKEm81OvgNHVCF98v3PY7YO0lZC7rEsKOUW0hlEHZhihb4PVRZZHz3NqjboP8xTsBpmD2sVog4liTwxnQzeW60AmfJwLZCgneJPbpOFeqcxI85CruQKDlix57ooSGJ1gBUarXTy3FWCGmQg+n1DHcPykCrdFY=
+  on:
+    tags: true
+    repo: limix/bgen
+    condition: "$CC = clang"
