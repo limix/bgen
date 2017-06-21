@@ -35,7 +35,7 @@ sudo make install
 
 ## Authors
 
-* **Danilo Horta** - [https://github.com/Horta](https://github.com/horta)
+* **Danilo Horta** - [https://github.com/horta](https://github.com/horta)
 
 ## License
 
