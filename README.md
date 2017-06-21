@@ -21,7 +21,7 @@ You can install it via
 conda install -c conda-forge bgen
 ```
 
-or by downloading the [latest release](https://github.com/limix/liknorm/releases/latest)
+or by downloading the [latest release](https://github.com/limix/bgen/releases/latest)
 and building it
 
 ```bash
