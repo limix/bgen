@@ -5,6 +5,7 @@ compiler:
 - clang
 - gcc
 before_script:
+- travis/install-zstd
 - mkdir build && pushd build && cmake .. && make && make test && popd
 - rm -rf build
 script:
