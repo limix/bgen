@@ -13,6 +13,7 @@ find_path(
         "/usr/local/facebook/include"
         "/usr/local/include"
         "/usr/include"
+        "/home/travis/build/limix/bgen/zstd/lib"
 )
 
 find_library(
@@ -22,6 +23,7 @@ find_library(
         "/usr/local/facebook/lib"
         "/usr/local/lib"
         "/usr/lib"
+        "/home/travis/build/limix/bgen/zstd/lib"
 )
 
 set(ZSTD_LIBRARIES ${ZSTD_LIBRARY})

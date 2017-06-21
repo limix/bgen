@@ -25,12 +25,12 @@ conda install -c conda-forge bgen
 or by building it
 
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.3.tar.gz
-tar xzf 0.1.3.tar.gz
-cd bgen-0.1.3
+wget https://github.com/limix/bgen/archive/0.1.4.tar.gz
+tar xzf 0.1.4.tar.gz
+cd bgen-0.1.4
 mkdir build
 cd build
-cmake .. -DZSTD_LIBRARIES=/path/to/libzstd.xxx -DZSTD_INCLUDE_DIRS=/path/to/include/dirs
+cmake ..
 make
 make test
 sudo make install
