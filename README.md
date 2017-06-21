@@ -1,4 +1,6 @@
-# BGEN
+# bgen
+
+[![Travis](https://img.shields.io/travis/limix/bgen.svg?style=flat-square)](https://travis-ci.org/limix/bgen)
 
 A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
 
@@ -16,7 +18,7 @@ conda install -c conda-forge bgen
 or by download one of the releases and building it
 
 ```bash
-git clone https://github.com/glimix/liknorm.git
+git clone https://github.com/limix/bgen.git
 cd liknorm
 mkdir build
 cd build
