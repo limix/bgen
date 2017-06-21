@@ -24,7 +24,6 @@ deploy:
   provider: releases
   api_key:
     secure: A0iflJTceOp+2plnUIfAWcB3GuU369djVDiROyPevylg/ZVjPIhttzQGtmdO2cNoFMKsZ1AlL0eu4ur68JsO6UGE63kiQk2ouOJmA04JM6hFMPMSVz7GLXOMaKFMDhAIra8dPeYH/c7dN5zJZiDqayIq0ReheDWMuYqn0WqaHw8BXjTGX8JQozcZ6qXeAOZZNjzieeQIlf7HpHm3Fh4Df7ovZH6cCvkq3Map/pRbaO6mc+O9YPCl1+5nMjFXMC4nnM+iAKkSc+Zujhxn0rMBT/MXt4xaNMkQ3az4Oaa/Rs/NP3Zx0kZBkZUVUeql1S2721ul1pfS6EzajZUXc+eCAThUuLhlLbT0oLGhZmktcHWmOOGwwmx5BSgbR+hzLxZTiEzlV22qF66U2RHiI5UrIo3ntU4VRJ+NkDAkgQ869eJSc1dJ3w+P1+avgJzrmIps/DuN5CDJeeVy+35NF5b3SezYP42ILFGpbKJ7UlIKId6slG/qyKE/9XyZNUeTBO1IvLKzIf1WbX5vtDSf9HJnXLoXZv/XnacfGX/LjE65TcKEIDRUOYxj3/9/kulLRkjmDd2PZa6M+AADZmvBBFhYgEGM4aRA5p1aQRCy/OoDe9qkzzfZ2/hteV/HFJ6xB/i2IZFBuSjbF2yFTmnrfwt+nD8NRhGniGHzGhwg6LacSbY=
-  file: ''
   on:
     tags: true
     repo: limix/bgen
