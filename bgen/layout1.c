@@ -44,43 +44,27 @@ inline static int get_bit_layout1(const byte *mem, inti bit_idx)
 void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
                                          real            *probabilities)
 {
-    inti ncombs, ploidy, uip_sum, ui_prob;
-    inti sample_start, geno_start, bit_idx;
-    real denom = (((inti)1 << vg->nbits)) - 1;
+    uint16_t ui_prob;
 
-    inti i, j, bi;
+    inti sample_start, geno_start, bit_idx;
+
+    real denom = 32768;
+
+    inti i, j;
+
+    printf("Ponto 1\n"); fflush(stdout);
+
+    byte *chunk = vg->current_chunk;
 
     for (j = 0; j < vg->nsamples; ++j)
     {
-        ploidy = bgen_read_ploidy_layout1(vg->plo_miss[j]);
-        assert(bgen_read_missingness_layout1(vg->plo_miss[j]) == 0);
-
-        ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
-
-        uip_sum = 0;
-
-        for (i = 0; i < ncombs - 1; ++i)
+        for (i = 0; i < 3; ++i)
         {
-            ui_prob = 0;
-
-            for (bi = 0; bi < vg->nbits; ++bi)
-            {
-                sample_start = bit_sample_start_layout1(j, vg->nbits, ncombs);
-                geno_start   = bit_geno_start_layout1(i, vg->nbits);
-                bit_idx      = sample_start + geno_start + bi;
-
-
-                if (get_bit_layout1(vg->current_chunk, bit_idx))
-                {
-                    ui_prob |= ((inti)1 << bi);
-                }
-            }
-
-            probabilities[j * ncombs + i] = ui_prob / denom;
-            uip_sum                      += ui_prob;
+            MEMCPY(&ui_prob, &chunk, 2);
+            probabilities[j * 3 + i] = ui_prob / denom;
         }
-        probabilities[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
     }
+    printf("Ponto 2\n"); fflush(stdout);
 }
 
 byte* bgen_uncompress_layout1(VariantIndexing *indexing)
@@ -141,6 +125,7 @@ inti bgen_read_variant_genotype_header_layout1(
     vg->nsamples      = indexing->nsamples;
     vg->nalleles      = 2;
     vg->ncombs        = 3;
+    vg->ploidy        = 2;
     vg->chunk         = chunk;
     vg->current_chunk = c;
 

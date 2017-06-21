@@ -22,7 +22,7 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
 
     if (e != Z_OK)
     {
-        printf("zlib failed to uncompress: %s.\n", zError(e));
+        fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 
@@ -33,11 +33,11 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
     strm.next_out  = *dst;
 
     e = inflate(&strm, Z_NO_FLUSH);
-    assert(e != Z_STREAM_ERROR); /* state not clobbered */
+    assert(e != Z_STREAM_ERROR);
 
     switch (e) {
     case Z_NEED_DICT:
-        e = Z_DATA_ERROR; /* and fall through */
+        e = Z_DATA_ERROR;
 
     case Z_DATA_ERROR:
     case Z_MEM_ERROR:
@@ -101,11 +101,8 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
         cdst   += just_wrote;
         unused -= just_wrote;
 
-        printf("strm.avail_out: %lld\n", strm.avail_out); fflush(stdout);
-
         if (ret == Z_STREAM_END)
         {
-            printf("1. unused: %lld\n", unused); fflush(stdout);
             *dst_size -= unused;
             *dst       = realloc(*dst, *dst_size);
             break;
@@ -113,8 +110,6 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
 
         if (strm.avail_out == 0)
         {
-            printf("2. unused: %lld\n", unused); fflush(stdout);
-
             if (unused > 0)
             {
                 fprintf(stderr, "zlib failed to uncompress: unknown error.\n");
@@ -129,7 +124,6 @@ inline static inti zlib_uncompress_chunked(const byte *src, inti src_size,
     }
 
     inflateEnd(&strm);
-    printf("Final size: %lld\n", *dst_size);
     return EXIT_SUCCESS;
 }
 
