@@ -21,11 +21,11 @@ You can install it via
 conda install -c conda-forge bgen
 ```
 
-or by download one of the releases and building it
+or by downloading the [latest release](https://github.com/limix/liknorm/releases/latest)
+and building it
 
 ```bash
-git clone https://github.com/limix/bgen.git
-cd bgen
+# Uncompress the downloaded file and enter into the resulting folder
 mkdir build
 cd build
 cmake .. -DZSTD_LIBRARIES=/path/to/libzstd.xxx -DZSTD_INCLUDE_DIRS=/path/to/include/dirs
