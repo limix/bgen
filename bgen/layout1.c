@@ -92,7 +92,6 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
     if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
-    printf("clength: %lld\n", clength); fflush(stdout);
 
     if (bgen_read(indexing->file, cchunk, clength) == FAIL)
     {
@@ -110,15 +109,9 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
     }
 
     ulength = 10 * clength;
-    uchunk = malloc(ulength);
+    uchunk  = malloc(ulength);
 
-    printf("before uncomp: %lld\n", ulength); fflush(stdout);
     zlib_uncompress_chunked(cchunk, clength, &uchunk, &ulength);
-
-    // if (indexing->compression == 2)
-    // {
-    //     zstd_uncompress(cchunk, clength, &uchunk, &ulength);
-    // }
 
     free(cchunk);
 
@@ -129,14 +122,11 @@ inti bgen_read_variant_genotype_header_layout1(
     VariantIndexing *indexing,
     VariantGenotype *vg)
 {
-    printf("bgen_read_variant_genotype_header_layout1\n"); fflush(stdout);
-
     byte *c;
     byte *chunk;
 
     if (indexing->compression > 0)
     {
-        printf("indexing->compression > 0\n"); fflush(stdout);
         chunk = bgen_uncompress_layout1(indexing);
         c     = chunk;
     }
@@ -147,7 +137,6 @@ inti bgen_read_variant_genotype_header_layout1(
 
         c = chunk;
     }
-    printf("indexing->nsamples: %ld\n", indexing->nsamples); fflush(stdout);
 
     vg->nsamples      = indexing->nsamples;
     vg->nalleles      = 2;
