@@ -42,7 +42,7 @@ inline static int get_bit_layout1(const byte *mem, inti bit_idx)
 }
 
 void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
-                                         real            *probabilities)
+                                         real *probabilities, inti *missingness)
 {
     uint16_t ui_prob;
 
@@ -134,7 +134,8 @@ inti bgen_read_variant_genotype_header_layout1(
 
 void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
                                                       VariantGenotype *vg,
-                                                      real            *probabilities)
+                                                      real            *probabilities,
+                                                      inti            *missingness)
 {
-    bgen_read_unphased_genotype_layout1(vg, probabilities);
+    bgen_read_unphased_genotype_layout1(vg, probabilities, missingness);
 }

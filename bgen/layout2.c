@@ -42,7 +42,8 @@ inline static int get_bit(const byte *mem, inti bit_idx)
 }
 
 void bgen_read_unphased_genotype(VariantGenotype *vg,
-                                 real            *probabilities)
+                                 real            *probabilities,
+                                 inti            *missingness)
 {
     inti ncombs, ploidy, uip_sum, ui_prob;
     inti sample_start, geno_start, bit_idx;
@@ -181,7 +182,8 @@ inti bgen_read_variant_genotype_header_layout2(
 
 void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
                                                       VariantGenotype *vg,
-                                                      real            *probabilities)
+                                                      real            *probabilities,
+                                                      inti            *missingness)
 {
-    bgen_read_unphased_genotype(vg, probabilities);
+    bgen_read_unphased_genotype(vg, probabilities, missingness);
 }

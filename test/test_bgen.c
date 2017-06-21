@@ -68,6 +68,7 @@ int test_probabilities(VariantIndexing *indexing)
     int    tmp;
     inti   nsamples, ncombs;
     real  *probabilities;
+    inti  *missingness;
 
     inti i, j;
 
@@ -88,8 +89,9 @@ int test_probabilities(VariantIndexing *indexing)
         printf("ncombs: %lld\n",   ncombs);
 
         probabilities = calloc(nsamples * ncombs, sizeof(real));
+        missingness   = calloc(nsamples, sizeof(real));
 
-        bgen_read_variant_genotype(indexing, vg, probabilities);
+        bgen_read_variant_genotype(indexing, vg, probabilities, missingness);
 
         for (j = 0; j < 500; ++j)
         {
@@ -116,6 +118,7 @@ int test_probabilities(VariantIndexing *indexing)
         }
         bgen_close_variant_genotype(indexing, vg);
         free(probabilities);
+        free(missingness);
     }
 
     fclose(f);

@@ -344,10 +344,10 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
 }
 
 void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
-                                real *probabilities)
+                                real *probabilities, inti *missingness)
 {
-    if (indexing->layout == 1) bgen_read_variant_genotype_probabilities_layout1(indexing, vg, probabilities);
-    else bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities);
+    if (indexing->layout == 1) bgen_read_variant_genotype_probabilities_layout1(indexing, vg, probabilities, missingness);
+    else bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities, missingness);
 }
 
 inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
