@@ -6,7 +6,6 @@ compiler:
 - gcc
 before_script:
 - travis/install-zstd
-- find /home/travis/build/limix/bgen/zstd/lib
 - mkdir build && pushd build && cmake .. && make && make test
   && popd
 - rm -rf build
