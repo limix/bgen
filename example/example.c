@@ -39,35 +39,40 @@ int main()
     // Releasing memory associated with variant identifications.
     bgen_free_variants(bgen, variants);
 
-    // // We now want the actual genotype probabilities of the second variant.
-    // // For performance reasons, it is done in two steps:
-    //
+    // We now want the actual genotype probabilities of the second variant.
+    // For performance reasons, it is done in two steps:
+
     // Step 1.
     VariantGenotype *vg = bgen_open_variant_genotype(index, 1);
 
-    real *probabilities = malloc(bgen_ncombs(vg) * sizeof(real));
+    real *probabilities = malloc(bgen_nsamples(bgen) * bgen_ncombs(vg) * sizeof(real));
 
-    //
-    // // Step 2.
-    // bgen_read_variant_genotype(index, vg, probabilities);
-    //
-    // printf("Genotype probabilities of the second variant:");
-    // inti i;
-    //
-    // for (i = 0; i < bgen_ncombs(vg); ++i)
-    // {
-    //     printf("%f ", probabilities[i]);
-    // }
-    // printf("\n");
-    //
+    
+    // Step 2.
+    bgen_read_variant_genotype(index, vg, probabilities);
+    
+    printf("Genotype probabilities of the second variant for the first two samples:\n");
+    inti i, j;
+    
+    for (j = 0; j < 2; ++j)
+    {
+        for (i = 0; i < bgen_ncombs(vg); ++i)
+        {
+            printf("  %f", probabilities[j * bgen_ncombs(vg) + i]);
+        }
+        printf("\n");
+    }
+    
     free(probabilities);
 
-    //
     // Releases associated memory.
     bgen_close_variant_genotype(index, vg);
 
     // Releases associated memory. Called at the end.
     bgen_close(bgen);
+
+    // Releases associated memory.
+    bgen_free_indexing(index);
 
     return 0;
 }
