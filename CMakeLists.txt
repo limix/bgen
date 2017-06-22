@@ -5,7 +5,7 @@ project(bgen C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -14,6 +14,13 @@ endif()
 file(STRINGS "VERSION" BGEN_VERSION)
 
 find_package( ZLIB REQUIRED )
+find_package( ZSTD REQUIRED )
+
+if(NOT ZSTD_FOUND)
+    message(STATUS "Could not find zstd library. If you have it installed,
+                    please, define ZSTD_INCLUDE_LIB and ZSTD_INCLUDE_DIR
+                    appropriately to fix it.")
+endif()
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )

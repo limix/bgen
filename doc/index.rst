@@ -1,6 +1,19 @@
-===========================
-BGen-reader's documentation
-===========================
+====================
+BGen's documentation
+====================
+
+A `BGEN file format`_ reader.
+
+BGEN is a file format for storing large genetic datasets.
+It supports both unphased genotypes and phased haplotype data with variable
+ploidy and number of alleles.
+It was designed to provides a compact data representation without sacrificing
+variant access performance.
+
+This is a low-memory footprint library that provides an easy-to-use interface
+to efficiently read BGEN files.
+It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3; as
+well as their optional compressed formats.
 
 .. toctree::
     :caption: Table of contents
@@ -8,7 +21,10 @@ BGen-reader's documentation
     :maxdepth: 2
 
     install
+    usage
     api
+
+.. _BGEN file format: http://www.well.ox.ac.uk/~gav/bgen_format/
 
 *****************
 Comments and bugs

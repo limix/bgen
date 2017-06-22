@@ -1,162 +1,136 @@
-*********************
-Functions description
-*********************
+********************
+Function description
+********************
 
-.. c:function:: BGenFile* bgen_reader_open(const char* filepath)
+.. c:function:: BGenFile* bgen_open(const byte* filepath)
 
   Create a bgen file handler.
 
-  :param const char* filepath: File path to the bgen file.
-  :return: bgen file handler.
+  :param const byte* filepath: File path to a bgen file.
+  :return: Bgen file handler.
   :rtype: BGenFile*
 
-.. c:function:: inti bgen_reader_close(BGenFile* bgenfile)
+.. c:function:: void bgen_close(BGenFile* bgen)
 
   Close a bgen file handler.
 
   :param BGenFile*: Bgen file handler.
-  :return: exit status.
-  :rtype: inti
 
-.. c:function:: inti bgen_reader_nsamples(BGenFile* bgenfile)
+.. c:function:: inti bgen_nsamples(BGenFile* bgen)
 
   Get the number of samples.
 
   :param BGenFile*: Bgen file handler.
-  :return: number of samples.
+  :return: Number of samples.
   :rtype: inti
 
-.. c:function:: inti bgen_reader_nvariants(BGenFile* bgenfile)
+.. c:function:: inti bgen_nvariants(BGenFile* bgen)
 
   Get the number of variants.
 
   :param BGenFile*: Bgen file handler.
-  :return: number of variants.
+  :return: Number of variants.
   :rtype: inti
 
-.. c:function:: inti bgen_reader_sampleid(BGenFile* bgenfile,\
-                                             inti  sample_idx,\
-                                             unsigned char** id,\
-                                             inti* length)
+.. c:function:: string* bgen_read_samples(BGenFile* bgen)
 
-  Get the sample id of the specified sample index.
+  Read sample identifications.
 
   :param BGenFile*: Bgen file handler.
-  :param inti: Sample index.
-  :param unsigned char**: Identification.
-  :param inti*: String length.
+  :return: Identifications.
+  :rtype: string*
 
-  :return: exit status.
-  :rtype: inti
+.. c:function:: void bgen_free_samples(BGenFile* bgen, string* samples)
 
-.. c:function:: inti bgen_reader_variantid(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             unsigned char** id,\
-                                             inti* length)
-
-  Get the variant id of the specified variant index.
+  Free memory associated with sample identifications.
 
   :param BGenFile*: Bgen file handler.
+  :param string*: Sample identifications.
+
+.. c:function:: Variant* bgen_read_variants(BGenFile* bgen, VariantIndexing** index)
+
+  Read variant data.
+  (It does not include the probabilities.)
+
+  :param BGenFile*: Bgen file handler.
+  :param VariantIndexing**: Variant indexing.
+  :return: Variant identifications, rsids, chromossomes, and more.
+  :rtype: Variant*
+
+.. c:function:: void bgen_free_variants(BGenFile* bgen, Variant* variants)
+
+  Free memory associated with variant data.
+  (It does not include the probabilities.)
+
+  :param BGenFile*: Bgen file handler.
+  :param Variant*: Variant data.
+
+.. c:function:: void bgen_free_indexing(VariantIndexing* index)
+
+  Free memory associated with variant indexing.
+
+  :param BGenFile*: Bgen file handler.
+  :param VariantIndexing*: Variant indexing.
+
+.. c:function:: VariantGenotype* bgen_open_variant_genotype(VariantIndexing* index,\
+                                                            inti             variant_idx)
+
+  Return a variant reference.
+
+  :param VariantIndexing**: Variant indexing.
   :param inti: Variant index.
-  :param unsigned char**: Identification.
-  :param inti*: String length.
+  :return: Variant probabilities.
+  :rtype: VariantGenotype*
 
-  :return: exit status.
-  :rtype: inti
+.. c:function:: void bgen_read_variant_genotype(VariantIndexing* index,\
+                                                VariantGenotype* vg,\
+                                                real*            probabilities)
 
-.. c:function:: inti bgen_reader_variant_rsid(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             unsigned char** rsid,\
-                                             inti* length)
+  Read the allele probabilities for a given variant.
 
-  Get the variant RSID of the specified variant index.
+  :param VariantIndexing*: Variant indexing.
+  :param VariantGenotype*: Variant genotype handler.
+  :param real*: Allele probabilities.
+  :param inti: Variant index.
+  :return: Variant probabilities.
+  :rtype: VariantGenotype*
+
+.. c:function:: void bgen_close_variant_genotype(VariantIndexing* index,\
+                                                 VariantGenotype* vg)
+
+  Close the variant genotype reference.
+
+  :param VariantIndexing*: Variant indexing.
+  :param VariantGenotype*: Variant genotype handler.
+
+.. c:function:: inti bgen_sample_ids_presence(BGenFile* bgen)
+
+  Check whether sample identifications are actually present.
 
   :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param unsigned char**: RSID.
-  :param inti*: String length.
-
-  :return: exit status.
+  :return: ``1`` for presence; ``0`` for absence.
   :rtype: inti
 
-.. c:function:: inti bgen_reader_variant_chrom(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             unsigned char** chrom,\
-                                             inti* length)
+.. c:function:: inti bgen_nalleles(VariantGenotype* vg)
 
-  Get the chromossome name of the specified variant index.
+  Get the number of alleles.
 
-  :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param unsigned char**: Chromossome name.
-  :param inti*: String length.
-
-  :return: exit status.
+  :param VariantGenotype*: Variant genotype handler.
+  :return: number of alleles.
   :rtype: inti
 
-.. c:function:: inti bgen_reader_variant_position(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             inti* position)
+.. c:function:: inti bgen_ploidy(VariantGenotype* vg)
 
-  Get the position of the specified variant index.
+  Get the ploidy.
 
-  :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param inti*: Position.
-
-  :return: exit status.
+  :param VariantGenotype*: Variant genotype handler.
+  :return: Ploidy.
   :rtype: inti
 
-.. c:function:: inti bgen_reader_variant_nalleles(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             inti* nalleles)
+.. c:function:: inti bgen_ncombs(VariantGenotype* vg)
 
-  Get the number of alleles the specified variant index has.
+  Get the number of genotype combinations.
 
-  :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param nalleles*: Number of alleles.
-
-  :return: exit status.
-  :rtype: inti
-
-.. c:function:: inti bgen_reader_variant_alleleid(BGenFile* bgenfile,\
-                                             inti  variant_idx,\
-                                             inti  allele_idx,\
-                                             unsigned char** id,\
-                                             inti* length)
-
-  Get the allele id of the specified allele.
-
-  :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param inti: Allele index.
-  :param unsigned char**: Identification.
-  :param inti*: String length.
-
-  :return: exit status.
-  :rtype: inti
-
-.. c:function:: inti bgen_reader_read_genotype(BGenFile*  bgenfile,\
-                                                  inti   variant_idx,\
-                                                  uint32_t** ui_probs,\
-                                                  inti*  ploidy,\
-                                                  inti*  nalleles)
-
-  Read the genotype probabilities of the specified variant index.
-  Let :math:`n_a` and :math:`n_p` be the number of alleles and the ploidy.
-  The resulting matrix ``ui_probs`` will be :math:`n`-by-:math:`k`, where
-  :math:`n` is the number of samples and
-
-  .. math::
-
-    k = {n_a + n_p - 1 \choose n_a - 1}.
-
-  :param BGenFile*: Bgen file handler.
-  :param inti: Variant index.
-  :param inti**: Genotype probabilities.
-  :param inti*: Ploidy.
-  :param inti*: Number of alleles.
-
-  :return: exit status.
+  :param VariantGenotype*: Variant genotype handler.
+  :return: Number of genotype combinations.
   :rtype: inti

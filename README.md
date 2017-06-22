@@ -10,7 +10,8 @@ It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3.
 
 It makes use of the [Zstandard](http://facebook.github.io/zstd/) library.
 You don't need to install it by yourself if you choose to install bgen
-via [conda](http://conda.pydata.org/docs/index.html).
+via [conda](http://conda.pydata.org/docs/index.html) but you do need it
+installed before-hand if you choose to build bgen library by youself.
 
 ## Install
 
@@ -21,14 +22,15 @@ You can install it via
 conda install -c conda-forge bgen
 ```
 
-or by downloading the [latest release](https://github.com/limix/bgen/releases/latest)
-and building it
+or by building it
 
 ```bash
-# Uncompress the downloaded file and enter into the resulting folder
+wget https://github.com/limix/bgen/archive/0.1.4.tar.gz
+tar xzf 0.1.4.tar.gz
+cd bgen-0.1.4
 mkdir build
 cd build
-cmake .. -DZSTD_LIBRARIES=/path/to/libzstd.xxx -DZSTD_INCLUDE_DIRS=/path/to/include/dirs
+cmake ..
 make
 make test
 sudo make install
