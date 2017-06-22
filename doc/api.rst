@@ -6,8 +6,8 @@ Function description
 
   Create a bgen file handler.
 
-  :param const byte* filepath: File path to the bgen file.
-  :return: bgen file handler.
+  :param const byte* filepath: File path to a bgen file.
+  :return: Bgen file handler.
   :rtype: BGenFile*
 
 .. c:function:: void bgen_close(BGenFile* bgen)
@@ -21,7 +21,7 @@ Function description
   Get the number of samples.
 
   :param BGenFile*: Bgen file handler.
-  :return: number of samples.
+  :return: Number of samples.
   :rtype: inti
 
 .. c:function:: inti bgen_nvariants(BGenFile* bgen)
@@ -29,16 +29,15 @@ Function description
   Get the number of variants.
 
   :param BGenFile*: Bgen file handler.
-  :return: number of variants.
+  :return: Number of variants.
   :rtype: inti
-
 
 .. c:function:: string* bgen_read_samples(BGenFile* bgen)
 
   Read sample identifications.
 
   :param BGenFile*: Bgen file handler.
-  :return: identifications.
+  :return: Identifications.
   :rtype: string*
 
 .. c:function:: void bgen_free_samples(BGenFile* bgen, string* samples)
@@ -50,11 +49,12 @@ Function description
 
 .. c:function:: Variant* bgen_read_variants(BGenFile* bgen, VariantIndexing** index)
 
-  Read variant data. (It does not include the probabilities.)
+  Read variant data.
+  (It does not include the probabilities.)
 
   :param BGenFile*: Bgen file handler.
   :param VariantIndexing**: Variant indexing.
-  :return: variant identifications, rsids, chromossomes, and more.
+  :return: Variant identifications, rsids, chromossomes, and more.
   :rtype: Variant*
 
 .. c:function:: void bgen_free_variants(BGenFile* bgen, Variant* variants)
@@ -72,17 +72,17 @@ Function description
   :param BGenFile*: Bgen file handler.
   :param VariantIndexing*: Variant indexing.
 
-.. c:function:: VariantGenotype* bgen_open_variant_genotype(VariantIndexing* indexing,\
+.. c:function:: VariantGenotype* bgen_open_variant_genotype(VariantIndexing* index,\
                                                             inti             variant_idx)
 
-  Return a reference to a variant.
+  Return a variant reference.
 
   :param VariantIndexing**: Variant indexing.
   :param inti: Variant index.
-  :return: variant probabilities.
+  :return: Variant probabilities.
   :rtype: VariantGenotype*
 
-.. c:function:: void bgen_read_variant_genotype(VariantIndexing* indexing,\
+.. c:function:: void bgen_read_variant_genotype(VariantIndexing* index,\
                                                 VariantGenotype* vg,\
                                                 real*            probabilities)
 
@@ -92,10 +92,10 @@ Function description
   :param VariantGenotype*: Variant genotype handler.
   :param real*: Allele probabilities.
   :param inti: Variant index.
-  :return: variant probabilities.
+  :return: Variant probabilities.
   :rtype: VariantGenotype*
 
-.. c:function:: void bgen_close_variant_genotype(VariantIndexing* indexing,\
+.. c:function:: void bgen_close_variant_genotype(VariantIndexing* index,\
                                                  VariantGenotype* vg)
 
   Close the variant genotype reference.
@@ -111,15 +111,15 @@ Function description
   :return: ``1`` for presence; ``0`` for absence.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
+.. c:function:: inti bgen_variant_genotype_nsamples(VariantGenotype* vg)
 
   Get the number of samples.
 
   :param VariantGenotype*: Variant genotype handler.
-  :return: number of samples.
+  :return: Number of samples.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_nalleles(VariantGenotype *vg)
+.. c:function:: inti bgen_variant_genotype_nalleles(VariantGenotype* vg)
 
   Get the number of alleles.
 
@@ -127,18 +127,18 @@ Function description
   :return: number of alleles.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_ploidy(VariantGenotype *vg)
+.. c:function:: inti bgen_variant_genotype_ploidy(VariantGenotype* vg)
 
   Get the ploidy.
 
   :param VariantGenotype*: Variant genotype handler.
-  :return: ploidy.
+  :return: Ploidy.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_ncombs(VariantGenotype *vg)
+.. c:function:: inti bgen_variant_genotype_ncombs(VariantGenotype* vg)
 
   Get the number of genotype combinations.
 
   :param VariantGenotype*: Variant genotype handler.
-  :return: number of genotype combinations.
+  :return: Number of genotype combinations.
   :rtype: inti
