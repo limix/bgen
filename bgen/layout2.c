@@ -3,6 +3,8 @@
 #include <math.h>
 
 #include "layout2.h"
+#include "variant_genotype.h"
+#include "variant_indexing.h"
 
 #include "bgen.h"
 #include "util/file.h"

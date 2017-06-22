@@ -2,9 +2,8 @@
 #define LAYOUT1_H
 
 #include "types.h"
-
-typedef struct VariantIndexing VariantIndexing;
-typedef struct VariantGenotype VariantGenotype;
+#include "variant_genotype_fwd.h"
+#include "variant_indexing_fwd.h"
 
 inti bgen_read_variant_genotype_header_layout1(VariantIndexing *indexing,
                                                VariantGenotype *vg);
