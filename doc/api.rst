@@ -111,15 +111,7 @@ Function description
   :return: ``1`` for presence; ``0`` for absence.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_nsamples(VariantGenotype* vg)
-
-  Get the number of samples.
-
-  :param VariantGenotype*: Variant genotype handler.
-  :return: Number of samples.
-  :rtype: inti
-
-.. c:function:: inti bgen_variant_genotype_nalleles(VariantGenotype* vg)
+.. c:function:: inti bgen_nalleles(VariantGenotype* vg)
 
   Get the number of alleles.
 
@@ -127,7 +119,7 @@ Function description
   :return: number of alleles.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_ploidy(VariantGenotype* vg)
+.. c:function:: inti bgen_ploidy(VariantGenotype* vg)
 
   Get the ploidy.
 
@@ -135,7 +127,7 @@ Function description
   :return: Ploidy.
   :rtype: inti
 
-.. c:function:: inti bgen_variant_genotype_ncombs(VariantGenotype* vg)
+.. c:function:: inti bgen_ncombs(VariantGenotype* vg)
 
   Get the number of genotype combinations.
 

@@ -45,19 +45,18 @@ void             bgen_free_variants(const BGenFile *bgen,
                                     Variant        *variants);
 void             bgen_free_indexing(VariantIndexing *index);
 
-VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
+VariantGenotype* bgen_open_variant_genotype(VariantIndexing *index,
                                             inti             variant_idx);
 
-void             bgen_read_variant_genotype(VariantIndexing *indexing,
+void             bgen_read_variant_genotype(VariantIndexing *index,
                                             VariantGenotype *vg,
                                             real            *probabilities);
 
-inti bgen_variant_genotype_nsamples(VariantGenotype *vg);
-inti bgen_variant_genotype_nalleles(VariantGenotype *vg);
-inti bgen_variant_genotype_ploidy(VariantGenotype *vg);
-inti bgen_variant_genotype_ncombs(VariantGenotype *vg);
+inti bgen_nalleles(VariantGenotype *vg);
+inti bgen_ploidy(VariantGenotype *vg);
+inti bgen_ncombs(VariantGenotype *vg);
 
-void bgen_close_variant_genotype(VariantIndexing *indexing,
+void bgen_close_variant_genotype(VariantIndexing *index,
                                  VariantGenotype *vg);
 
 inti bgen_sample_ids_presence(BGenFile *bgen);
