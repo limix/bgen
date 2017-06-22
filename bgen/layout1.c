@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <math.h>
 
-#include "layout2.h"
+#include "layout1.h"
 
 #include "bgen.h"
 #include "util/file.h"
