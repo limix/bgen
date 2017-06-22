@@ -65,4 +65,4 @@ target_link_libraries( bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 add_subdirectory(test)
 
 enable_testing()
-add_test(NAME TestBgen COMMAND test_bgen)
+add_test(test_bgen test/test_bgen)
