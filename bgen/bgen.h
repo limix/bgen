@@ -5,6 +5,8 @@
 #include <stdlib.h>
 
 #include "types.h"
+#include "variant_genotype_fwd.h"
+#include "variant_indexing_fwd.h"
 
 typedef struct Variant
 {
@@ -15,30 +17,6 @@ typedef struct Variant
     inti    nalleles;
     string *allele_ids;
 } Variant;
-
-typedef struct VariantGenotype
-{
-    inti     nsamples;
-    inti     nalleles;
-    inti     nbits;
-    uint8_t *plo_miss;
-    inti     ncombs;
-    inti     ploidy;
-    byte    *chunk;
-    byte    *current_chunk;
-    inti     variant_idx;
-} VariantGenotype;
-
-typedef struct VariantIndexing
-{
-    byte *filepath;
-    FILE *file;
-    inti  compression;
-    inti  layout;
-    inti  nsamples;
-    inti  nvariants;
-    inti *start;
-} VariantIndexing;
 
 typedef struct BGenFile
 {

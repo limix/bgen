@@ -10,6 +10,8 @@
 #include "layout2.h"
 #include "util/mem.h"
 #include "util/file.h"
+#include "variant_genotype.h"
+#include "variant_indexing.h"
 
 #define FAIL EXIT_FAILURE
 #define SUCCESS EXIT_SUCCESS
