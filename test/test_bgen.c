@@ -9,7 +9,7 @@
 #define FAIL EXIT_FAILURE
 
 
-int test_filepath(const byte *filepath, VariantIndexing **indexing)
+int test_filepath(const byte *filepath, VariantIndexing **index)
 {
     BGenFile *bgen;
     inti e;
@@ -35,7 +35,7 @@ int test_filepath(const byte *filepath, VariantIndexing **indexing)
         if (e != 0) return FAIL;
     }
 
-    Variant *variants = bgen_read_variants(bgen, indexing);
+    Variant *variants = bgen_read_variants(bgen, index);
 
     e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
 
@@ -53,7 +53,7 @@ int test_filepath(const byte *filepath, VariantIndexing **indexing)
     return EXIT_SUCCESS;
 }
 
-int test_probabilities(VariantIndexing *indexing)
+int test_probabilities(VariantIndexing *index, inti nsamples)
 {
     VariantGenotype *vg;
 
@@ -66,28 +66,26 @@ int test_probabilities(VariantIndexing *indexing)
     double prob[3];
     double eps = 1e-4;
     int    tmp;
-    inti   nsamples, ncombs;
+    inti   ncombs;
     real  *probabilities;
 
     inti i, j;
 
     for (i = 0; i < 199; ++i)
     {
-        vg = bgen_open_variant_genotype(indexing, i);
+        vg = bgen_open_variant_genotype(index, i);
 
-        if (bgen_variant_genotype_ploidy(vg) != 2)
+        if (bgen_ploidy(vg) != 2)
         {
             fprintf(stderr, "Wrong ploidy.\n");
             return FAIL;
         }
 
-        nsamples = bgen_variant_genotype_nsamples(vg);
-
-        ncombs = bgen_variant_genotype_ncombs(vg);
+        ncombs = bgen_ncombs(vg);
 
         probabilities = calloc(nsamples * ncombs, sizeof(real));
 
-        bgen_read_variant_genotype(indexing, vg, probabilities);
+        bgen_read_variant_genotype(index, vg, probabilities);
 
         for (j = 0; j < 500; ++j)
         {
@@ -117,7 +115,7 @@ int test_probabilities(VariantIndexing *indexing)
                         FAIL;
             }
         }
-        bgen_close_variant_genotype(indexing, vg);
+        bgen_close_variant_genotype(index, vg);
         free(probabilities);
     }
 
@@ -128,29 +126,30 @@ int test_probabilities(VariantIndexing *indexing)
 
 int main()
 {
-    VariantIndexing *indexing;
+    VariantIndexing *index;
+    inti nsamples = 500;
 
-    if (test_filepath((byte *)"test/data/example.1bits.bgen", &indexing) ==
+    if (test_filepath((byte *)"test/data/example.1bits.bgen", &index) ==
         FAIL) return FAIL;
 
-    bgen_free_indexing(indexing);
+    bgen_free_indexing(index);
 
 
-    if (test_filepath((byte *)"test/data/example.32bits.bgen", &indexing) ==
+    if (test_filepath((byte *)"test/data/example.32bits.bgen", &index) ==
         FAIL) return FAIL;
 
-    if (test_probabilities(indexing) == FAIL) return FAIL;
+    if (test_probabilities(index, nsamples) == FAIL) return FAIL;
 
-    bgen_free_indexing(indexing);
+    bgen_free_indexing(index);
 
 
-    if (test_filepath((byte *)"test/data/example.v11.bgen", &indexing) ==
+    if (test_filepath((byte *)"test/data/example.v11.bgen", &index) ==
         FAIL) return FAIL;
 
 
-    if (test_probabilities(indexing) == FAIL) return FAIL;
+    if (test_probabilities(index, nsamples) == FAIL) return FAIL;
 
-    bgen_free_indexing(indexing);
+    bgen_free_indexing(index);
 
     return EXIT_SUCCESS;
 }

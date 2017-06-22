@@ -320,13 +320,13 @@ void bgen_free_indexing(VariantIndexing *index)
     free(index);
 }
 
-VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
+VariantGenotype* bgen_open_variant_genotype(VariantIndexing *index,
                                             inti             variant_idx)
 {
-    indexing->file = fopen((const char *)indexing->filepath, "rb");
+    index->file = fopen((const char *)index->filepath, "rb");
 
-    if (indexing->file == NULL) {
-        fprintf(stderr, "Could not open: %s\n", indexing->filepath);
+    if (index->file == NULL) {
+        fprintf(stderr, "Could not open: %s\n", index->filepath);
         return NULL;
     }
 
@@ -335,45 +335,40 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *indexing,
     vg->variant_idx = variant_idx;
     vg->plo_miss    = NULL;
     vg->chunk       = NULL;
-    fseek(indexing->file, indexing->start[variant_idx], SEEK_SET);
+    fseek(index->file, index->start[variant_idx], SEEK_SET);
 
-    if (indexing->layout == 1) bgen_read_variant_genotype_header_layout1(indexing, vg);
-    else bgen_read_variant_genotype_header_layout2(indexing, vg);
+    if (index->layout == 1) bgen_read_variant_genotype_header_layout1(index, vg);
+    else bgen_read_variant_genotype_header_layout2(index, vg);
 
     return vg;
 }
 
-void bgen_read_variant_genotype(VariantIndexing *indexing, VariantGenotype *vg,
+void bgen_read_variant_genotype(VariantIndexing *index, VariantGenotype *vg,
                                 real *probabilities)
 {
-    if (indexing->layout == 1) bgen_read_variant_genotype_probabilities_layout1(indexing, vg, probabilities);
-    else bgen_read_variant_genotype_probabilities_layout2(indexing, vg, probabilities);
+    if (index->layout == 1) bgen_read_variant_genotype_probabilities_layout1(index, vg, probabilities);
+    else bgen_read_variant_genotype_probabilities_layout2(index, vg, probabilities);
 }
 
-inti bgen_variant_genotype_nsamples(VariantGenotype *vg)
-{
-    return vg->nsamples;
-}
-
-inti bgen_variant_genotype_nalleles(VariantGenotype *vg)
+inti bgen_nalleles(VariantGenotype *vg)
 {
     return vg->nalleles;
 }
 
-inti bgen_variant_genotype_ploidy(VariantGenotype *vg)
+inti bgen_ploidy(VariantGenotype *vg)
 {
     return vg->ploidy;
 }
 
-inti bgen_variant_genotype_ncombs(VariantGenotype *vg)
+inti bgen_ncombs(VariantGenotype *vg)
 {
     return vg->ncombs;
 }
 
-void bgen_close_variant_genotype(VariantIndexing *indexing,
+void bgen_close_variant_genotype(VariantIndexing *index,
                                  VariantGenotype *vg)
 {
-    if (indexing->file) fclose(indexing->file);
+    if (index->file) fclose(index->file);
 
     if (vg->plo_miss != NULL) free(vg->plo_miss);
 
