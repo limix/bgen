@@ -11,7 +11,9 @@ int main()
     // Mandatory first call, preparing to read the file.
     BGenFile *bgen = bgen_open(filepath);
 
-    printf("Number of samples: %lld\n",  bgen_nsamples(bgen));
+    inti nsamples = bgen_nsamples(bgen);
+
+    printf("Number of samples: %lld\n",  nsamples);
     printf("Number of variants: %lld\n", bgen_nvariants(bgen));
 
     // Reading sample identifications.
@@ -39,21 +41,25 @@ int main()
     // Releasing memory associated with variant identifications.
     bgen_free_variants(bgen, variants);
 
+    // Releases associated memory. Called at the end.
+    bgen_close(bgen);
+
     // We now want the actual genotype probabilities of the second variant.
     // For performance reasons, it is done in two steps:
 
     // Step 1.
     VariantGenotype *vg = bgen_open_variant_genotype(index, 1);
 
-    real *probabilities = malloc(bgen_nsamples(bgen) * bgen_ncombs(vg) * sizeof(real));
+    real *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(real));
 
-    
+
     // Step 2.
     bgen_read_variant_genotype(index, vg, probabilities);
-    
-    printf("Genotype probabilities of the second variant for the first two samples:\n");
+
+    printf("Genotype probabilities of the second variant ");
+    printf("for the first two samples:\n");
     inti i, j;
-    
+
     for (j = 0; j < 2; ++j)
     {
         for (i = 0; i < bgen_ncombs(vg); ++i)
@@ -62,16 +68,15 @@ int main()
         }
         printf("\n");
     }
-    
+
     free(probabilities);
 
-    // Releases associated memory.
+    // Releases associated memory when we are done reading this particular
+    // variant genotype.
     bgen_close_variant_genotype(index, vg);
 
-    // Releases associated memory. Called at the end.
-    bgen_close(bgen);
-
-    // Releases associated memory.
+    // Releases associated memory when we are done reading variant
+    // genotypes.
     bgen_free_indexing(index);
 
     return 0;
