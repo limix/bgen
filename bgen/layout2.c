@@ -94,21 +94,21 @@ void bgen_read_unphased_genotype(VariantGenotype *vg,
     }
 }
 
-byte* bgen_uncompress(VariantIndexing *indexing)
+byte* bgen_uncompress_layout2(VariantIndexing *indexing, FILE *file)
 {
     inti  clength = 0, ulength = 0;
     byte *cchunk;
     byte *uchunk;
 
-    if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
+    if (bgen_read(file, &clength, 4) == FAIL) return NULL;
 
     clength -= 4;
 
-    if (bgen_read(indexing->file, &ulength, 4) == FAIL) return NULL;
+    if (bgen_read(file, &ulength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(indexing->file, cchunk, clength) == FAIL)
+    if (bgen_read(file, cchunk, clength) == FAIL)
     {
         free(cchunk);
         return NULL;
@@ -134,7 +134,7 @@ byte* bgen_uncompress(VariantIndexing *indexing)
 
 inti bgen_read_variant_genotype_header_layout2(
     VariantIndexing *indexing,
-    VariantGenotype *vg)
+    VariantGenotype *vg, FILE *file)
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -145,16 +145,16 @@ inti bgen_read_variant_genotype_header_layout2(
 
     if (indexing->compression > 0)
     {
-        chunk = bgen_uncompress(indexing);
+        chunk = bgen_uncompress_layout2(indexing, file);
         c     = chunk;
         MEMCPY(&nsamples, &c, 4);
     }
     else {
-        if (bgen_read(indexing->file, &nsamples, 4) == FAIL) return FAIL;
+        if (bgen_read(file, &nsamples, 4) == FAIL) return FAIL;
 
         chunk = malloc(6 * nsamples);
 
-        if (bgen_read(indexing->file, chunk, 6 * nsamples) == FAIL) return FAIL;
+        if (bgen_read(file, chunk, 6 * nsamples) == FAIL) return FAIL;
 
         c = chunk;
     }

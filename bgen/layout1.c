@@ -83,17 +83,17 @@ void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
     bgen_read_unphased_genotype_layout1(vg, probabilities);
 }
 
-byte* bgen_uncompress_layout1(VariantIndexing *indexing)
+byte* bgen_uncompress_layout1(VariantIndexing *indexing, FILE *file)
 {
     inti  clength = 0, ulength = 0;
     byte *cchunk;
     byte *uchunk;
 
-    if (bgen_read(indexing->file, &clength, 4) == FAIL) return NULL;
+    if (bgen_read(file, &clength, 4) == FAIL) return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(indexing->file, cchunk, clength) == FAIL)
+    if (bgen_read(file, cchunk, clength) == FAIL)
     {
         free(cchunk);
         return NULL;
@@ -120,20 +120,20 @@ byte* bgen_uncompress_layout1(VariantIndexing *indexing)
 
 inti bgen_read_variant_genotype_header_layout1(
     VariantIndexing *indexing,
-    VariantGenotype *vg)
+    VariantGenotype *vg, FILE *file)
 {
     byte *c;
     byte *chunk;
 
     if (indexing->compression > 0)
     {
-        chunk = bgen_uncompress_layout1(indexing);
+        chunk = bgen_uncompress_layout1(indexing, file);
         c     = chunk;
     }
     else {
         chunk = malloc(6 * indexing->nsamples);
 
-        if (bgen_read(indexing->file, chunk, 6 * indexing->nsamples) == FAIL) return FAIL;
+        if (bgen_read(file, chunk, 6 * indexing->nsamples) == FAIL) return FAIL;
 
         c = chunk;
     }
