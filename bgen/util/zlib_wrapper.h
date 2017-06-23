@@ -42,7 +42,7 @@ inline static inti zlib_uncompress(const byte *src, inti src_size,
     case Z_DATA_ERROR:
     case Z_MEM_ERROR:
         inflateEnd(&strm);
-        printf("zlib failed to uncompress: %s.\n", zError(e));
+        fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
         return EXIT_FAILURE;
     }
 
