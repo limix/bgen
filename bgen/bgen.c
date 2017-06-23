@@ -325,9 +325,9 @@ void bgen_free_indexing(VariantIndexing *index)
 VariantGenotype* bgen_open_variant_genotype(VariantIndexing *index,
                                             inti             variant_idx)
 {
-    index->file = fopen((const char *)index->filepath, "rb");
+    FILE *file = fopen((const char *)index->filepath, "rb");
 
-    if (index->file == NULL) {
+    if (file == NULL) {
         fprintf(stderr, "Could not open: %s\n", index->filepath);
         return NULL;
     }
@@ -337,10 +337,12 @@ VariantGenotype* bgen_open_variant_genotype(VariantIndexing *index,
     vg->variant_idx = variant_idx;
     vg->plo_miss    = NULL;
     vg->chunk       = NULL;
-    fseek(index->file, index->start[variant_idx], SEEK_SET);
+    fseek(file, index->start[variant_idx], SEEK_SET);
 
-    if (index->layout == 1) bgen_read_variant_genotype_header_layout1(index, vg);
-    else bgen_read_variant_genotype_header_layout2(index, vg);
+    if (index->layout == 1) bgen_read_variant_genotype_header_layout1(index, vg, file);
+    else bgen_read_variant_genotype_header_layout2(index, vg, file);
+
+    fclose(file);
 
     return vg;
 }
@@ -370,8 +372,6 @@ inti bgen_ncombs(VariantGenotype *vg)
 void bgen_close_variant_genotype(VariantIndexing *index,
                                  VariantGenotype *vg)
 {
-    if (index->file) fclose(index->file);
-
     if (vg->plo_miss != NULL) free(vg->plo_miss);
 
     if (vg->chunk != NULL) free(vg->chunk);

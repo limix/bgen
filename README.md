@@ -26,9 +26,9 @@ conda install -c conda-forge bgen
 or by building it
 
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.10.tar.gz
-tar xzf 0.1.10.tar.gz
-cd bgen-0.1.10
+wget https://github.com/limix/bgen/archive/0.1.11.tar.gz
+tar xzf 0.1.11.tar.gz
+cd bgen-0.1.11
 mkdir build
 cd build
 cmake ..

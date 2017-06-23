@@ -8,7 +8,6 @@
 struct VariantIndexing
 {
     byte *filepath;
-    FILE *file;
     inti  compression;
     inti  layout;
     inti  nsamples;
