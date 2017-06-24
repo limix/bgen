@@ -2,17 +2,16 @@ cmake_minimum_required (VERSION 2.6.4)
 
 project(bgen C)
 
-macro(use_c99)
-  if (CMAKE_VERSION VERSION_LESS "3.1")
-    if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-      set (CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
-    endif ()
-  else ()
-    set (CMAKE_C_STANDARD 99)
-  endif ()
-endmacro(use_c99)
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                  OUTPUT_VARIABLE GCC_VERSION)
 
-use_c99()
+  if (GCC_VERSION VERSION_GREATER 4.8)
+    set (CMAKE_C_STANDARD 11)
+  else ()
+    set (CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
+  endif ()
+endif ()
 
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
