@@ -1,16 +1,22 @@
 build: off
 platform: x64
 image: Visual Studio 2015
+environment:
+  - PLATFORM: "x64"
+  - CONFIGURATION: "Release"
 
 install:
+  - set PATH_ORIGINAL=%PATH%
+  - SET ADDITIONALPARAM=/p:LibraryPath="C:\Program Files\Microsoft SDKs\Windows\v7.1\lib\x64;c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64;C:\Program Files (x86)\Microsoft Visual Studio 10.0\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\lib\amd64;"
+
+build_script:
   - mkdir deps
   - cd deps
   - nuget install zlib -Version 1.2.8.8
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - git clone https://github.com/facebook/zstd.git
   - cd zstd
-  - build\VS_scripts\build.generic.cmd VS2015 x64 Release v140
-  - dir * /b/s
+  - msbuild "build\VS2010\zstd.sln" /m /verbosity:minimal /property:PlatformToolset=v140 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cd ..
   - dir
   - mkdir build
