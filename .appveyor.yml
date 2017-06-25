@@ -6,7 +6,7 @@ install:
   - mkdir deps
   - nuget install zlib-msvc14-x64-master -Version 1.2.8.4 -Source https://ci.appveyor.com/nuget/zlib-shallow-x0n34b3pfq1b
   - powershell -Command "move zlib*\* deps -force"
-  - powershell move deps\zlibstatic.lib deps\zlib.lib
+  - dir deps
   - mkdir build
   - cd build
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\VC\vcvarsall.bat" %platform%
