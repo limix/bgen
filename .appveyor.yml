@@ -9,7 +9,7 @@ install:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - git clone https://github.com/facebook/zstd.git
   - cd zstd
-  - build\VS_scripts\build.generic.cmd VS2014 x64 Release v140
+  - build\VS_scripts\build.generic.cmd VS2015 x64 Release v140
   - dir * /b/s
   - cd ..
   - dir
