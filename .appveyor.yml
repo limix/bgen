@@ -2,8 +2,8 @@ build: off
 platform: x64
 image: Visual Studio 2015
 environment:
-  - PLATFORM: "x64"
-  - CONFIGURATION: "Release"
+  PLATFORM: "x64"
+  CONFIGURATION: "Release"
 
 install:
   - set PATH_ORIGINAL=%PATH%
