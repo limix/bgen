@@ -6,7 +6,7 @@ install:
   - mkdir deps
   - cd deps
   - nuget install zlib
-  - dir
+  - dir * /b/s
   - cd ..
   - dir
   - mkdir build
