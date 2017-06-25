@@ -6,17 +6,17 @@ install:
   - mkdir deps
   - cd deps
   - nuget install zlib -Version 1.2.8.8
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\vcvarsall.bat" x64
   - git clone https://github.com/facebook/zstd.git
   - cd zstd
   - cd build
-  - VS_scripts\build.generic.cmd VS2015 x64 Release v140
+  - VS_scripts\build.generic.cmd VS2010 x64 Release v100
   - dir * /b/s
   - cd ..
   - dir
   - mkdir build
   - cd build
-  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_INCLUDE_DIR="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\zlib.h" -DZLIB_LIBRARY="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\"
+  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_INCLUDE_DIR="C:\projects\bgen\deps\zlib.v100.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\zlib.h" -DZLIB_LIBRARY="C:\projects\bgen\deps\zlib.v100.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v100\windesktop\msvcstl\dyn\rt-dyn\x64\Release\"
   - nmake
   - nmake test
   - nmake install
