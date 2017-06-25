@@ -5,7 +5,7 @@ image: Visual Studio 2015
 install:
   - mkdir deps
   - cd deps
-  - nuget install zlib-msvc14-x64-master -Version 1.2.8.8
+  - nuget install zlib -Version 1.2.8.8
   - dir * /b/s
   - cd ..
   - dir
