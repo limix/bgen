@@ -1,5 +1,6 @@
 build: off
 platform: x64
+image: Visual Studio 2015
 
 install:
   - mkdir build
