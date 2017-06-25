@@ -7,9 +7,9 @@ install:
   - mkdir build
   - cd build
   - dir "C:\Program Files (x86)"
-  - dir "C:\Program Files (x86)\microsoft visual studio 14.0"
-  - dir "C:\Program Files (x86)\microsoft visual studio 14.0\Common7\Tools"
-  - call "C:\Program Files (x86)\microsoft visual studio 14.0\Common7\Tools\VC\vcvarsall.bat" %platform%
+  - dir "C:\Program Files (x86)\Microsoft Visual Studio 14.0"
+  - dir "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC"
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - cmake -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE ..
   - nmake
   - nmake test
