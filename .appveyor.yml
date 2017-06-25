@@ -10,7 +10,7 @@ install:
   - git clone https://github.com/facebook/zstd.git
   - cd zstd
   - cd build
-  - VS_scripts\build.generic.cmd VS2015 x64 Release v120
+  - VS_scripts\build.generic.cmd VS2015 x64 Release v140
   - dir * /b/s
   - cd ..
   - dir
