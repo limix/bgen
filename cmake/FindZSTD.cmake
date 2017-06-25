@@ -1,10 +1,8 @@
-#
-# - Try to find Facebook zstd library
-# This will define
-# ZSTD_FOUND
-# ZSTD_INCLUDE_DIR
-# ZSTD_LIBRARIES
-#
+# - Try to find zstd
+# Once done this will define
+#  ZSTD_FOUND - System has zstd
+#  ZSTD_INCLUDE_DIRS - The zstd include directories
+#  ZSTD_LIBRARIES - The libraries needed to use zstd
 
 find_path(
     ZSTD_INCLUDE_DIR
@@ -18,7 +16,7 @@ find_path(
 
 find_library(
     ZSTD_LIBRARY
-    NAMES zstd
+    NAMES "zstd"
     HINTS
         "/usr/local/facebook/lib"
         "/usr/local/lib"
@@ -26,14 +24,12 @@ find_library(
         "/home/travis/build/limix/bgen/zstd/lib"
 )
 
-set(ZSTD_LIBRARIES ${ZSTD_LIBRARY})
-
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(
-    ZSTD DEFAULT_MSG ZSTD_INCLUDE_DIR ZSTD_LIBRARIES)
+find_package_handle_standard_args(ZSTD DEFAULT_MSG
+    ZSTD_LIBRARY ZSTD_INCLUDE_DIR)
 
-mark_as_advanced(ZSTD_INCLUDE_DIR ZSTD_LIBRARIES ZSTD_FOUND)
+mark_as_advanced(ZSTD_INCLUDE_DIR ZSTD_LIBRARY)
 
-if(ZSTD_FOUND AND NOT ZSTD_FIND_QUIETLY)
-    message(STATUS "ZSTD: ${ZSTD_INCLUDE_DIR}")
-endif()
+set(ZSTD_LIBRARIES ${ZSTD_LIBRARY})
+set(ZSTD_INCLUDE_DIRS ${ZSTD_INCLUDE_DIR})
+
