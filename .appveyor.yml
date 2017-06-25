@@ -6,6 +6,9 @@ install:
   - mkdir deps
   - cd deps
   - nuget install zlib -Version 1.2.8.8
+  - git clone https://github.com/facebook/zstd.git
+  - cd zstd
+  - build/VS_scripts/build.VS2015.cmd
   - dir * /b/s
   - cd ..
   - dir
