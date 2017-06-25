@@ -18,6 +18,7 @@ build_script:
   - cd zstd
   - msbuild "build\VS2010\zstd.sln" /m /verbosity:minimal /property:PlatformToolset=v140 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cd ..
+  - cd ..
   - dir
   - mkdir build
   - cd build
