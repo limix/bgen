@@ -5,17 +5,20 @@ image: Visual Studio 2015
 install:
   - mkdir deps
   - cd deps
-  - nuget install zlib
+  - nuget install zlib-msvc14-x64-master -Version 1.2.8.8
   - dir * /b/s
   - cd ..
   - dir
   - mkdir build
   - cd build
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
-  - cmake -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE ..
+  - cmake -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_INCLUDE_DIR="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\zlib.h" -DZLIB_LIBRARY="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\" ..
   - nmake
   - nmake test
   - nmake install
+
+#zlib.dll
+#
 
 #test_script:
 #  - conda build recipe --quiet
