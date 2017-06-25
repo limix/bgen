@@ -1,1 +1,15 @@
+build: off
 platform: x64
+
+install:
+  - mkdir build
+  - cd build
+  - cmake -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE ..
+  - nmake
+  - nmake test
+  - nmake install
+
+#test_script:
+#  - conda build recipe --quiet
+#deploy_script:
+#  - cmd: upload_or_check_non_existence .\recipe conda-forge --channel=main
