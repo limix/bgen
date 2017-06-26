@@ -10,20 +10,30 @@ install:
   - SET ADDITIONALPARAM=/p:LibraryPath="C:\Program Files\Microsoft SDKs\Windows\v7.1\lib\x64;c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\lib\amd64;C:\Program Files (x86)\Microsoft Visual Studio 10.0\;C:\Program Files (x86)\Microsoft Visual Studio 10.0\lib\amd64;"
 
 build_script:
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - mkdir deps
   - cd deps
-  - nuget install zlib -Version 1.2.8.8
-  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
-  - git clone https://github.com/facebook/zstd.git
+  - mkdir zstd
   - cd zstd
+  - nuget install zlib -Version 1.2.8.8
+  - mkdir lib
+  - mkdir include
+  - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\*.* lib
+  - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\*.* include
+  - cd ..
+  - git clone https://github.com/facebook/zstd.git zstd-source
+  - mkdir zstd
+  - mkdir zstd\lib
+  - mkdir zstd\include
+  - cd zstd-source
   - msbuild "build\VS2010\zstd.sln" /m /verbosity:minimal /property:PlatformToolset=v140 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cd ..
+  - move zstd-source\build\VS2010\bin\x64_Release\*.* zstd\lib
+  - move zstd-source\lib\*.* zstd\include
   - cd ..
-  - dir
   - mkdir build
   - cd build
-  - dir "C:\projects\bgen\deps\zstd\build\VS2010\bin\x64_Release"
-  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_INCLUDEDIR="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include" -DZLIB_LIBRARYDIR="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\build\VS2010\bin\x64_Release" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\lib"
+  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
   - nmake
   - nmake test
   - nmake install
