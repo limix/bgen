@@ -54,7 +54,7 @@ as a replacement for ``make``.
 Assuming you are at folder ``C:\projects\bgen`` and that you have installed
 zlib and Zstandard libraries into ``C:\projects\bgen\deps``, you might want
 to try
-```
+```bash
 mkdir build
 cd build
 cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
