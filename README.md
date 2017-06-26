@@ -1,6 +1,7 @@
 # bgen
 
 [![Travis](https://img.shields.io/travis/limix/bgen.svg?style=flat-square)](https://travis-ci.org/limix/bgen)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/9ygi9jksbgikb87y/branch/master?svg=true)](https://ci.appveyor.com/project/Horta/bgen)
 [![Documentation Status](https://readthedocs.org/projects/bgen/badge/?style=flat-square&version=latest)](https://bgen.readthedocs.io/)
 
 A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
@@ -26,9 +27,9 @@ conda install -c conda-forge bgen
 or by building it
 
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.11.tar.gz
-tar xzf 0.1.11.tar.gz
-cd bgen-0.1.11
+wget https://github.com/limix/bgen/archive/0.1.12.tar.gz
+tar xzf 0.1.12.tar.gz
+cd bgen-0.1.12
 mkdir build
 cd build
 cmake ..
