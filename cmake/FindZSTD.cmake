@@ -1,27 +1,32 @@
-# - Try to find zstd
-# Once done this will define
-#  ZSTD_FOUND - System has zstd
-#  ZSTD_INCLUDE_DIRS - The zstd include directories
-#  ZSTD_LIBRARIES - The libraries needed to use zstd
+# FindZSTD
+# ---------
+#
+# Find ZSTANDARD include dirs and libraries
+#
+# This module reads hints about search locations from variables::
+#
+#   ZSTD_INCLUDEDIR       - Preferred include directory e.g. <prefix>/include
+#   ZSTD_LIBRARYDIR       - Preferred library directory e.g. <prefix>/lib
+
+set(_zstd_INCLUDE_SEARCH_DIRS "/usr/include" "/usr/local/include")
+if(ZSTD_INCLUDEDIR)
+    list(APPEND _zstd_INCLUDE_SEARCH_DIRS ${ZSTD_INCLUDEDIR})
 
 find_path(
     ZSTD_INCLUDE_DIR
-    NAMES "zstd.h"
-    HINTS
-        "/usr/local/facebook/include"
-        "/usr/local/include"
-        "/usr/include"
-        "/home/travis/build/limix/bgen/zstd/lib"
+    NAMES zstd.h
+    HINTS ${_zstd_INCLUDE_SEARCH_DIRS}
 )
+
+
+set(_zstd_LIBRARY_SEARCH_DIRS "/usr/lib" "/usr/local/lib")
+if(ZSTD_LIBRARYDIR)
+    list(APPEND _zstd_LIBRARY_SEARCH_DIRS ${ZSTD_LIBRARYDIR})
 
 find_library(
     ZSTD_LIBRARY
-    NAMES "zstd"
-    HINTS
-        "/usr/local/facebook/lib"
-        "/usr/local/lib"
-        "/usr/lib"
-        "/home/travis/build/limix/bgen/zstd/lib"
+    NAMES zstd
+    HINTS ${_zstd_LIBRARY_SEARCH_DIRS}
 )
 
 include(FindPackageHandleStandardArgs)

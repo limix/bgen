@@ -26,7 +26,7 @@ file(STRINGS "VERSION" BGEN_VERSION)
 find_package( ZLIB REQUIRED )
 if(NOT ZLIB_FOUND)
     message(STATUS "Could not find zlib library. If you have it installed,
-                    please, define ZLIB_LIBRARY and ZLIB_INCLUDE_DIR
+                    please, define ZLIB_LIBRARYDIR and ZLIB_INCLUDEDIR
                     appropriately to fix it.")
 endif()
 
@@ -34,7 +34,7 @@ endif()
 find_package( ZSTD REQUIRED )
 if(NOT ZSTD_FOUND)
     message(STATUS "Could not find zstd library. If you have it installed,
-                    please, define ZSTD_LIBRARY and ZSTD_INCLUDE_DIR
+                    please, define ZSTD_LIBRARYDIR and ZSTD_INCLUDEDIR
                     appropriately to fix it.")
 endif()
 
