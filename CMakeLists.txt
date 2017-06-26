@@ -38,9 +38,6 @@ if(NOT ZSTD_FOUND)
                     appropriately to fix it.")
 endif()
 
-message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
-message(STATUS "ZSTD_LIBRARIES: ${ZSTD_LIBRARIES}")
-
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
 include_directories( include/ )
