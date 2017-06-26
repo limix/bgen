@@ -24,13 +24,22 @@ endif()
 file(STRINGS "VERSION" BGEN_VERSION)
 
 find_package( ZLIB REQUIRED )
-find_package( ZSTD REQUIRED )
-
-if(NOT ZSTD_FOUND)
-    message(STATUS "Could not find zstd library. If you have it installed,
-                    please, define ZSTD_INCLUDE_LIB and ZSTD_INCLUDE_DIR
+if(NOT ZLIB_FOUND)
+    message(STATUS "Could not find zlib library. If you have it installed,
+                    please, define ZLIB_LIBRARY and ZLIB_INCLUDE_DIR
                     appropriately to fix it.")
 endif()
+
+
+find_package( ZSTD REQUIRED )
+if(NOT ZSTD_FOUND)
+    message(STATUS "Could not find zstd library. If you have it installed,
+                    please, define ZSTD_LIBRARY and ZSTD_INCLUDE_DIR
+                    appropriately to fix it.")
+endif()
+
+message(STATUS "ZLIB_LIBRARIES: ${ZLIB_LIBRARIES}")
+message(STATUS "ZSTD_LIBRARIES: ${ZSTD_LIBRARIES}")
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
@@ -59,7 +68,7 @@ install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 add_subdirectory(test)
 
