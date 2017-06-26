@@ -2,17 +2,16 @@ cmake_minimum_required (VERSION 2.6.4)
 
 project(bgen C)
 
-macro(use_c99)
-  if (CMAKE_VERSION VERSION_LESS "3.1")
-    if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
-      set (CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
-    endif ()
-  else ()
-    set (CMAKE_C_STANDARD 99)
-  endif ()
-endmacro(use_c99)
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+  execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+                  OUTPUT_VARIABLE GCC_VERSION)
 
-use_c99()
+  if (GCC_VERSION VERSION_GREATER 4.8)
+    set (CMAKE_C_STANDARD 11)
+  else ()
+    set (CMAKE_C_FLAGS "--std=gnu99 ${CMAKE_C_FLAGS}")
+  endif ()
+endif ()
 
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -25,11 +24,17 @@ endif()
 file(STRINGS "VERSION" BGEN_VERSION)
 
 find_package( ZLIB REQUIRED )
-find_package( ZSTD REQUIRED )
+if(NOT ZLIB_FOUND)
+    message(STATUS "Could not find zlib library. If you have it installed,
+                    please, define ZLIB_LIBRARYDIR and ZLIB_INCLUDEDIR
+                    appropriately to fix it.")
+endif()
 
+
+find_package( ZSTD REQUIRED )
 if(NOT ZSTD_FOUND)
     message(STATUS "Could not find zstd library. If you have it installed,
-                    please, define ZSTD_INCLUDE_LIB and ZSTD_INCLUDE_DIR
+                    please, define ZSTD_LIBRARYDIR and ZSTD_INCLUDEDIR
                     appropriately to fix it.")
 endif()
 
@@ -60,7 +65,7 @@ install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 add_subdirectory(test)
 
