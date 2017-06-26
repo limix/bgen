@@ -28,11 +28,13 @@ build_script:
   - cd zstd-source
   - msbuild "build\VS2010\zstd.sln" /m /verbosity:minimal /property:PlatformToolset=v140 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
   - cd ..
-  - move zstd-source\build\VS2010\bin\x64_Release\*.* zstd\lib
-  - move zstd-source\lib\*.* zstd\include
+  - move zstd-source\build\VS2010\bin\x64_Release\libzstd.* zstd\lib
+  - move zstd-source\build\VS2010\bin\x64_Release\libzstd_static.* zstd\lib
+  - move zstd-source\lib\*.h zstd\include
   - cd ..
   - mkdir build
   - cd build
+  - dir "C:\projects\bgen\deps\zstd\lib"
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
   - nmake
   - nmake test
