@@ -22,6 +22,7 @@ build_script:
   - dir
   - mkdir build
   - cd build
+  - dir "C:\projects\bgen\deps\zstd\build\VS2010\bin\x64_Release\"
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_INCLUDE_DIR="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\zlib.h" -DZLIB_LIBRARY="C:\projects\bgen\deps\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\" -DZSTD_LIBRARY="C:\projects\bgen\deps\zstd\build\VS2010\bin\x64_Release\" -DZSTD_INCLUDE_DIR="C:\projects\bgen\deps\zstd\lib\"
   - nmake
   - nmake test
