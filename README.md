@@ -28,9 +28,9 @@ A second installation option would be to download the latest source and to
 build it by yourself.
 On Linux or macOS systems it can be as simple as
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.12.tar.gz
-tar xzf 0.1.12.tar.gz
-cd bgen-0.1.12
+wget https://github.com/limix/bgen/archive/0.1.13.tar.gz
+tar xzf 0.1.13.tar.gz
+cd bgen-0.1.13
 mkdir build
 cd build
 cmake ..
@@ -44,8 +44,9 @@ any hint.
 If you do have those libraries installed but ``cmake`` did not manage to find
 them, you can specify their location to ``cmake`` as
 ```bash
-cmake .. -DZLIB_ROOT="/path/to/zlib/dir" -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir"
--DZSTD_INCLUDEDIR="/path/to/zstd/header/dir"
+cmake .. -DZLIB_ROOT="/path/to/zlib/dir" \
+         -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir" \
+         -DZSTD_INCLUDEDIR="/path/to/zstd/header/dir"
 ```
 
 On Windows systems you might want to have a look at the
@@ -54,10 +55,14 @@ as a replacement for ``make``.
 Assuming you are at folder ``C:\projects\bgen`` and that you have installed
 zlib and Zstandard libraries into ``C:\projects\bgen\deps``, you might want
 to try
-```bash
+```dos
 mkdir build
 cd build
-cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
+cmake .. -G "NMake Makefiles" ^
+         -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE ^
+         -DZLIB_ROOT="C:\projects\bgen\deps\zlib" ^
+         -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" ^
+         -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
 nmake
 nmake test
 nmake install
