@@ -40,10 +40,3 @@ build_script:
   - nmake test
   - nmake install
 
-#zlib.dll
-#
-
-#test_script:
-#  - conda build recipe --quiet
-#deploy_script:
-#  - cmd: upload_or_check_non_existence .\recipe conda-forge --channel=main
