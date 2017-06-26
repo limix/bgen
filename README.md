@@ -1,6 +1,7 @@
 # bgen
 
 [![Travis](https://img.shields.io/travis/limix/bgen.svg?style=flat-square)](https://travis-ci.org/limix/bgen)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/9ygi9jksbgikb87y/branch/master?svg=true)](https://ci.appveyor.com/project/Horta/bgen)
 [![Documentation Status](https://readthedocs.org/projects/bgen/badge/?style=flat-square&version=latest)](https://bgen.readthedocs.io/)
 
 A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
@@ -16,25 +17,55 @@ installed before-hand if you choose to build bgen library by yourself.
 
 ## Install
 
-You can install it via
+The recommended way is to install it via
 [conda](http://conda.pydata.org/docs/index.html)
 
 ```bash
 conda install -c conda-forge bgen
 ```
 
-or by building it
-
+A second installation option would be to download the latest source and to
+build it by yourself.
+On Linux or macOS systems it can be as simple as
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.11.tar.gz
-tar xzf 0.1.11.tar.gz
-cd bgen-0.1.11
+wget https://github.com/limix/bgen/archive/0.1.14.tar.gz
+tar xzf 0.1.14.tar.gz
+cd bgen-0.1.14
 mkdir build
 cd build
 cmake ..
 make
 make test
 sudo make install
+```
+assuming that you have both zlib (often the case) and Zstandard (usually not
+the case) libraries installed and that ``cmake`` managed to find them without
+any hint.
+If you do have those libraries installed but ``cmake`` did not manage to find
+them, you can specify their location to ``cmake`` as
+```bash
+cmake .. -DZLIB_ROOT="/path/to/zlib/dir" \
+         -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir" \
+         -DZSTD_INCLUDEDIR="/path/to/zstd/header/dir"
+```
+
+On Windows systems you might want to have a look at the
+[nmake](https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx) command
+as a replacement for ``make``.
+Assuming you are at folder ``C:\projects\bgen`` and that you have installed
+zlib and Zstandard libraries into ``C:\projects\bgen\deps``, you might want
+to try
+```dos
+mkdir build
+cd build
+cmake .. -G "NMake Makefiles" ^
+         -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE ^
+         -DZLIB_ROOT="C:\projects\bgen\deps\zlib" ^
+         -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" ^
+         -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
+nmake
+nmake test
+nmake install
 ```
 
 ## Documentation
