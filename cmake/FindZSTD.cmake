@@ -11,6 +11,7 @@
 set(_zstd_INCLUDE_SEARCH_DIRS "/usr/include" "/usr/local/include")
 if(ZSTD_INCLUDEDIR)
     list(APPEND _zstd_INCLUDE_SEARCH_DIRS ${ZSTD_INCLUDEDIR})
+endif()
 
 find_path(
     ZSTD_INCLUDE_DIR
@@ -22,6 +23,7 @@ find_path(
 set(_zstd_LIBRARY_SEARCH_DIRS "/usr/lib" "/usr/local/lib")
 if(ZSTD_LIBRARYDIR)
     list(APPEND _zstd_LIBRARY_SEARCH_DIRS ${ZSTD_LIBRARYDIR})
+endif()
 
 find_library(
     ZSTD_LIBRARY
