@@ -28,9 +28,9 @@ A second installation option would be to download the latest source and to
 build it by yourself.
 On Linux or macOS systems it can be as simple as
 ```bash
-wget https://github.com/limix/bgen/archive/0.1.13.tar.gz
-tar xzf 0.1.13.tar.gz
-cd bgen-0.1.13
+wget https://github.com/limix/bgen/archive/0.1.14.tar.gz
+tar xzf 0.1.14.tar.gz
+cd bgen-0.1.14
 mkdir build
 cd build
 cmake ..
