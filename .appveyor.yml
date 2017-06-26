@@ -34,7 +34,6 @@ build_script:
   - cd ..
   - mkdir build
   - cd build
-  - dir "C:\projects\bgen\deps\zstd\lib"
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
   - nmake
   - nmake test
