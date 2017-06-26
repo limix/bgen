@@ -24,8 +24,8 @@ The recommended way is to install it via
 conda install -c conda-forge bgen
 ```
 
-A second option would download the latest source and building
-it by yourself.
+A second installation option would be to download the latest source and to
+build it by yourself.
 On Linux or macOS systems it can be as simple as
 ```bash
 wget https://github.com/limix/bgen/archive/0.1.12.tar.gz
