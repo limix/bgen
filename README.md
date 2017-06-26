@@ -39,10 +39,10 @@ make test
 sudo make install
 ```
 assuming that you have both zlib (often the case) and Zstandard (usually not
-the case) libraries installed and that cmake managed to find them without
+the case) libraries installed and that ``cmake`` managed to find them without
 any hint.
-If you do have those libraries installed but cmake did not manage to find
-them, you can specify their location to cmake as
+If you do have those libraries installed but ``cmake`` did not manage to find
+them, you can specify their location to ``cmake`` as
 ```bash
 cmake .. -DZLIB_ROOT="/path/to/zlib/dir" -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir"
 -DZSTD_INCLUDEDIR="/path/to/zstd/header/dir"
