@@ -2,7 +2,15 @@
 #define TYPES_H
 
 #include <stdlib.h>
-#include <inttypes.h>
+#ifdef _MSC_VER
+# if (_MSC_VER <= 1500)
+   typedef long long int_fast64_t;
+# else
+#  include <inttypes.h>
+# endif
+#else
+# include <inttypes.h>
+#endif
 #include <assert.h>
 
 typedef unsigned char byte;

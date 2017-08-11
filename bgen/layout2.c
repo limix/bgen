@@ -139,9 +139,11 @@ inti bgen_read_variant_genotype_header_layout2(
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t  min_ploidy, max_ploidy, phased, nbits;
+    uint8_t *plo_miss;
 
     byte *c;
     byte *chunk;
+    inti i;
 
     if (indexing->compression > 0)
     {
@@ -164,9 +166,7 @@ inti bgen_read_variant_genotype_header_layout2(
     MEMCPY(&max_ploidy, &c, 1);
     vg->ploidy = max_ploidy;
 
-    uint8_t *plo_miss = malloc(nsamples * sizeof(uint8_t));
-
-    inti i;
+    plo_miss = malloc(nsamples * sizeof(uint8_t));
 
     for (i = 0; i < nsamples; ++i)
     {

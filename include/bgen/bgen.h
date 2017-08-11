@@ -2,8 +2,17 @@
 #define BGEN_READER_H
 
 #include <stdlib.h>
-#include <stdint.h>
-#include <inttypes.h>
+#ifdef _MSC_VER
+# if (_MSC_VER <= 1500)
+   typedef long long int_fast64_t;
+# else
+#  include <stdint.h>
+#  include <inttypes.h>
+# endif
+#else
+# include <stdint.h>
+# include <inttypes.h>
+#endif
 
 typedef unsigned char byte;
 typedef int_fast64_t  inti;
