@@ -2,10 +2,13 @@
 
 inti bgen_choose(inti n, inti k)
 {
-    inti ans = 1;
+    inti ans;
+    int j;
+
+    ans = 1;
 
     k = k > n - k ? n - k : k;
-    int j = 1;
+    j = 1;
 
     for (; j <= k; j++, n--)
     {

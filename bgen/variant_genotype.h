@@ -2,6 +2,16 @@
 #define VARIANT_GENOTYPE_H
 
 #include "variant_genotype_fwd.h"
+#ifdef _MSC_VER
+# if (_MSC_VER <= 1500)
+#  include "stdint_impl.h"
+# else
+#  include <stdint.h>
+# endif
+#else
+# include <stdint.h>
+#endif
+
 
 struct VariantGenotype
 {
