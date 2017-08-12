@@ -4,6 +4,18 @@
 #include <string.h>
 #include <math.h>
 
+#ifdef WIN32
+# ifndef NAN
+   static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
+#  define NAN (*(const float *) __nan)
+# endif
+#endif
+
+#ifdef _MSC_VER
+# if (_MSC_VER <= 1500)
+#  define isnan(x) _isnan(x)
+# endif
+#endif
 
 #define SUCCESS EXIT_SUCCESS
 #define FAIL EXIT_FAILURE
@@ -12,6 +24,8 @@
 int test_filepath(const byte *filepath, VariantIndexing **index)
 {
     BGenFile *bgen;
+    Variant *variants;
+    string *samples;
     inti e;
 
     bgen = bgen_open(filepath);
@@ -22,7 +36,7 @@ int test_filepath(const byte *filepath, VariantIndexing **index)
 
     if (bgen_nvariants(bgen) != 199) return FAIL;
 
-    string *samples = bgen_read_samples(bgen);
+    samples = bgen_read_samples(bgen);
 
     if (samples != NULL)
     {
@@ -35,7 +49,7 @@ int test_filepath(const byte *filepath, VariantIndexing **index)
         if (e != 0) return FAIL;
     }
 
-    Variant *variants = bgen_read_variants(bgen, index);
+    variants = bgen_read_variants(bgen, index);
 
     e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
 
@@ -56,20 +70,18 @@ int test_filepath(const byte *filepath, VariantIndexing **index)
 int test_probabilities(VariantIndexing *index, inti nsamples)
 {
     VariantGenotype *vg;
-
-
-    FILE *f = fopen("test/data/example.matrix", "r");
-
-    if (f == NULL) return FAIL;
-
+    FILE *f;
     char   line[65536];
     double prob[3];
     double eps = 1e-4;
     int    tmp;
     inti   ncombs;
+    inti i, j;
     real  *probabilities;
 
-    inti i, j;
+    f = fopen("test/data/example.matrix", "r");
+
+    if (f == NULL) return FAIL;
 
     for (i = 0; i < 199; ++i)
     {
@@ -127,7 +139,8 @@ int test_probabilities(VariantIndexing *index, inti nsamples)
 int main()
 {
     VariantIndexing *index;
-    inti nsamples = 500;
+    inti nsamples;
+    nsamples = 500;
 
     if (test_filepath((byte *)"test/data/example.1bits.bgen", &index) ==
         FAIL) return FAIL;
