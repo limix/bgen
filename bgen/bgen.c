@@ -242,7 +242,7 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
 Variant* bgen_read_variants(BGenFile *bgen, VariantIndexing **index)
 {
-    Variant *variants = NULL;
+    Variant *variants;
     uint32_t length;
     inti i, nvariants;
 

@@ -74,7 +74,6 @@ int test_probabilities(VariantIndexing *index, inti nsamples)
     char   line[65536];
     double prob[3];
     double eps = 1e-4;
-    int    tmp;
     inti   ncombs;
     inti i, j;
     real  *probabilities;
@@ -101,9 +100,9 @@ int test_probabilities(VariantIndexing *index, inti nsamples)
 
         for (j = 0; j < 500; ++j)
         {
-            tmp = fscanf(f, "%lf", prob + 0);
-            tmp = fscanf(f, "%lf", prob + 1);
-            tmp = fscanf(f, "%lf", prob + 2);
+            fscanf(f, "%lf", prob + 0);
+            fscanf(f, "%lf", prob + 1);
+            fscanf(f, "%lf", prob + 2);
 
             if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0))
             {
