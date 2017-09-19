@@ -3,7 +3,7 @@ compiler:
 - clang
 - gcc
 before_script:
-- bash <(curl -fsSL https://gist.githubusercontent.com/Horta/ed6baba1bf2626274141dc9c955ae58f/raw/a2bf48fdde6d97b5cbf0de7d84847420c5d336b2/install-zstd)
+- bash <(curl -fsSL https://gist.githubusercontent.com/Horta/ed6baba1bf2626274141dc9c955ae58f/raw/7c609686b3a814a4768cfbb1f52e56bc66795171/install-zstd)
 - mkdir build && pushd build && cmake .. && make && make test
   && popd
 - rm -rf build
