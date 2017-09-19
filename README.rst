@@ -31,15 +31,7 @@ On Linux or macOS systems it can be as simple as
 
 .. code:: bash
 
-    wget https://github.com/limix/bgen/archive/0.1.14.tar.gz
-    tar xzf 0.1.14.tar.gz
-    cd bgen-0.1.14
-    mkdir build
-    cd build
-    cmake ..
-    make
-    make test
-    sudo make install
+    bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
 
 assuming that you have both zlib (often the case) and Zstandard (usually not
 the case) libraries installed and that ``cmake`` managed to find them without
