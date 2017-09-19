@@ -11,10 +11,10 @@ It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3.
 Requirements
 ------------
 
-It makes use of the [Zstandard](http://facebook.github.io/zstd/) library.
+It makes use of the Zstandard_ library.
 You don't need to install it by yourself if you choose to install bgen
-via [conda](http://conda.pydata.org/docs/index.html) but you do need it
-installed before-hand if you choose to build bgen library by yourself.
+via conda_ but you do need it installed before-hand if you choose to build bgen
+library by yourself.
 
 Install
 -------
@@ -77,8 +77,8 @@ Authors
 License
 -------
 
-This project is licensed under the MIT License - see the `License file`_ file
-for details.
+This project is licensed under the MIT License - see the `license file`_ for
+details.
 
 
 .. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master
@@ -95,7 +95,7 @@ for details.
 
 .. _conda: http://conda.pydata.org/docs/index.html
 
-.. _License file: https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt
+.. _license file: https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt
 
 .. _Danilo Horta: https://github.com/horta
 
@@ -104,3 +104,5 @@ for details.
 .. _BGEN file format: http://www.well.ox.ac.uk/~gav/bgen_format/
 
 .. _nmake: https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx
+
+.. _Zstandard: http://facebook.github.io/zstd/
