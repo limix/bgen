@@ -1,5 +1,3 @@
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 build: off
 platform: x64
 image: Visual Studio 2015
@@ -35,7 +33,6 @@ build_script:
   - move zstd-source\lib\*.h zstd\include
   - cd ..
   - mkdir build
-  - dir deps
   - copy deps\zstd\lib\libzstd.dll build\libzstd.dll
   - copy deps\zlib\lib\zlib.dll build\zlib.dll
   - cd build
@@ -43,5 +40,3 @@ build_script:
   - nmake
   - ctest
   - nmake install
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
