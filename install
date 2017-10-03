@@ -1,6 +1,14 @@
 #!/bin/bash
 
-VERSION=0.1.18
+URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
+VERSION=$(curl -s $URL)
+
+echo "[_/_] Library(bgen==$VERSION)"
+
+rm /tmp/bgen.XXXX.log >/dev/null 2>&1 || true
+
+logfile=$(mktemp /tmp/bgen.XXXX.log)
+exec 3>"$logfile"
 
 function silent_run
 {
