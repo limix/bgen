@@ -35,6 +35,9 @@ build_script:
   - move zstd-source\lib\*.h zstd\include
   - cd ..
   - mkdir build
+  - dir deps
+  - copy deps\zstd\lib\zstd.dll build\zstd.dll
+  - copy deps\zlib\lib\zlib.dll build\zlib.dll
   - cd build
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
   - nmake
