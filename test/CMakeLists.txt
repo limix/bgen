@@ -1,11 +1,13 @@
 include_directories (${TEST_SOURCE_DIR}/src)
 
-add_executable (test_bgen test_bgen.c)
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-  target_link_libraries (test_bgen bgen)
-else()
-  target_link_libraries (test_bgen bgen m)
+set(LLIBS bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+
+if(NOT ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+  set(LLIBS ${LLIBS} m)
 endif()
+
+add_executable (test_bgen test_bgen.c)
+target_link_libraries (test_bgen ${LLIBS})
 
 configure_file(data/example.matrix ${CMAKE_CURRENT_BINARY_DIR}/data/example.matrix COPYONLY)
 configure_file(data/example.1bits.bgen ${CMAKE_CURRENT_BINARY_DIR}/data/example.1bits.bgen COPYONLY)
