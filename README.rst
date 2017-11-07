@@ -74,10 +74,10 @@ License
 This project is licensed under the MIT License - see the license file
 <https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt> for details.
 
-.. |Release| image:: http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat-square
+.. |Release| image:: http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat
     :target: https://github.com/limix/bgen/releases/latest
 
-.. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master&style=flat-square
+.. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master&style=flat
     :target: https://travis-ci.org/limix/bgen
 
 .. |Win-Build-Status| image:: https://ci.appveyor.com/api/projects/status/kb4b4rcsm4t60bg5/branch/master?svg=true
@@ -86,5 +86,5 @@ This project is licensed under the MIT License - see the license file
 .. |Codacy-Grade| image:: https://api.codacy.com/project/badge/Grade/689b555393364226863c3a237f801650
     :target: https://www.codacy.com/app/danilo.horta/bgen?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=limix/bgen&amp;utm_campaign=Badge_Grade
 
-.. |Doc-Status| image:: https://readthedocs.org/projects/bgen/badge/?style=flat-square&version=stable
+.. |Doc-Status| image:: https://readthedocs.org/projects/bgen/badge/?style=flat&version=stable
     :target: https://bgen.readthedocs.io/
