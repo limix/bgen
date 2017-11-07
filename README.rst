@@ -4,32 +4,28 @@ bgen
 
 |Build-Status| |Win-Build-Status| |Codacy-Grade| |Doc-Status|
 
-A `BGEN file format`_ reader.
+A BGEN file format <http://www.well.ox.ac.uk/~gav/bgen_format/> reader.
 
 It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3.
 
 Requirements
 ------------
 
-It makes use of the Zstandard_ library.
+It makes use of the Zstandard library <http://facebook.github.io/zstd/>.
 You don't need to install it by yourself if you choose to install bgen
-via conda_ but you do need it installed before-hand if you choose to build bgen
-library by yourself.
+via ``conda`` <http://conda.pydata.org/docs/index.html> but you do need it
+installed before-hand if you choose to build bgen library by yourself.
 
 Install
 -------
 
-You can install it via conda_
-
-.. code:: bash
+You can install it via ``conda``
 
     conda install -c conda-forge bgen
 
 A second installation option would be to download the latest source and to
 build it by yourself.
 On Linux or macOS systems it can be as simple as
-
-.. code:: bash
 
     bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
 
@@ -39,19 +35,16 @@ any hint.
 If you do have those libraries installed but ``cmake`` did not manage to find
 them, you can specify their location to ``cmake`` as
 
-.. code:: bash
-
     cmake .. -DZLIB_ROOT="/path/to/zlib/dir" \
              -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir" \
              -DZSTD_INCLUDEDIR="/path/to/zstd/header/dir"
 
-On Windows systems you might want to have a look at the nmake_ command
-as a replacement for ``make``.
+On Windows systems you might want to have a look at the nmake
+<https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx> command as a
+replacement for ``make``.
 Assuming you are at folder ``C:\projects\bgen`` and that you have installed
 zlib and Zstandard libraries into ``C:\projects\bgen\deps``, you might want
 to try
-
-.. code:: dos
 
     mkdir build
     cd build
@@ -67,18 +60,19 @@ to try
 Documentation
 -------------
 
-Refer to documentation_ for usage and API description.
+Refer to documentation <https://bgen.readthedocs.io/> for usage and API
+description.
 
 Authors
 -------
 
-* `Danilo Horta`_
+* `Danilo Horta` <https://github.com/horta>
 
 License
 -------
 
-This project is licensed under the MIT License - see the `license file`_ for
-details.
+This project is licensed under the MIT License - see the license file
+<https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt> for details.
 
 
 .. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master
@@ -92,17 +86,3 @@ details.
 
 .. |Doc-Status| image:: https://readthedocs.org/projects/bgen/badge/?style=flat-square&version=stable
     :target: https://bgen.readthedocs.io/
-
-.. _conda: http://conda.pydata.org/docs/index.html
-
-.. _license file: https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt
-
-.. _Danilo Horta: https://github.com/horta
-
-.. _documentation: http://bgen.readthedocs.io/
-
-.. _BGEN file format: http://www.well.ox.ac.uk/~gav/bgen_format/
-
-.. _nmake: https://msdn.microsoft.com/en-us/library/dd9y37ha.aspx
-
-.. _Zstandard: http://facebook.github.io/zstd/

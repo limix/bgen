@@ -34,11 +34,6 @@ endif()
 
 
 find_package( ZSTD REQUIRED )
-if(NOT ZSTD_FOUND)
-    message(STATUS "Could not find zstd library. If you have it installed,
-                    please, define ZSTD_LIBRARYDIR and ZSTD_INCLUDEDIR
-                    appropriately to fix it.")
-endif()
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
