@@ -19,13 +19,13 @@ installed before-hand if you choose to build bgen library by yourself.
 Install
 -------
 
-You can install it via ``conda``
+You can install it via ``conda``::
 
     conda install -c conda-forge bgen
 
 A second installation option would be to download the latest source and to
 build it by yourself.
-On Linux or macOS systems it can be as simple as
+On Linux or macOS systems it can be as simple as::
 
     bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
 
@@ -33,7 +33,7 @@ assuming that you have both zlib (often the case) and Zstandard (usually not
 the case) libraries installed and that ``cmake`` managed to find them without
 any hint.
 If you do have those libraries installed but ``cmake`` did not manage to find
-them, you can specify their location to ``cmake`` as
+them, you can specify their location to ``cmake`` as::
 
     cmake .. -DZLIB_ROOT="/path/to/zlib/dir" \
              -DZSTD_LIBRARYDIR="/path/to/zstd/lib/dir" \
@@ -44,7 +44,7 @@ On Windows systems you might want to have a look at the nmake
 replacement for ``make``.
 Assuming you are at folder ``C:\projects\bgen`` and that you have installed
 zlib and Zstandard libraries into ``C:\projects\bgen\deps``, you might want
-to try
+to try::
 
     mkdir build
     cd build
