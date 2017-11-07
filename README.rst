@@ -77,7 +77,7 @@ This project is licensed under the MIT License - see the license file
 .. |Release| image:: http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat-square
     :target: https://github.com/limix/bgen/releases/latest
 
-.. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master
+.. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master&style=flat-square
     :target: https://travis-ci.org/limix/bgen
 
 .. |Win-Build-Status| image:: https://ci.appveyor.com/api/projects/status/kb4b4rcsm4t60bg5/branch/master?svg=true
