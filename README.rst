@@ -2,7 +2,7 @@
 bgen
 ====
 
-|Build-Status| |Win-Build-Status| |Codacy-Grade| |Doc-Status|
+|Release| |Build-Status| |Win-Build-Status| |Codacy-Grade| |Doc-Status|
 
 A BGEN file format <http://www.well.ox.ac.uk/~gav/bgen_format/> reader.
 
@@ -74,6 +74,8 @@ License
 This project is licensed under the MIT License - see the license file
 <https://raw.githubusercontent.com/limix/bgen/master/LICENSE.txt> for details.
 
+.. |Release| image:: http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat-square
+    :target: https://github.com/limix/bgen/releases/latest
 
 .. |Build-Status| image:: https://travis-ci.org/limix/bgen.svg?branch=master
     :target: https://travis-ci.org/limix/bgen
