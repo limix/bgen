@@ -7,7 +7,7 @@
 #include "variant_indexing.h"
 
 #include "bgen.h"
-#include "util/file.h"
+#include "file.h"
 #include "util/bits.h"
 #include "util/zlib_wrapper.h"
 #include "util/zstd_wrapper.h"

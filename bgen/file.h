@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "../types.h"
+#include "types.h"
 
 static inline inti bgen_read(FILE          *file,
                              void          *buffer,

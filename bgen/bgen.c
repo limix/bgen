@@ -9,12 +9,11 @@
 #include "layout1.h"
 #include "layout2.h"
 #include "util/mem.h"
-#include "util/file.h"
+#include "file.h"
 #include "variant_genotype.h"
 #include "variant_indexing.h"
-
-#define FAIL EXIT_FAILURE
-#define SUCCESS EXIT_SUCCESS
+#include "string.h"
+#include "code.h"
 
 inti bgen_read_header(BGenFile *bgen)
 {
@@ -148,11 +147,7 @@ string* bgen_read_samples(BGenFile *bgen)
 
     for (i = 0; i < bgen->nsamples; ++i)
     {
-        if (bgen_read(bgen->file, &len, 2)) goto err;
-
-        string_alloc(sample_ids + i, len);
-
-        if (bgen_read(bgen->file, sample_ids[i].str, len)) goto err;
+        if (bgen_fread_string2(bgen->file, sample_ids + i) == FAIL) goto err;
     }
 
     bgen->variants_start = ftell(bgen->file);
@@ -191,31 +186,19 @@ void bgen_free_samples(const BGenFile *bgen, string *samples)
 inti bgen_read_variant(BGenFile *bgen, Variant *v)
 {
     inti i;
-    uint32_t nsamples, position, allele_len;
-    uint16_t id_len, rsid_len, chrom_len, nalleles;
+    uint32_t nsamples, position;
+    uint16_t nalleles;
 
     if (bgen->layout == 1)
     {
         if (bgen_read(bgen->file, &nsamples, 4) == FAIL) return FAIL;
     }
 
-    if (bgen_read(bgen->file, &id_len, 2) == FAIL) return FAIL;
+    if (bgen_fread_string2(bgen->file, &v->id) == FAIL) return FAIL;
 
-    string_alloc(&(v->id), id_len);
+    if (bgen_fread_string2(bgen->file, &v->rsid) == FAIL) return FAIL;
 
-    if (bgen_read(bgen->file, v->id.str, v->id.len) == FAIL) return FAIL;
-
-    if (bgen_read(bgen->file, &rsid_len, 2) == FAIL) return FAIL;
-
-    string_alloc(&(v->rsid), rsid_len);
-
-    if (bgen_read(bgen->file, v->rsid.str, v->rsid.len) == FAIL) return FAIL;
-
-    if (bgen_read(bgen->file, &chrom_len, 2) == FAIL) return FAIL;
-
-    string_alloc(&(v->chrom), chrom_len);
-
-    if (bgen_read(bgen->file, v->chrom.str, v->chrom.len) == FAIL) return FAIL;
+    if (bgen_fread_string2(bgen->file, &v->chrom) == FAIL) return FAIL;
 
     if (bgen_read(bgen->file, &position, 4) == FAIL) return FAIL;
 
@@ -230,11 +213,7 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v)
 
     for (i = 0; i < v->nalleles; ++i)
     {
-        if (bgen_read(bgen->file, &allele_len, 4) == FAIL) return FAIL;
-
-        string_alloc(v->allele_ids + i, allele_len);
-
-        if (bgen_read(bgen->file, v->allele_ids[i].str, allele_len) == FAIL) return FAIL;
+        if (bgen_fread_string4(bgen->file, v->allele_ids + i) == FAIL) return FAIL;
     }
 
     return SUCCESS;

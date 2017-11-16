@@ -22,10 +22,5 @@ typedef struct string {
     byte *str;
 } string;
 
-static inline void string_alloc(string *v, inti len)
-{
-    v->len = len;
-    v->str = malloc(len);
-}
 
 #endif /* end of include guard: TYPES_H */
