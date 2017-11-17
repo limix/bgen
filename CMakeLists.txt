@@ -38,13 +38,35 @@ find_package( ZSTD REQUIRED )
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
 include_directories( include/ )
-include_directories(.)
+include_directories( src/ )
 
-add_subdirectory(bgen)
+add_subdirectory(src)
 
-add_library(bgen SHARED bgen/bgen.c bgen/layout1.c bgen/layout2.c bgen/string.c bgen/util/choose.c bgen/util/mem.c)
+add_library(bgen SHARED
+    src/util/mem.c
+    src/util/string.c
+    src/util/choose.c
+    src/util/file.c
+    src/variants_index.c
+    src/layout/two.c
+    src/layout/one.c
+    src/tpl/tpl.c
+    src/zip/zstd_wrapper.c
+    src/zip/zlib_wrapper.c
+    src/bgen.c)
 
-add_library(bgen_static STATIC bgen/bgen.c bgen/layout1.c bgen/layout2.c bgen/string.c bgen/util/choose.c bgen/util/mem.c)
+add_library(bgen_static STATIC
+    src/util/mem.c
+    src/util/string.c
+    src/util/choose.c
+    src/util/file.c
+    src/variants_index.c
+    src/layout/two.c
+    src/layout/one.c
+    src/tpl/tpl.c
+    src/zip/zstd_wrapper.c
+    src/zip/zlib_wrapper.c
+    src/bgen.c)
 
 set_target_properties(bgen
   PROPERTIES
@@ -68,3 +90,4 @@ add_subdirectory(test)
 
 enable_testing()
 add_test(test_bgen test/test_bgen)
+add_test(test_store test/test_store)
