@@ -4,13 +4,12 @@
 #include <stdio.h>
 #include <string.h>
 
-const byte example_1bits[] = "test/data/example.1bits.bgen";
-const byte example_32bits[] = "test/data/example.32bits.bgen";
-const byte example_v11[] = "test/data/example.v11.bgen";
-
-const byte eg1bits_idx[] = "test/data/example.1bits.bgen.index";
-const byte eg32bits_idx[] = "test/data/example.32bits.bgen.index";
-const byte egv11_idx[] = "test/data/example.v11.bgen.index";
+const byte *examples[] = {"test/data/example.1bits.bgen",
+                          "test/data/example.32bits.bgen",
+                          "test/data/example.v11.bgen"};
+const byte *indices[] = {"test/data/example.1bits.bgen.index",
+                         "test/data/example.32bits.bgen.index",
+                         "test/data/example.v11.bgen.index"};
 
 int test_read_data(BGenFile *bgen, string *samples, Variant *variants) {
     inti e;
@@ -47,7 +46,8 @@ int test_read_data(BGenFile *bgen, string *samples, Variant *variants) {
     return SUCCESS;
 }
 
-int test_read(const byte *filepath, const byte *index_filepath, VariantIndexing **index) {
+int test_read(const byte *filepath, const byte *index_filepath,
+              VariantIndexing **index) {
     BGenFile *bgen;
     Variant *variants;
     string *samples;
@@ -142,44 +142,20 @@ int test_probabilities(VariantIndexing *index, inti nsamples) {
 
 int main() {
     VariantIndexing *index;
-    inti nsamples;
+    inti nsamples, i;
     nsamples = 500;
 
-    if (test_read((byte *)example_1bits, NULL, &index) == FAIL)
-        return FAIL;
+    for (i = 0; i < 3; ++i) {
+        if (test_read(examples[i], NULL, &index) == FAIL)
+            return FAIL;
 
-    bgen_free_indexing(index);
+        bgen_free_indexing(index);
 
-    if (test_read((byte *)example_32bits, NULL, &index) == FAIL)
-        return FAIL;
+        if (test_read(examples[i], indices[i], &index) == FAIL)
+            return FAIL;
 
-    if (test_probabilities(index, nsamples) == FAIL)
-        return FAIL;
-
-    bgen_free_indexing(index);
-
-    if (test_read((byte *)example_v11, NULL, &index) == FAIL)
-        return FAIL;
-
-    if (test_probabilities(index, nsamples) == FAIL)
-        return FAIL;
-
-    bgen_free_indexing(index);
-
-    if (test_read((byte *)example_1bits, eg1bits_idx, &index) == FAIL)
-        return FAIL;
-
-    bgen_free_indexing(index);
-
-    if (test_read((byte *)example_1bits, eg32bits_idx, &index) == FAIL)
-        return FAIL;
-
-    bgen_free_indexing(index);
-
-    if (test_read((byte *)example_1bits, egv11_idx, &index) == FAIL)
-        return FAIL;
-
-    bgen_free_indexing(index);
+        bgen_free_indexing(index);
+    }
 
     return SUCCESS;
 }
