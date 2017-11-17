@@ -7,26 +7,15 @@
 const byte example_1bits[] = "test/data/example.1bits.bgen";
 const byte example_32bits[] = "test/data/example.32bits.bgen";
 const byte example_v11[] = "test/data/example.v11.bgen";
-const byte varidx_fp[] = "test/data/variants.index";
 
-int test_filepath(const byte *filepath, VariantIndexing **index) {
-    BGenFile *bgen;
-    Variant *variants;
-    string *samples;
+int test_read_data(BGenFile *bgen, string *samples, Variant *variants) {
     inti e;
-
-    bgen = bgen_open(filepath);
-
-    if (bgen == NULL)
-        return FAIL;
 
     if (bgen_nsamples(bgen) != 500)
         return FAIL;
 
     if (bgen_nvariants(bgen) != 199)
         return FAIL;
-
-    samples = bgen_read_samples(bgen);
 
     if (samples != NULL) {
         e = strncmp("sample_001", (char *)samples[0].str, samples[0].len);
@@ -40,8 +29,6 @@ int test_filepath(const byte *filepath, VariantIndexing **index) {
             return FAIL;
     }
 
-    variants = bgen_read_variants(bgen, index);
-
     e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
 
     if (e != 0)
@@ -53,12 +40,31 @@ int test_filepath(const byte *filepath, VariantIndexing **index) {
     if (e != 0)
         return FAIL;
 
+    return SUCCESS;
+}
+
+int test_read(const byte *filepath, VariantIndexing **index) {
+    BGenFile *bgen;
+    Variant *variants;
+    string *samples;
+
+    bgen = bgen_open(filepath);
+
+    if (bgen == NULL)
+        return FAIL;
+
+    samples = bgen_read_samples(bgen);
+    variants = bgen_read_variants(bgen, index);
+
+    if (test_read_data(bgen, samples, variants) == FAIL)
+        return FAIL;
+
     bgen_free_samples(bgen, samples);
     bgen_free_variants(bgen, variants);
 
     bgen_close(bgen);
 
-    return EXIT_SUCCESS;
+    return SUCCESS;
 }
 
 int test_probabilities(VariantIndexing *index, inti nsamples) {
@@ -132,12 +138,12 @@ int main() {
     inti nsamples;
     nsamples = 500;
 
-    if (test_filepath((byte *)example_1bits, &index) == FAIL)
+    if (test_read((byte *)example_1bits, &index) == FAIL)
         return FAIL;
 
     bgen_free_indexing(index);
 
-    if (test_filepath((byte *)example_32bits, &index) == FAIL)
+    if (test_read((byte *)example_32bits, &index) == FAIL)
         return FAIL;
 
     if (test_probabilities(index, nsamples) == FAIL)
@@ -145,7 +151,7 @@ int main() {
 
     bgen_free_indexing(index);
 
-    if (test_filepath((byte *)example_v11, &index) == FAIL)
+    if (test_read((byte *)example_v11, &index) == FAIL)
         return FAIL;
 
     if (test_probabilities(index, nsamples) == FAIL)
@@ -153,5 +159,5 @@ int main() {
 
     bgen_free_indexing(index);
 
-    return EXIT_SUCCESS;
+    return SUCCESS;
 }

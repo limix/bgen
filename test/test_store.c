@@ -4,8 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 
+const byte eg1bits[] = "test/data/example.1bits.bgen";
 const byte eg32bits[] = "test/data/example.32bits.bgen";
+const byte egv11[] = "test/data/example.v11.bgen";
+
+const byte eg1bits_idx[] = "test/data/example.1bits.bgen.index";
 const byte eg32bits_idx[] = "test/data/example.32bits.bgen.index";
+const byte egv11_idx[] = "test/data/example.v11.bgen.index";
 
 int test_store(const byte *fp0, const byte *fp1) {
     BGenFile *bgen;
@@ -53,6 +58,18 @@ int test_load(const byte *fp0, const byte *fp1) {
 }
 
 int main() {
+    if (test_store(egv11, egv11_idx) == FAIL)
+        return FAIL;
+
+    if (test_load(egv11, egv11_idx) == FAIL)
+        return FAIL;
+
+    if (test_store(eg1bits, eg1bits_idx) == FAIL)
+        return FAIL;
+
+    if (test_load(eg1bits, eg1bits_idx) == FAIL)
+        return FAIL;
+
     if (test_store(eg32bits, eg32bits_idx) == FAIL)
         return FAIL;
 
