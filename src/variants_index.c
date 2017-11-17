@@ -159,7 +159,7 @@ Variant *bgen_load_variants(const BGenFile *bgen, const byte *fp,
     i = 0;
     while (tpl_unpack(tn, 1) > 0) {
         // printf("Index[%lld]\n", i);
-        vars[i].allele_ids = malloc(vars[i].nalleles);
+        vars[i].allele_ids = malloc(vars[i].nalleles * sizeof(string));
         j = 0;
         while (tpl_unpack(tn, 2) > 0) {
             str_get_tplstr(vars[i].allele_ids + j, &allele_id);
@@ -201,6 +201,7 @@ inti dump_variants(inti nvariants, Variant *vars, FILE *file) {
     mem_size_64bits = mem_size;
     fwrite(&mem_size_64bits, 1, 8, file);
     fwrite(mem, 1, mem_size_64bits, file);
+    free(mem);
     tpl_free(tn);
 
     return SUCCESS;
@@ -228,6 +229,7 @@ inti dump_alleles(inti nvariants, Variant *vars, FILE *file) {
     mem_size_64bits = mem_size;
     fwrite(&mem_size_64bits, 1, 8, file);
     fwrite(mem, 1, mem_size_64bits, file);
+    free(mem);
     tpl_free(tn);
 
     return SUCCESS;
