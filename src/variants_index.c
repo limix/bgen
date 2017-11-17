@@ -130,6 +130,7 @@ Variant *bgen_load_variants(const BGenFile *bgen, const byte *fp,
         ++i;
     }
 
+    free(mem);
     tpl_free(tn);
 
     if (fread(&mem_size_64bits, 1, 8, file) != 8) {
@@ -171,6 +172,7 @@ Variant *bgen_load_variants(const BGenFile *bgen, const byte *fp,
     }
 
     tpl_free(tn);
+    free(mem);
     fclose(file);
 
     return vars;
