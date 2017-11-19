@@ -4,19 +4,18 @@
 
 #include "layout/one.h"
 #include "variant_genotype.h"
-#include "variant_indexing.h"
+#include "variants_index.h"
 
 #include "bgen/bgen.h"
 #include "util/bits.h"
 
-#include "util/file.h"
 #include "util/choose.h"
+#include "util/file.h"
 #include "util/mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
 
-void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
-                                         real *probabilities) {
+void bgen_read_unphased_one(struct BGenVG *vg, real *probabilities) {
     uint16_t ui_prob;
     inti ui_prob_sum;
 
@@ -42,13 +41,11 @@ void bgen_read_unphased_genotype_layout1(VariantGenotype *vg,
     }
 }
 
-void bgen_read_variant_genotype_probabilities_layout1(VariantIndexing *indexing,
-                                                      VariantGenotype *vg,
-                                                      real *probabilities) {
-    bgen_read_unphased_genotype_layout1(vg, probabilities);
+void bgen_read_probs_one(struct BGenVG *vg, real *p) {
+    bgen_read_unphased_one(vg, p);
 }
 
-byte *bgen_uncompress_layout1(VariantIndexing *indexing, FILE *file) {
+byte *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
     inti clength = 0, ulength = 0;
     byte *cchunk;
     byte *uchunk;
@@ -63,42 +60,41 @@ byte *bgen_uncompress_layout1(VariantIndexing *indexing, FILE *file) {
         return NULL;
     }
 
-    if (indexing->compression != 1) {
+    if (index->compression != 1) {
         free(cchunk);
         fprintf(stderr, "Compression flag should be 1; not %lld.\n",
-                indexing->compression);
+                index->compression);
         return NULL;
     }
 
     ulength = 10 * clength;
     uchunk = malloc(ulength);
 
-    bgen_zlib_uncompress_chunked(cchunk, clength, &uchunk, &ulength);
+    bgen_unzlib_chunked(cchunk, clength, &uchunk, &ulength);
 
     free(cchunk);
 
     return uchunk;
 }
 
-inti bgen_read_variant_genotype_header_layout1(VariantIndexing *indexing,
-                                               VariantGenotype *vg,
-                                               FILE *file) {
+inti bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
+                                FILE *file) {
     byte *c;
     byte *chunk;
 
-    if (indexing->compression > 0) {
-        chunk = bgen_uncompress_layout1(indexing, file);
+    if (index->compression > 0) {
+        chunk = bgen_uncompress_layout1(index, file);
         c = chunk;
     } else {
-        chunk = malloc(6 * indexing->nsamples);
+        chunk = malloc(6 * index->nsamples);
 
-        if (bgen_read(file, chunk, 6 * indexing->nsamples) == FAIL)
+        if (bgen_read(file, chunk, 6 * index->nsamples) == FAIL)
             return FAIL;
 
         c = chunk;
     }
 
-    vg->nsamples = indexing->nsamples;
+    vg->nsamples = index->nsamples;
     vg->nalleles = 2;
     vg->ncombs = 3;
     vg->ploidy = 2;

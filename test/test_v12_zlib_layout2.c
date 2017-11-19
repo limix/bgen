@@ -1,82 +1,64 @@
-#include "bgen/bgen.h"
+#include "example_files.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
 
-int test_read_data(BGenFile *bgen, string *samples, BGVar *variants) {
-    inti e;
-
+int test_read_data(struct BGenFile *bgen, string *s, struct BGVar *v) {
     if (bgen_nsamples(bgen) != 500)
         return FAIL;
 
     if (bgen_nvariants(bgen) != 199)
         return FAIL;
 
-    if (samples != NULL) {
-        e = strncmp("sample_001", (char *)samples[0].str, samples[0].len);
-
-        if (e != 0)
-            return FAIL;
-
-        e = strncmp("sample_500", (char *)samples[499].str, samples[0].len);
-
-        if (e != 0)
-            return FAIL;
-    }
-
-    e = strncmp("SNPID_2", (char *)variants[0].id.str, variants[0].id.len);
-
-    if (e != 0)
+    if (strncmp("sample_001", s[0].str, s[0].len) != 0)
         return FAIL;
 
-    e = strncmp("SNPID_200", (char *)variants[198].id.str,
-                variants[198].id.len);
+    if (strncmp("sample_500", s[499].str, s[0].len) != 0)
+        return FAIL;
 
-    if (e != 0)
+    if (strncmp("SNPID_2", v[0].id.str, v[0].id.len) != 0)
+        return FAIL;
+
+    if (strncmp("SNPID_200", v[198].id.str, v[198].id.len) != 0)
         return FAIL;
 
     return SUCCESS;
 }
 
-int test_read(const byte *filepath, const byte *index_filepath,
-              struct BGenVI **index) {
-    BGenFile *bgen;
-    BGVar *variants;
-    string *samples;
+int test_read(const byte *fp0, const byte *fp1, struct BGenVI **index) {
+    struct BGenFile *bgen;
+    struct BGVar *v;
+    string *s;
 
-    bgen = bgen_open(filepath);
+    bgen = bgen_open(fp0);
 
     if (bgen == NULL)
         return FAIL;
 
-    samples = bgen_read_samples(bgen);
-    if (index_filepath)
-    {
-        printf("Loading variants...\n");
-        variants = bgen_load_variants(bgen, index_filepath, index);
-    } else {
-        printf("Reading variants...\n");
-        variants = bgen_read_variants(bgen, index);
-    }
+    s = bgen_read_samples(bgen);
+    if (fp1)
+        v = bgen_load_variants(bgen, fp1, index);
+    else
+        v = bgen_read_variants(bgen, index);
 
-    if (test_read_data(bgen, samples, variants) == FAIL)
+    if (test_read_data(bgen, s, v) == FAIL)
         return FAIL;
 
-    bgen_free_samples(bgen, samples);
-    bgen_free_variants(bgen, variants);
+    bgen_free_samples(bgen, s);
+    bgen_free_variants(bgen, v);
 
     bgen_close(bgen);
 
     return SUCCESS;
 }
 
-int test_probabilities(struct BGenVI *index, inti nsamples) {
-    BGenVG *vg;
+int test_probabilities(struct BGenVI *index, inti nsamples, inti prec) {
+    struct BGenVG *vg;
     FILE *f;
     double prob[3];
-    double eps = 1e-4;
+    double eps = (double) (1 << prec);
     inti ncombs;
     inti i, j;
     real *probabilities;
@@ -140,25 +122,26 @@ int test_probabilities(struct BGenVI *index, inti nsamples) {
 
 int main() {
     struct BGenVI *index;
-    inti nsamples, i;
-    byte *examples[] = {"test/data/example.v11.bgen"};
-    byte *indices[] = {"test/data/example.v11.bgen.index"};
+    inti i, prec;
+    const byte *ex, *ix;
 
-    nsamples = 500;
+    for (i = 0; i < get_nexamples(); ++i) {
+        ex = get_example(i);
+        ix = get_example_index(i);
+        prec = get_example_precision(i);
 
-    for (i = 0; i < 1; ++i) {
-        if (test_read(examples[i], NULL, &index) == FAIL)
+        if (test_read(ex, NULL, &index) == FAIL)
             return FAIL;
 
-        if (test_probabilities(index, nsamples) == FAIL)
+        if (test_probabilities(index, 500, prec) == FAIL)
             return FAIL;
 
         bgen_free_index(index);
 
-        if (test_read(examples[i], indices[i], &index) == FAIL)
+        if (test_read(ex, ix, &index) == FAIL)
             return FAIL;
 
-        if (test_probabilities(index, nsamples) == FAIL)
+        if (test_probabilities(index, 500, prec) == FAIL)
             return FAIL;
 
         bgen_free_index(index);

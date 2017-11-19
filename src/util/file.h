@@ -5,11 +5,9 @@
 #include <stdlib.h>
 
 #include "bgen/bgen.h"
+#include "variant_genotype.h"
 
-typedef struct VariantGenotype VariantGenotype;
-typedef struct VariantIndexing VariantIndexing;
-
-typedef struct BGenFile {
+struct BGenFile {
     byte *filepath;
     FILE *file;
     inti nvariants;
@@ -19,7 +17,7 @@ typedef struct BGenFile {
     inti sample_ids_presence;
     inti samples_start;
     inti variants_start;
-} BGenFile;
+};
 
 inti bgen_read(FILE *file, void *buffer, inti size);
 

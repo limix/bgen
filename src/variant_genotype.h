@@ -3,9 +3,7 @@
 
 #include "bgen/number.h"
 
-typedef struct VariantGenotype VariantGenotype;
-
-struct VariantGenotype {
+struct BGenVG {
     inti nsamples;
     inti nalleles;
     inti nbits;
@@ -15,6 +13,6 @@ struct VariantGenotype {
     byte *chunk;
     byte *current_chunk;
     inti variant_idx;
-};
+} BGenVG;
 
 #endif /* end of include guard: BGEN_VARIANT_GENOTYPE_H */

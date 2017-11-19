@@ -1,21 +1,14 @@
-#include "bgen/bgen.h"
+#include "example_files.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
-const byte eg1bits[] = "test/data/example.1bits.bgen";
-const byte eg32bits[] = "test/data/example.32bits.bgen";
-const byte egv11[] = "test/data/example.v11.bgen";
-
-const byte eg1bits_idx[] = "test/data/example.1bits.bgen.index";
-const byte eg32bits_idx[] = "test/data/example.32bits.bgen.index";
-const byte egv11_idx[] = "test/data/example.v11.bgen.index";
 
 int test_store(const byte *fp0, const byte *fp1) {
-    BGenFile *bgen;
-    Variant *variants;
-    VariantIndexing *index;
+    struct BGenFile *bgen;
+    struct BGVar *variants;
+    struct BGenVI *index;
 
     bgen = bgen_open(fp0);
     if (bgen == NULL)
@@ -25,11 +18,11 @@ int test_store(const byte *fp0, const byte *fp1) {
     if (variants == NULL)
         return FAIL;
 
-    if (bgen_store_variants(bgen, variants, fp1) == FAIL)
+    if (bgen_store_variants(bgen, variants, index, fp1) == FAIL)
         return FAIL;
 
     bgen_free_variants(bgen, variants);
-    bgen_free_indexing(index);
+    bgen_free_index(index);
 
     bgen_close(bgen);
 
@@ -37,20 +30,20 @@ int test_store(const byte *fp0, const byte *fp1) {
 }
 
 int test_load(const byte *fp0, const byte *fp1) {
-    BGenFile *bgen;
-    Variant *variants;
-    VariantIndexing *index;
+    struct BGenFile *bgen;
+    struct BGVar *variants;
+    struct BGenVI *index;
 
     bgen = bgen_open(fp0);
     if (bgen == NULL)
         return FAIL;
 
-    variants = bgen_load_variants(bgen, eg32bits_idx, &index);
+    variants = bgen_load_variants(bgen, fp1, &index);
     if (variants == NULL)
         return FAIL;
 
     bgen_free_variants(bgen, variants);
-    bgen_free_indexing(index);
+    bgen_free_index(index);
 
     bgen_close(bgen);
 
@@ -58,23 +51,22 @@ int test_load(const byte *fp0, const byte *fp1) {
 }
 
 int main() {
-    if (test_store(egv11, egv11_idx) == FAIL)
-        return FAIL;
+    inti nexamples, prec, i;
+    const byte *ex, *ix;
 
-    if (test_load(egv11, egv11_idx) == FAIL)
-        return FAIL;
+    nexamples = get_nexamples();
 
-    if (test_store(eg1bits, eg1bits_idx) == FAIL)
-        return FAIL;
+    for (i = 0; i < nexamples; ++i) {
+        ex = get_example(i);
+        ix = get_example_index(i);
+        prec = get_example_precision(i);
 
-    if (test_load(eg1bits, eg1bits_idx) == FAIL)
-        return FAIL;
+        if (test_store(ex, ix) == FAIL)
+            return FAIL;
 
-    if (test_store(eg32bits, eg32bits_idx) == FAIL)
-        return FAIL;
-
-    if (test_load(eg32bits, eg32bits_idx) == FAIL)
-        return FAIL;
+        if (test_load(ex, ix) == FAIL)
+            return FAIL;
+    }
 
     return SUCCESS;
 }

@@ -28,8 +28,8 @@ int main()
     // Reading variant metadata (i.e., identifications, chromossomes, number of
     // alleles, etc.)
     // Notice that we also have a VariantIndexing in return, used afterwards.
-    VariantIndexing *index;
-    Variant *variants = bgen_read_variants(bgen, &index);
+    struct BGenVI *index;
+    BGVar *variants = bgen_read_variants(bgen, &index);
 
     printf("RSID of the first variant: %.*s\n",
            (int)variants[0].rsid.len,
@@ -48,7 +48,7 @@ int main()
     // For performance reasons, it is done in two steps:
 
     // Step 1.
-    VariantGenotype *vg = bgen_open_variant_genotype(index, 1);
+    BGenVG *vg = bgen_open_variant_genotype(index, 1);
 
     real *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(real));
 
@@ -77,7 +77,7 @@ int main()
 
     // Releases associated memory when we are done reading variant
     // genotypes.
-    bgen_free_indexing(index);
+    bgen_free_index(index);
 
     return 0;
 }

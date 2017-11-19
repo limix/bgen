@@ -7,7 +7,7 @@
 
 #include "bgen/string.h"
 
-inti bgen_zlib_uncompress(const byte *src, inti src_size, byte **dst,
+inti bgen_unzlib(const byte *src, inti src_size, byte **dst,
                           inti *dst_size) {
     int e;
     z_stream strm;
@@ -49,7 +49,7 @@ inti bgen_zlib_uncompress(const byte *src, inti src_size, byte **dst,
     return EXIT_SUCCESS;
 }
 
-inti bgen_zlib_uncompress_chunked(const byte *src, inti src_size, byte **dst,
+inti bgen_unzlib_chunked(const byte *src, inti src_size, byte **dst,
                                   inti *dst_size) {
     int ret;
     z_stream strm;

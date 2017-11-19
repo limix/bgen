@@ -7,6 +7,6 @@
 
 #include "bgen/number.h"
 
-inti bgen_zstd_uncompress(const byte *, inti, byte **, inti *);
+inti bgen_unzstd(const byte *, inti, byte **, inti *);
 
 #endif /* end of include guard: BGEN_ZSTD_WRAPPER_H */

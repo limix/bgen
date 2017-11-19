@@ -4,13 +4,13 @@
 
 #include "layout/two.h"
 #include "variant_genotype.h"
-#include "variant_indexing.h"
+#include "variants_index.h"
 
 #include "bgen/bgen.h"
 #include "util/bits.h"
 
-#include "util/file.h"
 #include "util/choose.h"
+#include "util/file.h"
 #include "util/mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
@@ -37,7 +37,7 @@ inline static int get_bit(const byte *mem, inti bit_idx) {
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-void bgen_read_unphased_genotype(VariantGenotype *vg, real *probabilities) {
+void bgen_read_unphased_genotype(struct BGenVG *vg, real *p) {
     inti ncombs, ploidy, uip_sum, ui_prob;
     inti sample_start, geno_start, bit_idx;
     real denom = (((inti)1 << vg->nbits)) - 1;
@@ -51,7 +51,7 @@ void bgen_read_unphased_genotype(VariantGenotype *vg, real *probabilities) {
 
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
             for (i = 0; i < ncombs; ++i) {
-                probabilities[j * ncombs + i] = NAN;
+                p[j * ncombs + i] = NAN;
             }
             continue;
         }
@@ -71,14 +71,14 @@ void bgen_read_unphased_genotype(VariantGenotype *vg, real *probabilities) {
                 }
             }
 
-            probabilities[j * ncombs + i] = ui_prob / denom;
+            p[j * ncombs + i] = ui_prob / denom;
             uip_sum += ui_prob;
         }
-        probabilities[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
+        p[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
     }
 }
 
-byte *bgen_uncompress_layout2(VariantIndexing *indexing, FILE *file) {
+byte *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
     inti clength = 0, ulength = 0;
     byte *cchunk;
     byte *uchunk;
@@ -100,14 +100,15 @@ byte *bgen_uncompress_layout2(VariantIndexing *indexing, FILE *file) {
 
     uchunk = malloc(ulength);
 
-    if (indexing->compression == 1) {
-        if (bgen_zlib_uncompress(cchunk, clength, &uchunk, &ulength) == FAIL)
+    if (idx->compression == 1) {
+        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength) == FAIL)
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
-    }
-
-    if (indexing->compression == 2) {
-        if (bgen_zstd_uncompress(cchunk, clength, &uchunk, &ulength) == FAIL)
+    } else if (idx->compression == 2) {
+        if (bgen_unzstd(cchunk, clength, &uchunk, &ulength) == FAIL)
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
+    } else {
+        fprintf(stderr, "Unrecognized compression method.");
+        return NULL;
     }
 
     free(cchunk);
@@ -115,9 +116,8 @@ byte *bgen_uncompress_layout2(VariantIndexing *indexing, FILE *file) {
     return uchunk;
 }
 
-inti bgen_read_variant_genotype_header_layout2(VariantIndexing *indexing,
-                                               VariantGenotype *vg,
-                                               FILE *file) {
+inti bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
+                                FILE *file) {
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t min_ploidy, max_ploidy, phased, nbits;
@@ -127,8 +127,9 @@ inti bgen_read_variant_genotype_header_layout2(VariantIndexing *indexing,
     byte *chunk;
     inti i;
 
-    if (indexing->compression > 0) {
-        chunk = bgen_uncompress_layout2(indexing, file);
+    if (idx->compression > 0) {
+        if ((chunk = bgen_uncompress_two(idx, file)) == NULL)
+            return FAIL;
         c = chunk;
         bgen_memcpy(&nsamples, &c, 4);
     } else {
@@ -171,8 +172,6 @@ inti bgen_read_variant_genotype_header_layout2(VariantIndexing *indexing,
     return EXIT_SUCCESS;
 }
 
-void bgen_read_variant_genotype_probabilities_layout2(VariantIndexing *indexing,
-                                                      VariantGenotype *vg,
-                                                      real *probabilities) {
-    bgen_read_unphased_genotype(vg, probabilities);
+void bgen_read_probs_two(struct BGenVG *vg, real *p) {
+    bgen_read_unphased_genotype(vg, p);
 }

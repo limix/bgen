@@ -13,12 +13,12 @@
 #include "util/file.h"
 #include "util/mem.h"
 #include "variant_genotype.h"
-#include "variant_indexing.h"
+#include "variants_index.h"
 
 inti bgen_fread_string2(FILE *file, string *s);
 inti bgen_fread_string4(FILE *file, string *s);
 
-inti bgen_read_header(BGenFile *bgen) {
+inti bgen_read_header(struct BGenFile *bgen) {
     uint32_t header_length;
     uint32_t nvariants;
     uint32_t nsamples;
@@ -51,16 +51,17 @@ inti bgen_read_header(BGenFile *bgen) {
     return SUCCESS;
 }
 
-BGenFile *bgen_open(const byte *filepath) {
+struct BGenFile *bgen_open(const byte *filepath) {
     uint32_t offset;
-    BGenFile *bgen = malloc(sizeof(BGenFile));
+    struct BGenFile *bgen = malloc(sizeof(struct BGenFile));
 
     bgen->filepath = bgen_strdup(filepath);
 
-    bgen->file = fopen((const char *)bgen->filepath, "rb");
+    bgen->file = fopen(bgen->filepath, "rb");
 
     if (bgen->file == NULL) {
-        fprintf(stderr, "Could not open: %s\n", bgen->filepath);
+        fprintf(stderr, "Could not open %s", bgen->filepath);
+        perror(NULL);
         goto err;
     }
 
@@ -81,13 +82,13 @@ BGenFile *bgen_open(const byte *filepath) {
         bgen->samples_start = ftell(bgen->file);
 
         if (bgen->samples_start == EOF) {
-            perror("Could not find sample blocks.");
+            perror("Could not find sample blocks");
             goto err;
         }
     }
 
     if (fclose(bgen->file)) {
-        perror("Could not close the file.");
+        perror("Could not close file");
         goto err;
     }
 
@@ -103,10 +104,11 @@ err:
 
     if (bgen != NULL)
         free(bgen);
+
     return NULL;
 }
 
-void bgen_close(BGenFile *bgen) {
+void bgen_close(struct BGenFile *bgen) {
     if (bgen->filepath)
         free(bgen->filepath);
 
@@ -114,16 +116,16 @@ void bgen_close(BGenFile *bgen) {
         free(bgen);
 }
 
-inti bgen_nsamples(BGenFile *bgen) { return bgen->nsamples; }
+inti bgen_nsamples(struct BGenFile *bgen) { return bgen->nsamples; }
 
-inti bgen_nvariants(BGenFile *bgen) { return bgen->nvariants; }
+inti bgen_nvariants(struct BGenFile *bgen) { return bgen->nvariants; }
 
-string *bgen_read_samples(BGenFile *bgen) {
+string *bgen_read_samples(struct BGenFile *bgen) {
     uint32_t length, nsamples;
     inti i;
     string *sample_ids;
 
-    bgen->file = fopen((const char *)bgen->filepath, "rb");
+    bgen->file = fopen(bgen->filepath, "rb");
 
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
@@ -166,7 +168,7 @@ err:
     return NULL;
 }
 
-void bgen_free_samples(const BGenFile *bgen, string *samples) {
+void bgen_free_samples(const struct BGenFile *bgen, string *samples) {
     inti i;
 
     if (bgen->sample_ids_presence == 0)
@@ -181,7 +183,7 @@ void bgen_free_samples(const BGenFile *bgen, string *samples) {
     free(samples);
 }
 
-inti bgen_read_variant(BGenFile *bgen, Variant *v) {
+inti bgen_read_variant(struct BGenFile *bgen, struct BGVar *v) {
     inti i;
     uint32_t nsamples, position;
     uint16_t nalleles;
@@ -222,27 +224,29 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v) {
     return SUCCESS;
 }
 
-Variant *bgen_read_variants(BGenFile *bgen, VariantIndexing **index) {
-    Variant *variants;
+struct BGVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index) {
+    struct BGVar *variants;
     uint32_t length;
     inti i, nvariants;
 
-    *index = malloc(sizeof(VariantIndexing));
+    bgen->file = fopen(bgen->filepath, "rb");
 
-    bgen->file = fopen((const char *)bgen->filepath, "rb");
+    if (bgen->file == NULL) {
+        fprintf(stderr, "Could not open %s", bgen->filepath);
+        perror(NULL);
+        return NULL;
+    }
 
-    fseek(bgen->file, bgen->variants_start, SEEK_SET);
+    if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
+        fprintf(stderr, "Could not jump to variants start");
+        perror(NULL);
+        goto err;
+    }
 
-    (*index)->filepath = bgen_strdup(bgen->filepath);
-    (*index)->compression = bgen->compression;
-    (*index)->layout = bgen->layout;
-    (*index)->nsamples = bgen->nsamples;
-    (*index)->nvariants = bgen->nvariants;
+    *index = bgen_new_index(bgen);
 
     nvariants = bgen->nvariants;
-
-    variants = malloc(nvariants * sizeof(Variant));
-    (*index)->start = malloc(nvariants * sizeof(inti));
+    variants = malloc(nvariants * sizeof(struct BGVar));
 
     for (i = 0; i < nvariants; ++i) {
         if (bgen_read_variant(bgen, variants + i) == FAIL)
@@ -252,7 +256,11 @@ Variant *bgen_read_variants(BGenFile *bgen, VariantIndexing **index) {
         if (bgen_read(bgen->file, &length, 4) == FAIL)
             goto err;
 
-        fseek(bgen->file, length, SEEK_CUR);
+        if (fseek(bgen->file, length, SEEK_CUR)) {
+            fprintf(stderr, "Could not jump to a variants");
+            perror(NULL);
+            goto err;
+        }
     }
 
     if (fclose(bgen->file)) {
@@ -278,7 +286,7 @@ err:
     return NULL;
 }
 
-void bgen_free_variants(const BGenFile *bgen, Variant *variants) {
+void bgen_free_variants(const struct BGenFile *bgen, struct BGVar *variants) {
     inti i, j;
 
     for (i = 0; i < bgen->nvariants; ++i) {
@@ -293,35 +301,41 @@ void bgen_free_variants(const BGenFile *bgen, Variant *variants) {
     free(variants);
 }
 
-void bgen_free_indexing(VariantIndexing *index) {
+void bgen_free_index(struct BGenVI *index) {
     free(index->filepath);
     free(index->start);
     free(index);
 }
 
-VariantGenotype *bgen_open_variant_genotype(VariantIndexing *index,
+struct BGenVG *bgen_open_variant_genotype(struct BGenVI *index,
                                             inti variant_idx) {
-    VariantGenotype *vg;
-    FILE *file = fopen((const char *)index->filepath, "rb");
+    struct BGenVG *vg;
+    FILE *file = fopen(index->filepath, "rb");
 
     if (file == NULL) {
-        fprintf(stderr, "Could not open: %s\n", index->filepath);
+        fprintf(stderr, "Could not open %s", index->filepath);
+        perror(NULL);
         return NULL;
     }
 
-    vg = malloc(sizeof(VariantGenotype));
+    vg = malloc(sizeof(struct BGenVG));
 
     vg->variant_idx = variant_idx;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
-    fseek(file, index->start[variant_idx], SEEK_SET);
+    if (fseek(file, index->start[variant_idx], SEEK_SET)) {
+        fprintf(stderr, "Could not seek a variant");
+        perror(NULL);
+        return NULL;
+    }
 
     if (index->layout == 1) {
-        printf("Reading layout 1\n");
-        bgen_read_variant_genotype_header_layout1(index, vg, file);
+        bgen_read_probs_header_one(index, vg, file);
+    } else if (index->layout == 2) {
+        bgen_read_probs_header_two(index, vg, file);
     } else {
-        printf("Reading layout 2\n");
-        bgen_read_variant_genotype_header_layout2(index, vg, file);
+        fprintf(stderr, "Unrecognized layout type.\n");
+        return NULL;
     }
 
     fclose(file);
@@ -329,23 +343,18 @@ VariantGenotype *bgen_open_variant_genotype(VariantIndexing *index,
     return vg;
 }
 
-void bgen_read_variant_genotype(VariantIndexing *index, VariantGenotype *vg,
+void bgen_read_variant_genotype(struct BGenVI *index, struct BGenVG *vg,
                                 real *probabilities) {
-    if (index->layout == 1)
-        bgen_read_variant_genotype_probabilities_layout1(index, vg,
-                                                         probabilities);
-    else
-        bgen_read_variant_genotype_probabilities_layout2(index, vg,
-                                                         probabilities);
+    if (index->layout == 1) {
+        bgen_read_probs_one(vg, probabilities);
+    } else if (index->layout == 2) {
+        bgen_read_probs_two(vg, probabilities);
+    } else {
+        fprintf(stderr, "Unrecognized layout type.\n");
+    }
 }
 
-inti bgen_nalleles(VariantGenotype *vg) { return vg->nalleles; }
-
-inti bgen_ploidy(VariantGenotype *vg) { return vg->ploidy; }
-
-inti bgen_ncombs(VariantGenotype *vg) { return vg->ncombs; }
-
-void bgen_close_variant_genotype(VariantIndexing *index, VariantGenotype *vg) {
+void bgen_close_variant_genotype(struct BGenVI *index, struct BGenVG *vg) {
     if (vg->plo_miss != NULL)
         free(vg->plo_miss);
 
@@ -356,6 +365,12 @@ void bgen_close_variant_genotype(VariantIndexing *index, VariantGenotype *vg) {
         free(vg);
 }
 
-inti bgen_sample_ids_presence(BGenFile *bgen) {
+inti bgen_nalleles(struct BGenVG *vg) { return vg->nalleles; }
+
+inti bgen_ploidy(struct BGenVG *vg) { return vg->ploidy; }
+
+inti bgen_ncombs(struct BGenVG *vg) { return vg->ncombs; }
+
+inti bgen_sample_ids_presence(struct BGenFile *bgen) {
     return bgen->sample_ids_presence;
 }
