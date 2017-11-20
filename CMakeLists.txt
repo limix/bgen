@@ -34,39 +34,31 @@ endif()
 
 
 find_package( ZSTD REQUIRED )
+find_package( OMEM REQUIRED )
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
+include_directories( ${OMEM_INCLUDE_DIRS} )
 include_directories( include/ )
 include_directories( src/ )
 
 add_subdirectory(src)
 
-add_library(bgen SHARED
-    src/util/mem.c
-    src/util/string.c
-    src/util/choose.c
-    src/util/file.c
-    src/variants_index.c
-    src/layout/two.c
-    src/layout/one.c
-    src/tpl/tpl.c
-    src/zip/zstd_wrapper.c
-    src/zip/zlib_wrapper.c
-    src/bgen.c)
+set(CFILES "src/util/mem.c"
+    "src/util/string.c"
+    "src/util/choose.c"
+    "src/util/file.c"
+    "src/variants_index.c"
+    "src/layout/two.c"
+    "src/layout/one.c"
+    "src/tpl/tpl.c"
+    "src/zip/zstd_wrapper.c"
+    "src/zip/zlib_wrapper.c"
+    "src/bgen.c")
 
-add_library(bgen_static STATIC
-    src/util/mem.c
-    src/util/string.c
-    src/util/choose.c
-    src/util/file.c
-    src/variants_index.c
-    src/layout/two.c
-    src/layout/one.c
-    src/tpl/tpl.c
-    src/zip/zstd_wrapper.c
-    src/zip/zlib_wrapper.c
-    src/bgen.c)
+
+add_library(bgen SHARED "${CFILES}")
+add_library(bgen_static STATIC "${CFILES}")
 
 set_target_properties(bgen
   PROPERTIES
@@ -79,13 +71,13 @@ install(TARGETS bgen
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries( bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES} ${OMEM_LIBRARIES})
 
 install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES} ${OMEM_LIBRARIES})
 
 add_subdirectory(test)
 

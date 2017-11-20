@@ -3,6 +3,7 @@
 #include "tpl/tpl.h"
 #include "util/file.h"
 #include "util/mem.h"
+#include "omem/omem.h"
 #include "variants_index.h"
 
 typedef struct tpl_string {
@@ -66,27 +67,49 @@ inti dump_genotype_offset(inti nvariants, inti *genotype_offset, FILE *file);
 
 inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
                          struct BGenVI *index, const byte *fp) {
-    FILE *file;
+    FILE *file, *buffer;
+    void *base;
+    size_t size;
+    omem fm;
     unsigned char header[] = {178, 125, 13, 247};
 
+    omem_init(&fm);
+    printf("Ponto 0\n"); fflush(stdout);
+    buffer = omem_open(&fm, "wb");
+    printf("Ponto 1\n"); fflush(stdout);
+
+    //if (file == NULL) {
+    //    fprintf(stderr, "Could not open %s", fp);
+    //    perror(fp);
+    //    return FAIL;
+    //}
+
+    if (fwrite(header, 1, 4, buffer) != 4) {
+        //fprintf(stderr, "Could not write to %s", fp);
+        //perror(NULL);
+        printf("Ponto 2\n"); fflush(stdout);
+        return FAIL;
+    }
+
+    dump_variants(bgen->nvariants, vars, buffer);
+    printf("Ponto 3\n"); fflush(stdout);
+    dump_alleles(bgen->nvariants, vars, buffer);
+    printf("Ponto 4\n"); fflush(stdout);
+    dump_genotype_offset(bgen->nvariants, index->start, buffer);
+    printf("Ponto 5\n"); fflush(stdout);
+
+    fflush(buffer);
+    //size = ftell(buffer);
+    //fseek(buffer, 0, SEEK_SET);
+    omem_mem(&fm, &base, &size);
+
     file = fopen(fp, "wb");
-    if (file == NULL) {
-        fprintf(stderr, "Could not open %s", fp);
-        perror(fp);
-        return FAIL;
-    }
-
-    if (fwrite(header, 1, 4, file) != 4) {
-        fprintf(stderr, "Could not write to %s", fp);
-        perror(NULL);
-        return FAIL;
-    }
-
-    dump_variants(bgen->nvariants, vars, file);
-    dump_alleles(bgen->nvariants, vars, file);
-    dump_genotype_offset(bgen->nvariants, index->start, file);
-
+    fwrite(base, 1, size, file);
     fclose(file);
+
+    fclose(buffer);
+    omem_term(&fm);
+
     return SUCCESS;
 }
 
