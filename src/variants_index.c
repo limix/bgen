@@ -3,6 +3,7 @@
 #include "tpl/tpl.h"
 #include "util/file.h"
 #include "util/mem.h"
+#include "zip/zstd_wrapper.h"
 #include "omem/omem.h"
 #include "variants_index.h"
 
@@ -70,6 +71,7 @@ inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
     FILE *file, *buffer;
     void *base;
     size_t size;
+    inti dst_size;
     omem fm;
     unsigned char header[] = {178, 125, 13, 247};
 
@@ -103,8 +105,12 @@ inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
     //fseek(buffer, 0, SEEK_SET);
     omem_mem(&fm, &base, &size);
 
+    byte *zipped = bgen_zstd(base, size, &dst_size);
+    printf("From %lld to %lld\n", size, dst_size);
+
     file = fopen(fp, "wb");
-    fwrite(base, 1, size, file);
+    //fwrite(base, 1, size, file);
+    fwrite(zipped, 1, dst_size, file);
     fclose(file);
 
     fclose(buffer);
@@ -116,15 +122,17 @@ inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
 struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
                             struct BGenVI **vi) {
     inti i, j;
-    FILE *file;
+    FILE *file, *buffer;
     unsigned char header[4];
     tpl_node *tn;
     size_t mem_size;
-    byte *mem;
+    byte *mem, *undata;
+    omem fm;
     uint64_t mem_size_64bits;
     struct TPLVar tpl_variant;
     tpl_string allele_id;
     struct BGenVar *vars;
+    //omem_init(&fm);
 
     *vi = bgen_new_index(bgen);
     vars = malloc(bgen->nvariants * sizeof(struct BGenVar));
@@ -134,24 +142,53 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
         fprintf(stderr, "Could not open: %s\n", fp);
         return NULL;
     }
+    fseek(file, 0L, SEEK_END);
+    size_t file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    printf("File size %lld\n", file_size); fflush(stdout);
+    byte *zipped = malloc(file_size);
 
-    if (fread(header, 1, 4, file) != 4) {
-        fprintf(stderr, "Could not read file header.\n");
+    if (fread(zipped, 1, file_size, file) != file_size) {
+        fprintf(stderr, "Could not read file.\n");
         return NULL;
     }
+    fclose(file);
+    printf("Chegou 1\n"); fflush(stdout);
+    inti unsize = 13622;
+    undata = malloc(unsize);
+    inti code = bgen_unzstd(zipped, file_size, &undata, &unsize);
+    printf("Chegou 2: %lld\n", unsize); fflush(stdout);
+    //file = omem_open(&fm, "wb");
+    //printf("Chegou 3\n"); fflush(stdout);
+    //size_t written = fwrite(undata, 1, unsize, file);
+    //printf("Chegou 3.1: %lld\n", written); fflush(stdout);
+    //printf("Chegou 3.15: %lld\n", fflush(file)); fflush(stdout);
+    //printf("Chegou 3.2: %lld\n", fseek(file, 0, SEEK_SET)); fflush(stdout);
+    ////omem_mem(&fm, &undata, &unsize);
+    //printf("Chegou 4\n"); fflush(stdout);
 
-    if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-        fprintf(stderr, "Could not read the size of the variants block.\n");
-        return NULL;
-    }
+    //if (fread(header, 1, 4, file) != 4) {
+    //    fprintf(stderr, "Could not read file header.\n");
+    //    return NULL;
+    //}
+    byte *base = undata + 4;
+    mem_size_64bits = *((inti *) base);
+    base += 8;
+
+    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
+    //    fprintf(stderr, "Could not read the size of the variants block.\n");
+    //    return NULL;
+    //}
 
     mem_size = mem_size_64bits;
     mem = malloc(mem_size);
+    memcpy(mem, base, mem_size);
+    base += mem_size;
 
-    if (fread(mem, 1, mem_size, file) != mem_size) {
-        fprintf(stderr, "Could not read variants block.\n");
-        return NULL;
-    }
+    //if (fread(mem, 1, mem_size, file) != mem_size) {
+    //    fprintf(stderr, "Could not read variants block.\n");
+    //    return NULL;
+    //}
     tn = tpl_map("A(S($(vs)$(vs)$(vs)uv))", &tpl_variant);
 
     if (tn == NULL) {
@@ -179,18 +216,23 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
     free(mem);
     tpl_free(tn);
 
-    if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-        fprintf(stderr, "Could not read the size of the allelles block.\n");
-        return NULL;
-    }
+    mem_size_64bits = *((inti *) base);
+    base += 8;
+
+    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
+    //    fprintf(stderr, "Could not read the size of the allelles block.\n");
+    //    return NULL;
+    //}
 
     mem_size = mem_size_64bits;
     mem = malloc(mem_size);
+    memcpy(mem, base, mem_size);
+    base += mem_size;
 
-    if (fread(mem, 1, mem_size, file) != mem_size) {
-        fprintf(stderr, "Could not read allelles block.\n");
-        return NULL;
-    }
+    //if (fread(mem, 1, mem_size, file) != mem_size) {
+    //    fprintf(stderr, "Could not read allelles block.\n");
+    //    return NULL;
+    //}
 
     tn = tpl_map("A(A(S(vs)))", &allele_id);
     if (tn == NULL) {
@@ -218,19 +260,25 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
     tpl_free(tn);
     free(mem);
 
-    if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-        fprintf(stderr,
-                "Could not read the size of the genotype offsets block.\n");
-        return NULL;
-    }
+    mem_size_64bits = *((inti *) base);
+    base += 8;
+
+    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
+    //    fprintf(stderr,
+    //            "Could not read the size of the genotype offsets block.\n");
+    //    return NULL;
+    //}
 
     mem_size = mem_size_64bits;
     mem = malloc(mem_size);
 
-    if (fread(mem, 1, mem_size, file) != mem_size) {
-        fprintf(stderr, "Could not read genotype offsets block.\n");
-        return NULL;
-    }
+    //if (fread(mem, 1, mem_size, file) != mem_size) {
+    //    fprintf(stderr, "Could not read genotype offsets block.\n");
+    //    return NULL;
+    //}
+
+    memcpy(mem, base, mem_size);
+    base += mem_size;
 
     tn = tpl_map("I#", (*vi)->start, bgen->nvariants);
     if (tn == NULL) {
