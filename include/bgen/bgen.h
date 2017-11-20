@@ -11,7 +11,7 @@
 struct BGenFile;
 struct BGenVI;
 
-struct BGVar {
+struct BGenVar {
     string id;
     string rsid;
     string chrom;
@@ -39,10 +39,10 @@ struct BGenVG;
 struct BGenFile *bgen_open(const byte *);
 void bgen_close(struct BGenFile *);
 
-// BGVar headers can be stored in a file for faster reloading.
-inti bgen_store_variants(const struct BGenFile *, struct BGVar *, struct BGenVI *,
+// BGenVar headers can be stored in a file for faster reloading.
+inti bgen_store_variants(const struct BGenFile *, struct BGenVar *, struct BGenVI *,
                          const byte *);
-struct BGVar *bgen_load_variants(const struct BGenFile *, const byte *,
+struct BGenVar *bgen_load_variants(const struct BGenFile *, const byte *,
                             struct BGenVI **);
 
 inti bgen_nsamples(struct BGenFile *bgen);
@@ -53,7 +53,7 @@ inti bgen_nvariants(struct BGenFile *bgen);
 string *bgen_read_samples(struct BGenFile *bgen);
 void bgen_free_samples(const struct BGenFile *bgen, string *samples);
 
-// BGVar headers are read all at once via either bgen_read_variants
+// BGenVar headers are read all at once via either bgen_read_variants
 // or bgen_load_variants. The second option exists because the first one
 // might be too slow for some IOs as it requires jumping between blocks
 // covering the entire files.
@@ -62,8 +62,8 @@ void bgen_free_samples(const struct BGenFile *bgen, string *samples);
 // However, a high number of variants will require a high number of access
 // requests, which could be slow even for random access IOs (a network file
 // system, e.g.).
-struct BGVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index);
-void bgen_free_variants(const struct BGenFile *bgen, struct BGVar *variants);
+struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index);
+void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants);
 void bgen_free_index(struct BGenVI *index);
 
 // Genotype interaction should happen between open and close call using the

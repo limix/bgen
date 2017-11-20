@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-int test_read_data(struct BGenFile *bgen, string *s, struct BGVar *v) {
+int test_read_data(struct BGenFile *bgen, string *s, struct BGenVar *v) {
     if (bgen_nsamples(bgen) != 500)
         return FAIL;
 
@@ -29,7 +29,7 @@ int test_read_data(struct BGenFile *bgen, string *s, struct BGVar *v) {
 
 int test_read(const byte *fp0, const byte *fp1, struct BGenVI **index) {
     struct BGenFile *bgen;
-    struct BGVar *v;
+    struct BGenVar *v;
     string *s;
 
     bgen = bgen_open(fp0);

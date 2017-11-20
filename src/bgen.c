@@ -183,7 +183,7 @@ void bgen_free_samples(const struct BGenFile *bgen, string *samples) {
     free(samples);
 }
 
-inti bgen_read_variant(struct BGenFile *bgen, struct BGVar *v) {
+inti bgen_read_variant(struct BGenFile *bgen, struct BGenVar *v) {
     inti i;
     uint32_t nsamples, position;
     uint16_t nalleles;
@@ -224,8 +224,8 @@ inti bgen_read_variant(struct BGenFile *bgen, struct BGVar *v) {
     return SUCCESS;
 }
 
-struct BGVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index) {
-    struct BGVar *variants;
+struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index) {
+    struct BGenVar *variants;
     uint32_t length;
     inti i, nvariants;
 
@@ -247,7 +247,7 @@ struct BGVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index) {
     *index = bgen_new_index(bgen);
 
     nvariants = bgen->nvariants;
-    variants = malloc(nvariants * sizeof(struct BGVar));
+    variants = malloc(nvariants * sizeof(struct BGenVar));
 
     for (i = 0; i < nvariants; ++i) {
         if (bgen_read_variant(bgen, variants + i) == FAIL)
@@ -287,7 +287,7 @@ err:
     return NULL;
 }
 
-void bgen_free_variants(const struct BGenFile *bgen, struct BGVar *variants) {
+void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants) {
     inti i, j;
 
     for (i = 0; i < bgen->nvariants; ++i) {

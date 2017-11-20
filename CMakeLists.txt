@@ -71,7 +71,8 @@ add_library(bgen_static STATIC
 set_target_properties(bgen
   PROPERTIES
     VERSION ${BGEN_VERSION}
-    PUBLIC_HEADER include/bgen/bgen.h)
+    PUBLIC_HEADER
+        "include/bgen/bgen.h;include/bgen/number.h;include/bgen/paul_stdint.h;include/bgen/stdint.h;include/bgen/string.h")
 
 install(TARGETS bgen
         ARCHIVE DESTINATION lib

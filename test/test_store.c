@@ -7,7 +7,7 @@
 
 int test_store(const byte *fp0, const byte *fp1) {
     struct BGenFile *bgen;
-    struct BGVar *variants;
+    struct BGenVar *variants;
     struct BGenVI *index;
 
     bgen = bgen_open(fp0);
@@ -31,7 +31,7 @@ int test_store(const byte *fp0, const byte *fp1) {
 
 int test_load(const byte *fp0, const byte *fp1) {
     struct BGenFile *bgen;
-    struct BGVar *variants;
+    struct BGenVar *variants;
     struct BGenVI *index;
 
     bgen = bgen_open(fp0);

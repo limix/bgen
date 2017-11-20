@@ -60,11 +60,11 @@ void dump2file(tpl_node *tn, FILE *file)
     free(mem);
 }
 
-inti dump_variants(inti nvariants, struct BGVar *vars, FILE *file);
-inti dump_alleles(inti nvariants, struct BGVar *vars, FILE *file);
+inti dump_variants(inti nvariants, struct BGenVar *vars, FILE *file);
+inti dump_alleles(inti nvariants, struct BGenVar *vars, FILE *file);
 inti dump_genotype_offset(inti nvariants, inti *genotype_offset, FILE *file);
 
-inti bgen_store_variants(const struct BGenFile *bgen, struct BGVar *vars,
+inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
                          struct BGenVI *index, const byte *fp) {
     FILE *file;
     unsigned char header[] = {178, 125, 13, 247};
@@ -90,7 +90,7 @@ inti bgen_store_variants(const struct BGenFile *bgen, struct BGVar *vars,
     return SUCCESS;
 }
 
-struct BGVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
+struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
                             struct BGenVI **vi) {
     inti i, j;
     FILE *file;
@@ -101,10 +101,10 @@ struct BGVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
     uint64_t mem_size_64bits;
     struct TPLVar tpl_variant;
     tpl_string allele_id;
-    struct BGVar *vars;
+    struct BGenVar *vars;
 
     *vi = bgen_new_index(bgen);
-    vars = malloc(bgen->nvariants * sizeof(struct BGVar));
+    vars = malloc(bgen->nvariants * sizeof(struct BGenVar));
 
     file = fopen(fp, "rb");
     if (file == NULL) {
@@ -243,7 +243,7 @@ inti dump_genotype_offset(inti nvariants, inti *genotype_offset, FILE *file)
     return SUCCESS;
 }
 
-inti dump_variants(inti nvariants, struct BGVar *vars, FILE *file) {
+inti dump_variants(inti nvariants, struct BGenVar *vars, FILE *file) {
     inti i;
     tpl_node *tn;
     struct TPLVar tpl_variant;
@@ -268,7 +268,7 @@ inti dump_variants(inti nvariants, struct BGVar *vars, FILE *file) {
     return SUCCESS;
 }
 
-inti dump_alleles(inti nvariants, struct BGVar *vars, FILE *file) {
+inti dump_alleles(inti nvariants, struct BGenVar *vars, FILE *file) {
     inti i, j;
     tpl_node *tn;
     tpl_string allele_id;

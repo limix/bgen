@@ -29,7 +29,7 @@ int main()
     // alleles, etc.)
     // Notice that we also have a VariantIndexing in return, used afterwards.
     struct BGenVI *index;
-    BGVar *variants = bgen_read_variants(bgen, &index);
+    BGenVar *variants = bgen_read_variants(bgen, &index);
 
     printf("RSID of the first variant: %.*s\n",
            (int)variants[0].rsid.len,
