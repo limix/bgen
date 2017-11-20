@@ -229,6 +229,7 @@ struct BGVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index) {
     uint32_t length;
     inti i, nvariants;
 
+    variants = NULL;
     bgen->file = fopen(bgen->filepath, "rb");
 
     if (bgen->file == NULL) {

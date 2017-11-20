@@ -5,7 +5,7 @@
 #include <string.h>
 
 
-int test_read_data(BGenFile *bgen, string *samples, BGVar *variants) {
+int test_read_data(struct BGenFile *bgen, string *samples, struct BGVar *variants) {
     inti e;
 
     if (bgen_nsamples(bgen) != 500)
@@ -42,8 +42,8 @@ int test_read_data(BGenFile *bgen, string *samples, BGVar *variants) {
 
 int test_read(const byte *filepath, const byte *index_filepath,
               struct BGenVI **index) {
-    BGenFile *bgen;
-    BGVar *variants;
+    struct BGenFile *bgen;
+    struct BGVar *variants;
     string *samples;
 
     bgen = bgen_open(filepath);
@@ -73,7 +73,7 @@ int test_read(const byte *filepath, const byte *index_filepath,
 }
 
 int test_probabilities(struct BGenVI *index, inti nsamples) {
-    BGenVG *vg;
+    struct BGenVG *vg;
     FILE *f;
     double prob[3];
     double eps = 1e-4;
