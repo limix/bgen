@@ -4,17 +4,16 @@
 
 #include "bgen/bgen.h"
 
-int main()
-{
-    const byte filepath[] = "example.bgen";
+int main() {
+    const char filepath[] = "example.bgen";
 
     // Mandatory first call, preparing to read the file.
-    BGenFile *bgen = bgen_open(filepath);
+    struct BGenFile *bgen = bgen_open(filepath);
 
     int nsamples = bgen_nsamples(bgen);
 
-    printf("Number of samples: %lld\n",  nsamples);
-    printf("Number of variants: %lld\n", bgen_nvariants(bgen));
+    printf("Number of samples: %d\n", nsamples);
+    printf("Number of variants: %d\n", bgen_nvariants(bgen));
 
     // Reading sample identifications.
     string *sample_ids = bgen_read_samples(bgen);
@@ -29,13 +28,12 @@ int main()
     // alleles, etc.)
     // Notice that we also have a VariantIndexing in return, used afterwards.
     struct BGenVI *index;
-    BGenVar *variants = bgen_read_variants(bgen, &index);
+    struct BGenVar *variants = bgen_read_variants(bgen, &index);
 
-    printf("RSID of the first variant: %.*s\n",
-           (int)variants[0].rsid.len,
+    printf("RSID of the first variant: %.*s\n", (int)variants[0].rsid.len,
            variants[0].rsid.str);
 
-    printf("Number of alleles of the first variant: %lld\n",
+    printf("Number of alleles of the first variant: %d\n",
            variants[0].nalleles);
 
     // Releasing memory associated with variant identifications.
@@ -48,22 +46,19 @@ int main()
     // For performance reasons, it is done in two steps:
 
     // Step 1.
-    BGenVG *vg = bgen_open_variant_genotype(index, 1);
+    struct BGenVG *vg = bgen_open_variant_genotype(index, 1);
 
-    real *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(real));
-
+    double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
 
     // Step 2.
     bgen_read_variant_genotype(index, vg, probabilities);
 
     printf("Genotype probabilities of the second variant ");
     printf("for the first two samples:\n");
-    inti i, j;
+    size_t i, j;
 
-    for (j = 0; j < 2; ++j)
-    {
-        for (i = 0; i < bgen_ncombs(vg); ++i)
-        {
+    for (j = 0; j < 2; ++j) {
+        for (i = 0; i < bgen_ncombs(vg); ++i) {
             printf("  %f", probabilities[j * bgen_ncombs(vg) + i]);
         }
         printf("\n");
