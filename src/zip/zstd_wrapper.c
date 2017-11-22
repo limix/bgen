@@ -1,21 +1,20 @@
 #include "zip/zstd_wrapper.h"
 
-inti bgen_unzstd(const byte *src, inti src_size, byte **dst, inti *dst_size) {
+int bgen_unzstd(const char *src, size_t src_size, void **dst, size_t *dst_size) {
     size_t dSize = ZSTD_decompress(*dst, *dst_size, src, src_size);
 
-    if (dSize != *dst_size) {
-        fprintf(stderr, "decoded %lld\n", dSize);
-        fprintf(stderr, "error decoding: %s \n", ZSTD_getErrorName(dSize));
-        return EXIT_FAILURE;
+    if (ZSTD_isError(dSize)) {
+        fprintf(stderr, "Error decoding: %s \n", ZSTD_getErrorName(dSize));
+        return 1;
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
 
-byte *bgen_zstd(const byte *src, inti src_size, inti *dst_size) {
+char *bgen_zstd(const char *src, size_t src_size, size_t *dst_size) {
 
-    byte *dst;
-    inti dst_capacity;
+    char *dst;
+    size_t dst_capacity;
     size_t dst_size_;
 
     dst_capacity = ZSTD_compressBound(src_size) + src_size;

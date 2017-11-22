@@ -3,17 +3,15 @@
 
 #include <stdio.h>
 
-#include "bgen/number.h"
-
 struct BGenVI {
-    byte *filepath;
-    inti compression;
-    inti layout;
-    inti nsamples;
-    inti nvariants;
-    inti *start;
+    char *filepath;
+    uint32_t compression;
+    uint32_t layout;
+    uint32_t nsamples;
+    uint32_t nvariants;
+    uint64_t *start;
 };
 
-struct BGenVI *bgen_new_index(const struct BGenFile *);
+struct BGenVI *new_variants_index(const struct BGenFile *);
 
 #endif /* end of include guard: BGEN_VARIANTS_INDEX_H */

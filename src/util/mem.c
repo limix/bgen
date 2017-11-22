@@ -1,13 +1,13 @@
 #include "mem.h"
 
-byte *bgen_strdup(const byte *src) {
-    byte *str;
-    byte *p;
+char *bgen_strdup(const char *src) {
+    char *str;
+    char *p;
     int len = 0;
 
     while (src[len])
         len++;
-    str = (byte *)malloc(len + 1);
+    str = (char *)malloc(len + 1);
     p = str;
 
     while (*src)
@@ -16,7 +16,7 @@ byte *bgen_strdup(const byte *src) {
     return str;
 }
 
-void bgen_memcpy(void *dst, byte **src, inti n) {
+void bgen_memcpy(void *dst, char **src, size_t n) {
     memcpy(dst, *src, n);
     *src = *src + n;
 }

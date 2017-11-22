@@ -11,7 +11,7 @@ int main()
     // Mandatory first call, preparing to read the file.
     BGenFile *bgen = bgen_open(filepath);
 
-    inti nsamples = bgen_nsamples(bgen);
+    int nsamples = bgen_nsamples(bgen);
 
     printf("Number of samples: %lld\n",  nsamples);
     printf("Number of variants: %lld\n", bgen_nvariants(bgen));

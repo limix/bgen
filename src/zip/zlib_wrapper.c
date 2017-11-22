@@ -7,8 +7,8 @@
 
 #include "bgen/string.h"
 
-inti bgen_unzlib(const byte *src, inti src_size, byte **dst,
-                          inti *dst_size) {
+int bgen_unzlib(const char *src, size_t src_size, char **dst,
+                size_t *dst_size) {
     int e;
     z_stream strm;
 
@@ -49,14 +49,14 @@ inti bgen_unzlib(const byte *src, inti src_size, byte **dst,
     return EXIT_SUCCESS;
 }
 
-inti bgen_unzlib_chunked(const byte *src, inti src_size, byte **dst,
-                                  inti *dst_size) {
+int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst,
+                        size_t *dst_size) {
     int ret;
     z_stream strm;
 
     unsigned int just_wrote;
     unsigned int unused = *dst_size;
-    byte *cdst = *dst;
+    char *cdst = *dst;
 
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;

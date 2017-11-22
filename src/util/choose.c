@@ -1,7 +1,7 @@
 #include "util/choose.h"
 
-inti bgen_choose(inti n, inti k) {
-    inti ans;
+int bgen_choose(int n, int k) {
+    int ans;
     int j;
 
     ans = 1;

@@ -1,9 +1,9 @@
 #ifndef BGEN_ZLIB_WRAPPER_H
 #define BGEN_ZLIB_WRAPPER_H
 
-#include "bgen/number.h"
+#include <stddef.h>
 
-inti bgen_unzlib(const byte *, inti, byte **, inti *);
-inti bgen_unzlib_chunked(const byte *, inti, byte **, inti *);
+int bgen_unzlib(const char *, size_t, char **, size_t *);
+int bgen_unzlib_chunked(const char *, size_t, char **, size_t *);
 
 #endif /* end of include guard: BGEN_ZLIB_WRAPPER_H */

@@ -5,9 +5,7 @@
 #include <stdlib.h>
 #include <zstd.h>
 
-#include "bgen/number.h"
-
-inti bgen_unzstd(const byte *, inti, byte **, inti *);
-byte *bgen_zstd(const byte *src, inti src_size, inti *dst_size);
+int bgen_unzstd(const char *, size_t, void **, size_t *);
+char *bgen_zstd(const char *src, size_t src_size, size_t *dst_size);
 
 #endif /* end of include guard: BGEN_ZSTD_WRAPPER_H */

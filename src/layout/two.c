@@ -9,40 +9,42 @@
 #include "bgen/bgen.h"
 #include "util/bits.h"
 
+#include "bgen_file.h"
 #include "util/choose.h"
-#include "util/file.h"
 #include "util/mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
 
-inline static inti bgen_read_ploidy(byte ploidy_miss) {
+inline static int bgen_read_ploidy(char ploidy_miss) {
     return ploidy_miss & 127;
 }
 
-inline static inti bgen_read_missingness(byte ploidy_miss) {
+inline static int bgen_read_missingness(char ploidy_miss) {
     return ploidy_miss >> 7;
 }
 
-inline static inti bit_sample_start(inti sample_idx, inti nbits, inti ncomb) {
+inline static int bit_sample_start(int sample_idx, int nbits, int ncomb) {
     return sample_idx * (nbits * (ncomb - 1));
 }
 
-inline static inti bit_geno_start(inti geno_idx, inti nbits) {
+inline static int bit_geno_start(int geno_idx, int nbits) {
     return geno_idx * nbits;
 }
 
-inline static int get_bit(const byte *mem, inti bit_idx) {
-    inti bytes = bit_idx / 8;
+inline static int get_bit(const char *mem, int bit_idx) {
+    int bytes = bit_idx / 8;
 
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-void bgen_read_unphased_genotype(struct BGenVG *vg, real *p) {
-    inti ncombs, ploidy, uip_sum, ui_prob;
-    inti sample_start, geno_start, bit_idx;
-    real denom = (((inti)1 << vg->nbits)) - 1;
+void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
+    int ncombs, ploidy;
+    uint64_t uip_sum, ui_prob;
+    uint64_t sample_start, geno_start, bit_idx;
+    double denom;
 
-    inti i, j, bi;
+    size_t i, j, bi;
+    denom = (((uint64_t)1 << vg->nbits)) - 1;
 
     for (j = 0; j < vg->nsamples; ++j) {
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
@@ -67,7 +69,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, real *p) {
                 bit_idx = sample_start + geno_start + bi;
 
                 if (get_bit(vg->current_chunk, bit_idx)) {
-                    ui_prob |= ((inti)1 << bi);
+                    ui_prob |= ((uint64_t)1 << bi);
                 }
             }
 
@@ -78,22 +80,24 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, real *p) {
     }
 }
 
-byte *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
-    inti clength = 0, ulength = 0;
-    byte *cchunk;
-    byte *uchunk;
+char *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
+    size_t clength, ulength;
+    char *cchunk;
+    char *uchunk;
+    clength = 0;
+    ulength = 0;
 
-    if (bgen_read(file, &clength, 4) == FAIL)
+    if (fread(&clength, 1, 4, file) < 4)
         return NULL;
 
     clength -= 4;
 
-    if (bgen_read(file, &ulength, 4) == FAIL)
+    if (fread(&ulength, 1, 4, file) < 4)
         return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(file, cchunk, clength) == FAIL) {
+    if (fread(cchunk, 1, clength, file) < clength) {
         free(cchunk);
         return NULL;
     }
@@ -101,10 +105,10 @@ byte *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
     uchunk = malloc(ulength);
 
     if (idx->compression == 1) {
-        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength) == FAIL)
+        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength))
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
     } else if (idx->compression == 2) {
-        if (bgen_unzstd(cchunk, clength, &uchunk, &ulength) == FAIL)
+        if (bgen_unzstd(cchunk, clength, (void**) &uchunk, &ulength))
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
     } else {
         fprintf(stderr, "Unrecognized compression method.");
@@ -116,30 +120,30 @@ byte *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
     return uchunk;
 }
 
-inti bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
-                                FILE *file) {
+int bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
+                               FILE *file) {
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t min_ploidy, max_ploidy, phased, nbits;
     uint8_t *plo_miss;
 
-    byte *c;
-    byte *chunk;
-    inti i;
+    char *c;
+    char *chunk;
+    size_t i;
 
     if (idx->compression > 0) {
         if ((chunk = bgen_uncompress_two(idx, file)) == NULL)
-            return FAIL;
+            return 1;
         c = chunk;
         bgen_memcpy(&nsamples, &c, 4);
     } else {
-        if (bgen_read(file, &nsamples, 4) == FAIL)
-            return FAIL;
+        if (fread(&nsamples, 1, 4, file) < 4)
+            return 1;
 
         chunk = malloc(6 * nsamples);
 
-        if (bgen_read(file, chunk, 6 * nsamples) == FAIL)
-            return FAIL;
+        if (fread(chunk, 1, 6 * nsamples, file) < 6 * nsamples)
+            return 1;
 
         c = chunk;
     }
@@ -172,6 +176,6 @@ inti bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
     return EXIT_SUCCESS;
 }
 
-void bgen_read_probs_two(struct BGenVG *vg, real *p) {
+void bgen_read_probs_two(struct BGenVG *vg, double *p) {
     bgen_read_unphased_genotype(vg, p);
 }

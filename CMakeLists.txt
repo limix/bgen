@@ -34,11 +34,11 @@ endif()
 
 
 find_package( ZSTD REQUIRED )
-find_package( OMEM REQUIRED )
+find_package( PROGRESSBAR REQUIRED )
 
 include_directories( ${ZLIB_INCLUDE_DIRS} )
 include_directories( ${ZSTD_INCLUDE_DIRS} )
-include_directories( ${OMEM_INCLUDE_DIRS} )
+include_directories( ${PROGRESSBAR_INCLUDE_DIRS} )
 include_directories( include/ )
 include_directories( src/ )
 
@@ -47,7 +47,6 @@ add_subdirectory(src)
 set(SOURCES "src/util/mem.c"
     "src/util/string.c"
     "src/util/choose.c"
-    "src/util/file.c"
     "src/util/tpl.c"
     "src/util/buffer.c"
     "src/variants_index.c"
@@ -58,10 +57,7 @@ set(SOURCES "src/util/mem.c"
     "src/zip/zlib_wrapper.c"
     "src/bgen.c")
 
-set(PUBLIC_HEADERS "include/bgen/bgen.h;include/bgen/number.h")
-set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/paul_stdint.h;")
-set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/stdint.h;")
-set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/string.h")
+set(PUBLIC_HEADERS "include/bgen/bgen.h;include/bgen/string.h")
 
 add_library(bgen SHARED "${SOURCES}")
 add_library(bgen_static STATIC "${SOURCES}")
@@ -76,18 +72,21 @@ install(TARGETS bgen
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries(bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries(bgen
+    ${ZLIB_LIBRARIES}
+    ${ZSTD_LIBRARIES}
+    ${PROGRESSBAR_LIBRARIES})
 
 install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
+target_link_libraries(bgen_static
+    ${ZLIB_LIBRARIES}
+    ${ZSTD_LIBRARIES}
+    ${PROGRESSBAR_LIBRARIES})
 
 add_subdirectory(test)
 
 enable_testing()
-#add_test(test_bgen test/test_bgen)
-# add_test(test_v12_zlib_layout2 test/test_v12_zlib_layout2)
-add_test(test_store_cache test/test_store_cache)
-add_test(test_load_cache test/test_load_cache)
+add_test(test_v12_zlib_layout2 test/test_v12_zlib_layout2)

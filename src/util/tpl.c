@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-inti tpl_append_buffer(tpl_node *tn, struct Buffer *b)
+int tpl_append_buffer(tpl_node *tn, struct Buffer *b)
 {
-    byte *mem;
+    char *mem;
     size_t size;
     uint64_t size64;
 
@@ -21,5 +21,5 @@ inti tpl_append_buffer(tpl_node *tn, struct Buffer *b)
     free(mem);
 
     tpl_free(tn);
-    return SUCCESS;
+    return 0;
 }

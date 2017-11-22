@@ -9,21 +9,21 @@
 #include "bgen/bgen.h"
 #include "util/bits.h"
 
+#include "bgen_file.h"
 #include "util/choose.h"
-#include "util/file.h"
 #include "util/mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
 
-void bgen_read_unphased_one(struct BGenVG *vg, real *probabilities) {
+void bgen_read_unphased_one(struct BGenVG *vg, double *probabilities) {
     uint16_t ui_prob;
-    inti ui_prob_sum;
+    unsigned int ui_prob_sum;
 
-    real denom = 32768;
+    double denom = 32768;
 
-    inti i, j;
+    size_t i, j;
 
-    byte *chunk = vg->current_chunk;
+    char *chunk = vg->current_chunk;
 
     for (j = 0; j < vg->nsamples; ++j) {
         ui_prob_sum = 0;
@@ -41,28 +41,30 @@ void bgen_read_unphased_one(struct BGenVG *vg, real *probabilities) {
     }
 }
 
-void bgen_read_probs_one(struct BGenVG *vg, real *p) {
+void bgen_read_probs_one(struct BGenVG *vg, double *p) {
     bgen_read_unphased_one(vg, p);
 }
 
-byte *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
-    inti clength = 0, ulength = 0;
-    byte *cchunk;
-    byte *uchunk;
+char *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
+    size_t clength, ulength;
+    char *cchunk, *uchunk;
 
-    if (bgen_read(file, &clength, 4) == FAIL)
+    clength = 0;
+    ulength = 0;
+
+    if (fread(&clength, 1, 4, file) < 4)
         return NULL;
 
     cchunk = malloc(clength);
 
-    if (bgen_read(file, cchunk, clength) == FAIL) {
+    if (fread(cchunk, 1, clength, file) < clength) {
         free(cchunk);
         return NULL;
     }
 
     if (index->compression != 1) {
         free(cchunk);
-        fprintf(stderr, "Compression flag should be 1; not %lld.\n",
+        fprintf(stderr, "Compression flag should be 1; not %u.\n",
                 index->compression);
         return NULL;
     }
@@ -77,10 +79,10 @@ byte *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
     return uchunk;
 }
 
-inti bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
-                                FILE *file) {
-    byte *c;
-    byte *chunk;
+int bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
+                               FILE *file) {
+    char *c;
+    char *chunk;
 
     if (index->compression > 0) {
         chunk = bgen_uncompress_layout1(index, file);
@@ -88,8 +90,8 @@ inti bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
     } else {
         chunk = malloc(6 * index->nsamples);
 
-        if (bgen_read(file, chunk, 6 * index->nsamples) == FAIL)
-            return FAIL;
+        if (fread(chunk, 1, 6 * index->nsamples, file) < 6 * index->nsamples)
+            return 1;
 
         c = chunk;
     }
@@ -101,5 +103,5 @@ inti bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
     vg->chunk = chunk;
     vg->current_chunk = c;
 
-    return EXIT_SUCCESS;
+    return 0;
 }

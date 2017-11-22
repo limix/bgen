@@ -1,12 +1,8 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#include <stdlib.h>
-#include "bgen/number.h"
 #include "bgen/string.h"
-
-#define FAIL EXIT_FAILURE
-#define SUCCESS EXIT_SUCCESS
+#include <stdlib.h>
 
 struct BGenFile;
 struct BGenVI;
@@ -15,8 +11,8 @@ struct BGenVar {
     string id;
     string rsid;
     string chrom;
-    inti position;
-    inti nalleles;
+    int position;
+    int nalleles;
     string *allele_ids;
 };
 
@@ -36,17 +32,18 @@ struct BGenVG;
 // bgen_close
 
 // Any interaction should happen between open and close calls.
-struct BGenFile *bgen_open(const byte *);
+struct BGenFile *bgen_open(const char *);
 void bgen_close(struct BGenFile *);
 
 // BGenVar headers can be stored in a file for faster reloading.
-inti bgen_store_variants(const struct BGenFile *, struct BGenVar *, struct BGenVI *,
-                         const byte *);
-struct BGenVar *bgen_load_variants(const struct BGenFile *, const byte *,
-                            struct BGenVI **);
+int bgen_store_variants(const struct BGenFile *, struct BGenVar *,
+                        struct BGenVI *, const char *);
+struct BGenVar *bgen_load_variants(const struct BGenFile *, const char *,
+                                   struct BGenVI **, int);
+int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp);
 
-inti bgen_nsamples(struct BGenFile *bgen);
-inti bgen_nvariants(struct BGenFile *bgen);
+int bgen_nsamples(struct BGenFile *bgen);
+int bgen_nvariants(struct BGenFile *bgen);
 
 // Gets array of sample identifications ought to be freed by calling
 // bgen_free_samples.
@@ -62,7 +59,8 @@ void bgen_free_samples(const struct BGenFile *bgen, string *samples);
 // However, a high number of variants will require a high number of access
 // requests, which could be slow even for random access IOs (a network file
 // system, e.g.).
-struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index);
+struct BGenVar *bgen_read_variants(struct BGenFile *bgen,
+                                   struct BGenVI **index);
 void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants);
 void bgen_free_index(struct BGenVI *index);
 
@@ -70,15 +68,15 @@ void bgen_free_index(struct BGenVI *index);
 // following functions; and those open and close calls should happen between
 // read and close calls of bgen_read_variants/bgen_load_variants and
 // bgen_free_index.
-struct BGenVG *bgen_open_variant_genotype(struct BGenVI *, inti);
+struct BGenVG *bgen_open_variant_genotype(struct BGenVI *, size_t);
 void bgen_close_variant_genotype(struct BGenVI *index, struct BGenVG *vg);
 
 // Retrieve properties of a genotype specified by its variant.
-void bgen_read_variant_genotype(struct BGenVI *, struct BGenVG *, real *);
-inti bgen_nalleles(struct BGenVG *vg);
-inti bgen_ploidy(struct BGenVG *vg);
-inti bgen_ncombs(struct BGenVG *vg);
+void bgen_read_variant_genotype(struct BGenVI *, struct BGenVG *, double *);
+int bgen_nalleles(struct BGenVG *vg);
+int bgen_ploidy(struct BGenVG *vg);
+int bgen_ncombs(struct BGenVG *vg);
 
-inti bgen_sample_ids_presence(struct BGenFile *bgen);
+int bgen_sample_ids_presence(struct BGenFile *bgen);
 
 #endif /* end of include guard: BGEN_BGEN_H */

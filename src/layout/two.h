@@ -5,7 +5,7 @@
 
 #include "bgen/bgen.h"
 
-inti bgen_read_probs_header_two(struct BGenVI *, struct BGenVG *, FILE *);
-void bgen_read_probs_two(struct BGenVG *, real *);
+int bgen_read_probs_header_two(struct BGenVI *, struct BGenVG *, FILE *);
+void bgen_read_probs_two(struct BGenVG *, double *);
 
 #endif /* ifndef BGEN_LAYOUT_TWO_H */

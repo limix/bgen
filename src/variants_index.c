@@ -1,17 +1,15 @@
 #include "bgen/bgen.h"
-#include "bgen/number.h"
-#include "omem/omem.h"
 #include "tpl/tpl.h"
 #include "util/buffer.h"
-#include "util/file.h"
 #include "util/mem.h"
 #include "util/tpl.h"
 #include "variants_index.h"
 #include "zip/zstd_wrapper.h"
+#include "bgen_file.h"
 
 typedef struct tpl_string {
     uint16_t len;
-    byte *str;
+    char *str;
 } tpl_string;
 
 struct TPLVar {
@@ -32,7 +30,7 @@ static inline void set_str(string *dst, const tpl_string *src) {
     dst->str = src->str;
 }
 
-struct BGenVI *bgen_new_index(const struct BGenFile *bgen) {
+struct BGenVI *new_variants_index(const struct BGenFile *bgen) {
     struct BGenVI *vi;
 
     vi = malloc(sizeof(struct BGenVI));
@@ -43,21 +41,21 @@ struct BGenVI *bgen_new_index(const struct BGenFile *bgen) {
     vi->nsamples = bgen->nsamples;
     vi->nvariants = bgen->nvariants;
 
-    vi->start = malloc(bgen->nvariants * sizeof(inti));
+    vi->start = malloc(bgen->nvariants * sizeof(uint64_t));
 
     return vi;
 }
 
-inti append_variants(inti, struct BGenVar *, struct Buffer *);
-inti append_alleles(inti, struct BGenVar *, struct Buffer *);
-inti append_genotype_offsets(inti, inti *, struct Buffer *);
+int append_variants(size_t, struct BGenVar *, struct Buffer *);
+int append_alleles(size_t, struct BGenVar *, struct Buffer *);
+int append_genotype_offsets(size_t, uint64_t *, struct Buffer *);
 size_t read_variants(void *mem, struct BGenVar *variants);
 size_t read_alleles(void *mem, struct BGenVar *variants);
 size_t read_genotype_offsets(void *mem, const struct BGenFile *bgen,
                              struct BGenVI **vi);
 
-inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
-                         struct BGenVI *index, const byte *fp) {
+int bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
+                         struct BGenVI *index, const char *fp) {
 
     struct Buffer *b;
 
@@ -70,11 +68,11 @@ inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
     buffer_store(fp, b);
     buffer_destroy(b);
 
-    return SUCCESS;
+    return 0;
 }
 
-struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
-                                   struct BGenVI **vi) {
+struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const char *fp,
+                                   struct BGenVI **vi, int verbose) {
     struct Buffer *b;
     struct BGenVar *variants;
     void *mem;
@@ -82,7 +80,7 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
 
     b = buffer_create();
 
-    if (buffer_load(fp, b)) {
+    if (buffer_load(fp, b, verbose)) {
         fprintf(stderr, "Could not load buffer for %s.\n", fp);
     }
     mem = buffer_base(b);
@@ -102,19 +100,42 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
     return variants;
 }
 
-inti append_genotype_offsets(inti nvariants, inti *offsets, struct Buffer *b) {
+int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp)
+{
+    struct BGenFile *bgen;
+    struct BGenVar *variants;
+    struct BGenVI *index;
+
+    if ((bgen = bgen_open(bgen_fp)) == NULL)
+        return 1;
+
+    if ((variants = bgen_read_variants(bgen, &index)) == NULL)
+        return 1;
+
+    if (bgen_store_variants(bgen, variants, index, index_fp))
+        return 1;
+
+    bgen_free_variants(bgen, variants);
+    bgen_free_index(index);
+
+    bgen_close(bgen);
+
+    return 0;
+}
+
+int append_genotype_offsets(size_t nvariants, uint64_t *offsets, struct Buffer *b) {
     tpl_node *tn;
 
-    tn = tpl_map("I#", offsets, nvariants);
+    tn = tpl_map("U#", offsets, nvariants);
     tpl_pack(tn, 0);
     tpl_append_buffer(tn, b);
 
     return 0;
 }
 
-inti append_variants(inti nvariants, struct BGenVar *variants,
+int append_variants(size_t nvariants, struct BGenVar *variants,
                      struct Buffer *b) {
-    inti i;
+    size_t i;
     tpl_node *tn;
     struct TPLVar tpl_variant;
 
@@ -136,9 +157,9 @@ inti append_variants(inti nvariants, struct BGenVar *variants,
     return 0;
 }
 
-inti append_alleles(inti nvariants, struct BGenVar *variants,
+int append_alleles(size_t nvariants, struct BGenVar *variants,
                     struct Buffer *b) {
-    inti i, j;
+    size_t i, j;
     tpl_node *tn;
     tpl_string allele_id;
 
@@ -228,8 +249,8 @@ size_t read_genotype_offsets(void *mem, const struct BGenFile *bgen,
     tpl_node *tn;
     uint64_t block_size;
 
-    *vi = bgen_new_index(bgen);
-    tn = tpl_map("I#", (*vi)->start, bgen->nvariants);
+    *vi = new_variants_index(bgen);
+    tn = tpl_map("U#", (*vi)->start, bgen->nvariants);
 
     block_size = *((uint64_t *)mem);
     mem += sizeof(uint64_t);
