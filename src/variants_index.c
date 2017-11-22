@@ -1,11 +1,13 @@
 #include "bgen/bgen.h"
 #include "bgen/number.h"
+#include "omem/omem.h"
 #include "tpl/tpl.h"
+#include "util/buffer.h"
 #include "util/file.h"
 #include "util/mem.h"
-#include "zip/zstd_wrapper.h"
-#include "omem/omem.h"
+#include "util/tpl.h"
 #include "variants_index.h"
+#include "zip/zstd_wrapper.h"
 
 typedef struct tpl_string {
     uint16_t len;
@@ -20,18 +22,17 @@ struct TPLVar {
     uint16_t nalleles;
 };
 
-static inline void tplstr_get_str(tpl_string *dst, const string *src) {
+static inline void set_tpl_str(tpl_string *dst, const string *src) {
     dst->len = src->len;
     dst->str = src->str;
 }
 
-static inline void str_get_tplstr(string *dst, const tpl_string *src) {
+static inline void set_str(string *dst, const tpl_string *src) {
     dst->len = src->len;
     dst->str = src->str;
 }
 
-struct BGenVI *bgen_new_index(const struct BGenFile *bgen)
-{
+struct BGenVI *bgen_new_index(const struct BGenFile *bgen) {
     struct BGenVI *vi;
 
     vi = malloc(sizeof(struct BGenVI));
@@ -47,274 +48,72 @@ struct BGenVI *bgen_new_index(const struct BGenFile *bgen)
     return vi;
 }
 
-void dump2file(tpl_node *tn, FILE *file)
-{
-    byte *mem;
-    size_t mem_size;
-    uint64_t mem_size_;
+inti append_variants(inti, struct BGenVar *, struct Buffer *);
+inti append_alleles(inti, struct BGenVar *, struct Buffer *);
+inti append_genotype_offsets(inti, inti *, struct Buffer *);
+size_t read_variants(void *mem, struct BGenVar *variants);
+size_t read_alleles(void *mem, struct BGenVar *variants);
+size_t read_genotype_offsets(void *mem, const struct BGenFile *bgen,
+                             struct BGenVI **vi);
 
-    tpl_dump(tn, TPL_MEM, &mem, &mem_size);
-    mem_size_ = mem_size;
-
-    fwrite(&mem_size_, 1, 8, file);
-    fwrite(mem, 1, mem_size_, file);
-
-    free(mem);
-}
-
-inti dump_variants(inti nvariants, struct BGenVar *vars, FILE *file);
-inti dump_alleles(inti nvariants, struct BGenVar *vars, FILE *file);
-inti dump_genotype_offset(inti nvariants, inti *genotype_offset, FILE *file);
-
-inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *vars,
+inti bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
                          struct BGenVI *index, const byte *fp) {
-    FILE *file, *buffer;
-    void *base;
-    size_t size;
-    inti dst_size;
-    omem fm;
-    unsigned char header[] = {178, 125, 13, 247};
 
-    omem_init(&fm);
-    printf("Ponto 0\n"); fflush(stdout);
-    buffer = omem_open(&fm, "wb");
-    printf("Ponto 1\n"); fflush(stdout);
+    struct Buffer *b;
 
-    //if (file == NULL) {
-    //    fprintf(stderr, "Could not open %s", fp);
-    //    perror(fp);
-    //    return FAIL;
-    //}
+    b = buffer_create();
 
-    if (fwrite(header, 1, 4, buffer) != 4) {
-        //fprintf(stderr, "Could not write to %s", fp);
-        //perror(NULL);
-        printf("Ponto 2\n"); fflush(stdout);
-        return FAIL;
-    }
+    append_variants(bgen->nvariants, variants, b);
+    append_alleles(bgen->nvariants, variants, b);
+    append_genotype_offsets(bgen->nvariants, index->start, b);
 
-    dump_variants(bgen->nvariants, vars, buffer);
-    printf("Ponto 3\n"); fflush(stdout);
-    dump_alleles(bgen->nvariants, vars, buffer);
-    printf("Ponto 4\n"); fflush(stdout);
-    dump_genotype_offset(bgen->nvariants, index->start, buffer);
-    printf("Ponto 5\n"); fflush(stdout);
-
-    fflush(buffer);
-    //size = ftell(buffer);
-    //fseek(buffer, 0, SEEK_SET);
-    omem_mem(&fm, &base, &size);
-
-    byte *zipped = bgen_zstd(base, size, &dst_size);
-    printf("From %lld to %lld\n", size, dst_size);
-
-    file = fopen(fp, "wb");
-    //fwrite(base, 1, size, file);
-    fwrite(zipped, 1, dst_size, file);
-    fclose(file);
-
-    fclose(buffer);
-    omem_term(&fm);
+    buffer_store(fp, b);
+    buffer_destroy(b);
 
     return SUCCESS;
 }
 
 struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const byte *fp,
-                            struct BGenVI **vi) {
-    inti i, j;
-    FILE *file, *buffer;
-    unsigned char header[4];
-    tpl_node *tn;
-    size_t mem_size;
-    byte *mem, *undata;
-    omem fm;
-    uint64_t mem_size_64bits;
-    struct TPLVar tpl_variant;
-    tpl_string allele_id;
-    struct BGenVar *vars;
-    //omem_init(&fm);
+                                   struct BGenVI **vi) {
+    struct Buffer *b;
+    struct BGenVar *variants;
+    void *mem;
+    size_t read_len;
 
-    *vi = bgen_new_index(bgen);
-    vars = malloc(bgen->nvariants * sizeof(struct BGenVar));
+    b = buffer_create();
 
-    file = fopen(fp, "rb");
-    if (file == NULL) {
-        fprintf(stderr, "Could not open: %s\n", fp);
-        return NULL;
+    if (buffer_load(fp, b)) {
+        fprintf(stderr, "Could not load buffer for %s.\n", fp);
     }
-    fseek(file, 0L, SEEK_END);
-    size_t file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
-    printf("File size %lld\n", file_size); fflush(stdout);
-    byte *zipped = malloc(file_size);
+    mem = buffer_base(b);
 
-    if (fread(zipped, 1, file_size, file) != file_size) {
-        fprintf(stderr, "Could not read file.\n");
-        return NULL;
-    }
-    fclose(file);
-    printf("Chegou 1\n"); fflush(stdout);
-    inti unsize = 13622;
-    undata = malloc(unsize);
-    inti code = bgen_unzstd(zipped, file_size, &undata, &unsize);
-    printf("Chegou 2: %lld\n", unsize); fflush(stdout);
-    //file = omem_open(&fm, "wb");
-    //printf("Chegou 3\n"); fflush(stdout);
-    //size_t written = fwrite(undata, 1, unsize, file);
-    //printf("Chegou 3.1: %lld\n", written); fflush(stdout);
-    //printf("Chegou 3.15: %lld\n", fflush(file)); fflush(stdout);
-    //printf("Chegou 3.2: %lld\n", fseek(file, 0, SEEK_SET)); fflush(stdout);
-    ////omem_mem(&fm, &undata, &unsize);
-    //printf("Chegou 4\n"); fflush(stdout);
+    variants = malloc(bgen->nvariants * sizeof(struct BGenVar));
 
-    //if (fread(header, 1, 4, file) != 4) {
-    //    fprintf(stderr, "Could not read file header.\n");
-    //    return NULL;
-    //}
-    byte *base = undata + 4;
-    mem_size_64bits = *((inti *) base);
-    base += 8;
+    read_len = read_variants(mem, variants);
+    mem += read_len;
 
-    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-    //    fprintf(stderr, "Could not read the size of the variants block.\n");
-    //    return NULL;
-    //}
+    read_len = read_alleles(mem, variants);
+    mem += read_len;
 
-    mem_size = mem_size_64bits;
-    mem = malloc(mem_size);
-    memcpy(mem, base, mem_size);
-    base += mem_size;
+    read_genotype_offsets(mem, bgen, vi);
+    mem += read_len;
 
-    //if (fread(mem, 1, mem_size, file) != mem_size) {
-    //    fprintf(stderr, "Could not read variants block.\n");
-    //    return NULL;
-    //}
-    tn = tpl_map("A(S($(vs)$(vs)$(vs)uv))", &tpl_variant);
-
-    if (tn == NULL) {
-        fprintf(stderr, "Could not map variants block.");
-        return NULL;
-    }
-
-    if (tpl_load(tn, TPL_MEM, mem, mem_size)) {
-        fprintf(stderr, "Could not load variants block.");
-        return NULL;
-    }
-
-    i = 0;
-    while (tpl_unpack(tn, 1) > 0) {
-        str_get_tplstr(&vars[i].id, &tpl_variant.id);
-        str_get_tplstr(&vars[i].rsid, &tpl_variant.rsid);
-        str_get_tplstr(&vars[i].chrom, &tpl_variant.chrom);
-
-        vars[i].position = tpl_variant.position;
-        vars[i].nalleles = tpl_variant.nalleles;
-
-        ++i;
-    }
-
-    free(mem);
-    tpl_free(tn);
-
-    mem_size_64bits = *((inti *) base);
-    base += 8;
-
-    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-    //    fprintf(stderr, "Could not read the size of the allelles block.\n");
-    //    return NULL;
-    //}
-
-    mem_size = mem_size_64bits;
-    mem = malloc(mem_size);
-    memcpy(mem, base, mem_size);
-    base += mem_size;
-
-    //if (fread(mem, 1, mem_size, file) != mem_size) {
-    //    fprintf(stderr, "Could not read allelles block.\n");
-    //    return NULL;
-    //}
-
-    tn = tpl_map("A(A(S(vs)))", &allele_id);
-    if (tn == NULL) {
-        fprintf(stderr, "Could not map alleles block.");
-        return NULL;
-    }
-
-    if (tpl_load(tn, TPL_MEM, mem, mem_size)) {
-        fprintf(stderr, "Could not load alleles block.");
-        return NULL;
-    }
-
-    i = 0;
-    while (tpl_unpack(tn, 1) > 0) {
-        vars[i].allele_ids = malloc(vars[i].nalleles * sizeof(string));
-        j = 0;
-        while (tpl_unpack(tn, 2) > 0) {
-            str_get_tplstr(vars[i].allele_ids + j, &allele_id);
-            ++j;
-        }
-
-        ++i;
-    }
-
-    tpl_free(tn);
-    free(mem);
-
-    mem_size_64bits = *((inti *) base);
-    base += 8;
-
-    //if (fread(&mem_size_64bits, 1, 8, file) != 8) {
-    //    fprintf(stderr,
-    //            "Could not read the size of the genotype offsets block.\n");
-    //    return NULL;
-    //}
-
-    mem_size = mem_size_64bits;
-    mem = malloc(mem_size);
-
-    //if (fread(mem, 1, mem_size, file) != mem_size) {
-    //    fprintf(stderr, "Could not read genotype offsets block.\n");
-    //    return NULL;
-    //}
-
-    memcpy(mem, base, mem_size);
-    base += mem_size;
-
-    tn = tpl_map("I#", (*vi)->start, bgen->nvariants);
-    if (tn == NULL) {
-        fprintf(stderr, "Could not map genotype offsets.");
-        return NULL;
-    }
-
-    if (tpl_load(tn, TPL_MEM, mem, mem_size)) {
-        fprintf(stderr, "Could not load genotype offsets.");
-        return NULL;
-    }
-
-    tpl_unpack(tn, 0);
-
-    tpl_free(tn);
-    free(mem);
-
-    fclose(file);
-
-    return vars;
+    buffer_destroy(b);
+    return variants;
 }
 
-inti dump_genotype_offset(inti nvariants, inti *genotype_offset, FILE *file)
-{
+inti append_genotype_offsets(inti nvariants, inti *offsets, struct Buffer *b) {
     tpl_node *tn;
 
-    tn = tpl_map("I#", genotype_offset, nvariants);
-
+    tn = tpl_map("I#", offsets, nvariants);
     tpl_pack(tn, 0);
-    dump2file(tn, file);
-    tpl_free(tn);
+    tpl_append_buffer(tn, b);
 
-    return SUCCESS;
+    return 0;
 }
 
-inti dump_variants(inti nvariants, struct BGenVar *vars, FILE *file) {
+inti append_variants(inti nvariants, struct BGenVar *variants,
+                     struct Buffer *b) {
     inti i;
     tpl_node *tn;
     struct TPLVar tpl_variant;
@@ -322,24 +121,23 @@ inti dump_variants(inti nvariants, struct BGenVar *vars, FILE *file) {
     tn = tpl_map("A(S($(vs)$(vs)$(vs)uv))", &tpl_variant);
 
     for (i = 0; i < nvariants; ++i) {
-        tplstr_get_str(&tpl_variant.id, &vars[i].id);
-        tplstr_get_str(&tpl_variant.rsid, &vars[i].rsid);
-        tplstr_get_str(&tpl_variant.chrom, &vars[i].chrom);
+        set_tpl_str(&tpl_variant.id, &variants[i].id);
+        set_tpl_str(&tpl_variant.rsid, &variants[i].rsid);
+        set_tpl_str(&tpl_variant.chrom, &variants[i].chrom);
 
-        tpl_variant.position = vars[i].position;
-        tpl_variant.nalleles = vars[i].nalleles;
+        tpl_variant.position = variants[i].position;
+        tpl_variant.nalleles = variants[i].nalleles;
 
         tpl_pack(tn, 1);
     }
 
-    dump2file(tn, file);
+    tpl_append_buffer(tn, b);
 
-    tpl_free(tn);
-
-    return SUCCESS;
+    return 0;
 }
 
-inti dump_alleles(inti nvariants, struct BGenVar *vars, FILE *file) {
+inti append_alleles(inti nvariants, struct BGenVar *variants,
+                    struct Buffer *b) {
     inti i, j;
     tpl_node *tn;
     tpl_string allele_id;
@@ -347,15 +145,102 @@ inti dump_alleles(inti nvariants, struct BGenVar *vars, FILE *file) {
     tn = tpl_map("A(A(S(vs)))", &allele_id);
 
     for (i = 0; i < nvariants; ++i) {
-        for (j = 0; j < vars[i].nalleles; ++j) {
-            tplstr_get_str(&allele_id, vars[i].allele_ids + j);
+        for (j = 0; j < variants[i].nalleles; ++j) {
+            set_tpl_str(&allele_id, variants[i].allele_ids + j);
             tpl_pack(tn, 2);
         }
         tpl_pack(tn, 1);
     }
 
-    dump2file(tn, file);
+    tpl_append_buffer(tn, b);
+
+    return 0;
+}
+
+size_t read_variants(void *mem, struct BGenVar *variants) {
+    tpl_node *tn;
+    struct TPLVar v;
+    size_t i;
+    uint64_t block_size;
+
+    tn = tpl_map("A(S($(vs)$(vs)$(vs)uv))", &v);
+
+    block_size = *((uint64_t *)mem);
+    mem += sizeof(uint64_t);
+
+    if (tpl_load(tn, TPL_MEM, mem, block_size)) {
+        fprintf(stderr, "Could not load variants block.");
+        return 0;
+    }
+
+    i = 0;
+    while (tpl_unpack(tn, 1) > 0) {
+        set_str(&variants[i].id, &v.id);
+        set_str(&variants[i].rsid, &v.rsid);
+        set_str(&variants[i].chrom, &v.chrom);
+
+        variants[i].position = v.position;
+        variants[i].nalleles = v.nalleles;
+
+        ++i;
+    }
+
     tpl_free(tn);
 
-    return SUCCESS;
+    return block_size + sizeof(uint64_t);
+}
+
+size_t read_alleles(void *mem, struct BGenVar *variants) {
+    tpl_node *tn;
+    tpl_string allele_id;
+    size_t i, j;
+    uint64_t block_size;
+
+    tn = tpl_map("A(A(S(vs)))", &allele_id);
+
+    block_size = *((uint64_t *)mem);
+    mem += sizeof(uint64_t);
+
+    if (tpl_load(tn, TPL_MEM, mem, block_size)) {
+        fprintf(stderr, "Could not load alleles block.");
+        return 0;
+    }
+
+    i = 0;
+    while (tpl_unpack(tn, 1) > 0) {
+        variants[i].allele_ids = malloc(variants[i].nalleles * sizeof(string));
+        j = 0;
+        while (tpl_unpack(tn, 2) > 0) {
+            set_str(variants[i].allele_ids + j, &allele_id);
+            ++j;
+        }
+
+        ++i;
+    }
+
+    tpl_free(tn);
+
+    return block_size + sizeof(uint64_t);
+}
+
+size_t read_genotype_offsets(void *mem, const struct BGenFile *bgen,
+                             struct BGenVI **vi) {
+    tpl_node *tn;
+    uint64_t block_size;
+
+    *vi = bgen_new_index(bgen);
+    tn = tpl_map("I#", (*vi)->start, bgen->nvariants);
+
+    block_size = *((uint64_t *)mem);
+    mem += sizeof(uint64_t);
+
+    if (tpl_load(tn, TPL_MEM, mem, block_size)) {
+        fprintf(stderr, "Could not load genotype offsets.");
+        return 0;
+    }
+
+    tpl_unpack(tn, 0);
+    tpl_free(tn);
+
+    return 0;
 }

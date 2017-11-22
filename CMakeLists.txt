@@ -44,10 +44,12 @@ include_directories( src/ )
 
 add_subdirectory(src)
 
-set(CFILES "src/util/mem.c"
+set(SOURCES "src/util/mem.c"
     "src/util/string.c"
     "src/util/choose.c"
     "src/util/file.c"
+    "src/util/tpl.c"
+    "src/util/buffer.c"
     "src/variants_index.c"
     "src/layout/two.c"
     "src/layout/one.c"
@@ -56,32 +58,36 @@ set(CFILES "src/util/mem.c"
     "src/zip/zlib_wrapper.c"
     "src/bgen.c")
 
+set(PUBLIC_HEADERS "include/bgen/bgen.h;include/bgen/number.h")
+set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/paul_stdint.h;")
+set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/stdint.h;")
+set(PUBLIC_HEADERS "${PUBLIC_HEADERS};include/bgen/string.h")
 
-add_library(bgen SHARED "${CFILES}")
-add_library(bgen_static STATIC "${CFILES}")
+add_library(bgen SHARED "${SOURCES}")
+add_library(bgen_static STATIC "${SOURCES}")
 
 set_target_properties(bgen
   PROPERTIES
     VERSION ${BGEN_VERSION}
-    PUBLIC_HEADER
-        "include/bgen/bgen.h;include/bgen/number.h;include/bgen/paul_stdint.h;include/bgen/stdint.h;include/bgen/string.h")
+    PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 install(TARGETS bgen
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
         RUNTIME DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries( bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES} ${OMEM_LIBRARIES})
+target_link_libraries(bgen ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 install(TARGETS bgen_static
         ARCHIVE DESTINATION lib
         LIBRARY DESTINATION lib
     PUBLIC_HEADER DESTINATION include/bgen)
-target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES} ${OMEM_LIBRARIES})
+target_link_libraries(bgen_static ${ZLIB_LIBRARIES} ${ZSTD_LIBRARIES})
 
 add_subdirectory(test)
 
 enable_testing()
 #add_test(test_bgen test/test_bgen)
-add_test(test_v12_zlib_layout2 test/test_v12_zlib_layout2)
-add_test(test_store test/test_store)
+# add_test(test_v12_zlib_layout2 test/test_v12_zlib_layout2)
+add_test(test_store_cache test/test_store_cache)
+add_test(test_load_cache test/test_load_cache)
