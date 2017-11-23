@@ -1,136 +1,116 @@
-********************
-Function description
-********************
+*********
+Functions
+*********
 
-.. c:function:: BGenFile* bgen_open(const byte* filepath)
+.. c:function:: struct BGenFile* bgen_open(const byte* filepath)
 
-  Create a bgen file handler.
+    Create a bgen file handler.
 
-  :param const byte* filepath: File path to a bgen file.
-  :return: Bgen file handler.
-  :rtype: BGenFile*
+    :param filepath: File path to a bgen file
+    :return: Bgen file handler
 
-.. c:function:: void bgen_close(BGenFile* bgen)
+.. c:function:: void bgen_close(struct BGenFile* bgen)
 
-  Close a bgen file handler.
+    Close a bgen file handler.
 
-  :param BGenFile*: Bgen file handler.
+    :param bgen: Bgen file handler
 
-.. c:function:: inti bgen_nsamples(BGenFile* bgen)
+.. c:function:: int bgen_nsamples(struct BGenFile* bgen)
 
-  Get the number of samples.
+    Get the number of samples.
 
-  :param BGenFile*: Bgen file handler.
-  :return: Number of samples.
-  :rtype: inti
+    :param bgen: Bgen file handler
+    :return: number of samples
 
-.. c:function:: inti bgen_nvariants(BGenFile* bgen)
+.. c:function:: int bgen_nvariants(struct BGenFile* bgen)
 
-  Get the number of variants.
+    Get the number of variants.
 
-  :param BGenFile*: Bgen file handler.
-  :return: Number of variants.
-  :rtype: inti
+    :param bgen: Bgen file handler
+    :return: number of variants
 
-.. c:function:: string* bgen_read_samples(BGenFile* bgen)
+.. c:function:: string* bgen_read_samples(struct BGenFile* bgen)
 
-  Read sample identifications.
+    Read sample identifications.
 
-  :param BGenFile*: Bgen file handler.
-  :return: Identifications.
-  :rtype: string*
+    :param bgen: Bgen file handler
+    :return: identifications
 
-.. c:function:: void bgen_free_samples(BGenFile* bgen, string* samples)
+.. c:function:: void bgen_free_samples(struct BGenFile* bgen, string* samples)
 
-  Free memory associated with sample identifications.
+    Free memory associated with sample identifications.
 
-  :param BGenFile*: Bgen file handler.
-  :param string*: Sample identifications.
+    :param bgen: Bgen file handler
+    :param samples: Identifications
 
-.. c:function:: Variant* bgen_read_variants(BGenFile* bgen, VariantIndexing** index)
+.. c:function:: struct BGenVar* bgen_read_variants(struct BGenFile* bgen,\
+    struct BGenVI** index)
 
-  Read variant data.
-  (It does not include the probabilities.)
+    Read variant data.
 
-  :param BGenFile*: Bgen file handler.
-  :param VariantIndexing**: Variant indexing.
-  :return: Variant identifications, rsids, chromossomes, and more.
-  :rtype: Variant*
+    :param bgen: Bgen file handler
+    :param index: Variants index
+    :return: variants information
 
-.. c:function:: void bgen_free_variants(BGenFile* bgen, Variant* variants)
+.. c:function:: void bgen_free_variants(struct BGenFile* bgen,\
+    BGenVar* variants)
 
-  Free memory associated with variant data.
-  (It does not include the probabilities.)
+    Free memory associated with variant data.
 
-  :param BGenFile*: Bgen file handler.
-  :param Variant*: Variant data.
+    :param bgen: Bgen file handler
+    :param variants: Variants information
 
-.. c:function:: void bgen_free_indexing(VariantIndexing* index)
+.. c:function:: void bgen_free_indexing(struct BGenVI* index)
 
-  Free memory associated with variant indexing.
+    Free memory associated with variants index.
 
-  :param BGenFile*: Bgen file handler.
-  :param VariantIndexing*: Variant indexing.
+    :param index: Variants index
 
-.. c:function:: VariantGenotype* bgen_open_variant_genotype(VariantIndexing* index,\
-                                                            inti             variant_idx)
+.. c:function:: struct BGenVG* bgen_open_variant_genotype(struct BGenVI* vi,\
+    int index)
 
-  Return a variant reference.
+    Return a variant reference.
 
-  :param VariantIndexing**: Variant indexing.
-  :param inti: Variant index.
-  :return: Variant probabilities.
-  :rtype: VariantGenotype*
+    :param vi: Variants index
+    :param index: Variant index
+    :return: variant probabilities
 
-.. c:function:: void bgen_read_variant_genotype(VariantIndexing* index,\
-                                                VariantGenotype* vg,\
-                                                real*            probabilities)
+.. c:function:: void bgen_read_variant_genotype(struct BGenVI* index,\
+    struct BGenVG* vg,\
+    double* probs)
 
-  Read the allele probabilities for a given variant.
+    Read the allele probabilities for a given variant.
 
-  :param VariantIndexing*: Variant indexing.
-  :param VariantGenotype*: Variant genotype handler.
-  :param real*: Allele probabilities.
-  :param inti: Variant index.
-  :return: Variant probabilities.
-  :rtype: VariantGenotype*
+    :param index: Variants index
+    :param vg: Variant genotype handler
+    :param probs: Allele probabilities
 
-.. c:function:: void bgen_close_variant_genotype(VariantIndexing* index,\
-                                                 VariantGenotype* vg)
+.. c:function:: void bgen_close_variant_genotype(struct BGenVI* index,\
+    struct BGenVG* vg)
 
-  Close the variant genotype reference.
+    Close the variant genotype reference.
 
-  :param VariantIndexing*: Variant indexing.
-  :param VariantGenotype*: Variant genotype handler.
+    :param index: Variants index
+    :param vg: Variant genotype handler
 
-.. c:function:: inti bgen_sample_ids_presence(BGenFile* bgen)
+.. c:function:: int bgen_sample_ids_presence(struct BGenFile* bgen)
 
-  Check whether sample identifications are actually present.
+    Check whether sample identifications are actually present.
 
-  :param BGenFile*: Bgen file handler.
-  :return: ``1`` for presence; ``0`` for absence.
-  :rtype: inti
+    :param bgen: Bgen file handler
+    :return: ``1`` for presence; ``0`` for absence.
 
-.. c:function:: inti bgen_nalleles(VariantGenotype* vg)
+.. c:function:: int bgen_nalleles(struct BGenVG* vg)
 
-  Get the number of alleles.
+    Get the number of alleles.
 
-  :param VariantGenotype*: Variant genotype handler.
-  :return: number of alleles.
-  :rtype: inti
+    :param vg: Variant genotype handler
+    :return: number of alleles
 
-.. c:function:: inti bgen_ploidy(VariantGenotype* vg)
+.. c:function:: int bgen_ploidy(struct BGenVG* vg)
 
-  Get the ploidy.
+    Get the ploidy.
 
-  :param VariantGenotype*: Variant genotype handler.
-  :return: Ploidy.
-  :rtype: inti
+    :param vg: Variant genotype handler
+    :return: ploidy
 
-.. c:function:: inti bgen_ncombs(VariantGenotype* vg)
-
-  Get the number of genotype combinations.
-
-  :param VariantGenotype*: Variant genotype handler.
-  :return: Number of genotype combinations.
-  :rtype: inti

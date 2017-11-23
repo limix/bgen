@@ -21,7 +21,7 @@ well as their optional compressed formats.
     :maxdepth: 2
 
     install
-    usage
+    example
     api
 
 .. _BGEN file format: http://www.well.ox.ac.uk/~gav/bgen_format/
