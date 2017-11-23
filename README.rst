@@ -15,6 +15,9 @@ It makes use of the Zstandard library <http://facebook.github.io/zstd/>.
 You don't need to install it by yourself if you choose to install bgen
 via ``conda`` <http://conda.pydata.org/docs/index.html> but you do need it
 installed before-hand if you choose to build bgen library by yourself.
+It also makes use of the progressbar library
+<https://github.com/limix/progressbar> for showing progress while performing
+time-consuming tasks.
 
 Install
 -------
