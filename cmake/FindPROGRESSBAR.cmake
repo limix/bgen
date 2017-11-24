@@ -8,7 +8,8 @@
 #   PROGRESSBAR_INCLUDEDIR       - Preferred include directory e.g. <prefix>/include
 #   PROGRESSBAR_LIBRARYDIR       - Preferred library directory e.g. <prefix>/lib
 
-set(progressbar_incl_dirs "/usr/include" "/usr/local/include")
+set(progressbar_incl_dirs "/usr/include" "/usr/local/include"
+	"C:/Program Files/ProgressBar/include")
 if(PROGRESSBAR_INCLUDEDIR)
     list(APPEND progressbar_incl_dirs ${PROGRESSBAR_INCLUDEDIR})
 endif()
@@ -20,7 +21,8 @@ find_path(
 )
 
 
-set(progressbar_lib_dirs "/usr/lib" "/usr/local/lib")
+set(progressbar_lib_dirs "/usr/lib" "/usr/local/lib"
+	"C:/Program Files/ProgressBar/lib")
 if(PROGRESSBAR_LIBRARYDIR)
     list(APPEND progressbar_lib_dirs ${PROGRESSBAR_LIBRARYDIR})
 endif()
