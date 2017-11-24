@@ -44,7 +44,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
     double denom;
 
     size_t i, j, bi;
-    denom = (((uint64_t)1 << vg->nbits)) - 1;
+    denom = (double) ((((uint64_t)1 << vg->nbits)) - 1);
 
     for (j = 0; j < vg->nsamples; ++j) {
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
@@ -52,7 +52,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
         ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
 
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
-            for (i = 0; i < ncombs; ++i) {
+            for (i = 0; i < (size_t) ncombs; ++i) {
                 p[j * ncombs + i] = NAN;
             }
             continue;
@@ -60,7 +60,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
 
         uip_sum = 0;
 
-        for (i = 0; i < ncombs - 1; ++i) {
+        for (i = 0; i < (size_t) (ncombs - 1); ++i) {
             ui_prob = 0;
 
             for (bi = 0; bi < vg->nbits; ++bi) {
@@ -68,7 +68,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
                 geno_start = bit_geno_start(i, vg->nbits);
                 bit_idx = sample_start + geno_start + bi;
 
-                if (get_bit(vg->current_chunk, bit_idx)) {
+                if (get_bit(vg->current_chunk, (int) bit_idx)) {
                     ui_prob |= ((uint64_t)1 << bi);
                 }
             }

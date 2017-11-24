@@ -18,7 +18,7 @@ struct Buffer *buffer_create() {
 
 int buffer_append(struct Buffer *b, void *mem, size_t size) {
     b->base = realloc(b->base, b->size + size);
-    memcpy(b->base + b->size, mem, size);
+    memcpy((char*) b->base + b->size, mem, size);
     b->size += size;
     return 0;
 }
@@ -96,7 +96,7 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
         goto err;
     }
 
-    b->size = uncompressed_size;
+    b->size = (size_t) uncompressed_size;
     b->base = malloc(b->size);
 
     if (fread(&compressed_size, 1, 8, f) != 8) {
@@ -104,13 +104,13 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
         goto err;
     }
 
-    compressed = malloc(compressed_size);
-    if (buffer_load_loop(f, compressed, compressed_size, verbose)) {
+    compressed = malloc((size_t) compressed_size);
+    if (buffer_load_loop(f, compressed, (size_t) compressed_size, verbose)) {
         goto err;
     }
 
     dst_size = b->size;
-    if (bgen_unzstd(compressed, compressed_size, &(b->base), &dst_size)) {
+    if (bgen_unzstd(compressed, (size_t) compressed_size, &(b->base), &dst_size)) {
         goto err;
     }
 

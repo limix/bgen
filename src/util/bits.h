@@ -15,9 +15,9 @@ static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
 #ifdef _MSC_VER
 #if (_MSC_VER <= 1500)
 #define isnan(x) _isnan(x)
-#endif
-#endif
+#define MIN(x, y) x < y ? x : y;
 
+#else
 #define MIN(x, y)                                                              \
     ({                                                                         \
         typeof(x) _min1 = (x);                                                 \
@@ -25,6 +25,9 @@ static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
         (void)(&_min1 == &_min2);                                              \
         _min1 < _min2 ? _min1 : _min2;                                         \
     })
+
+#endif
+#endif
 
 #define CEILDIV(x, y) ((x + (y - 1)) / y)
 
