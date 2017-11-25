@@ -1,6 +1,8 @@
-cmake_minimum_required (VERSION 2.6.4)
+cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
+file(STRINGS "VERSION" BGEN_VERSION)
+project(bgen VERSION ${BGEN_VERSION} LANGUAGES C)
 
-project(bgen C)
+include(GNUInstallDirs)
 
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
   execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
@@ -17,13 +19,13 @@ set(CMAKE_MACOSX_RPATH 1)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+add_definitions(-DTPL_NOLIB)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-Dinline=__inline)
 endif()
-
-file(STRINGS "VERSION" BGEN_VERSION)
 
 find_package( ZLIB REQUIRED )
 if(NOT ZLIB_FOUND)
@@ -53,6 +55,7 @@ set(SOURCES "src/util/mem.c"
     "src/layout/two.c"
     "src/layout/one.c"
     "src/tpl/tpl.c"
+    "src/tpl/win/mmap.c"
     "src/zip/zstd_wrapper.c"
     "src/zip/zlib_wrapper.c"
     "src/bgen.c")
@@ -68,9 +71,9 @@ set_target_properties(bgen
     PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 install(TARGETS bgen
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
-        RUNTIME DESTINATION lib
+    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
     PUBLIC_HEADER DESTINATION include/bgen)
 target_link_libraries(bgen
     ${ZLIB_LIBRARIES}
@@ -78,8 +81,9 @@ target_link_libraries(bgen
     ${PROGRESSBAR_LIBRARIES})
 
 install(TARGETS bgen_static
-        ARCHIVE DESTINATION lib
-        LIBRARY DESTINATION lib
+    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR}
     PUBLIC_HEADER DESTINATION include/bgen)
 target_link_libraries(bgen_static
     ${ZLIB_LIBRARIES}

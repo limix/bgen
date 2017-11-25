@@ -21,7 +21,7 @@ int fread_string(FILE *file, string *s, size_t len_size) {
 
     bgen_string_alloc(s, len);
 
-    if (fread(s->str, 1, s->len, file) < s->len) {
+    if (fread(s->str, 1, s->len, file) < (size_t) s->len) {
         perror("Error while freading a string ");
         return 1;
     }

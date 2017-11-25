@@ -138,7 +138,7 @@ int main() {
     int prec;
     const char *ex, *ix;
 
-    for (i = 0; i < get_nexamples(); ++i) {
+    for (i = 0; i < (size_t) get_nexamples(); ++i) {
         ex = get_example_filepath(i);
         ix = get_example_index_filepath(i);
         prec = get_example_precision(i);
