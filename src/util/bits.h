@@ -5,13 +5,14 @@
 #define GetBit(var, bit) ((var & (1 << bit)) != 0)
 #define SetBit(var, bit) (var |= (1 << bit))
 
-
 #ifdef _MSC_VER
 #if (_MSC_VER <= 1500)
 #define isnan(x) _isnan(x)
 #define MIN(x, y) x < y ? x : y;
+#endif
+#endif
 
-#else
+#ifndef MIN
 #define MIN(x, y)                                                              \
     ({                                                                         \
         typeof(x) _min1 = (x);                                                 \
@@ -19,8 +20,6 @@
         (void)(&_min1 == &_min2);                                              \
         _min1 < _min2 ? _min1 : _min2;                                         \
     })
-
-#endif
 #endif
 
 #define CEILDIV(x, y) ((x + (y - 1)) / y)

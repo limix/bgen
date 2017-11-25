@@ -55,10 +55,13 @@ set(SOURCES "src/util/mem.c"
     "src/layout/two.c"
     "src/layout/one.c"
     "src/tpl/tpl.c"
-    "src/tpl/win/mmap.c"
     "src/zip/zstd_wrapper.c"
     "src/zip/zlib_wrapper.c"
     "src/bgen.c")
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(SOURCES ${SOURCES} "src/tpl/win/mmap.c")
+endif()
 
 set(PUBLIC_HEADERS "include/bgen/bgen.h;include/bgen/string.h")
 
