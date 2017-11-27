@@ -21,14 +21,10 @@ build_script:
   - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\*.* lib
   - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\*.* include
   - cd ..
-  - dir
-  - cd
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/81d020fe594419295a190a189e67e62896110e7d/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
-  - dir
-  - cd
-  - type install.log
   - mkdir build
-  - copy deps\zstd\lib\libzstd.dll build\libzstd.dll
+  - copy "C:/Program Files/zstd/bin/zstd.dll" build/zstd.dll
+  - copy "C:/Program Files/zstd/bin/zstd.dll" build/libzstd.dll
   - copy deps\zlib\lib\zlib.dll build\zlib.dll
   - cd build
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
