@@ -10,7 +10,7 @@
 
 set(zstd_incl_dirs "/usr/include" "/usr/local/include")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(zstd_incl_dirs ${zstd_incl_dirs} "$ENV{PROGRAMFILES}/include")
+    set(zstd_incl_dirs ${zstd_incl_dirs} "$ENV{PROGRAMFILES}/zstd/include")
 endif()
 
 if(ZSTD_INCLUDEDIR)
@@ -25,7 +25,7 @@ find_path(
 
 set(zstd_lib_dirs "/usr/lib" "/usr/local/lib")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMFILES}/lib")
+    set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMFILES}/zstd/lib")
 endif()
 
 if(ZSTD_LIBRARYDIR)
