@@ -23,7 +23,7 @@ build_script:
   - cd ..
   - dir
   - cd
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/669c595bef71fef24e3b01db197aa100d4807c6d/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/81d020fe594419295a190a189e67e62896110e7d/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
   - dir
   - cd
   - type install.log
