@@ -21,17 +21,8 @@ build_script:
   - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\lib\native\v140\windesktop\msvcstl\dyn\rt-dyn\x64\Release\*.* lib
   - move zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\build\native\include\*.* include
   - cd ..
-  - git clone https://github.com/facebook/zstd.git zstd-source
-  - mkdir zstd
-  - mkdir zstd\lib
-  - mkdir zstd\include
-  - cd zstd-source
-  - msbuild "build\VS2010\zstd.sln" /m /verbosity:minimal /property:PlatformToolset=v140 /t:Clean,Build /p:Platform=%PLATFORM% /p:Configuration=%CONFIGURATION% /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
-  - cd ..
-  - move zstd-source\build\VS2010\bin\x64_Release\libzstd.* zstd\lib
-  - move zstd-source\build\VS2010\bin\x64_Release\libzstd_static.* zstd\lib
-  - move zstd-source\lib\*.h zstd\include
-  - cd ..
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/2f671a9acef187a7cefa9f4eadbed7cb1990629a/install-zstd.ba
+t', 'install-zstd.bat')" && .\install-zstd.bat
   - mkdir build
   - copy deps\zstd\lib\libzstd.dll build\libzstd.dll
   - copy deps\zlib\lib\zlib.dll build\zlib.dll
