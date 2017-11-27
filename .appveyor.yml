@@ -11,9 +11,9 @@ install:
 
 build_script:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+  - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/fd9aa4d3d55687d91c125543f32b0440f1a8ab96/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/81d020fe594419295a190a189e67e62896110e7d/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
-  - type install.log
   # - copy "C:\Program Files\zstd\bin\zstd.dll" build\zstd.dll
   # - copy "C:\Program Files\zstd\bin\zstd.dll" build\libzstd.dll
   # - copy deps\zlib\lib\zlib.dll build\zlib.dll
