@@ -13,7 +13,6 @@ build_script:
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/21e693e0edbc2d3e4c74979256246f275fc69d84/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
   - type install.log
   - mkdir build && cd build
-  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
   - nmake && ctest && nmake install
-  
