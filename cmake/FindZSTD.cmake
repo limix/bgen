@@ -9,6 +9,10 @@
 #   ZSTD_LIBRARYDIR       - Preferred library directory e.g. <prefix>/lib
 
 set(zstd_incl_dirs "/usr/include" "/usr/local/include")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(zstd_incl_dirs ${zstd_incl_dirs} "$ENV{PROGRAMFILES}/include")
+endif()
+
 if(ZSTD_INCLUDEDIR)
     list(APPEND zstd_incl_dirs ${ZSTD_INCLUDEDIR})
 endif()
@@ -19,8 +23,11 @@ find_path(
     HINTS ${zstd_incl_dirs}
 )
 
-
 set(zstd_lib_dirs "/usr/lib" "/usr/local/lib")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMFILES}/lib")
+endif()
+
 if(ZSTD_LIBRARYDIR)
     list(APPEND zstd_lib_dirs ${ZSTD_LIBRARYDIR})
 endif()

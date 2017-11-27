@@ -5,23 +5,15 @@ environment:
   PLATFORM: "x64"
   CONFIGURATION: "Release"
 
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
 build_script:
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/28df7424c5a61721f7e7ea3bb339268499f9126d/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/c9591f74c191c57d66cd35936097cfa51ac95b78/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/21e693e0edbc2d3e4c74979256246f275fc69d84/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
   - type install.log
-  # - copy "C:\Program Files\zstd\bin\zstd.dll" build\zstd.dll
-  # - copy "C:\Program Files\zstd\bin\zstd.dll" build\libzstd.dll
-  # - copy deps\zlib\lib\zlib.dll build\zlib.dll
   - mkdir build && cd build
-  # - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE -DZLIB_ROOT="C:\projects\bgen\deps\zlib" -DZSTD_LIBRARYDIR="C:\projects\bgen\deps\zstd\lib" -DZSTD_INCLUDEDIR="C:\projects\bgen\deps\zstd\include"
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
-  - nmake && ctest && nmake install
-
-on_finish:
   - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - nmake && ctest && nmake install
+  
