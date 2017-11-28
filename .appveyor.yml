@@ -16,6 +16,7 @@ build_script:
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/e41b29e7c6f9bd74f2732d065e21eea4/raw/9002589f236711bf81eaa22397fb85e03e2bf844/install-progressbar.bat', 'install-progressbar.bat')" && .\install-progressbar.bat
   - type install.log
+  - set PATH=%PATH%;C:\Program Files\zlib\bin;C:\Program Files\zstd\bin;C:\Program Files\ProgressBar\bin
   - mkdir build && cd build
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
