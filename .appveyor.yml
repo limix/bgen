@@ -14,7 +14,7 @@ build_script:
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/21e693e0edbc2d3e4c74979256246f275fc69d84/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
   - type install.log
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/e41b29e7c6f9bd74f2732d065e21eea4/raw/c288490b4fa10a75039f16c7f93b94359b0a9d31/install-progressbar.bat', 'install-progressbar.bat')" && .\install-progressbar.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/e41b29e7c6f9bd74f2732d065e21eea4/raw/9002589f236711bf81eaa22397fb85e03e2bf844/install-progressbar.bat', 'install-progressbar.bat')" && .\install-progressbar.bat
   - type install.log
   - mkdir build && cd build
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
