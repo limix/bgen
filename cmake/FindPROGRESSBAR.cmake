@@ -13,6 +13,9 @@ set(progressbar_incl_dirs "/usr/include" "/usr/local/include"
 if(PROGRESSBAR_INCLUDEDIR)
     list(APPEND progressbar_incl_dirs ${PROGRESSBAR_INCLUDEDIR})
 endif()
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(progressbar_incl_dirs ${progressbar_incl_dirs} "$ENV{PROGRAMFILES}/progressbar/include")
+endif()
 
 find_path(
     PROGRESSBAR_INCLUDE_DIR
@@ -26,6 +29,10 @@ set(progressbar_lib_dirs "/usr/lib" "/usr/local/lib"
 if(PROGRESSBAR_LIBRARYDIR)
     list(APPEND progressbar_lib_dirs ${PROGRESSBAR_LIBRARYDIR})
 endif()
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(progressbar_lib_dirs ${progressbar_lib_dirs} "$ENV{PROGRAMFILES}/progressbar/lib")
+endif()
+
 
 find_library(
     PROGRESSBAR_LIBRARY
