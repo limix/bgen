@@ -8,18 +8,11 @@
 #ifdef _MSC_VER
 #if (_MSC_VER <= 1500)
 #define isnan(x) _isnan(x)
-#define MIN(x, y) x < y ? x : y;
 #endif
 #endif
 
 #ifndef MIN
-#define MIN(x, y)                                                              \
-    ({                                                                         \
-        typeof(x) _min1 = (x);                                                 \
-        typeof(y) _min2 = (y);                                                 \
-        (void)(&_min1 == &_min2);                                              \
-        _min1 < _min2 ? _min1 : _min2;                                         \
-    })
+#define MIN(x, y) x < y ? x : y;
 #endif
 
 #define CEILDIV(x, y) ((x + (y - 1)) / y)
