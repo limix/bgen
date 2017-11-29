@@ -1,9 +1,25 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-file(STRINGS "VERSION" BGEN_VERSION)
-project(bgen VERSION ${BGEN_VERSION} LANGUAGES C)
+file(STRINGS ${CMAKE_HOME_DIRECTORY}/VERSION PROJECT_VERSION)
+project(bgen VERSION ${PROJECT_VERSION} LANGUAGES C)
+
+string(CONCAT WELCOME_MESSAGE_LINE0 "  Hello there."
+" This is the ${PROJECT_NAME} (${PROJECT_VERSION}) project."
+" We wish you an easy ride.")
+
+string(CONCAT WELCOME_MESSAGE_LINE1 "If by any chance you find in trouble,"
+" please, do not hesitate in contacting")
+
+set(WELCOME_MESSAGE_LINE2 "us at <https://github.com/bgen-reader/issues/new>.")
+
+message(">>>")
+message(${WELCOME_MESSAGE_LINE0})
+message(${WELCOME_MESSAGE_LINE1})
+message(${WELCOME_MESSAGE_LINE2})
+message("<<<")
 
 include(GNUInstallDirs)
 
+message(WARNING "-- TODO: convert gnu version check into feature requirement")
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
   execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
                   OUTPUT_VARIABLE GCC_VERSION)
@@ -15,12 +31,18 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
   endif ()
 endif ()
 
-set(CMAKE_MACOSX_RPATH 1)
-set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-add_definitions(-DTPL_NOLIB)
+# Common configuration
+set(CMAKE_MACOSX_RPATH TRUE)
+if (NOT CMAKE_BUILD_TYPE)
+    set(MSG "CMAKE_BUILD_TYPE has not been set.")
+    set(MSG "${MSG} Using the default value \"Release\".")
+    message(STATUS "${MSG}")
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 
+# Windows specific common configuration
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
@@ -28,50 +50,30 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   add_definitions(-Dinline=__inline)
 endif()
 
-find_package( ZLIB REQUIRED )
-if(NOT ZLIB_FOUND)
-    message(STATUS "Could not find zlib library. If you have it installed,
-                    please, define ZLIB_LIBRARYDIR and ZLIB_INCLUDEDIR
-                    appropriately to fix it.")
-endif()
+add_definitions(-DTPL_NOLIB)
 
+find_package(ZLIB REQUIRED)
+find_package(ZSTD REQUIRED )
+find_package(PROGRESSBAR REQUIRED)
 
-find_package( ZSTD REQUIRED )
-find_package( PROGRESSBAR REQUIRED )
-
-include_directories( ${ZLIB_INCLUDE_DIRS} )
-include_directories( ${ZSTD_INCLUDE_DIRS} )
-include_directories( ${PROGRESSBAR_INCLUDE_DIRS} )
-include_directories( include/ )
-include_directories( src/ )
+include_directories(${ZLIB_INCLUDE_DIRS})
+include_directories(${ZSTD_INCLUDE_DIRS})
+include_directories(${PROGRESSBAR_INCLUDE_DIRS})
+include_directories(include)
+include_directories(src)
 
 add_subdirectory(src)
+define_sources(src SOURCES)
 
-set(SOURCES "src/util/mem.c"
-    "src/util/string.c"
-    "src/util/choose.c"
-    "src/util/tpl.c"
-    "src/util/buffer.c"
-    "src/variants_index.c"
-    "src/layout/two.c"
-    "src/layout/one.c"
-    "src/tpl/tpl.c"
-    "src/zip/zstd_wrapper.c"
-    "src/zip/zlib_wrapper.c"
-    "src/bgen.c")
+add_subdirectory(include)
+define_public_headers(include PUBLIC_HEADERS)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(SOURCES ${SOURCES} "src/tpl/win/mmap.c")
-endif()
-
-set(PUBLIC_HEADERS "include/bgen/bgen.h;include/bgen/string.h")
-
-add_library(bgen SHARED "${SOURCES}")
-add_library(bgen_static STATIC "${SOURCES}")
+add_library(bgen SHARED ${SOURCES})
+add_library(bgen_static STATIC ${SOURCES})
 
 set_target_properties(bgen
   PROPERTIES
-    VERSION ${BGEN_VERSION}
+    VERSION ${PROJECT_VERSION}
     PUBLIC_HEADER "${PUBLIC_HEADERS}")
 
 install(TARGETS bgen
