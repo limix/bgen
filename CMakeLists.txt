@@ -1,23 +1,10 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-file(STRINGS ${CMAKE_HOME_DIRECTORY}/VERSION PROJECT_VERSION)
+include(limix.cmake)
+
+define_standard_variables()
 project(bgen VERSION ${PROJECT_VERSION} LANGUAGES C)
 
-string(CONCAT WELCOME_MESSAGE_LINE0 "  Hello there."
-" This is the ${PROJECT_NAME} (${PROJECT_VERSION}) project."
-" We wish you an easy ride.")
-
-string(CONCAT WELCOME_MESSAGE_LINE1 "If by any chance you find in trouble,"
-" please, do not hesitate in contacting")
-
-set(WELCOME_MESSAGE_LINE2 "us at <https://github.com/bgen-reader/issues/new>.")
-
-message(">>>")
-message(${WELCOME_MESSAGE_LINE0})
-message(${WELCOME_MESSAGE_LINE1})
-message(${WELCOME_MESSAGE_LINE2})
-message("<<<")
-
-include(GNUInstallDirs)
+display_welcome()
 
 message(WARNING "-- TODO: convert gnu version check into feature requirement")
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
