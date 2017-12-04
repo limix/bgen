@@ -1,8 +1,0 @@
-function(display_welcome)
-    foreach(MSG ${WELCOME})
-        string(REPLACE "{NAME}" ${PROJECT_NAME} MSG ${MSG})
-        string(REPLACE "{VERSION}" ${PROJECT_VERSION} MSG ${MSG})
-        string(REPLACE "{GITHUB_URL}" ${GITHUB_URL} MSG ${MSG})
-        message(${MSG})
-    endforeach()
-endfunction(display_welcome)
