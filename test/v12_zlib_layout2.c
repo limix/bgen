@@ -62,7 +62,7 @@ int test_read_probabilities(struct BGenVI *index, int nsamples, int prec) {
     size_t i, j;
     double *probabilities;
 
-    if ((f = fopen("test/data/example.matrix", "r")) == NULL)
+    if ((f = fopen("data/example.matrix", "r")) == NULL)
         return 1;
 
     for (i = 0; i < 199; ++i) {

@@ -1,12 +1,12 @@
 #include "example_files.h"
 
-const char *examples[] = {"test/data/example.1bits.bgen",
-                          "test/data/example.14bits.bgen",
-                          "test/data/example.32bits.bgen"};
+const char *examples[] = {"data/example.1bits.bgen",
+                          "data/example.14bits.bgen",
+                          "data/example.32bits.bgen"};
 
-const char *indices[] = {"test/data/example.1bits.bgen.index",
-                         "test/data/example.14bits.bgen.index",
-                         "test/data/example.32bits.bgen.index"};
+const char *indices[] = {"data/example.1bits.bgen.index",
+                         "data/example.14bits.bgen.index",
+                         "data/example.32bits.bgen.index"};
 
 const int precision[] = {1, 14, 32};
 
