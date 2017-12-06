@@ -1,8 +1,7 @@
 include_directories("${TEST_SOURCE_DIR}/src")
 
-add_executable(v12_zlib_layout2 v12_zlib_layout2.c example_files.c)
-target_link_libraries(v12_zlib_layout2 bgen)
-add_test(test_v12_zlib_layout2 v12_zlib_layout2)
+set(SOURCES "v12_zlib_layout2.c;example_files.c")
+limix_add_test(v12_zlib_layout2 ${PROJECT_NAME} "${SOURCES}")
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)
