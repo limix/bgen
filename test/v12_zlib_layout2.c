@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef isnan
 int isnan(double x)
 {
 #if defined _MSC_VER
@@ -17,6 +18,7 @@ int isnan(double x)
     return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) +
            ( (unsigned)ieee754.u != 0 ) > 0x7ff00000;
 }
+#endif
 
 int test_read_metadata(struct BGenFile *bgen, string *s, struct BGenVar *v) {
     if (bgen_nsamples(bgen) != 500)
