@@ -19,5 +19,5 @@ build_script:
   - set PATH=%PATH%;C:\Program Files\zlib\bin;C:\Program Files\zstd\bin;C:\Program Files\ProgressBar\bin
   - mkdir build && cd build
   # - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - cmake .. -G "NMake Makefiles" -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=TRUE
-  - nmake && ctest && nmake install
+  - cmake .. -G "NMake Makefiles"
+  - cmake --build . && ctest && nmake install
