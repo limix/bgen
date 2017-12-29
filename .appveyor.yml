@@ -5,9 +5,6 @@ environment:
   PLATFORM: "x64"
   CONFIGURATION: "Release"
 
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-
 build_script:
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
@@ -19,10 +16,11 @@ build_script:
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/e41b29e7c6f9bd74f2732d065e21eea4/raw/9002589f236711bf81eaa22397fb85e03e2bf844/install-progressbar.bat', 'install-progressbar.bat')" && .\install-progressbar.bat
   - type install.log
-  - set PATH=%PATH%;C:\Program Files\zlib\bin;C:\Program Files\zstd\bin;C:\Program Files\ProgressBar\bin
   - mkdir build && cd build
   - cmake .. -G "NMake Makefiles"
   - cmake --build .
-  # - cmake --build . && ctest && nmake install
-on_finish:
-  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+  - cmake --build .
+  - copy "C:\Program Files\zlib\bin\zlib.dll" test\
+  - copy "C:\Program Files\zstd\bin\zstd.dll"  test\
+  - copy "C:\Program Files\ProgressBar\bin\progressbar.dll" test\
+  - ctest && nmake install
