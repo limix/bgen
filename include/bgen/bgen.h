@@ -2,6 +2,7 @@
 #define BGEN_BGEN_H
 
 #include "bgen/string.h"
+#include <math.h>
 #include <stdlib.h>
 
 #ifdef WIN32
