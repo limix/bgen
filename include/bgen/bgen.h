@@ -11,13 +11,6 @@ static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
 #endif
 #endif
 
-#ifdef _MSC_VER
-#if (_MSC_VER <= 1500)
-#include <float.h>
-#define isnan(x) _isnan(x)
-#endif
-#endif
-
 struct BGenFile;
 struct BGenVI;
 

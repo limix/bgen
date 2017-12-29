@@ -18,7 +18,9 @@ function(display_welcome)
     endforeach()
 endfunction(display_welcome)
 
-macro(common_config)
+macro(limix_config)
+    enable_testing()
+    
     if (NOT CMAKE_BUILD_TYPE)
         set(MSG "CMAKE_BUILD_TYPE has not been set.")
         set(MSG "${MSG} Using the default value \"Release\".")
@@ -42,16 +44,14 @@ macro(common_config)
       add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
       add_definitions(-Dinline=__inline)
     endif()
-endmacro(common_config)
+endmacro(limix_config)
 
 macro(limix_initialise)
-    enable_testing()
     file(STRINGS ${CMAKE_HOME_DIRECTORY}/NAME PROJECT_NAME)
     file(STRINGS ${CMAKE_HOME_DIRECTORY}/VERSION PROJECT_VERSION)
     file(STRINGS ${CMAKE_HOME_DIRECTORY}/WELCOME WELCOME)
     file(STRINGS ${CMAKE_HOME_DIRECTORY}/GITHUB_URL GITHUB_URL)
     display_welcome()
-    common_config()
 endmacro(limix_initialise)
 
 function(easy_set_target_property NAME PROPERTY VALUE)
@@ -94,4 +94,13 @@ macro(limix_add_test NAME LIBRARY SOURCES)
     add_executable(${NAME} ${SOURCES})
     target_link_libraries(${NAME} ${LIBRARY})
     add_test(test_${NAME} ${NAME})
+    set_property(TEST test_${NAME} APPEND PROPERTY ENVIRONMENT
+              "PATH=${CMAKE_BINARY_DIR}")
+
+    # set_property(TEST test_${NAME} PROPERTY ENVIRONMENT 
+    #    "PATH=%PATH%\;$<TARGET_FILE_DIR:${NAME}>")
+    # add_custom_command(TARGET ${NAME} POST_BUILD
+    #     COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    #     "${CMAKE_BINARY_DIR}/*.dll"
+    #     $<TARGET_FILE_DIR:${NAME}>)
 endmacro(limix_add_test)

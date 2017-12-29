@@ -1,9 +1,8 @@
 cmake_minimum_required(VERSION 3.2 FATAL_ERROR)
-
 include(cmake/limix.cmake)
 limix_initialise()
-
 project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} LANGUAGES C)
+limix_config()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 add_definitions(-DTPL_NOLIB)
@@ -29,6 +28,7 @@ define_public_headers(include HEADERS)
 
 macro(create_libraries)
     set(LIBS "${ZLIB_LIBRARIES};${ZSTD_LIBRARIES};${PROGRESSBAR_LIBRARIES}")
+    message(${LIBS})
     set(NAME ${PROJECT_NAME})
     set(VERSION ${PROJECT_VERSION})
     limix_add_library(${NAME} ${VERSION} "${SOURCES}" "${HEADERS}" "${LIBS}")

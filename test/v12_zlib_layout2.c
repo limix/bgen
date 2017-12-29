@@ -2,9 +2,21 @@
 
 #include "bgen/bgen.h"
 #include <math.h>
+#include <float.h>
 #include <stdio.h>
 #include <string.h>
 
+int isnan(double x)
+{
+#if defined _MSC_VER
+    union { __int64 u; double f; } ieee754;
+#else
+    union { uint64_t u; double f; } ieee754;
+#endif
+    ieee754.f = x;
+    return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) +
+           ( (unsigned)ieee754.u != 0 ) > 0x7ff00000;
+}
 
 int test_read_metadata(struct BGenFile *bgen, string *s, struct BGenVar *v) {
     if (bgen_nsamples(bgen) != 500)

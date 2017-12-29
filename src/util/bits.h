@@ -5,12 +5,6 @@
 #define GetBit(var, bit) ((var & (1 << bit)) != 0)
 #define SetBit(var, bit) (var |= (1 << bit))
 
-#ifdef _MSC_VER
-#if (_MSC_VER <= 1500)
-#define isnan(x) _isnan(x)
-#endif
-#endif
-
 #ifndef MIN
 #define MIN(x, y) x < y ? x : y;
 #endif
