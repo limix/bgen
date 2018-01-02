@@ -3,13 +3,14 @@ os:
   - osx
 dist: trusty
 language: c
-sudo: required
+sudo: false
 compiler:
 - clang
 - gcc
 before_script:
 - bash <(curl -fsSL https://gist.githubusercontent.com/Horta/ed6baba1bf2626274141dc9c955ae58f/raw/403859c606121b9673dc7d1804a82661fb1f45c5/install-zstd)
 - bash <(curl -fsSL https://raw.githubusercontent.com/limix/progressbar/master/install)
+script:
 - mkdir build && pushd build
 - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR -DCMAKE_BUILD_TYPE=Release
 - make && make test && make install
