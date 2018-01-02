@@ -10,7 +10,7 @@ build_script:
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - choco install cmake
   - set PATH=C:\Program Files\CMake\bin;%PATH%
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/c9591f74c191c57d66cd35936097cfa51ac95b78/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/8d851f0a2aa9449336eff463b48924f3da76c2be/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/f6b57c6ef0df967fc8d0b2ec5e3ac80c631972c0/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
   - type install.log
