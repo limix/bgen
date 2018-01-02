@@ -3,9 +3,9 @@
 
 #include "bgen/bgen.h"
 
-const char *get_example_filepath(int i);
-const char *get_example_index_filepath(int i);
-int get_example_precision(int i);
+const char *get_example_filepath(size_t i);
+const char *get_example_index_filepath(size_t i);
+int get_example_precision(size_t i);
 int get_nexamples();
 
 #endif /* end of include guard: BGEN_TEST_EXAMPLE_FILES_H */

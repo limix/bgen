@@ -10,17 +10,17 @@ const char *indices[] = {"data/example.1bits.bgen.index",
 
 const int precision[] = {1, 14, 32};
 
-const char *get_example_filepath(int i)
+const char *get_example_filepath(size_t i)
 {
     return examples[i];
 }
 
-const char *get_example_index_filepath(int i)
+const char *get_example_index_filepath(size_t i)
 {
     return indices[i];
 }
 
-int get_example_precision(int i)
+int get_example_precision(size_t i)
 {
     return precision[i];
 }
