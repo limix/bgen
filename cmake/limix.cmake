@@ -1,4 +1,4 @@
-# limix 
+# limix
 # ---------
 #
 # Common configuration and handy functions for limix projects.
@@ -20,7 +20,7 @@ endfunction(display_welcome)
 
 macro(limix_config)
     enable_testing()
-    
+
     if (NOT CMAKE_BUILD_TYPE)
         set(MSG "CMAKE_BUILD_TYPE has not been set.")
         set(MSG "${MSG} Using the default value \"Release\".")
@@ -44,7 +44,18 @@ macro(limix_config)
       add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
       add_definitions(-Dinline=__inline)
     endif()
+
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
 endmacro(limix_config)
+
+macro(limix_process_default_dirs)
+    include_directories(src include)
+    add_subdirectory(src)
+    add_subdirectory(include)
+
+    define_sources(src SOURCES)
+    define_public_headers(include HEADERS)
+endmacro(limix_process_default_dirs)
 
 macro(limix_initialise)
     file(STRINGS ${CMAKE_HOME_DIRECTORY}/NAME PROJECT_NAME)
@@ -58,13 +69,19 @@ function(easy_set_target_property NAME PROPERTY VALUE)
     set_target_properties(${NAME} PROPERTIES ${PROPERTY} "${VALUE}")
 endfunction(easy_set_target_property)
 
-function(easy_install TARGET_NAME INCLUDE_DIR)
+function(easy_shared_install TARGET_NAME INCLUDE_DIR)
     install(TARGETS ${TARGET_NAME}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         PUBLIC_HEADER DESTINATION ${INCLUDE_DIR})
-endfunction(easy_install)
+endfunction(easy_shared_install)
+
+function(easy_static_install TARGET_NAME INCLUDE_DIR)
+    install(TARGETS ${TARGET_NAME}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endfunction(easy_static_install)
 
 function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
     if (TYPE MATCHES "STATIC")
@@ -75,11 +92,9 @@ function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
     easy_set_target_property(${NAME} VERSION ${VERSION})
     if (TYPE MATCHES "SHARED")
         easy_set_target_property(${NAME} PUBLIC_HEADER "${PUBLIC_HEADERS}")
-    endif()
-
-
-    if (TYPE MATCHES "SHARED")
-        easy_install(${NAME} include/${NAME})
+        easy_shared_install(${NAME} include/${NAME})
+    else()
+        easy_static_install(${NAME} include/${NAME})
     endif()
 
     target_link_libraries(${NAME} "${LIBS}")
@@ -102,3 +117,10 @@ macro(limix_add_test NAME LIBRARY SOURCES)
     set_property(TEST test_${NAME} APPEND PROPERTY ENVIRONMENT
               "PATH=${MYPATH}")
 endmacro(limix_add_test)
+
+function(limix_convert_rel_to_full _FULL BASE_DIR REL)
+    foreach(SRC ${REL})
+        list(APPEND FULL "${BASE_DIR}/${SRC}")
+    endforeach()
+    set(${_FULL} ${FULL} PARENT_SCOPE)
+endfunction(limix_convert_rel_to_full)

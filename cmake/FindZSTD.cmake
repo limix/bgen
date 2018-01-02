@@ -34,7 +34,7 @@ endif()
 
 find_library(
     ZSTD_LIBRARY
-    NAMES zstd
+    NAMES zstd zstdlib libzstd
     HINTS ${zstd_lib_dirs}
 )
 

@@ -1,7 +1,6 @@
 include_directories("${TEST_SOURCE_DIR}/src")
 
-set(SOURCES "v12_zlib_layout2.c;example_files.c")
-limix_add_test(v12_zlib_layout2 ${PROJECT_NAME} "${SOURCES}")
+limix_add_test(v12_zlib_layout2 ${PROJECT_NAME} "v12_zlib_layout2.c;example_files.c")
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)
