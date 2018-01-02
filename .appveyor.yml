@@ -4,19 +4,17 @@ image: Visual Studio 2015
 environment:
   PLATFORM: "x64"
   CONFIGURATION: "Release"
-init:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 build_script:
   - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
   - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
   - choco install cmake
   - set PATH=C:\Program Files\CMake\bin;%PATH%
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/ef81ff3a2ccddb2b4dd51156d3bca3b0f7b14802/install-zlib.bat', 'install-zlib.bat')" && .\install-zlib.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/18a6bda81f254d6a9f8f61e82101b66b/raw/ef81ff3a2ccddb2b4dd51156d3bca3b0f7b14802/install-zlib.bat', 'install-zlib.bat')" && call install-zlib.bat
   - type install.log
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/8697f4de0ce8333bbc1418dfd47c6ed413f59e52/install-zstd.bat', 'install-zstd.bat')" && .\install-zstd.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/8697f4de0ce8333bbc1418dfd47c6ed413f59e52/install-zstd.bat', 'install-zstd.bat')" && call install-zstd.bat
   - type install.log
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/limix/progressbar/master/install.bat', 'install.bat')" && .\install.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/limix/progressbar/master/install.bat', 'install.bat')" && call install.bat
   - type install.log
   - mkdir build && cd build
   - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER% ..
