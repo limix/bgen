@@ -1,6 +1,6 @@
 # bgen
 
-[![Release](http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat)](https://github.com/limix/bgen/releases/latest) [![Linux / macOS](https://img.shields.io/travis/limix/bgen/master.svg?label=Linux%20%2F%20macOS&style=flat-square)](https://travis-ci.org/limix/bgen) [![Windows](https://img.shields.io/appveyor/ci/horta/bgen/master.svg?label=Windows&style=flat-square)](https://ci.appveyor.com/project/Horta/bgen/branch/master)
+[![Release](http://github-release-version.herokuapp.com/github/limix/bgen/release.svg?style=flat-square)](https://github.com/limix/bgen/releases/latest) [![Linux / macOS](https://img.shields.io/travis/limix/bgen/master.svg?label=Linux%20%2F%20macOS&style=flat-square)](https://travis-ci.org/limix/bgen) [![Windows](https://img.shields.io/appveyor/ci/horta/bgen/master.svg?label=Windows&style=flat-square)](https://ci.appveyor.com/project/Horta/bgen/branch/master)
 
 A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
 
