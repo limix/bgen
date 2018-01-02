@@ -93,14 +93,12 @@ endfunction(limix_add_library)
 macro(limix_add_test NAME LIBRARY SOURCES)
     add_executable(${NAME} ${SOURCES})
     target_link_libraries(${NAME} ${LIBRARY})
-    add_test(test_${NAME} ${NAME})
-    set_property(TEST test_${NAME} APPEND PROPERTY ENVIRONMENT
-              "PATH=${CMAKE_BINARY_DIR}")
+    add_test(test_${NAME} ${NAME} -E environment)
 
-    # set_property(TEST test_${NAME} PROPERTY ENVIRONMENT 
-    #    "PATH=%PATH%\;$<TARGET_FILE_DIR:${NAME}>")
-    # add_custom_command(TARGET ${NAME} POST_BUILD
-    #     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    #     "${CMAKE_BINARY_DIR}/*.dll"
-    #     $<TARGET_FILE_DIR:${NAME}>)
+    file(TO_CMAKE_PATH "$ENV{PATH}" MYPATH)
+    list(APPEND MYPATH ${CMAKE_BINARY_DIR})
+    string(REPLACE ";" "\\;" MYPATH "${MYPATH}")
+
+    set_property(TEST test_${NAME} APPEND PROPERTY ENVIRONMENT
+              "PATH=${MYPATH}")
 endmacro(limix_add_test)

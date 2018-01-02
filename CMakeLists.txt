@@ -28,7 +28,6 @@ define_public_headers(include HEADERS)
 
 macro(create_libraries)
     set(LIBS "${ZLIB_LIBRARIES};${ZSTD_LIBRARIES};${PROGRESSBAR_LIBRARIES}")
-    message(${LIBS})
     set(NAME ${PROJECT_NAME})
     set(VERSION ${PROJECT_VERSION})
     limix_add_library(${NAME} ${VERSION} "${SOURCES}" "${HEADERS}" "${LIBS}")
