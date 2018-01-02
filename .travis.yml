@@ -9,6 +9,8 @@ compiler:
 before_script:
 - bash <(curl -fsSL https://gist.githubusercontent.com/Horta/ed6baba1bf2626274141dc9c955ae58f/raw/403859c606121b9673dc7d1804a82661fb1f45c5/install-zstd)
 - bash <(curl -fsSL https://raw.githubusercontent.com/limix/progressbar/master/install)
+- mkdir build && pushd build
+- cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR -DCMAKE_BUILD_TYPE=Release
 - make && make test && make install
 - popd && rm -rf build
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libprogressbar.so; fi
