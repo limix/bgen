@@ -59,8 +59,8 @@ silent_run do_then_sudo make install
 [ $? == 0 ] && echo "done." || { echo "FAILED."; exit 1; }
 
 cd .. && cd ..
-silent_trun rm bgen-$VERSION.tar.gz
-silent_trun rm -rf bgen-$VERSION
+silent_trun rm $FILE
+silent_trun rm -rf $DIR
 
 if type "ldconfig" >/dev/null 2>&1; then
     silent_run do_then_sudo ldconfig
