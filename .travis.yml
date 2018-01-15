@@ -9,7 +9,7 @@ compiler:
 - gcc
 before_script:
 - bash <(curl -fsSL https://gist.githubusercontent.com/Horta/ed6baba1bf2626274141dc9c955ae58f/raw/76ca3cee05de4fc0c0c356bcf22a717d4054137e/install-zstd)
-- bash <(curl -fsSL https://raw.githubusercontent.com/limix/progressbar/master/install)
+- bash <(curl -fsSL https://raw.githubusercontent.com/horta/almosthere/master/install)
 script:
 - mkdir build && pushd build
 - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR -DCMAKE_BUILD_TYPE=Release
