@@ -1,3 +1,5 @@
+build: off
+
 notifications:
   - provider: Email
     on_build_success: false
@@ -18,8 +20,11 @@ environment:
 build_script:
     - mkdir build.%BDIR% && cd build.%BDIR%
     - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install-zlib.bat')" && install-zlib.bat
-    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.github.com/horta/3691adb8790e0d6358a54a00ffe4edd3/raw/', 'install-zstd.bat')" && call install-zstd.bat
+    - set PATH=%programfiles%\zlib\bin;%PATH%
+    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zstd.install/master/install.bat', 'install-zstd.bat')" && call install-zstd.bat
+    - set PATH=%programfiles%\zstd\bin;%PATH%
     - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/almosthere/master/install.bat', 'install.bat')" && call install.bat
+    - set PATH=%programfiles%\athr\bin;%PATH%
     - cmake .. -G"%PRJ_GEN%"
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%
