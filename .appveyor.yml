@@ -14,7 +14,7 @@ build_script:
   - type install.log
   - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://gist.githubusercontent.com/Horta/3691adb8790e0d6358a54a00ffe4edd3/raw/8697f4de0ce8333bbc1418dfd47c6ed413f59e52/install-zstd.bat', 'install-zstd.bat')" && call install-zstd.bat
   - type install.log
-  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/limix/progressbar/master/install.bat', 'install.bat')" && call install.bat
+  - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/almosthere/master/install.bat', 'install.bat')" && call install.bat
   - type install.log
   - mkdir build && cd build
   - cmake -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER% ..
