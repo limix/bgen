@@ -1,4 +1,4 @@
-#include "progressbar/progressbar.h"
+#include "athr.h"
 #include "util/bits.h"
 #include "util/buffer.h"
 #include "zip/zstd_wrapper.h"
@@ -18,7 +18,7 @@ struct Buffer *buffer_create() {
 
 int buffer_append(struct Buffer *b, void *mem, size_t size) {
     b->base = realloc(b->base, b->size + size);
-    memcpy((char*) b->base + b->size, mem, size);
+    memcpy((char *)b->base + b->size, mem, size);
     b->size += size;
     return 0;
 }
@@ -96,7 +96,7 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
         goto err;
     }
 
-    b->size = (size_t) uncompressed_size;
+    b->size = (size_t)uncompressed_size;
     b->base = malloc(b->size);
 
     if (fread(&compressed_size, 1, 8, f) != 8) {
@@ -104,13 +104,14 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
         goto err;
     }
 
-    compressed = malloc((size_t) compressed_size);
-    if (buffer_load_loop(f, compressed, (size_t) compressed_size, verbose)) {
+    compressed = malloc((size_t)compressed_size);
+    if (buffer_load_loop(f, compressed, (size_t)compressed_size, verbose)) {
         goto err;
     }
 
     dst_size = b->size;
-    if (bgen_unzstd(compressed, (size_t) compressed_size, &(b->base), &dst_size)) {
+    if (bgen_unzstd(compressed, (size_t)compressed_size, &(b->base),
+                    &dst_size)) {
         goto err;
     }
 
@@ -133,12 +134,11 @@ err:
     return 1;
 }
 
-int buffer_load_loop(FILE *file, char *data, size_t size, int verbose)
-{
+int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
     size_t chunk_size = 5242880;
     size_t read_size;
     char *last, *current;
-    progressbar *progress;
+    struct athr *athr;
     int nsteps = CEILDIV(size, chunk_size);
 
     current = data;
@@ -146,26 +146,26 @@ int buffer_load_loop(FILE *file, char *data, size_t size, int verbose)
 
     chunk_size = MIN(size, chunk_size);
     if (verbose)
-        progress = progressbar_new("Loading index", nsteps);
+        athr = athr_create(nsteps, "Loading index");
     else
-        progress = NULL;
+        athr = NULL;
 
     while (current < last) {
 
-        read_size = MIN(chunk_size, (size_t) (last - current));
+        read_size = MIN(chunk_size, (size_t)(last - current));
         if (fread(current, 1, read_size, file) < read_size) {
             perror("Could not read compressed data");
             if (verbose)
-                progressbar_finish(progress);
+                athr_finish(athr);
             return 1;
         }
         current += read_size;
 
         if (verbose)
-            progressbar_inc(progress);
+            athr_consume(athr, 1);
     }
 
     if (verbose)
-        progressbar_finish(progress);
+        athr_finish(athr);
     return 0;
 }
