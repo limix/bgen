@@ -1,9 +1,13 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#include "bgen/string.h"
 #include <math.h>
 #include <stdlib.h>
+
+typedef struct string {
+    int len;
+    char *str;
+} string;
 
 #ifdef WIN32
 #ifndef NAN
