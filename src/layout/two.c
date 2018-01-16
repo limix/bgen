@@ -6,7 +6,7 @@
 #include "variant_genotype.h"
 #include "variants_index.h"
 
-#include "bgen/bgen.h"
+#include "bgen.h"
 #include "util/bits.h"
 
 #include "bgen_file.h"

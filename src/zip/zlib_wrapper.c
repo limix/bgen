@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <zlib.h>
 
-#include "bgen/string.h"
+#include "bgen.h"
 
 int bgen_unzlib(const char *src, size_t src_size, char **dst,
                 size_t *dst_size) {

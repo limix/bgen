@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-#include "bgen/bgen.h"
+#include "bgen.h"
 
 int bgen_read_probs_header_one(struct BGenVI *, struct BGenVG *, FILE *);
 void bgen_read_probs_one(struct BGenVG *, double *);

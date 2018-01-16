@@ -4,8 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bgen/bgen.h"
-#include "bgen/string.h"
+#include "bgen.h"
 #include "bgen_file.h"
 #include "layout/one.h"
 #include "layout/two.h"
@@ -141,7 +140,7 @@ string *bgen_read_samples(struct BGenFile *bgen) {
     if (fread(&nsamples, 1, 4, bgen->file) < 4)
         goto err;
 
-    for (i = 0; i < (size_t) bgen->nsamples; ++i) {
+    for (i = 0; i < (size_t)bgen->nsamples; ++i) {
         if (fread_string(bgen->file, sample_ids + i, 2))
             goto err;
     }
@@ -174,7 +173,7 @@ void bgen_free_samples(const struct BGenFile *bgen, string *samples) {
     if (samples == NULL)
         return;
 
-    for (i = 0; i < (size_t) bgen->nsamples; ++i) {
+    for (i = 0; i < (size_t)bgen->nsamples; ++i) {
         free(samples[i].str);
     }
     free(samples);
@@ -213,7 +212,7 @@ int bgen_read_variant(struct BGenFile *bgen, struct BGenVar *v) {
 
     v->allele_ids = malloc(nalleles * sizeof(string));
 
-    for (i = 0; i < (size_t) v->nalleles; ++i) {
+    for (i = 0; i < (size_t)v->nalleles; ++i) {
         if (fread_string(bgen->file, v->allele_ids + i, 4))
             return 1;
     }
@@ -284,8 +283,8 @@ err:
 void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants) {
     size_t i, j;
 
-    for (i = 0; i < (size_t) bgen->nvariants; ++i) {
-        for (j = 0; j < (size_t) variants[i].nalleles; ++j) {
+    for (i = 0; i < (size_t)bgen->nvariants; ++i) {
+        for (j = 0; j < (size_t)variants[i].nalleles; ++j) {
             free(variants[i].allele_ids[j].str);
         }
         free(variants[i].allele_ids);
@@ -317,7 +316,7 @@ struct BGenVG *bgen_open_variant_genotype(struct BGenVI *index,
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (fseek(file, (long) index->start[variant_idx], SEEK_SET)) {
+    if (fseek(file, (long)index->start[variant_idx], SEEK_SET)) {
         perror("Could not seek a variant ");
         return NULL;
     }

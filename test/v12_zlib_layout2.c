@@ -1,6 +1,6 @@
 #include "example_files.h"
 
-#include "bgen/bgen.h"
+#include "bgen.h"
 #include <float.h>
 #include <stdio.h>
 #include <string.h>

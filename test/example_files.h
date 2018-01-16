@@ -1,7 +1,7 @@
 #ifndef BGEN_TEST_EXAMPLE_FILES_H
 #define BGEN_TEST_EXAMPLE_FILES_H
 
-#include "bgen/bgen.h"
+#include "bgen.h"
 
 const char *get_example_filepath(size_t i);
 const char *get_example_index_filepath(size_t i);

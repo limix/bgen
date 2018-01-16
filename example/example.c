@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bgen/bgen.h"
+#include "bgen.h"
 
 int main() {
     const char filepath[] = "example.bgen";

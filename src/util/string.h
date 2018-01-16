@@ -1,7 +1,7 @@
 #ifndef BGEN_UTIL_STRING_H
 #define BGEN_UTIL_STRING_H
 
-#include "bgen/string.h"
+#include "bgen.h"
 #include <stdio.h>
 
 int fread_string(FILE *file, string *s, size_t len_size);
