@@ -40,6 +40,11 @@ assuming that you have both zlib (often the case) and Zstandard (usually not the
 
 Refer to [documentation](https://bgen.readthedocs.io/) for usage and API description.
 
+## File specification
+
+The original specification can be found at [http://www.well.ox.ac.uk/~gav/bgen_format/](http://www.well.ox.ac.uk/~gav/bgen_format/).
+We have also created an alternative, more [user-friendly BGEN specification](bgen-file-format.pdf).
+
 ## Authors
 
   - [Danilo Horta](https://github.com/horta)
