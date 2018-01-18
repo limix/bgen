@@ -21,10 +21,9 @@ build_script:
     - set PATH=%programfiles%\zstd\bin;%PATH%
     - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/almosthere/master/install.bat', 'install.bat')" && call install.bat
     - set PATH=%programfiles%\athr\bin;%PATH%
-    - cmake .. -G"%PRJ_GEN%"
+    - cmake ..
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%
-        -DCMAKE_BUILD_TYPE=Release
     - cmake --build . --config Release --target install
     - ctest -V --output-on-failure -C Release
 
