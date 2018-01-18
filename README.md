@@ -8,7 +8,11 @@ It fully supports the BGEN format specifications 1.2 and 1.3.
 
 ## Requirements
 
-It makes use of the [Zstandard library](http://facebook.github.io/zstd/). You don't need to install it by yourself if you choose to install bgen via [conda](http://conda.pydata.org/docs/index.html) but you do need it installed before-hand if you choose to build bgen library by yourself. It also makes use of the [progressbar library](https://github.com/limix/progressbar) for showing progress while performing time-consuming tasks.
+It makes use of the [Zstandard library](http://facebook.github.io/zstd/). You don't need to install it by yourself if you choose to install bgen via [conda](http://conda.pydata.org/docs/index.html) but you do need it installed before-hand if you choose to build bgen library by yourself. It also makes use of the [almosthere library](https://github.com/horta/almosthere) for showing progress while performing time-consuming tasks:
+
+- [zstd install](https://github.com/horta/zstd.install)
+- [zlib install](https://github.com/horta/zlib.install)
+- [almosthere install](https://github.com/horta/almosthere)
 
 ## Install
 
