@@ -22,22 +22,37 @@ int bgen_read_header(struct BGenFile *bgen) {
     uint32_t magic_number;
     uint32_t flags;
 
-    if (fread(&header_length, 1, 4, bgen->file) < 4)
+    if (fread(&header_length, 1, 4, bgen->file) < 4) {
+        fprintf(stderr, "Could not read the header length.\n");
         return 1;
+    }
 
-    if (fread(&nvariants, 1, 4, bgen->file) < 4)
+    if (fread(&nvariants, 1, 4, bgen->file) < 4) {
+        fprintf(stderr, "Could not read the number of variants.\n");
         return 1;
+    }
 
-    if (fread(&nsamples, 1, 4, bgen->file) < 4)
+    if (fread(&nsamples, 1, 4, bgen->file) < 4) {
+        fprintf(stderr, "Could not read the number of samples.\n");
         return 1;
+    }
 
-    if (fread(&magic_number, 1, 4, bgen->file) < 4)
+    if (fread(&magic_number, 1, 4, bgen->file) < 4) {
+        fprintf(stderr, "Could not read the magic number.\n");
         return 1;
+    }
+
+    if (magic_number != 1852139362) {
+        fprintf(stderr, "This is not a BGEN file: magic number mismatch.\n");
+        return 1;
+    }
 
     fseek(bgen->file, header_length - 20, SEEK_CUR);
 
-    if (fread(&flags, 1, 4, bgen->file) < 4)
+    if (fread(&flags, 1, 4, bgen->file) < 4) {
+        fprintf(stderr, "Could not read the bgen flags.\n");
         return 1;
+    }
 
     bgen->nvariants = nvariants;
     bgen->nsamples = nsamples;
@@ -71,8 +86,10 @@ struct BGenFile *bgen_open(const char *filepath) {
 
     bgen->variants_start = offset + 4;
 
-    if (bgen_read_header(bgen))
+    if (bgen_read_header(bgen)) {
+        fprintf(stderr, "Could not read bgen header.");
         goto err;
+    }
 
     if (bgen->sample_ids_presence == 0) {
         bgen->samples_start = ftell(bgen->file);
@@ -118,7 +135,7 @@ int bgen_nsamples(struct BGenFile *bgen) { return bgen->nsamples; }
 
 int bgen_nvariants(struct BGenFile *bgen) { return bgen->nvariants; }
 
-string *bgen_read_samples(struct BGenFile *bgen) {
+string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
     uint32_t length, nsamples;
     size_t i;
     string *sample_ids;
@@ -128,6 +145,8 @@ string *bgen_read_samples(struct BGenFile *bgen) {
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (bgen->sample_ids_presence == 0) {
+        if (verbose)
+            printf("This BGEN file does not contain sample IDs.\n");
         fclose(bgen->file);
         return NULL;
     }

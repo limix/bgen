@@ -145,10 +145,11 @@ int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
     last = data + size;
 
     chunk_size = MIN(size, chunk_size);
-    if (verbose)
+    if (verbose) {
         athr = athr_create(nsteps, "Loading index");
-    else
+    } else {
         athr = NULL;
+    }
 
     while (current < last) {
 

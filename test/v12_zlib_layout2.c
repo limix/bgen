@@ -6,16 +6,22 @@
 #include <string.h>
 
 #ifndef isnan
-int isnan(double x)
-{
+int isnan(double x) {
 #if defined _MSC_VER
-    union { __int64 u; double f; } ieee754;
+    union {
+        __int64 u;
+        double f;
+    } ieee754;
 #else
-    union { uint64_t u; double f; } ieee754;
+    union {
+        uint64_t u;
+        double f;
+    } ieee754;
 #endif
     ieee754.f = x;
-    return ( (unsigned)(ieee754.u >> 32) & 0x7fffffff ) +
-           ( (unsigned)ieee754.u != 0 ) > 0x7ff00000;
+    return ((unsigned)(ieee754.u >> 32) & 0x7fffffff) +
+               ((unsigned)ieee754.u != 0) >
+           0x7ff00000;
 }
 #endif
 
@@ -49,7 +55,7 @@ int test_reading(const char *fp0, const char *fp1, struct BGenVI **index) {
     if ((bgen = bgen_open(fp0)) == NULL)
         return 1;
 
-    s = bgen_read_samples(bgen);
+    s = bgen_read_samples(bgen, 0);
     if (fp1)
         v = bgen_load_variants(bgen, fp1, index, 0);
     else
@@ -70,7 +76,7 @@ int test_read_probabilities(struct BGenVI *index, int nsamples, int prec) {
     struct BGenVG *vg;
     FILE *f;
     double prob[3];
-    double eps = (double) (1 << prec);
+    double eps = (double)(1 << prec);
     int ncombs;
     size_t i, j;
     double *probabilities;
@@ -130,8 +136,7 @@ int test_read_probabilities(struct BGenVI *index, int nsamples, int prec) {
     return 0;
 }
 
-int test_read(const char *bgen_fp, const char *index_fp, int precision)
-{
+int test_read(const char *bgen_fp, const char *index_fp, int precision) {
     struct BGenVI *index;
 
     if (test_reading(bgen_fp, index_fp, &index))
@@ -151,7 +156,7 @@ int main() {
     int prec;
     const char *ex, *ix;
 
-    for (i = 0; i < (size_t) get_nexamples(); ++i) {
+    for (i = 0; i < (size_t)get_nexamples(); ++i) {
         ex = get_example_filepath(i);
         ix = get_example_index_filepath(i);
         prec = get_example_precision(i);
