@@ -1,5 +1,0 @@
-#!/bin/bash
-
-V=$(cat VERSION)
-V="$(echo -e "${V}" | tr -d '[:space:]')"
-git archive --format=tar --prefix=bgen-$V/ HEAD | gzip --best >bgen-$V.tar.gz
