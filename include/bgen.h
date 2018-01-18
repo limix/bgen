@@ -59,7 +59,7 @@ int bgen_nvariants(struct BGenFile *bgen);
 
 // Gets array of sample identifications ought to be freed by calling
 // bgen_free_samples.
-string *bgen_read_samples(struct BGenFile *bgen, int verbose);
+string *bgen_read_samples(struct BGenFile *bgen);
 void bgen_free_samples(const struct BGenFile *bgen, string *samples);
 
 // BGenVar headers are read all at once via either bgen_read_variants

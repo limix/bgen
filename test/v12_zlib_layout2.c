@@ -55,7 +55,7 @@ int test_reading(const char *fp0, const char *fp1, struct BGenVI **index) {
     if ((bgen = bgen_open(fp0)) == NULL)
         return 1;
 
-    s = bgen_read_samples(bgen, 0);
+    s = bgen_read_samples(bgen);
     if (fp1)
         v = bgen_load_variants(bgen, fp1, index, 0);
     else

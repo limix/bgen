@@ -135,7 +135,7 @@ int bgen_nsamples(struct BGenFile *bgen) { return bgen->nsamples; }
 
 int bgen_nvariants(struct BGenFile *bgen) { return bgen->nvariants; }
 
-string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
+string *bgen_read_samples(struct BGenFile *bgen) {
     uint32_t length, nsamples;
     size_t i;
     string *sample_ids;
@@ -145,8 +145,6 @@ string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (bgen->sample_ids_presence == 0) {
-        if (verbose)
-            printf("This BGEN file does not contain sample IDs.\n");
         fclose(bgen->file);
         return NULL;
     }
