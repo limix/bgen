@@ -21,8 +21,6 @@ build_script:
     - set PATH=%programfiles%\zlib\bin;%PATH%
     - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zstd.install/master/install.bat', 'install-zstd.bat')" && call install-zstd.bat
     - set PATH=%programfiles%\zstd\bin;%PATH%
-    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/almosthere/master/install.bat', 'install.bat')" && call install.bat
-    - set PATH=%programfiles%\athr\bin;%PATH%
     - cmake ..
         -DCMAKE_BUILD_TYPE=Release
         -DCMAKE_GENERATOR_PLATFORM=%ARCH%
