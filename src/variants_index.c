@@ -100,7 +100,8 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const char *fp,
     return variants;
 }
 
-int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp) {
+int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp,
+                                    int verbose) {
     struct BGenFile *bgen;
     struct BGenVar *variants;
     struct BGenVI *index;
@@ -108,7 +109,7 @@ int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp) {
     if ((bgen = bgen_open(bgen_fp)) == NULL)
         return 1;
 
-    if ((variants = bgen_read_variants(bgen, &index)) == NULL)
+    if ((variants = bgen_read_variants(bgen, &index, verbose)) == NULL)
         return 1;
 
     if (bgen_store_variants(bgen, variants, index, index_fp))
