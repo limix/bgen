@@ -19,6 +19,6 @@ include_directories("${ZSTD_INCLUDE_DIRS}")
 limix_process_default_dirs()
 
 limix_add_library(${PROJECT_NAME} ${PROJECT_VERSION} "${SOURCES}" "${HEADERS}"
-"${ZLIB_LIBRARIES};${ZSTD_LIBRARIES};${ATHR_LIBRARIES}")
+"${ZLIB_LIBRARIES};${ZSTD_LIBRARIES}")
 
 add_subdirectory(test)
