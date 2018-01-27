@@ -10,8 +10,10 @@ environment:
     matrix:
       - PRJ_GEN: "Visual Studio 12 2013 Win64"
         BDIR: msvc2013
+        ARCH: x64
       - PRJ_GEN: "Visual Studio 14 2015 Win64"
         BDIR: msvc2015
+        ARCH: x64
 
 build_script:
     - mkdir build.%BDIR% && cd build.%BDIR%
@@ -23,6 +25,7 @@ build_script:
     - set PATH=%programfiles%\athr\bin;%PATH%
     - cmake ..
         -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_GENERATOR_PLATFORM=%ARCH%
         -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%
     - cmake --build . --config Release --target install
     - ctest -V --output-on-failure -C Release
