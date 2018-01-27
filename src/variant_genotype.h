@@ -1,19 +1,29 @@
-#ifndef BGEN_VARIANT_GENOTYPE_H
-#define BGEN_VARIANT_GENOTYPE_H
+#ifndef VARIANT_GENOTYPE_H
+#define VARIANT_GENOTYPE_H
 
-#include <stddef.h>
-#include "util/stdint.h"
+#include "variant_genotype_fwd.h"
+#ifdef _MSC_VER
+# if (_MSC_VER <= 1500)
+#  include "stdint_impl.h"
+# else
+#  include <stdint.h>
+# endif
+#else
+# include <stdint.h>
+#endif
 
-struct BGenVG {
-    uint32_t nsamples;
-    uint16_t nalleles;
-    uint8_t nbits;
+
+struct VariantGenotype
+{
+    inti     nsamples;
+    inti     nalleles;
+    inti     nbits;
     uint8_t *plo_miss;
-    int ncombs;
-    uint8_t ploidy;
-    char *chunk;
-    char *current_chunk;
-    size_t variant_idx;
-} BGenVG;
+    inti     ncombs;
+    inti     ploidy;
+    byte    *chunk;
+    byte    *current_chunk;
+    inti     variant_idx;
+};
 
-#endif /* end of include guard: BGEN_VARIANT_GENOTYPE_H */
+#endif /* end of include guard: VARIANT_GENOTYPE_H */

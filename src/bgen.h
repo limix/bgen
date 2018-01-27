@@ -1,29 +1,12 @@
 #ifndef BGEN_READER_H
 #define BGEN_READER_H
 
+#include <stdio.h>
 #include <stdlib.h>
-#ifdef _MSC_VER
-#if (_MSC_VER <= 1500)
-typedef long long int_fast64_t;
-#else
-#include <inttypes.h>
-#include <stdint.h>
-#endif
-#else
-#include <inttypes.h>
-#include <stdint.h>
-#endif
 
-typedef unsigned char byte;
-typedef int_fast64_t inti;
-typedef double real;
-
-typedef struct string {
-    inti len;
-    byte *str;
-} string;
-
-typedef struct BGenFile BGenFile;
+#include "types.h"
+#include "variant_genotype_fwd.h"
+#include "variant_indexing_fwd.h"
 
 typedef struct Variant {
     string id;
@@ -34,9 +17,17 @@ typedef struct Variant {
     string *allele_ids;
 } Variant;
 
-typedef struct VariantGenotype VariantGenotype;
-
-typedef struct VariantIndexing VariantIndexing;
+typedef struct BGenFile {
+    byte *filepath;
+    FILE *file;
+    inti nvariants;
+    inti nsamples;
+    inti compression;
+    inti layout;
+    inti sample_ids_presence;
+    inti samples_start;
+    inti variants_start;
+} BGenFile;
 
 BGenFile *bgen_open(const byte *filepath);
 void bgen_close(BGenFile *bgen);

@@ -1,22 +1,9 @@
 #include "mem.h"
 
-char *bgen_strdup(const char *src) {
-    char *str;
-    char *p;
-    int len = 0;
+byte* bgen_reader_strndup(const byte *src, inti size)
+{
+    byte *str = malloc(size);
 
-    while (src[len])
-        len++;
-    str = (char *)malloc(len + 1);
-    p = str;
-
-    while (*src)
-        *p++ = *src++;
-    *p = '\0';
+    memcpy(str, src, size);
     return str;
-}
-
-void bgen_memcpy(void *dst, char **src, size_t n) {
-    memcpy(dst, *src, n);
-    *src = *src + n;
 }

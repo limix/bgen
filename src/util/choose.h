@@ -1,6 +1,8 @@
-#ifndef BGEN_UTIL_CHOOSE_H
-#define BGEN_UTIL_CHOOSE_H
+#ifndef CHOOSE_H
+#define CHOOSE_H
 
-int bgen_choose(int n, int k);
+#include "../types.h"
 
-#endif /* end of include guard: BGEN_UTIL_CHOOSE_H */
+inti bgen_choose(inti n, inti k);
+
+#endif /* end of include guard: CHOOSE_H */
