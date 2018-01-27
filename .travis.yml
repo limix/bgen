@@ -37,7 +37,7 @@ deploy:
   on:
     tags: true
     repo: limix/bgen
-    branch: master
+    branch: 1.0.x
 env:
   global:
     - ZSTD=true
