@@ -51,7 +51,7 @@ We have also created an alternative, more [user-friendly BGEN specification](bge
 
 ## Authors
 
-  - [Danilo Horta](https://github.com/horta)
+- [Danilo Horta](https://github.com/horta)
 
 ## License
 

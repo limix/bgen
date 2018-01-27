@@ -4,10 +4,10 @@
 #include <math.h>
 #include <stdlib.h>
 
-typedef struct string {
+typedef struct bgen_string {
     int len;
     char *str;
-} string;
+} bgen_string;
 
 #ifdef WIN32
 #ifndef NAN
@@ -20,18 +20,18 @@ struct BGenFile;
 struct BGenVI;
 
 struct BGenVar {
-    string id;
-    string rsid;
-    string chrom;
+    bgen_string id;
+    bgen_string rsid;
+    bgen_string chrom;
     int position;
     int nalleles;
-    string *allele_ids;
+    bgen_string *allele_ids;
 };
 
 struct BGenVG;
 
 // Usual call flow:
-// bgen_read
+// bgen_open
 //     bgen_read_samples
 //         ...
 //     bgen_free_samples
@@ -52,15 +52,16 @@ int bgen_store_variants(const struct BGenFile *, struct BGenVar *,
                         struct BGenVI *, const char *);
 struct BGenVar *bgen_load_variants(const struct BGenFile *, const char *,
                                    struct BGenVI **, int);
-int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp);
+int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp,
+                                    int verbose);
 
 int bgen_nsamples(struct BGenFile *bgen);
 int bgen_nvariants(struct BGenFile *bgen);
 
 // Gets array of sample identifications ought to be freed by calling
 // bgen_free_samples.
-string *bgen_read_samples(struct BGenFile *bgen);
-void bgen_free_samples(const struct BGenFile *bgen, string *samples);
+bgen_string *bgen_read_samples(struct BGenFile *bgen, int verbose);
+void bgen_free_samples(const struct BGenFile *bgen, bgen_string *samples);
 
 // BGenVar headers are read all at once via either bgen_read_variants
 // or bgen_load_variants. The second option exists because the first one
@@ -71,8 +72,8 @@ void bgen_free_samples(const struct BGenFile *bgen, string *samples);
 // However, a high number of variants will require a high number of access
 // requests, which could be slow even for random access IOs (a network file
 // system, e.g.).
-struct BGenVar *bgen_read_variants(struct BGenFile *bgen,
-                                   struct BGenVI **index);
+struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index,
+                                   int verbose);
 void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants);
 void bgen_free_index(struct BGenVI *index);
 

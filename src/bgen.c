@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "bgen.h"
+#include "bgen_err.h"
 #include "bgen_file.h"
 #include "layout/one.h"
 #include "layout/two.h"
@@ -14,6 +15,8 @@
 #include "variants_index.h"
 
 #include "util/string.h"
+
+#include "athr.h"
 
 int bgen_read_header(struct BGenFile *bgen) {
     uint32_t header_length;
@@ -63,6 +66,10 @@ int bgen_read_header(struct BGenFile *bgen) {
     return 0;
 }
 
+/**
+ * filepath
+ *  File path to the bgen file.
+ */
 struct BGenFile *bgen_open(const char *filepath) {
     uint32_t offset;
     struct BGenFile *bgen;
@@ -135,10 +142,11 @@ int bgen_nsamples(struct BGenFile *bgen) { return bgen->nsamples; }
 
 int bgen_nvariants(struct BGenFile *bgen) { return bgen->nvariants; }
 
-string *bgen_read_samples(struct BGenFile *bgen) {
+string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
     uint32_t length, nsamples;
     size_t i;
     string *sample_ids;
+    struct athr *at = NULL;
 
     bgen->file = fopen(bgen->filepath, "rb");
 
@@ -157,9 +165,20 @@ string *bgen_read_samples(struct BGenFile *bgen) {
     if (fread(&nsamples, 1, 4, bgen->file) < 4)
         goto err;
 
+    if (verbose) {
+        at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
+    }
+
     for (i = 0; i < (size_t)bgen->nsamples; ++i) {
+        if (verbose) {
+            athr_consume(at, 1);
+        }
         if (fread_string(bgen->file, sample_ids + i, 2))
             goto err;
+    }
+
+    if (verbose) {
+        athr_finish(at);
     }
 
     bgen->variants_start = ftell(bgen->file);
@@ -237,11 +256,12 @@ int bgen_read_variant(struct BGenFile *bgen, struct BGenVar *v) {
     return 0;
 }
 
-struct BGenVar *bgen_read_variants(struct BGenFile *bgen,
-                                   struct BGenVI **index) {
+struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index,
+                                   int verbose) {
     struct BGenVar *variants;
     uint32_t length;
     size_t i, nvariants;
+    struct athr *at = NULL;
 
     variants = NULL;
     if ((bgen->file = fopen(bgen->filepath, "rb")) == NULL) {
@@ -259,7 +279,14 @@ struct BGenVar *bgen_read_variants(struct BGenFile *bgen,
     nvariants = bgen->nvariants;
     variants = malloc(nvariants * sizeof(struct BGenVar));
 
+    if (verbose) {
+        at = athr_create(nvariants, "Reading variants", ATHR_BAR);
+    }
+
     for (i = 0; i < nvariants; ++i) {
+        if (verbose)
+            athr_consume(at, 1);
+
         if (bgen_read_variant(bgen, variants + i))
             goto err;
 
@@ -273,6 +300,9 @@ struct BGenVar *bgen_read_variants(struct BGenFile *bgen,
             goto err;
         }
     }
+
+    if (verbose)
+        athr_finish(at);
 
     if (fclose(bgen->file)) {
         perror("Could not close the file.");
