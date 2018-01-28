@@ -1,7 +1,7 @@
 @echo off
 
 :: Configuration
-set VERSION_URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
+set VERSION_URL=https://raw.githubusercontent.com/limix/bgen/1.0.x/VERSION
 powershell -Command "(New-Object Net.WebClient).DownloadFile('%VERSION_URL%', 'VERSION.tmp')"
 set /p VERSION=<VERSION.tmp && del VERSION.tmp
 set FILE=bgen-%VERSION%.zip

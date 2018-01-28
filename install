@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
+URL=https://raw.githubusercontent.com/limix/bgen/1.0.x/VERSION
 VERSION=$(curl -s $URL)
 
 echo "[_/_] Library(bgen==$VERSION)"
