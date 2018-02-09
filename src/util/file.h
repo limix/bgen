@@ -5,16 +5,13 @@
 
 #include "../types.h"
 
-static inline inti bgen_read(FILE          *file,
-                             void          *buffer,
-                             inti           size)
-{
+static inline inti bgen_read(FILE *file, void *buffer, inti size) {
+    if (size == 0)
+        return EXIT_SUCCESS;
     inti e = fread(buffer, size, 1, file);
 
-    if (e != 1)
-    {
-        if (feof(file))
-        {
+    if (e != 1) {
+        if (feof(file)) {
             perror("Unexpected end of file");
             return EXIT_FAILURE;
         }

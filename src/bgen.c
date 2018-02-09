@@ -219,8 +219,11 @@ inti bgen_read_variant(BGenFile *bgen, Variant *v) {
 
     string_alloc(&(v->chrom), chrom_len);
 
-    if (bgen_read(bgen->file, v->chrom.str, v->chrom.len) == FAIL)
+    if (bgen_read(bgen->file, v->chrom.str, v->chrom.len) == FAIL) {
+        fprintf(stderr, "Could not read the chromossome identification.\n");
+        fprintf(stderr, "Chromossome identification size: %d.\n", chrom_len);
         return FAIL;
+    }
 
     if (bgen_read(bgen->file, &position, 4) == FAIL)
         return FAIL;
@@ -258,7 +261,16 @@ Variant *bgen_read_variants(BGenFile *bgen, VariantIndexing **index) {
 
     bgen->file = fopen((const char *)bgen->filepath, "rb");
 
-    fseek(bgen->file, bgen->variants_start, SEEK_SET);
+    if (bgen->file == NULL) {
+        fprintf(stderr, "Could not open: %s\n", bgen->filepath);
+        goto err;
+    }
+
+    if (fseek(bgen->file, bgen->variants_start, SEEK_SET) != 0) {
+        fprintf(stderr, "Could not fseek to position %lld\n",
+                bgen->variants_start);
+        goto err;
+    }
 
     (*index)->filepath = bgen_strdup(bgen->filepath);
     (*index)->compression = bgen->compression;
