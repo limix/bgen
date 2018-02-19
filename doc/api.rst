@@ -29,7 +29,7 @@ Functions
     :param bgen: Bgen file handler
     :return: number of variants
 
-.. c:function:: string* bgen_read_samples(struct BGenFile* bgen)
+.. c:function:: string* bgen_read_samples(struct BGenFile* bgen, int verbose)
 
     Read sample identifications.
 
@@ -113,4 +113,3 @@ Functions
 
     :param vg: Variant genotype handler
     :return: ploidy
-
