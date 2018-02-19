@@ -55,4 +55,4 @@ We have also created an alternative, more [user-friendly BGEN specification](bge
 
 ## License
 
-This project is licensed under the MIT License - see the [license file](https://raw.githubusercontent.com/limix/bgen/master/LICENSE.md) for details.
+This project is licensed under the [MIT License](https://raw.githubusercontent.com/limix/bgen/master/LICENSE.md).
