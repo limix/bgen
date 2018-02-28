@@ -17,10 +17,6 @@ IF "%ARCH%"=="" set ARCH=x64
 
 echo [0/4] Library(bgen==%VERSION%)
 
-SET ORIGIN=%cd%
-call :joinpath "%ORIGIN%" "install.log"
-SET LOG_FILE=%Result%
-
 :: Cleaning up previous mess
 del /Q %FILE% ! >nul 2>&1
 rd /S /Q %DIR% >nul 2>&1

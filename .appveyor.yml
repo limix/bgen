@@ -17,11 +17,11 @@ environment:
 
 build_script:
     - mkdir build.%BDIR% && cd build.%BDIR%
-    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install-zlib.bat')" && install-zlib.bat
+    - appveyor DownloadFile https://raw.githubusercontent.com/horta/zlib.install/master/install.bat && install.bat
     - set PATH=%programfiles%\zlib\bin;%PATH%
-    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zstd.install/master/install.bat', 'install-zstd.bat')" && call install-zstd.bat
+    - appveyor DownloadFile https://raw.githubusercontent.com/horta/zstd.install/master/install.bat && install.bat
     - set PATH=%programfiles%\zstd\bin;%PATH%
-    - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/almosthere/master/install.bat', 'install.bat')" && call install.bat
+    - appveyor DownloadFile https://raw.githubusercontent.com/horta/almosthere/master/install.bat && install.bat
     - set PATH=%programfiles%\athr\bin;%PATH%
     - cmake ..
         -DCMAKE_BUILD_TYPE=Release
