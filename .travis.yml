@@ -19,6 +19,7 @@ script:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen_static.a; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen.dylib; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen_static.a; fi
+- bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
 after_success:
 - mkdir dist && pushd dist && cmake .. -DCMAKE_BUILD_TYPE=Release && popd
 - mv dist bgen-`cat VERSION`
