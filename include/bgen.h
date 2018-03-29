@@ -5,8 +5,8 @@
 #include <stdlib.h>
 
 typedef struct bgen_string {
-    int len;
-    char *str;
+  int len;
+  char *str;
 } bgen_string;
 
 #ifdef WIN32
@@ -20,12 +20,12 @@ struct BGenFile;
 struct BGenVI;
 
 struct BGenVar {
-    bgen_string id;
-    bgen_string rsid;
-    bgen_string chrom;
-    int position;
-    int nalleles;
-    bgen_string *allele_ids;
+  bgen_string id;
+  bgen_string rsid;
+  bgen_string chrom;
+  int position;
+  int nalleles;
+  bgen_string *allele_ids;
 };
 
 struct BGenVG;
