@@ -138,9 +138,13 @@ void bgen_close(struct BGenFile *bgen) {
     free(bgen);
 }
 
-int bgen_nsamples(struct BGenFile *bgen) { return bgen->nsamples; }
+int bgen_nsamples(const struct BGenFile *bgen) { return bgen->nsamples; }
 
-int bgen_nvariants(struct BGenFile *bgen) { return bgen->nvariants; }
+int bgen_nvariants(const struct BGenFile *bgen) { return bgen->nvariants; }
+
+int bgen_sample_ids_presence(const struct BGenFile *bgen) {
+  return bgen->sample_ids_presence;
+}
 
 bgen_string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
   uint32_t length, nsamples;
@@ -404,12 +408,8 @@ void bgen_close_variant_genotype(struct BGenVI *index, struct BGenVG *vg) {
     free(vg);
 }
 
-int bgen_nalleles(struct BGenVG *vg) { return vg->nalleles; }
+int bgen_nalleles(const struct BGenVG *vg) { return vg->nalleles; }
 
-int bgen_ploidy(struct BGenVG *vg) { return vg->ploidy; }
+int bgen_ploidy(const struct BGenVG *vg) { return vg->ploidy; }
 
-int bgen_ncombs(struct BGenVG *vg) { return vg->ncombs; }
-
-int bgen_sample_ids_presence(struct BGenFile *bgen) {
-  return bgen->sample_ids_presence;
-}
+int bgen_ncombs(const struct BGenVG *vg) { return vg->ncombs; }

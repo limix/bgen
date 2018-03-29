@@ -120,21 +120,21 @@ File
 
     :param bgen: bgen file handler.
 
-.. c:function:: int bgen_nsamples(struct BGenFile* bgen)
+.. c:function:: int bgen_nsamples(const struct BGenFile* bgen)
 
     Get the number of samples.
 
     :param bgen: bgen file handler.
     :return: number of samples.
 
-.. c:function:: int bgen_nvariants(struct BGenFile* bgen)
+.. c:function:: int bgen_nvariants(const struct BGenFile* bgen)
 
     Get the number of variants.
 
     :param bgen: bgen file handler.
     :return: number of variants.
 
-.. c:function:: int bgen_sample_ids_presence(struct BGenFile* bgen)
+.. c:function:: int bgen_sample_ids_presence(const struct BGenFile* bgen)
 
     Check whether sample identifications are actually present.
 
@@ -236,21 +236,21 @@ Variant genotype
     :param vi: variants index.
     :param vg: variant genotype handler.
 
-.. c:function:: int bgen_nalleles(struct BGenVG* vg)
+.. c:function:: int bgen_nalleles(const struct BGenVG* vg)
 
     Get the number of alleles.
 
     :param vg: variant genotype handler.
     :return: number of alleles.
 
-.. c:function:: int bgen_ploidy(struct BGenVG* vg)
+.. c:function:: int bgen_ploidy(const struct BGenVG* vg)
 
     Get the ploidy.
 
     :param vg: variant genotype handler.
     :return: ploidy.
 
-.. c:function:: int bgen_ncombs(struct BGenVG *vg)
+.. c:function:: int bgen_ncombs(const struct BGenVG *vg)
 
     Get the number of genotype combinations for a given variant.
 
@@ -283,7 +283,7 @@ Variants metadata file
     :return: variants metadata.
 
 
-.. c:function:: int bgen_create_variants_index_file(const char *bgen_fp,\
+.. c:function:: int bgen_create_variants_file(const char *bgen_fp,\
     const char *vi_fp, int verbose)
 
     Create variants index and save it to a file.

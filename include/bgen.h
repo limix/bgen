@@ -47,9 +47,9 @@ struct BGenVG;
 struct BGenFile *bgen_open(const char *filepath);
 void bgen_close(struct BGenFile *bgen);
 
-int bgen_nsamples(struct BGenFile *bgen);
-int bgen_nvariants(struct BGenFile *bgen);
-int bgen_sample_ids_presence(struct BGenFile *bgen);
+int bgen_nsamples(const struct BGenFile *bgen);
+int bgen_nvariants(const struct BGenFile *bgen);
+int bgen_sample_ids_presence(const struct BGenFile *bgen);
 
 // Get array of sample identifications
 bgen_string *bgen_read_samples(struct BGenFile *bgen, int verbose);
@@ -80,9 +80,9 @@ void bgen_close_variant_genotype(struct BGenVI *vi, struct BGenVG *vg);
 // Retrieve genotype properties of a variant.
 void bgen_read_variant_genotype(struct BGenVI *vi, struct BGenVG *vg,
                                 double *probs);
-int bgen_nalleles(struct BGenVG *vg);
-int bgen_ploidy(struct BGenVG *vg);
-int bgen_ncombs(struct BGenVG *vg);
+int bgen_nalleles(const struct BGenVG *vg);
+int bgen_ploidy(const struct BGenVG *vg);
+int bgen_ncombs(const struct BGenVG *vg);
 
 // Variants metadata file handling
 int bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
@@ -90,7 +90,7 @@ int bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
 struct BGenVar *bgen_load_variants(const struct BGenFile *bgen,
                                    const char *filepath, struct BGenVI **vi,
                                    int verbose);
-int bgen_create_variants_index_file(const char *bgen_fp, const char *vi_fp,
+int bgen_create_variants_file(const char *bgen_fp, const char *vi_fp,
                                     int verbose);
 
 #endif /* end of include guard: BGEN_BGEN_H */

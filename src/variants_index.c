@@ -100,7 +100,7 @@ struct BGenVar *bgen_load_variants(const struct BGenFile *bgen, const char *fp,
   return variants;
 }
 
-int bgen_create_variants_index_file(const char *bgen_fp, const char *index_fp,
+int bgen_create_variants_file(const char *bgen_fp, const char *index_fp,
                                     int verbose) {
   struct BGenFile *bgen;
   struct BGenVar *variants;

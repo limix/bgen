@@ -162,7 +162,7 @@ int main() {
     ix = get_example_index_filepath(i);
     prec = get_example_precision(i);
 
-    bgen_create_variants_index_file(ex, ix, 0);
+    bgen_create_variants_file(ex, ix, 0);
 
     if (test_read(ex, NULL, prec))
       return 1;
