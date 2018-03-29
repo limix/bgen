@@ -2,6 +2,8 @@ from __future__ import unicode_literals
 
 import os
 
+import sphinx_rtd_theme
+
 folder = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(folder, '..', 'VERSION')) as f:
     version = f.read().strip()
@@ -18,7 +20,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'conf.py']
 pygments_style = 'sphinx'
 todo_include_todos = False
 
-import sphinx_rtd_theme
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 

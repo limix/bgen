@@ -10,7 +10,7 @@ ploidy and number of alleles.
 It was designed to provides a compact data representation without sacrificing
 variant access performance.
 
-This is a low-memory footprint library that provides an easy-to-use interface
+This is a low-memory footprint library that provides an easy-to-use C interface
 to efficiently read BGEN files.
 It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3; as
 well as their optional compressed formats.
@@ -32,4 +32,4 @@ Comments and bugs
 
 You can get the source and open issues `on Github.`_
 
-.. _on Github.: https://github.com/limix/bgen-reader
+.. _on Github.: https://github.com/limix/bgen
