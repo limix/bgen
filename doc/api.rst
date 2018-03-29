@@ -7,7 +7,8 @@ A BGEN file is associated with a :c:type:`BGenFile` variable, returned by
 The user can query, for example, the number of samples contained in a BGEN file
 by passing a :c:type:`BGenFile` variable to the :c:func:`bgen_nsamples`
 function.
-The user is required to release resources by calling :c:func:`bgen_close`.
+The user has to release resources by calling :c:func:`bgen_close` after its
+use.
 
 The function :c:func:`bgen_sample_ids_presence` can be used to detect
 whether the BGEN file contain sample identifications.
@@ -19,7 +20,7 @@ The allocated resources must be released by a subsequent call to
 The function :c:func:`bgen_read_variants` reads the metadata of all variants
 in the file (i.e., names, chromosomes, number of alleles, etc.).
 It returns the read information as an array of type :c:type:`BGenVar`.
-Let ``v`` be such array.
+Let ``v`` be such an array.
 The user can, for example, get the name of the i-th variant from
 ``v[i].id`` or its genetic position from ``v[i].position``.
 After use, its resources have to be released by calling
@@ -84,6 +85,10 @@ Types
 
         Reference SNP cluster identifier.
 
+    .. c:member:: bgen_string chrom
+
+        Chromosome.
+
     .. c:member:: int position
 
         Genetic position.
@@ -146,7 +151,7 @@ File
 
     :param bgen: bgen file handler.
     :param verbose: ``1`` to show progress or ``0`` to disable output.
-    :return: identifications.
+    :return: array of sample identifications.
 
 .. c:function:: void bgen_free_samples(const struct BGenFile* bgen,\
     bgen_string* samples)
@@ -154,7 +159,7 @@ File
     Free memory associated with sample identifications.
 
     :param bgen: bgen file handler.
-    :param samples: identifications.
+    :param samples: array of sample identifications.
 
 Variant metadata
 ^^^^^^^^^^^^^^^^
@@ -212,8 +217,7 @@ Variant genotype
     :return: variant genotype handler.
 
 .. c:function:: void bgen_read_variant_genotype(struct BGenVI* vi,\
-    struct BGenVG* vg,\
-    double* probs)
+    struct BGenVG* vg, double* probs)
 
     Read the allele probabilities for a given variant.
 
@@ -264,7 +268,7 @@ Variants metadata file
     :param bgen: bgen file handler.
     :param variants: variants metadata.
     :param vi: variants index.
-    :param filepath: null-terminated file path to the variants metadata cache.
+    :param filepath: null-terminated file path to the variants metadata.
 
 .. c:function:: struct BGenVar *bgen_load_variants(\
     const struct BGenFile* bgen, const char *filepath,\
@@ -273,7 +277,7 @@ Variants metadata file
     Load variants metadata from a file.
 
     :param bgen: bgen file handler.
-    :param filepath: null-terminated file path to the variants metadata cache.
+    :param filepath: null-terminated file path to the variants metadata.
     :param vi: variants index.
     :param verbose: ``1`` to show progress or ``0`` to disable output.
     :return: variants metadata.
@@ -284,7 +288,7 @@ Variants metadata file
 
     Create variants index and save it to a file.
 
-    :param bgen: null-terminated file path to a bgen file.
-    :param filepath: null-terminated file path to the destination file.
+    :param bgen_fp: null-terminated file path to a bgen file.
+    :param vi_fp: null-terminated file path to the destination file.
     :param verbose: ``1`` to show progress or ``0`` to disable output.
     :return: ``0`` on success; ``1`` otherwise.
