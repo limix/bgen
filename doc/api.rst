@@ -232,8 +232,8 @@ Variant metadata
     Read variants metadata and index.
 
     Alternatively, the user can call
-    :c:func:`bgen_load_variants` to read that information from a file
-    created by calling :c:func:`bgen_store_variants`.
+    :c:func:`bgen_load_variants_metadata` to read that information from a file
+    created by calling :c:func:`bgen_store_variants_metadata`.
 
     Remember to call :c:func:`bgen_free_variants` on the returned array
     to release allocated resources after the interaction has finished.
@@ -260,7 +260,7 @@ Variant metadata
 Variants metadata file
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. c:function:: int bgen_store_variants(const struct bgen_file* bgen,\
+.. c:function:: int bgen_store_variants_metadata(const struct bgen_file* bgen,\
     struct bgen_var *variants, struct bgen_vi *vi, const char *filepath)
 
     Save variants metadata into a file for faster reloading.
@@ -270,7 +270,7 @@ Variants metadata file
     :param vi: variants index.
     :param filepath: null-terminated file path to the variants metadata.
 
-.. c:function:: struct bgen_var *bgen_load_variants(\
+.. c:function:: struct bgen_var *bgen_load_variants_metadata(\
     const struct bgen_file* bgen, const char *filepath,\
     struct bgen_vi** vi, int verbose)
 
@@ -283,7 +283,7 @@ Variants metadata file
     :return: variants metadata.
 
 
-.. c:function:: int bgen_create_variants_file(const char *bgen_fp,\
+.. c:function:: int bgen_create_variants_metadata_file(const char *bgen_fp,\
     const char *vi_fp, int verbose)
 
     Create variants index and save it to a file.

@@ -54,7 +54,7 @@ size_t read_alleles(void *mem, struct bgen_var *variants);
 size_t read_genotype_offsets(void *mem, const struct bgen_file *bgen,
                              struct bgen_vi **vi);
 
-int bgen_store_variants(const struct bgen_file *bgen, struct bgen_var *variants,
+int bgen_store_variants_metadata(const struct bgen_file *bgen, struct bgen_var *variants,
                         struct bgen_vi *index, const char *fp) {
 
   struct Buffer *b;
@@ -71,7 +71,7 @@ int bgen_store_variants(const struct bgen_file *bgen, struct bgen_var *variants,
   return 0;
 }
 
-struct bgen_var *bgen_load_variants(const struct bgen_file *bgen, const char *fp,
+struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen, const char *fp,
                                    struct bgen_vi **vi, int verbose) {
   struct Buffer *b;
   struct bgen_var *variants;
@@ -100,7 +100,7 @@ struct bgen_var *bgen_load_variants(const struct bgen_file *bgen, const char *fp
   return variants;
 }
 
-int bgen_create_variants_file(const char *bgen_fp, const char *index_fp,
+int bgen_create_variants_metadata_file(const char *bgen_fp, const char *index_fp,
                                     int verbose) {
   struct bgen_file *bgen;
   struct bgen_var *variants;
@@ -112,7 +112,7 @@ int bgen_create_variants_file(const char *bgen_fp, const char *index_fp,
   if ((variants = bgen_read_variants(bgen, &index, verbose)) == NULL)
     return 1;
 
-  if (bgen_store_variants(bgen, variants, index, index_fp))
+  if (bgen_store_variants_metadata(bgen, variants, index, index_fp))
     return 1;
 
   bgen_free_variants(bgen, variants);

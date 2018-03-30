@@ -45,9 +45,9 @@ void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples);
     Reading variants metadata (and generating the variants index) can be costly
     as it requires accessing chunks of data across the file. We therefore
     provide the functions
-        - bgen_store_variants
-        - bgen_load_variants
-        - bgen_create_variants_file
+        - bgen_store_variants_metadata
+        - bgen_load_variants_metadata
+        - bgen_create_variants_metadata_file
     for storing and reading that information from an additional file. We refer
     to this file as variants metadata file.
 
@@ -88,19 +88,20 @@ int bgen_ploidy(const struct bgen_vg *vg);
 int bgen_ncombs(const struct bgen_vg *vg);
 
 /* Store variants metadata. */
-int bgen_store_variants(const struct bgen_file *bgen, struct bgen_var *variants,
-                        struct bgen_vi *vi, const char *filepath);
+int bgen_store_variants_metadata(const struct bgen_file *bgen,
+                                 struct bgen_var *variants, struct bgen_vi *vi,
+                                 const char *filepath);
 /* Read variants metadata from file. */
-struct bgen_var *bgen_load_variants(const struct bgen_file *bgen,
-                                    const char *filepath, struct bgen_vi **vi,
-                                    int verbose);
+struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
+                                             const char *filepath,
+                                             struct bgen_vi **vi, int verbose);
 /* Create a variants metadata file.
 
     Helper for easy creation of variants metadata file.
 
     Note: this file is not part of the bgen file format specification.
 */
-int bgen_create_variants_file(const char *bgen_fp, const char *vi_fp,
-                              int verbose);
+int bgen_create_variants_metadata_file(const char *bgen_fp, const char *vi_fp,
+                                       int verbose);
 
 #endif /* end of include guard: BGEN_BGEN_H */
