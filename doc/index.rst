@@ -2,6 +2,9 @@
 BGen's documentation
 ====================
 
+:Date: |today|
+:Version: |version|
+
 A `BGEN file format`_ reader.
 
 BGEN is a file format for storing large genetic datasets.
@@ -12,7 +15,7 @@ variant access performance.
 
 This is a low-memory footprint library that provides an easy-to-use C interface
 to efficiently read BGEN files.
-It fully supports all the BGEN format specifications: 1.1, 1.2, and 1.3; as
+It fully supports all the BGEN format specifications: 1.2 and 1.3; as
 well as their optional compressed formats.
 
 .. toctree::
