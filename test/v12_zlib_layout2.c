@@ -25,8 +25,8 @@ int isnan(double x) {
 }
 #endif
 
-int test_read_metadata(struct BGenFile *bgen, bgen_string *s,
-                       struct BGenVar *v) {
+int test_read_metadata(struct bgen_file *bgen, bgen_string *s,
+                       struct bgen_var *v) {
   if (bgen_nsamples(bgen) != 500)
     return 1;
 
@@ -48,9 +48,9 @@ int test_read_metadata(struct BGenFile *bgen, bgen_string *s,
   return 0;
 }
 
-int test_reading(const char *fp0, const char *fp1, struct BGenVI **index) {
-  struct BGenFile *bgen;
-  struct BGenVar *v;
+int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
+  struct bgen_file *bgen;
+  struct bgen_var *v;
   bgen_string *s;
 
   if ((bgen = bgen_open(fp0)) == NULL)
@@ -73,8 +73,8 @@ int test_reading(const char *fp0, const char *fp1, struct BGenVI **index) {
   return 0;
 }
 
-int test_read_probabilities(struct BGenVI *index, int nsamples, int prec) {
-  struct BGenVG *vg;
+int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
+  struct bgen_vg *vg;
   FILE *f;
   double prob[3];
   double eps = (double)(1 << prec);
@@ -138,7 +138,7 @@ int test_read_probabilities(struct BGenVI *index, int nsamples, int prec) {
 }
 
 int test_read(const char *bgen_fp, const char *index_fp, int precision) {
-  struct BGenVI *index;
+  struct bgen_vi *index;
 
   if (test_reading(bgen_fp, index_fp, &index))
     return 1;

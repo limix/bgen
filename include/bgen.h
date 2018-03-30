@@ -9,17 +9,12 @@ typedef struct bgen_string {
   char *str;
 } bgen_string;
 
-#ifdef WIN32
-#ifndef NAN
-static const unsigned long __nan[2] = {0xffffffff, 0x7fffffff};
-#define NAN (*(const float *)__nan)
-#endif
-#endif
+struct bgen_file; /* bgen file handler */
+struct bgen_vi;   /* variant index */
+struct bgen_vg;   /* variant genotype */
 
-struct BGenFile;
-struct BGenVI;
-
-struct BGenVar {
+/* Variant metadata. */
+struct bgen_var {
   bgen_string id;
   bgen_string rsid;
   bgen_string chrom;
@@ -28,69 +23,84 @@ struct BGenVar {
   bgen_string *allele_ids;
 };
 
-struct BGenVG;
+/* Open a file and return a bgen file handler. */
+struct bgen_file *bgen_open(const char *filepath);
+/* Close a bgen file handler. */
+void bgen_close(struct bgen_file *bgen);
 
-// Usual call flow:
-// bgen_open
-//     bgen_read_samples
-//         ...
-//     bgen_free_samples
-//     bgen_read_variants / bgen_load_variants
-//         bgen_free_variants (once)
-//         bgen_open_variant_genotype
-//             ...
-//         bgen_close_variant_genotype
-//     bgen_free_index
-// bgen_close
+/* Get the number of samples. */
+int bgen_nsamples(const struct bgen_file *bgen);
+/* Get the number of variants. */
+int bgen_nvariants(const struct bgen_file *bgen);
+/* Check if the file contains sample identifications. */
+int bgen_sample_ids_presence(const struct bgen_file *bgen);
 
-// Any interaction should happen between open and close calls.
-struct BGenFile *bgen_open(const char *filepath);
-void bgen_close(struct BGenFile *bgen);
+/* Get array of sample identifications. */
+bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
+/* Free array of sample identifications. */
+void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples);
 
-int bgen_nsamples(const struct BGenFile *bgen);
-int bgen_nvariants(const struct BGenFile *bgen);
-int bgen_sample_ids_presence(const struct BGenFile *bgen);
+/* Read variants metadata and generate variants index.
 
-// Get array of sample identifications
-bgen_string *bgen_read_samples(struct BGenFile *bgen, int verbose);
-// Free array of sample identifications
-void bgen_free_samples(const struct BGenFile *bgen, bgen_string *samples);
+    Reading variants metadata (and generating the variants index) can be costly
+    as it requires accessing chunks of data across the file. We therefore
+    provide the functions
+        - bgen_store_variants
+        - bgen_load_variants
+        - bgen_create_variants_file
+    for storing and reading that information from an additional file. We refer
+    to this file as variants metadata file.
 
-// BGenVar headers are read all at once via either bgen_read_variants
-// or bgen_load_variants. The second option exists because the first one
-// might be too slow for some IOs as it requires jumping between blocks
-// covering the entire files.
-// Additional info: those blocks are in total very small compared to usual bgen
-// file sizes, and are always in increasing order of serial positioning.
-// However, a high number of variants will require a high number of access
-// requests, which could be slow even for random access IOs (a network file
-// system, e.g.).
-struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **vi,
-                                   int verbose);
-void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants);
-void bgen_free_index(struct BGenVI *vi);
-
-// Genotype interaction should happen between open and close call using the
-// following functions; and those open and close calls should happen between
-// read and close calls of bgen_read_variants/bgen_load_variants and
-// bgen_free_index.
-struct BGenVG *bgen_open_variant_genotype(struct BGenVI *vi, size_t index);
-void bgen_close_variant_genotype(struct BGenVI *vi, struct BGenVG *vg);
-
-// Retrieve genotype properties of a variant.
-void bgen_read_variant_genotype(struct BGenVI *vi, struct BGenVG *vg,
-                                double *probs);
-int bgen_nalleles(const struct BGenVG *vg);
-int bgen_ploidy(const struct BGenVG *vg);
-int bgen_ncombs(const struct BGenVG *vg);
-
-// Variants metadata file handling
-int bgen_store_variants(const struct BGenFile *bgen, struct BGenVar *variants,
-                        struct BGenVI *vi, const char *filepath);
-struct BGenVar *bgen_load_variants(const struct BGenFile *bgen,
-                                   const char *filepath, struct BGenVI **vi,
-                                   int verbose);
-int bgen_create_variants_file(const char *bgen_fp, const char *vi_fp,
+    Note: remember to call `bgen_free_variants` and `bgen_free_index` after use.
+*/
+struct bgen_var *bgen_read_variants(struct bgen_file *bgen, struct bgen_vi **vi,
                                     int verbose);
+void bgen_free_variants(const struct bgen_file *bgen,
+                        struct bgen_var *variants);
+void bgen_free_index(struct bgen_vi *vi);
+
+/* Open a variant for genotype queries.
+
+    A variant genotype handler is needed to call
+        - bgen_read_variant_genotype
+        - bgen_nalleles
+        - bgen_ploidy
+        - bgen_ncombs
+
+    Note: remember to call `bgen_close_variant_genotype` after use.
+ */
+struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
+/* Close a variant genotype handler. */
+void bgen_close_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg);
+
+/* Read the probabilities of each possible genotype.
+
+    The variant index and a variant genotype handler are required.
+    The number of probabilities can be found from `bgen_ncombs`.
+*/
+void bgen_read_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg,
+                                double *probs);
+/* Get the number of alleles. */
+int bgen_nalleles(const struct bgen_vg *vg);
+/* Get the ploidy. */
+int bgen_ploidy(const struct bgen_vg *vg);
+/* Get the number of genotype combinations. */
+int bgen_ncombs(const struct bgen_vg *vg);
+
+/* Store variants metadata. */
+int bgen_store_variants(const struct bgen_file *bgen, struct bgen_var *variants,
+                        struct bgen_vi *vi, const char *filepath);
+/* Read variants metadata from file. */
+struct bgen_var *bgen_load_variants(const struct bgen_file *bgen,
+                                    const char *filepath, struct bgen_vi **vi,
+                                    int verbose);
+/* Create a variants metadata file.
+
+    Helper for easy creation of variants metadata file.
+
+    Note: this file is not part of the bgen file format specification.
+*/
+int bgen_create_variants_file(const char *bgen_fp, const char *vi_fp,
+                              int verbose);
 
 #endif /* end of include guard: BGEN_BGEN_H */

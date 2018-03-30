@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-struct BGenVI {
+struct bgen_vi {
     char *filepath;
     uint32_t compression;
     uint32_t layout;
@@ -12,6 +12,6 @@ struct BGenVI {
     uint64_t *start;
 };
 
-struct BGenVI *new_variants_index(const struct BGenFile *);
+struct bgen_vi *new_variants_index(const struct bgen_file *);
 
 #endif /* end of include guard: BGEN_VARIANTS_INDEX_H */

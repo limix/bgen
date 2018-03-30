@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-struct BGenFile {
+struct bgen_file {
     char *filepath;
     FILE *file;
     int nvariants;

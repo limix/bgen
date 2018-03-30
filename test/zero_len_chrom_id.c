@@ -8,10 +8,10 @@
 #define FAIL EXIT_FAILURE
 
 int main() {
-  struct BGenVI *index;
+  struct bgen_vi *index;
   int nsamples;
-  struct BGenFile *bgen;
-  struct BGenVar *variants;
+  struct bgen_file *bgen;
+  struct bgen_var *variants;
   bgen_string *samples;
   int e;
 

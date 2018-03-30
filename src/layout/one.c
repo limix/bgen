@@ -15,7 +15,7 @@
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
 
-void bgen_read_unphased_one(struct BGenVG *vg, double *probabilities) {
+void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities) {
     uint16_t ui_prob;
     unsigned int ui_prob_sum;
 
@@ -41,11 +41,11 @@ void bgen_read_unphased_one(struct BGenVG *vg, double *probabilities) {
     }
 }
 
-void bgen_read_probs_one(struct BGenVG *vg, double *p) {
+void bgen_read_probs_one(struct bgen_vg *vg, double *p) {
     bgen_read_unphased_one(vg, p);
 }
 
-char *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
+char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file) {
     size_t clength, ulength;
     char *cchunk, *uchunk;
 
@@ -79,7 +79,7 @@ char *bgen_uncompress_layout1(struct BGenVI *index, FILE *file) {
     return uchunk;
 }
 
-int bgen_read_probs_header_one(struct BGenVI *index, struct BGenVG *vg,
+int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg,
                                FILE *file) {
     char *c;
     char *chunk;

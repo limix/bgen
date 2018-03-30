@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include "util/stdint.h"
 
-struct BGenVG {
+struct bgen_vg {
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t nbits;
@@ -14,6 +14,6 @@ struct BGenVG {
     char *chunk;
     char *current_chunk;
     size_t variant_idx;
-} BGenVG;
+} bgen_vg;
 
 #endif /* end of include guard: BGEN_VARIANT_GENOTYPE_H */

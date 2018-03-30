@@ -8,7 +8,7 @@ int main() {
   const char filepath[] = "example.bgen";
 
   // Mandatory first call, preparing to read the file.
-  struct BGenFile *bgen = bgen_open(filepath);
+  struct bgen_file *bgen = bgen_open(filepath);
 
   int nsamples = bgen_nsamples(bgen);
 
@@ -26,8 +26,8 @@ int main() {
   // Reading variant metadata (i.e., identifications, chromossomes, number of
   // alleles, etc.)
   // Notice that we also have a VariantIndexing in return, used afterwards.
-  struct BGenVI *index;
-  struct BGenVar *variants = bgen_read_variants(bgen, &index);
+  struct bgen_vi *index;
+  struct bgen_var *variants = bgen_read_variants(bgen, &index);
 
   printf("RSID of the first variant: %.*s\n", (int)variants[0].rsid.len,
          variants[0].rsid.str);
@@ -44,7 +44,7 @@ int main() {
   // For performance reasons, it is done in two steps:
 
   // Step 1.
-  struct BGenVG *vg = bgen_open_variant_genotype(index, 1);
+  struct bgen_vg *vg = bgen_open_variant_genotype(index, 1);
 
   double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
 

@@ -3,7 +3,7 @@
 #include <string.h>
 
 int main() {
-    struct BGenFile *bgen;
+    struct bgen_file *bgen;
 
     if ((bgen = bgen_open("data/pbgen_example.pgen")) == NULL) {
         return 0;

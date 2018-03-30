@@ -18,7 +18,7 @@
 
 #include "athr.h"
 
-int bgen_read_header(struct BGenFile *bgen) {
+int bgen_read_header(struct bgen_file *bgen) {
   uint32_t header_length;
   uint32_t nvariants;
   uint32_t nsamples;
@@ -70,11 +70,11 @@ int bgen_read_header(struct BGenFile *bgen) {
  * filepath
  *  File path to the bgen file.
  */
-struct BGenFile *bgen_open(const char *filepath) {
+struct bgen_file *bgen_open(const char *filepath) {
   uint32_t offset;
-  struct BGenFile *bgen;
+  struct bgen_file *bgen;
 
-  bgen = malloc(sizeof(struct BGenFile));
+  bgen = malloc(sizeof(struct bgen_file));
   bgen->samples_start = -1;
   bgen->variants_start = -1;
   bgen->file = NULL;
@@ -130,7 +130,7 @@ err:
   return NULL;
 }
 
-void bgen_close(struct BGenFile *bgen) {
+void bgen_close(struct bgen_file *bgen) {
   if (bgen->filepath)
     free(bgen->filepath);
 
@@ -138,15 +138,15 @@ void bgen_close(struct BGenFile *bgen) {
     free(bgen);
 }
 
-int bgen_nsamples(const struct BGenFile *bgen) { return bgen->nsamples; }
+int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
 
-int bgen_nvariants(const struct BGenFile *bgen) { return bgen->nvariants; }
+int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
 
-int bgen_sample_ids_presence(const struct BGenFile *bgen) {
+int bgen_sample_ids_presence(const struct bgen_file *bgen) {
   return bgen->sample_ids_presence;
 }
 
-bgen_string *bgen_read_samples(struct BGenFile *bgen, int verbose) {
+bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
   uint32_t length, nsamples;
   size_t i;
   bgen_string *sample_ids;
@@ -204,7 +204,7 @@ err:
   return NULL;
 }
 
-void bgen_free_samples(const struct BGenFile *bgen, bgen_string *samples) {
+void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples) {
   size_t i;
 
   if (bgen->sample_ids_presence == 0)
@@ -219,7 +219,7 @@ void bgen_free_samples(const struct BGenFile *bgen, bgen_string *samples) {
   free(samples);
 }
 
-int bgen_read_variant(struct BGenFile *bgen, struct BGenVar *v) {
+int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
   size_t i;
   uint32_t nsamples, position;
   uint16_t nalleles;
@@ -260,9 +260,9 @@ int bgen_read_variant(struct BGenFile *bgen, struct BGenVar *v) {
   return 0;
 }
 
-struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index,
+struct bgen_var *bgen_read_variants(struct bgen_file *bgen, struct bgen_vi **index,
                                    int verbose) {
-  struct BGenVar *variants;
+  struct bgen_var *variants;
   uint32_t length;
   size_t i, nvariants;
   struct athr *at = NULL;
@@ -281,7 +281,7 @@ struct BGenVar *bgen_read_variants(struct BGenFile *bgen, struct BGenVI **index,
   *index = new_variants_index(bgen);
 
   nvariants = bgen->nvariants;
-  variants = malloc(nvariants * sizeof(struct BGenVar));
+  variants = malloc(nvariants * sizeof(struct bgen_var));
 
   if (verbose) {
     at = athr_create(nvariants, "Reading variants", ATHR_BAR);
@@ -331,7 +331,7 @@ err:
   return NULL;
 }
 
-void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants) {
+void bgen_free_variants(const struct bgen_file *bgen, struct bgen_var *variants) {
   size_t i, j;
 
   for (i = 0; i < (size_t)bgen->nvariants; ++i) {
@@ -346,15 +346,15 @@ void bgen_free_variants(const struct BGenFile *bgen, struct BGenVar *variants) {
   free(variants);
 }
 
-void bgen_free_index(struct BGenVI *index) {
+void bgen_free_index(struct bgen_vi *index) {
   free(index->filepath);
   free(index->start);
   free(index);
 }
 
-struct BGenVG *bgen_open_variant_genotype(struct BGenVI *index,
+struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index,
                                           size_t variant_idx) {
-  struct BGenVG *vg;
+  struct bgen_vg *vg;
   FILE *file;
 
   if ((file = fopen(index->filepath, "rb")) == NULL) {
@@ -362,7 +362,7 @@ struct BGenVG *bgen_open_variant_genotype(struct BGenVI *index,
     return NULL;
   }
 
-  vg = malloc(sizeof(struct BGenVG));
+  vg = malloc(sizeof(struct bgen_vg));
   vg->variant_idx = variant_idx;
   vg->plo_miss = NULL;
   vg->chunk = NULL;
@@ -386,7 +386,7 @@ struct BGenVG *bgen_open_variant_genotype(struct BGenVI *index,
   return vg;
 }
 
-void bgen_read_variant_genotype(struct BGenVI *index, struct BGenVG *vg,
+void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
                                 double *probabilities) {
   if (index->layout == 1) {
     bgen_read_probs_one(vg, probabilities);
@@ -397,7 +397,7 @@ void bgen_read_variant_genotype(struct BGenVI *index, struct BGenVG *vg,
   }
 }
 
-void bgen_close_variant_genotype(struct BGenVI *index, struct BGenVG *vg) {
+void bgen_close_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg) {
   if (vg->plo_miss != NULL)
     free(vg->plo_miss);
 
@@ -408,8 +408,8 @@ void bgen_close_variant_genotype(struct BGenVI *index, struct BGenVG *vg) {
     free(vg);
 }
 
-int bgen_nalleles(const struct BGenVG *vg) { return vg->nalleles; }
+int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 
-int bgen_ploidy(const struct BGenVG *vg) { return vg->ploidy; }
+int bgen_ploidy(const struct bgen_vg *vg) { return vg->ploidy; }
 
-int bgen_ncombs(const struct BGenVG *vg) { return vg->ncombs; }
+int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }

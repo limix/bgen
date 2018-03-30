@@ -37,7 +37,7 @@ inline static int get_bit(const char *mem, int bit_idx) {
     return GetBit(*(mem + bytes), bit_idx % 8);
 }
 
-void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
+void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
     int ncombs, ploidy;
     uint64_t uip_sum, ui_prob;
     uint64_t sample_start, geno_start, bit_idx;
@@ -80,7 +80,7 @@ void bgen_read_unphased_genotype(struct BGenVG *vg, double *p) {
     }
 }
 
-char *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
+char *bgen_uncompress_two(struct bgen_vi *idx, FILE *file) {
     size_t clength, ulength;
     char *cchunk;
     char *uchunk;
@@ -120,7 +120,7 @@ char *bgen_uncompress_two(struct BGenVI *idx, FILE *file) {
     return uchunk;
 }
 
-int bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
+int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg,
                                FILE *file) {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -176,6 +176,6 @@ int bgen_read_probs_header_two(struct BGenVI *idx, struct BGenVG *vg,
     return EXIT_SUCCESS;
 }
 
-void bgen_read_probs_two(struct BGenVG *vg, double *p) {
+void bgen_read_probs_two(struct bgen_vg *vg, double *p) {
     bgen_read_unphased_genotype(vg, p);
 }
