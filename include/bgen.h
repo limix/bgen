@@ -37,10 +37,10 @@
 #include <math.h>
 #include <stdlib.h>
 
-typedef struct bgen_string {
+struct bgen_string {
   int len;
   char *str;
-} bgen_string;
+};
 
 struct bgen_file; /* bgen file handler */
 struct bgen_vi;   /* variant index */
@@ -48,12 +48,12 @@ struct bgen_vg;   /* variant genotype */
 
 /* Variant metadata. */
 struct bgen_var {
-  bgen_string id;
-  bgen_string rsid;
-  bgen_string chrom;
+  struct bgen_string id;
+  struct bgen_string rsid;
+  struct bgen_string chrom;
   int position;
   int nalleles;
-  bgen_string *allele_ids;
+  struct bgen_string *allele_ids;
 };
 
 /* Open a file and return a bgen file handler. */
@@ -69,9 +69,10 @@ int bgen_nvariants(const struct bgen_file *bgen);
 int bgen_sample_ids_presence(const struct bgen_file *bgen);
 
 /* Get array of sample identifications. */
-bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
+struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
-void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples);
+void bgen_free_samples(const struct bgen_file *bgen,
+                       struct bgen_string *samples);
 
 /* Read variants metadata and generate variants index.
 

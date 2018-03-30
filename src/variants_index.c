@@ -20,12 +20,12 @@ struct TPLVar {
   uint16_t nalleles;
 };
 
-static inline void set_tpl_str(tpl_string *dst, const bgen_string *src) {
+static inline void set_tpl_str(tpl_string *dst, const struct bgen_string *src) {
   dst->len = src->len;
   dst->str = src->str;
 }
 
-static inline void set_str(bgen_string *dst, const tpl_string *src) {
+static inline void set_str(struct bgen_string *dst, const tpl_string *src) {
   dst->len = src->len;
   dst->str = src->str;
 }
@@ -54,8 +54,9 @@ size_t read_alleles(void *mem, struct bgen_var *variants);
 size_t read_genotype_offsets(void *mem, const struct bgen_file *bgen,
                              struct bgen_vi **vi);
 
-int bgen_store_variants_metadata(const struct bgen_file *bgen, struct bgen_var *variants,
-                        struct bgen_vi *index, const char *fp) {
+int bgen_store_variants_metadata(const struct bgen_file *bgen,
+                                 struct bgen_var *variants,
+                                 struct bgen_vi *index, const char *fp) {
 
   struct Buffer *b;
 
@@ -71,8 +72,9 @@ int bgen_store_variants_metadata(const struct bgen_file *bgen, struct bgen_var *
   return 0;
 }
 
-struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen, const char *fp,
-                                   struct bgen_vi **vi, int verbose) {
+struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
+                                             const char *fp,
+                                             struct bgen_vi **vi, int verbose) {
   struct Buffer *b;
   struct bgen_var *variants;
   void *mem;
@@ -100,8 +102,8 @@ struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen, const
   return variants;
 }
 
-int bgen_create_variants_metadata_file(const char *bgen_fp, const char *index_fp,
-                                    int verbose) {
+int bgen_create_variants_metadata_file(const char *bgen_fp,
+                                       const char *index_fp, int verbose) {
   struct bgen_file *bgen;
   struct bgen_var *variants;
   struct bgen_vi *index;
@@ -230,7 +232,8 @@ size_t read_alleles(void *mem, struct bgen_var *variants) {
 
   i = 0;
   while (tpl_unpack(tn, 1) > 0) {
-    variants[i].allele_ids = malloc(variants[i].nalleles * sizeof(bgen_string));
+    variants[i].allele_ids =
+        malloc(variants[i].nalleles * sizeof(struct bgen_string));
     j = 0;
     while (tpl_unpack(tn, 2) > 0) {
       set_str(variants[i].allele_ids + j, &allele_id);

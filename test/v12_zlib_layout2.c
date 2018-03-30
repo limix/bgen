@@ -25,7 +25,7 @@ int isnan(double x) {
 }
 #endif
 
-int test_read_metadata(struct bgen_file *bgen, bgen_string *s,
+int test_read_metadata(struct bgen_file *bgen, struct bgen_string *s,
                        struct bgen_var *v) {
   if (bgen_nsamples(bgen) != 500)
     return 1;
@@ -51,7 +51,7 @@ int test_read_metadata(struct bgen_file *bgen, bgen_string *s,
 int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
   struct bgen_file *bgen;
   struct bgen_var *v;
-  bgen_string *s;
+  struct bgen_string *s;
 
   if ((bgen = bgen_open(fp0)) == NULL)
     return 1;

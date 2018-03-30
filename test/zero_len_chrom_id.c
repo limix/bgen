@@ -12,7 +12,7 @@ int main() {
   int nsamples;
   struct bgen_file *bgen;
   struct bgen_var *variants;
-  bgen_string *samples;
+  struct bgen_string *samples;
   int e;
 
   bgen = bgen_open("data/zero_len_chrom_id.bgen");

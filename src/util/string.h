@@ -4,6 +4,6 @@
 #include "bgen.h"
 #include <stdio.h>
 
-int fread_string(FILE *file, bgen_string *s, size_t len_size);
+int fread_string(FILE *file, struct bgen_string *s, size_t len_size);
 
 #endif /* end of include guard: BGEN_UTIL_STRING_H */

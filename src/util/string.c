@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void bgen_string_alloc(bgen_string *v, size_t len) {
+void bgen_string_alloc(struct bgen_string *v, size_t len) {
   v->len = len;
   v->str = malloc(len + 1);
   v->str[len] = '\0';
 }
 
-int fread_string(FILE *file, bgen_string *s, size_t len_size) {
+int fread_string(FILE *file, struct bgen_string *s, size_t len_size) {
   uint32_t len;
   len = 0;
 

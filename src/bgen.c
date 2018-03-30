@@ -146,10 +146,10 @@ int bgen_sample_ids_presence(const struct bgen_file *bgen) {
   return bgen->sample_ids_presence;
 }
 
-bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
+struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
   uint32_t length, nsamples;
   size_t i;
-  bgen_string *sample_ids;
+  struct bgen_string *sample_ids;
   struct athr *at = NULL;
 
   bgen->file = fopen(bgen->filepath, "rb");
@@ -161,7 +161,7 @@ bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
     return NULL;
   }
 
-  sample_ids = malloc(bgen->nsamples * sizeof(bgen_string));
+  sample_ids = malloc(bgen->nsamples * sizeof(struct bgen_string));
 
   if (fread(&length, 1, 4, bgen->file) < 4)
     goto err;
@@ -204,7 +204,8 @@ err:
   return NULL;
 }
 
-void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples) {
+void bgen_free_samples(const struct bgen_file *bgen,
+                       struct bgen_string *samples) {
   size_t i;
 
   if (bgen->sample_ids_presence == 0)
@@ -250,7 +251,7 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
 
   v->nalleles = nalleles;
 
-  v->allele_ids = malloc(nalleles * sizeof(bgen_string));
+  v->allele_ids = malloc(nalleles * sizeof(struct bgen_string));
 
   for (i = 0; i < (size_t)v->nalleles; ++i) {
     if (fread_string(bgen->file, v->allele_ids + i, 4))
@@ -260,8 +261,9 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
   return 0;
 }
 
-struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index,
-                                   int verbose) {
+struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
+                                             struct bgen_vi **index,
+                                             int verbose) {
   struct bgen_var *variants;
   uint32_t length;
   size_t i, nvariants;
@@ -331,7 +333,8 @@ err:
   return NULL;
 }
 
-void bgen_free_variants_metadata(const struct bgen_file *bgen, struct bgen_var *variants) {
+void bgen_free_variants_metadata(const struct bgen_file *bgen,
+                                 struct bgen_var *variants) {
   size_t i, j;
 
   for (i = 0; i < (size_t)bgen->nvariants; ++i) {
@@ -353,7 +356,7 @@ void bgen_free_index(struct bgen_vi *index) {
 }
 
 struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index,
-                                          size_t variant_idx) {
+                                           size_t variant_idx) {
   struct bgen_vg *vg;
   FILE *file;
 
