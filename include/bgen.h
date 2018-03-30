@@ -1,5 +1,38 @@
+/*******************************************************************************
+ * Project: bgen
+ * Purpose: BGEN file reader
+ * Author: Danilo Horta, danilo.horta@gmail.com
+ * Language: C
+ *******************************************************************************
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2018 Danilo Horta
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ ******************************************************************************/
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
+
+#define BGEN_VERSION "1.1.0"
+#define BGEN_VERSION_MAJOR 1
+#define BGEN_VERSION_MINOR 1
+#define BGEN_VERSION_PATCH 0
 
 #include <math.h>
 #include <stdlib.h>
@@ -51,12 +84,13 @@ void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples);
     for storing and reading that information from an additional file. We refer
     to this file as variants metadata file.
 
-    Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index` after use.
+    Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
+   after use.
 */
-struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **vi,
-                                    int verbose);
+struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
+                                             struct bgen_vi **vi, int verbose);
 void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                        struct bgen_var *variants);
+                                 struct bgen_var *variants);
 void bgen_free_index(struct bgen_vi *vi);
 
 /* Open a variant for genotype queries.

@@ -2,13 +2,23 @@
 Install
 *******
 
-You can install it via `conda`_ (the recommended way)
+A successful installation of this library will copy a dynamic and a static
+libraries and a C header.
+For example, in a GNU/Linux, an installation might consists in the following
+files:
+
+- /usr/local/lib/libbgen.so.VERSION
+- /usr/local/lib/libbgen.so
+- /usr/local/include/bgen.h
+- /usr/local/lib/libbgen_static.a
+
+The recommended way of installing bgen is via `conda`_
 
 .. code-block:: bash
 
   conda install -c conda-forge bgen
 
-or by cloning its repository and building it
+Alternatively, you can clone its repository and build it
 
 .. code-block:: bash
 

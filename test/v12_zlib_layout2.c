@@ -78,7 +78,7 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
   FILE *f;
   double prob[3];
   double eps = (double)(1 << prec);
-  int ncombs;
+  int ncombs, e;
   size_t i, j;
   double *probabilities;
 
@@ -100,9 +100,18 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
     bgen_read_variant_genotype(index, vg, probabilities);
 
     for (j = 0; j < 500; ++j) {
-      fscanf(f, "%lf", prob + 0);
-      fscanf(f, "%lf", prob + 1);
-      fscanf(f, "%lf", prob + 2);
+
+      e = fscanf(f, "%lf", prob + 0);
+      if (e != 1)
+        return 1;
+
+      e = fscanf(f, "%lf", prob + 1);
+      if (e != 1)
+        return 1;
+
+      e = fscanf(f, "%lf", prob + 2);
+      if (e != 1)
+        return 1;
 
       if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) {
         prob[0] = NAN;
