@@ -51,11 +51,11 @@ void bgen_free_samples(const struct bgen_file *bgen, bgen_string *samples);
     for storing and reading that information from an additional file. We refer
     to this file as variants metadata file.
 
-    Note: remember to call `bgen_free_variants` and `bgen_free_index` after use.
+    Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index` after use.
 */
-struct bgen_var *bgen_read_variants(struct bgen_file *bgen, struct bgen_vi **vi,
+struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **vi,
                                     int verbose);
-void bgen_free_variants(const struct bgen_file *bgen,
+void bgen_free_variants_metadata(const struct bgen_file *bgen,
                         struct bgen_var *variants);
 void bgen_free_index(struct bgen_vi *vi);
 

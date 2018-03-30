@@ -31,7 +31,7 @@ int main() {
   if (samples == NULL)
     return FAIL;
 
-  variants = bgen_read_variants(bgen, &index, 0);
+  variants = bgen_read_variants_metadata(bgen, &index, 0);
   if (variants == NULL)
     return FAIL;
 

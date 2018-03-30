@@ -27,7 +27,7 @@ int main() {
   // alleles, etc.)
   // Notice that we also have a VariantIndexing in return, used afterwards.
   struct bgen_vi *index;
-  struct bgen_var *variants = bgen_read_variants(bgen, &index);
+  struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index);
 
   printf("RSID of the first variant: %.*s\n", (int)variants[0].rsid.len,
          variants[0].rsid.str);
@@ -35,7 +35,7 @@ int main() {
   printf("Number of alleles of the first variant: %d\n", variants[0].nalleles);
 
   // Releasing memory associated with variant identifications.
-  bgen_free_variants(bgen, variants);
+  bgen_free_variants_metadata(bgen, variants);
 
   // Releases associated memory. Called at the end.
   bgen_close(bgen);

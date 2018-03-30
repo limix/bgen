@@ -17,16 +17,16 @@ of sample identifications.
 The allocated resources must be released by a subsequent call to
 :c:func:`bgen_free_samples`.
 
-The function :c:func:`bgen_read_variants` reads the metadata of all variants
+The function :c:func:`bgen_read_variants_metadata` reads the metadata of all variants
 in the file (i.e., names, chromosomes, number of alleles, etc.).
 It returns the read information as an array of type :c:type:`bgen_var`.
 Let ``v`` be such an array.
 The user can, for example, get the name of the i-th variant from
 ``v[i].id`` or its genetic position from ``v[i].position``.
 After use, its resources have to be released by calling
-:c:func:`bgen_free_variants`.
+:c:func:`bgen_free_variants_metadata`.
 
-The function :c:func:`bgen_read_variants` also returns another important
+The function :c:func:`bgen_read_variants_metadata` also returns another important
 structure: the variants index, :c:type:`bgen_vi`.
 It is used to locate the variants in a BGEN file.
 Importantly, the variants index can be used even after the BGEN file has
@@ -226,7 +226,7 @@ Variant genotype
 Variant metadata
 ^^^^^^^^^^^^^^^^
 
-.. c:function:: struct bgen_var* bgen_read_variants(struct bgen_file* bgen,\
+.. c:function:: struct bgen_var* bgen_read_variants_metadata(struct bgen_file* bgen,\
     struct bgen_vi** vi, int verbose)
 
     Read variants metadata and index.
@@ -235,7 +235,7 @@ Variant metadata
     :c:func:`bgen_load_variants_metadata` to read that information from a file
     created by calling :c:func:`bgen_store_variants_metadata`.
 
-    Remember to call :c:func:`bgen_free_variants` on the returned array
+    Remember to call :c:func:`bgen_free_variants_metadata` on the returned array
     to release allocated resources after the interaction has finished.
 
     :param bgen: bgen file handler.
@@ -243,7 +243,7 @@ Variant metadata
     :param verbose: ``1`` to show progress or ``0`` to disable output.
     :return: variants information.
 
-.. c:function:: void bgen_free_variants(const struct bgen_file* bgen,\
+.. c:function:: void bgen_free_variants_metadata(const struct bgen_file* bgen,\
     struct bgen_var* variants)
 
     Free memory associated with variants metadata.

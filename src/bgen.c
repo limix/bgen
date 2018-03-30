@@ -260,7 +260,7 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
   return 0;
 }
 
-struct bgen_var *bgen_read_variants(struct bgen_file *bgen, struct bgen_vi **index,
+struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index,
                                    int verbose) {
   struct bgen_var *variants;
   uint32_t length;
@@ -331,7 +331,7 @@ err:
   return NULL;
 }
 
-void bgen_free_variants(const struct bgen_file *bgen, struct bgen_var *variants) {
+void bgen_free_variants_metadata(const struct bgen_file *bgen, struct bgen_var *variants) {
   size_t i, j;
 
   for (i = 0; i < (size_t)bgen->nvariants; ++i) {
