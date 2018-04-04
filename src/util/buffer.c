@@ -96,8 +96,23 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
         goto err;
     }
 
+    if (uncompressed_size == 0) {
+        fprintf(stderr, "Invalid uncompressed size: 0\n");
+        goto err;
+    }
+
     b->size = (size_t)uncompressed_size;
+
+    if (b->size == 0) {
+        fprintf(stderr, "Invalid buffer size: 0\n");
+        goto err;
+    }
+
     b->base = malloc(b->size);
+    if (b->base == NULL) {
+        fprintf(stderr, "Error: file %s might be invalid.\n", fp);
+        goto err;
+    }
 
     if (fread(&compressed_size, 1, 8, f) != 8) {
         perror("Error while reading buffer size");
