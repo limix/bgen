@@ -29,17 +29,17 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "1.1.3"
+#define BGEN_VERSION "1.1.4"
 #define BGEN_VERSION_MAJOR 1
 #define BGEN_VERSION_MINOR 1
-#define BGEN_VERSION_PATCH 3
+#define BGEN_VERSION_PATCH 4
 
 #include <math.h>
 #include <stdlib.h>
 
 struct bgen_string {
-  int len;
-  char *str;
+    int len;
+    char *str;
 };
 
 struct bgen_file; /* bgen file handler */
@@ -48,12 +48,12 @@ struct bgen_vg;   /* variant genotype */
 
 /* Variant metadata. */
 struct bgen_var {
-  struct bgen_string id;
-  struct bgen_string rsid;
-  struct bgen_string chrom;
-  int position;
-  int nalleles;
-  struct bgen_string *allele_ids;
+    struct bgen_string id;
+    struct bgen_string rsid;
+    struct bgen_string chrom;
+    int position;
+    int nalleles;
+    struct bgen_string *allele_ids;
 };
 
 /* Open a file and return a bgen file handler. */
