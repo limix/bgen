@@ -120,6 +120,11 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
     }
 
     compressed = malloc((size_t)compressed_size);
+    if (compressed == NULL) {
+        fprintf(stderr, "Error: file %s might be invalid.\n", fp);
+        goto err;
+    }
+
     if (buffer_load_loop(f, compressed, (size_t)compressed_size, verbose)) {
         goto err;
     }

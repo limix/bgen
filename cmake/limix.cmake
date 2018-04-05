@@ -41,12 +41,17 @@ endmacro(limix_windows_config)
 macro(limix_config)
     enable_testing()
 
-    if (NOT CMAKE_BUILD_TYPE)
-        set(MSG "CMAKE_BUILD_TYPE has not been set.")
-        set(MSG "${MSG} Using the default value \"Release\".")
-        message(STATUS "${MSG}")
-        set(CMAKE_BUILD_TYPE Release)
+    # Set default build type.
+    if(NOT CMAKE_BUILD_TYPE)
+        message(STATUS "CMAKE_BUILD_TYPE not given, defaulting to 'Debug'.")
+        set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Choose the type of build."
+            FORCE)
     endif()
+
+    # Set available build types for CMake GUIs.
+    # A different build type can still be set by -DCMAKE_BUILD_TYPE=...
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY
+        STRINGS "Debug" "Release")
 
     macro(set_rpath)
         set(CMAKE_MACOSX_RPATH TRUE)
