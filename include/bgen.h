@@ -29,10 +29,10 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "1.1.2"
+#define BGEN_VERSION "1.1.3"
 #define BGEN_VERSION_MAJOR 1
 #define BGEN_VERSION_MINOR 1
-#define BGEN_VERSION_PATCH 2
+#define BGEN_VERSION_PATCH 3
 
 #include <math.h>
 #include <stdlib.h>
