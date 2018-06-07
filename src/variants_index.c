@@ -1,10 +1,10 @@
+#include "variants_index.h"
 #include "bgen.h"
 #include "bgen_file.h"
 #include "tpl/tpl.h"
 #include "util/buffer.h"
 #include "util/mem.h"
 #include "util/tpl.h"
-#include "variants_index.h"
 #include "zip/zstd_wrapper.h"
 
 typedef struct tpl_string {

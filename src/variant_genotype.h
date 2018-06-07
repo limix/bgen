@@ -1,8 +1,8 @@
 #ifndef BGEN_VARIANT_GENOTYPE_H
 #define BGEN_VARIANT_GENOTYPE_H
 
-#include <stddef.h>
 #include "util/stdint.h"
+#include <stddef.h>
 
 struct bgen_vg {
     uint32_t nsamples;
