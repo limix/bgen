@@ -1,6 +1,8 @@
 #ifndef BGEN_VARIANTS_INDEX_H
 #define BGEN_VARIANTS_INDEX_H
 
+#include "bgen_file.h"
+#include <stdint.h>
 #include <stdio.h>
 
 struct bgen_vi {

@@ -121,6 +121,8 @@ int bgen_nalleles(const struct bgen_vg *vg);
 int bgen_ploidy(const struct bgen_vg *vg);
 /* Get the number of genotype combinations. */
 int bgen_ncombs(const struct bgen_vg *vg);
+/* Return 1 for phased or 0 for unphased genotype. */
+int bgen_phased(const struct bgen_vg *vg);
 
 /* Store variants metadata. */
 int bgen_store_variants_metadata(const struct bgen_file *bgen,

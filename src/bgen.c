@@ -416,3 +416,5 @@ int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 int bgen_ploidy(const struct bgen_vg *vg) { return vg->ploidy; }
 
 int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
+
+int bgen_phased(const struct bgen_vg *vg) { return vg->phased; }

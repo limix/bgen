@@ -7,6 +7,7 @@
 struct bgen_vg {
     uint32_t nsamples;
     uint16_t nalleles;
+    uint8_t phased;
     uint8_t nbits;
     uint8_t *plo_miss;
     int ncombs;
