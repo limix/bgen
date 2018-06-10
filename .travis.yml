@@ -8,7 +8,7 @@ compiler:
 - clang
 - gcc
 before_script:
-- bash <(curl -fsSL https://gist.githubusercontent.com/horta/ed6baba1bf2626274141dc9c955ae58f/raw/3d86d224c9cbd6a413b7f556a5964f85bce97327/install-zstd)
+- bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
 - bash <(curl -fsSL https://raw.githubusercontent.com/horta/almosthere/master/install)
 script:
 - mkdir build && pushd build
