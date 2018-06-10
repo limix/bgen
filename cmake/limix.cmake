@@ -17,6 +17,26 @@ function(display_welcome)
   endforeach()
 endfunction(display_welcome)
 
+macro(limix_windows_config)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
+  add_definitions(-Dinline=__inline)
+
+  set(CompilerFlags
+      CMAKE_CXX_FLAGS
+      CMAKE_CXX_FLAGS_DEBUG
+      CMAKE_CXX_FLAGS_RELEASE
+      CMAKE_C_FLAGS
+      CMAKE_C_FLAGS_DEBUG
+      CMAKE_C_FLAGS_RELEASE)
+
+  foreach(CompilerFlag ${CompilerFlags})
+    string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+  endforeach()
+endmacro(limix_windows_config)
+
 macro(limix_config)
   enable_testing()
 
@@ -38,10 +58,7 @@ macro(limix_config)
 
   # Windows specific common configuration
   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
-    add_definitions(-Dinline=__inline)
+    limix_windows_config()
   endif()
 
   set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
@@ -68,13 +85,19 @@ function(easy_set_target_property NAME PROPERTY VALUE)
   set_target_properties(${NAME} PROPERTIES ${PROPERTY} "${VALUE}")
 endfunction(easy_set_target_property)
 
-function(easy_install TARGET_NAME INCLUDE_DIR)
+function(easy_shared_install TARGET_NAME)
   install(TARGETS ${TARGET_NAME}
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          PUBLIC_HEADER DESTINATION ${INCLUDE_DIR})
-endfunction(easy_install)
+          PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+endfunction(easy_shared_install)
+
+function(easy_static_install TARGET_NAME)
+  install(TARGETS ${TARGET_NAME}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+endfunction(easy_static_install)
 
 function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
   if(TYPE MATCHES "STATIC")
@@ -85,10 +108,9 @@ function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
   easy_set_target_property(${NAME} VERSION ${VERSION})
   if(TYPE MATCHES "SHARED")
     easy_set_target_property(${NAME} PUBLIC_HEADER "${PUBLIC_HEADERS}")
-  endif()
-
-  if(TYPE MATCHES "SHARED")
-    easy_install(${NAME} include/${NAME})
+    easy_shared_install(${NAME})
+  else()
+    easy_static_install(${NAME})
   endif()
 
   target_link_libraries(${NAME} "${LIBS}")
@@ -103,9 +125,10 @@ macro(limix_add_test NAME LIBRARY SOURCES)
   add_executable(${NAME} ${SOURCES})
   target_link_libraries(${NAME} ${LIBRARY})
   add_test(test_${NAME} ${NAME} -E environment)
-
   file(TO_CMAKE_PATH "$ENV{PATH}" MYPATH)
+
   list(APPEND MYPATH ${CMAKE_BINARY_DIR})
+  list(APPEND MYPATH ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
   string(REPLACE ";" "\\;" MYPATH "${MYPATH}")
 
   set_property(TEST test_${NAME} APPEND PROPERTY ENVIRONMENT "PATH=${MYPATH}")
