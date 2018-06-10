@@ -49,6 +49,10 @@ Refer to [documentation](https://bgen.readthedocs.io/) for usage and API descrip
 The original specification can be found at [http://www.well.ox.ac.uk/~gav/bgen_format/](http://www.well.ox.ac.uk/~gav/bgen_format/).
 We have also created an alternative, more [user-friendly BGEN specification](bgen-file-format.pdf).
 
+## Acknowledgments
+
+- [Yan Wong](https://github.com/hyanwong) for bug-reporting and improvement suggestions.
+
 ## Authors
 
 - [Danilo Horta](https://github.com/horta)
