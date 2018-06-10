@@ -57,35 +57,36 @@ inline static void set_array_nan(double *p, size_t n) {
 }
 
 void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
-    int nalleles, ploidy, nbits;
+    int nalleles, ploidy, nbits, max_ploidy;
     uint64_t uip_sum, ui_prob;
     uint64_t sample_start, haplo_start, allele_start;
     double denom;
 
     nbits = vg->nbits;
     nalleles = vg->nalleles;
+    max_ploidy = vg->max_ploidy;
     size_t i, ii, j, bi, offset;
     denom = (double)((((uint64_t)1 << nbits)) - 1);
+    double *pend = p + vg->nsamples * max_ploidy * nalleles;
 
+    sample_start = 0;
     for (j = 0; j < vg->nsamples; ++j) {
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
 
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
-            set_array_nan(p + j * ploidy * nalleles,
-                          (size_t)(ploidy * nalleles));
+            set_array_nan(p, (size_t)(ploidy * nalleles));
+            p += ploidy * nalleles;
             continue;
         }
 
-        sample_start = j * vg->nbits * ploidy * (nalleles - 1);
+        haplo_start = 0;
         for (i = 0; i < (size_t)ploidy; ++i) {
 
             uip_sum = 0;
-            haplo_start = i * vg->nbits * (nalleles - 1);
-
+            allele_start = 0;
             for (ii = 0; ii < (size_t)(nalleles - 1); ++ii) {
 
                 ui_prob = 0;
-                allele_start = ii * vg->nbits;
                 offset = sample_start + haplo_start + allele_start;
 
                 for (bi = 0; bi < nbits; ++bi) {
@@ -95,13 +96,18 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
                     }
                 }
 
-                p[j * ploidy * nalleles + i * nalleles + ii] = ui_prob / denom;
+                *p = ui_prob / denom;
+                ++p;
                 uip_sum += ui_prob;
+                allele_start += nbits;
             }
-            p[j * ploidy * nalleles + i * nalleles + nalleles - 1] =
-                (denom - uip_sum) / denom;
+            *p = (denom - uip_sum) / denom;
+            ++p;
+            haplo_start += nbits * (nalleles - 1);
         }
+        sample_start += nbits * ploidy * (nalleles - 1);
     }
+    set_array_nan(p, (size_t)(pend - p));
 }
 
 void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
@@ -227,7 +233,8 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg,
     bgen_memcpy(&nalleles, &c, 2);
     bgen_memcpy(&min_ploidy, &c, 1);
     bgen_memcpy(&max_ploidy, &c, 1);
-    vg->ploidy = max_ploidy;
+    vg->min_ploidy = min_ploidy;
+    vg->max_ploidy = max_ploidy;
 
     plo_miss = malloc(nsamples * sizeof(uint8_t));
 
@@ -246,9 +253,9 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg,
     vg->plo_miss = plo_miss;
 
     if (phased)
-        vg->ncombs = nalleles * vg->ploidy;
+        vg->ncombs = nalleles * vg->max_ploidy;
     else
-        vg->ncombs = bgen_choose(nalleles + vg->ploidy - 1, nalleles - 1);
+        vg->ncombs = bgen_choose(nalleles + vg->max_ploidy - 1, nalleles - 1);
     vg->chunk = chunk;
     vg->current_chunk = c;
 

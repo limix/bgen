@@ -11,7 +11,8 @@ struct bgen_vg {
     uint8_t nbits;
     uint8_t *plo_miss;
     int ncombs;
-    uint8_t ploidy;
+    uint8_t min_ploidy;
+    uint8_t max_ploidy;
     char *chunk;
     char *current_chunk;
     size_t variant_idx;

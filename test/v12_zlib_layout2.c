@@ -88,7 +88,7 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
     for (i = 0; i < 199; ++i) {
         vg = bgen_open_variant_genotype(index, i);
 
-        if (bgen_ploidy(vg) != 2) {
+        if (bgen_max_ploidy(vg) != 2) {
             fprintf(stderr, "Wrong ploidy.\n");
             return 1;
         }

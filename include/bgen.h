@@ -29,9 +29,9 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "1.2.0"
-#define BGEN_VERSION_MAJOR 1
-#define BGEN_VERSION_MINOR 2
+#define BGEN_VERSION "2.0.0"
+#define BGEN_VERSION_MAJOR 2
+#define BGEN_VERSION_MINOR 0
 #define BGEN_VERSION_PATCH 0
 
 #include <math.h>
@@ -117,8 +117,14 @@ void bgen_read_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg,
                                 double *probs);
 /* Get the number of alleles. */
 int bgen_nalleles(const struct bgen_vg *vg);
+/* Return 1 if variant is missing for the sample; 0 otherwise. */
+int bgen_missing(const struct bgen_vg *vg, size_t index);
 /* Get the ploidy. */
-int bgen_ploidy(const struct bgen_vg *vg);
+int bgen_ploidy(const struct bgen_vg *vg, size_t index);
+/* Get the minimum ploidy of the variant. */
+int bgen_min_ploidy(const struct bgen_vg *vg);
+/* Get the maximum ploidy of the variant. */
+int bgen_max_ploidy(const struct bgen_vg *vg);
 /* Get the number of genotype combinations. */
 int bgen_ncombs(const struct bgen_vg *vg);
 /* Return 1 for phased or 0 for unphased genotype. */

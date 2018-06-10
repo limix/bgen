@@ -99,7 +99,8 @@ int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg,
     vg->nsamples = index->nsamples;
     vg->nalleles = 2;
     vg->ncombs = 3;
-    vg->ploidy = 2;
+    vg->min_ploidy = 2;
+    vg->max_ploidy = 2;
     vg->chunk = chunk;
     vg->current_chunk = c;
 

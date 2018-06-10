@@ -54,7 +54,13 @@ int main() {
     if (bgen_ncombs(vg) != 4)
         return 1;
 
-    if (bgen_ploidy(vg) != 2)
+    if (bgen_ploidy(vg, 0) != 2)
+        return 1;
+
+    if (bgen_min_ploidy(vg) != 2)
+        return 1;
+
+    if (bgen_max_ploidy(vg) != 2)
         return 1;
 
     if (bgen_nalleles(vg) != 2)

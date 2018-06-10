@@ -413,7 +413,17 @@ void bgen_close_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg) {
 
 int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 
-int bgen_ploidy(const struct bgen_vg *vg) { return vg->ploidy; }
+int bgen_missing(const struct bgen_vg *vg, size_t index) {
+    return vg->plo_miss[index] >> 7;
+}
+
+int bgen_ploidy(const struct bgen_vg *vg, size_t index) {
+    return vg->plo_miss[index] & 127;
+}
+
+int bgen_min_ploidy(const struct bgen_vg *vg) { return vg->min_ploidy; }
+
+int bgen_max_ploidy(const struct bgen_vg *vg) { return vg->max_ploidy; }
 
 int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
 
