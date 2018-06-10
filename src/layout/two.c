@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <math.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include "layout/two.h"
@@ -170,19 +171,29 @@ char *bgen_uncompress_two(struct bgen_vi *idx, FILE *file) {
     uchunk = malloc(ulength);
 
     if (idx->compression == 1) {
-        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength))
+        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength)) {
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
+            goto err;
+        }
     } else if (idx->compression == 2) {
-        if (bgen_unzstd(cchunk, clength, (void **)&uchunk, &ulength))
+        if (bgen_unzstd(cchunk, clength, (void **)&uchunk, &ulength)) {
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
+            goto err;
+        }
     } else {
         fprintf(stderr, "Unrecognized compression method.");
-        return NULL;
+        goto err;
     }
 
     free(cchunk);
 
     return uchunk;
+err:
+    fflush(stderr);
+
+    free(cchunk);
+    free(uchunk);
+    return NULL;
 }
 
 int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg,
@@ -233,6 +244,7 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg,
     vg->phased = phased;
     vg->nbits = nbits;
     vg->plo_miss = plo_miss;
+
     if (phased)
         vg->ncombs = nalleles * vg->ploidy;
     else

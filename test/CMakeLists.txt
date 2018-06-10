@@ -4,6 +4,7 @@ limix_add_test(v12_zlib_layout2 ${PROJECT_NAME} "v12_zlib_layout2.c;example_file
 limix_add_test(zero_len_chrom_id ${PROJECT_NAME} "zero_len_chrom_id.c")
 limix_add_test(pbgen_example ${PROJECT_NAME} "pbgen_example.c")
 limix_add_test(metadata_example ${PROJECT_NAME} "metadata_example.c")
+limix_add_test(haplotype ${PROJECT_NAME} "haplotype.c")
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)
@@ -11,6 +12,7 @@ list(APPEND DATA_FILES example.v11.bgen)
 list(APPEND DATA_FILES pbgen_example.pgen)
 list(APPEND DATA_FILES zero_len_chrom_id.bgen)
 list(APPEND DATA_FILES wrong.metadata)
+list(APPEND DATA_FILES haplotypes.bgen)
 
 foreach(DATA_FILE ${DATA_FILES})
     set(ORIGIN "data/${DATA_FILE}")
