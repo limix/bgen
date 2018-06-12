@@ -77,6 +77,7 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
             set_array_nan(p, (size_t)(pend - p));
             p = pend;
+            sample_start += nbits * ploidy * (nalleles - 1);
             continue;
         }
 
@@ -138,6 +139,7 @@ void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
             set_array_nan(p, (size_t)(pend - p));
             p = pend;
+            sample_start += nbits * (ncombs - 1);
             continue;
         }
 
@@ -155,7 +157,6 @@ void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
                     ui_prob |= ((uint64_t)1 << bi);
                 }
             }
-
             *p = ui_prob / denom;
             ++p;
             uip_sum += ui_prob;

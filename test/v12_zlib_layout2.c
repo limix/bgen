@@ -77,7 +77,7 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
     struct bgen_vg *vg;
     FILE *f;
     double prob[3];
-    double eps = (double)(1 << prec);
+    double eps = 1. / pow(2, prec) + 1. / pow(2, prec) / 3.;
     int ncombs, e;
     size_t i, j;
     double *probabilities;

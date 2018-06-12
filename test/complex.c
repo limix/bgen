@@ -147,11 +147,16 @@ int main() {
         bgen_read_variant_genotype(index, vg, probabilities);
 
         for (j = 0; j < nsamples; ++j) {
+
             if (ploidys[jj] != bgen_ploidy(vg, j))
                 return 1;
+
             if (bgen_missing(vg, j) != 0)
                 return 1;
+
             for (ii = 0; ii < bgen_ncombs(vg); ++ii) {
+                printf("%f ", *p);
+
                 if (*rp != *p && !(isnan(*rp) && isnan(*p)))
                     return 1;
                 ++rp;
@@ -159,6 +164,7 @@ int main() {
             }
             ++jj;
         }
+        printf("\n");
         bgen_close_variant_genotype(index, vg);
         free(probabilities);
     }
