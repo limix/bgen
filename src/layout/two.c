@@ -67,15 +67,16 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
     max_ploidy = vg->max_ploidy;
     size_t i, ii, j, bi, offset;
     denom = (double)((((uint64_t)1 << nbits)) - 1);
-    double *pend = p + vg->nsamples * max_ploidy * nalleles;
+    double *pend;
 
     sample_start = 0;
     for (j = 0; j < vg->nsamples; ++j) {
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
+        pend = p + max_ploidy * nalleles;
 
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
-            set_array_nan(p, (size_t)(ploidy * nalleles));
-            p += ploidy * nalleles;
+            set_array_nan(p, (size_t)(pend - p));
+            p = pend;
             continue;
         }
 
@@ -106,49 +107,65 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
             haplo_start += nbits * (nalleles - 1);
         }
         sample_start += nbits * ploidy * (nalleles - 1);
+        set_array_nan(p, (size_t)(pend - p));
+        p = pend;
     }
-    set_array_nan(p, (size_t)(pend - p));
 }
 
 void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
-    int ncombs, ploidy;
+    int nalleles, ncombs, ploidy, nbits, max_ploidy, max_ncombs;
     uint64_t uip_sum, ui_prob;
     uint64_t sample_start, geno_start;
     double denom;
 
-    size_t i, j, bi, offset;
-    denom = (double)((((uint64_t)1 << vg->nbits)) - 1);
+    nbits = vg->nbits;
+    nalleles = vg->nalleles;
+    max_ploidy = vg->max_ploidy;
 
+    size_t i, j, bi, offset;
+    denom = (double)((((uint64_t)1 << nbits)) - 1);
+    double *pend;
+
+    max_ncombs = bgen_choose(nalleles + max_ploidy - 1, nalleles - 1);
+
+    sample_start = 0;
     for (j = 0; j < vg->nsamples; ++j) {
+        pend = p + max_ncombs;
         ploidy = bgen_read_ploidy(vg->plo_miss[j]);
 
-        ncombs = bgen_choose(vg->nalleles + ploidy - 1, vg->nalleles - 1);
+        ncombs = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
 
         if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
-            set_array_nan(p + j * ncombs, (size_t)ncombs);
+            set_array_nan(p, (size_t)(pend - p));
+            p = pend;
             continue;
         }
 
         uip_sum = 0;
 
-        sample_start = j * vg->nbits * (ncombs - 1);
+        geno_start = 0;
         for (i = 0; i < (size_t)(ncombs - 1); ++i) {
 
             ui_prob = 0;
-            geno_start = i * vg->nbits;
             offset = sample_start + geno_start;
 
-            for (bi = 0; bi < vg->nbits; ++bi) {
+            for (bi = 0; bi < nbits; ++bi) {
 
                 if (get_bit(vg->current_chunk, (int)(bi + offset))) {
                     ui_prob |= ((uint64_t)1 << bi);
                 }
             }
 
-            p[j * ncombs + i] = ui_prob / denom;
+            *p = ui_prob / denom;
+            ++p;
             uip_sum += ui_prob;
+            geno_start += nbits;
         }
-        p[j * ncombs + ncombs - 1] = (denom - uip_sum) / denom;
+        *p = (denom - uip_sum) / denom;
+        ++p;
+        sample_start += nbits * (ncombs - 1);
+        set_array_nan(p, (size_t)(pend - p));
+        p = pend;
     }
 }
 
