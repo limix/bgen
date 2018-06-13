@@ -25,6 +25,20 @@ int isnan(double x) {
 }
 #endif
 
+int ipow(int base, int exp) {
+    int result = 1;
+    for (;;) {
+        if (exp & 1)
+            result *= base;
+        exp >>= 1;
+        if (!exp)
+            break;
+        base *= base;
+    }
+
+    return result;
+}
+
 int test_read_metadata(struct bgen_file *bgen, struct bgen_string *s,
                        struct bgen_var *v) {
     if (bgen_nsamples(bgen) != 500)
@@ -77,7 +91,7 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
     struct bgen_vg *vg;
     FILE *f;
     double prob[3];
-    double eps = 1. / pow(2, prec) + 1. / pow(2, prec) / 3.;
+    double eps = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
     int ncombs, e;
     size_t i, j;
     double *probabilities;
