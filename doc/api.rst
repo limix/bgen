@@ -208,12 +208,54 @@ Variant genotype
     :param vg: variant genotype handler.
     :return: number of alleles.
 
-.. function:: int bgen_ploidy(const struct bgen_vg* vg)
+.. function:: int bgen_missing(const struct bgen_vg *vg,\
+    size_t index)
 
-    Get the ploidy.
+    Return ``1`` if variant is missing for the sample;
+    ``0`` otherwise.
+
+    .. note::
+        
+        Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
+    :param index: sample index.
+    :return: ``1`` for missing variant; ``0`` otherwise.
+
+.. function:: int bgen_ploidy(const struct bgen_vg* vg,\
+    size_t index)
+
+    Get the ploidy for a given locus and sample index.
+
+    .. note::
+        
+        Modified in version 2.0.0.
+
+    :param vg: variant genotype handler.
+    :param index: sample index.
     :return: ploidy.
+
+.. function:: int bgen_min_ploidy(const struct bgen_vg *vg)
+
+    Get the minimum ploidy of the variant.
+
+    .. note::
+        
+        Implemented in version 2.0.0.
+
+    :param vg: variant genotype handler.
+    :return: minimum ploidy.
+
+.. function:: int bgen_max_ploidy(const struct bgen_vg *vg)
+
+    Get the maximum ploidy of the variant.
+
+    .. note::
+        
+        Implemented in version 2.0.0.
+
+    :param vg: variant genotype handler.
+    :return: maximum ploidy.
 
 .. function:: int bgen_ncombs(const struct bgen_vg *vg)
 
@@ -228,7 +270,7 @@ Variant genotype
 
     .. note::
         
-        Implemented in version 1.2.0.
+        Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
     :return: ``1`` for phased genotype; ``0`` otherwise.
