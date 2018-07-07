@@ -1,3 +1,5 @@
+#define BGEN_API_EXPORTS
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -70,7 +72,7 @@ int bgen_read_header(struct bgen_file *bgen) {
  * filepath
  *  File path to the bgen file.
  */
-struct bgen_file *bgen_open(const char *filepath) {
+BGEN_API struct bgen_file *bgen_open(const char *filepath) {
     uint32_t offset;
     struct bgen_file *bgen;
 
@@ -130,7 +132,7 @@ err:
     return NULL;
 }
 
-void bgen_close(struct bgen_file *bgen) {
+BGEN_API void bgen_close(struct bgen_file *bgen) {
     if (bgen->filepath)
         free(bgen->filepath);
 
@@ -138,15 +140,15 @@ void bgen_close(struct bgen_file *bgen) {
         free(bgen);
 }
 
-int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
+BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
 
-int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
+BGEN_API int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
 
-int bgen_sample_ids_presence(const struct bgen_file *bgen) {
+BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen) {
     return bgen->sample_ids_presence;
 }
 
-struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
+BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
     uint32_t length, nsamples;
     size_t i;
     struct bgen_string *sample_ids;
@@ -204,8 +206,7 @@ err:
     return NULL;
 }
 
-void bgen_free_samples(const struct bgen_file *bgen,
-                       struct bgen_string *samples) {
+BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_string *samples) {
     size_t i;
 
     if (bgen->sample_ids_presence == 0)
@@ -261,9 +262,8 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
     return 0;
 }
 
-struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                             struct bgen_vi **index,
-                                             int verbose) {
+BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
+                                             struct bgen_vi **index, int verbose) {
     struct bgen_var *variants;
     uint32_t length;
     size_t i, nvariants;
@@ -333,7 +333,7 @@ err:
     return NULL;
 }
 
-void bgen_free_variants_metadata(const struct bgen_file *bgen,
+BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
                                  struct bgen_var *variants) {
     size_t i, j;
 
@@ -349,14 +349,13 @@ void bgen_free_variants_metadata(const struct bgen_file *bgen,
     free(variants);
 }
 
-void bgen_free_index(struct bgen_vi *index) {
+BGEN_API void bgen_free_index(struct bgen_vi *index) {
     free(index->filepath);
     free(index->start);
     free(index);
 }
 
-struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index,
-                                           size_t variant_idx) {
+BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index, size_t variant_idx) {
     struct bgen_vg *vg;
     FILE *file;
 
@@ -389,7 +388,7 @@ struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index,
     return vg;
 }
 
-void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
+BGEN_API void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
                                 double *probabilities) {
     if (index->layout == 1) {
         bgen_read_probs_one(vg, probabilities);
@@ -400,7 +399,7 @@ void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
     }
 }
 
-void bgen_close_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg) {
+BGEN_API void bgen_close_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg) {
     if (vg->plo_miss != NULL)
         free(vg->plo_miss);
 
@@ -411,20 +410,20 @@ void bgen_close_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg) {
         free(vg);
 }
 
-int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
+BGEN_API int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 
-int bgen_missing(const struct bgen_vg *vg, size_t index) {
+BGEN_API int bgen_missing(const struct bgen_vg *vg, size_t index) {
     return vg->plo_miss[index] >> 7;
 }
 
-int bgen_ploidy(const struct bgen_vg *vg, size_t index) {
+BGEN_API int bgen_ploidy(const struct bgen_vg *vg, size_t index) {
     return vg->plo_miss[index] & 127;
 }
 
-int bgen_min_ploidy(const struct bgen_vg *vg) { return vg->min_ploidy; }
+BGEN_API int bgen_min_ploidy(const struct bgen_vg *vg) { return vg->min_ploidy; }
 
-int bgen_max_ploidy(const struct bgen_vg *vg) { return vg->max_ploidy; }
+BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg) { return vg->max_ploidy; }
 
-int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
+BGEN_API int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
 
-int bgen_phased(const struct bgen_vg *vg) { return vg->phased; }
+BGEN_API int bgen_phased(const struct bgen_vg *vg) { return vg->phased; }

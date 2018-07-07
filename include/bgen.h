@@ -34,6 +34,20 @@
 #define BGEN_VERSION_MINOR 0
 #define BGEN_VERSION_PATCH 0
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef _WIN32
+#ifdef BGEN_API_EXPORTS
+#define BGEN_API __declspec(dllexport)
+#else
+#define BGEN_API __declspec(dllimport)
+#endif
+#else
+#define BGEN_API
+#endif
+
 #include <math.h>
 #include <stdlib.h>
 
@@ -57,22 +71,23 @@ struct bgen_var {
 };
 
 /* Open a file and return a bgen file handler. */
-struct bgen_file *bgen_open(const char *filepath);
+BGEN_API struct bgen_file *bgen_open(const char *filepath);
 /* Close a bgen file handler. */
-void bgen_close(struct bgen_file *bgen);
+BGEN_API void bgen_close(struct bgen_file *bgen);
 
 /* Get the number of samples. */
-int bgen_nsamples(const struct bgen_file *bgen);
+BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
 /* Get the number of variants. */
-int bgen_nvariants(const struct bgen_file *bgen);
+BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 /* Check if the file contains sample identifications. */
-int bgen_sample_ids_presence(const struct bgen_file *bgen);
+BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
 
 /* Get array of sample identifications. */
-struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
+BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen,
+                                               int verbose);
 /* Free array of sample identifications. */
-void bgen_free_samples(const struct bgen_file *bgen,
-                       struct bgen_string *samples);
+BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
+                                struct bgen_string *samples);
 
 /* Read variants metadata and generate variants index.
 
@@ -88,11 +103,12 @@ void bgen_free_samples(const struct bgen_file *bgen,
     Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
    after use.
 */
-struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                             struct bgen_vi **vi, int verbose);
-void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                 struct bgen_var *variants);
-void bgen_free_index(struct bgen_vi *vi);
+BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
+                                                      struct bgen_vi **vi,
+                                                      int verbose);
+BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
+                                          struct bgen_var *variants);
+BGEN_API void bgen_free_index(struct bgen_vi *vi);
 
 /* Open a variant for genotype queries.
 
@@ -104,47 +120,54 @@ void bgen_free_index(struct bgen_vi *vi);
 
     Note: remember to call `bgen_close_variant_genotype` after use.
  */
-struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
+BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi,
+                                                    size_t index);
 /* Close a variant genotype handler. */
-void bgen_close_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg);
+BGEN_API void bgen_close_variant_genotype(struct bgen_vi *vi,
+                                          struct bgen_vg *vg);
 
 /* Read the probabilities of each possible genotype.
 
     The variant index and a variant genotype handler are required.
     The number of probabilities can be found from `bgen_ncombs`.
 */
-void bgen_read_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg,
-                                double *probs);
+BGEN_API void bgen_read_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg,
+                                         double *probs);
 /* Get the number of alleles. */
-int bgen_nalleles(const struct bgen_vg *vg);
+BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */
-int bgen_missing(const struct bgen_vg *vg, size_t index);
+BGEN_API int bgen_missing(const struct bgen_vg *vg, size_t index);
 /* Get the ploidy. */
-int bgen_ploidy(const struct bgen_vg *vg, size_t index);
+BGEN_API int bgen_ploidy(const struct bgen_vg *vg, size_t index);
 /* Get the minimum ploidy of the variant. */
-int bgen_min_ploidy(const struct bgen_vg *vg);
+BGEN_API int bgen_min_ploidy(const struct bgen_vg *vg);
 /* Get the maximum ploidy of the variant. */
-int bgen_max_ploidy(const struct bgen_vg *vg);
+BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg);
 /* Get the number of genotype combinations. */
-int bgen_ncombs(const struct bgen_vg *vg);
+BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
 /* Return 1 for phased or 0 for unphased genotype. */
-int bgen_phased(const struct bgen_vg *vg);
+BGEN_API int bgen_phased(const struct bgen_vg *vg);
 
 /* Store variants metadata. */
-int bgen_store_variants_metadata(const struct bgen_file *bgen,
-                                 struct bgen_var *variants, struct bgen_vi *vi,
-                                 const char *filepath);
+BGEN_API int bgen_store_variants_metadata(const struct bgen_file *bgen,
+                                          struct bgen_var *variants,
+                                          struct bgen_vi *vi,
+                                          const char *filepath);
 /* Read variants metadata from file. */
-struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
-                                             const char *filepath,
-                                             struct bgen_vi **vi, int verbose);
+BGEN_API struct bgen_var *
+bgen_load_variants_metadata(const struct bgen_file *bgen, const char *filepath,
+                            struct bgen_vi **vi, int verbose);
 /* Create a variants metadata file.
 
     Helper for easy creation of variants metadata file.
 
     Note: this file is not part of the bgen file format specification.
 */
-int bgen_create_variants_metadata_file(const char *bgen_fp, const char *vi_fp,
-                                       int verbose);
+BGEN_API int bgen_create_variants_metadata_file(const char *bgen_fp,
+                                                const char *vi_fp, int verbose);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* end of include guard: BGEN_BGEN_H */
