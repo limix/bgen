@@ -219,8 +219,7 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *fi
         chunk = malloc(6 * nsamples);
 
         if (fread(chunk, 1, 6 * nsamples, file) < 6 * nsamples) {
-            if (chunk)
-                free(chunk);
+            free(chunk);
             return 1;
         }
 
