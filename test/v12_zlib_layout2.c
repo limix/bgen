@@ -19,8 +19,7 @@ int isnan(double x) {
     } ieee754;
 #endif
     ieee754.f = x;
-    return ((unsigned)(ieee754.u >> 32) & 0x7fffffff) +
-               ((unsigned)ieee754.u != 0) >
+    return ((unsigned)(ieee754.u >> 32) & 0x7fffffff) + ((unsigned)ieee754.u != 0) >
            0x7ff00000;
 }
 #endif
@@ -88,28 +87,26 @@ int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
 }
 
 int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
-    struct bgen_vg *vg;
     FILE *f;
     double prob[3];
     double eps = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
-    int ncombs, e;
+    int e;
     size_t i, j;
-    double *probabilities;
 
     if ((f = fopen("data/example.matrix", "r")) == NULL)
         return 1;
 
     for (i = 0; i < 199; ++i) {
-        vg = bgen_open_variant_genotype(index, i);
+        struct bgen_vg *vg = bgen_open_variant_genotype(index, i);
 
         if (bgen_max_ploidy(vg) != 2) {
             fprintf(stderr, "Wrong ploidy.\n");
             return 1;
         }
 
-        ncombs = bgen_ncombs(vg);
+        int ncombs = bgen_ncombs(vg);
 
-        probabilities = calloc(nsamples * ncombs, sizeof(double));
+        double *probabilities = calloc(nsamples * ncombs, sizeof(double));
 
         bgen_read_variant_genotype(index, vg, probabilities);
 
@@ -177,13 +174,11 @@ int test_read(const char *bgen_fp, const char *index_fp, int precision) {
 int main() {
 
     size_t i;
-    int prec;
-    const char *ex, *ix;
 
     for (i = 0; i < (size_t)get_nexamples(); ++i) {
-        ex = get_example_filepath(i);
-        ix = get_example_index_filepath(i);
-        prec = get_example_precision(i);
+        const char *ex = get_example_filepath(i);
+        const char *ix = get_example_index_filepath(i);
+        int prec = get_example_precision(i);
 
         bgen_create_variants_metadata_file(ex, ix, 0);
 

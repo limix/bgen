@@ -17,7 +17,6 @@
 
 void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities) {
     uint16_t ui_prob;
-    unsigned int ui_prob_sum;
 
     double denom = 32768;
 
@@ -26,7 +25,7 @@ void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities) {
     char *chunk = vg->current_chunk;
 
     for (j = 0; j < vg->nsamples; ++j) {
-        ui_prob_sum = 0;
+        unsigned int ui_prob_sum = 0;
 
         for (i = 0; i < 3; ++i) {
             bgen_memcpy(&ui_prob, &chunk, 2);
@@ -64,8 +63,7 @@ char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file) {
 
     if (index->compression != 1) {
         free(cchunk);
-        fprintf(stderr, "Compression flag should be 1; not %u.\n",
-                index->compression);
+        fprintf(stderr, "Compression flag should be 1; not %u.\n", index->compression);
         return NULL;
     }
 
@@ -79,8 +77,7 @@ char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file) {
     return uchunk;
 }
 
-int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg,
-                               FILE *file) {
+int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg, FILE *file) {
     char *c;
     char *chunk;
 
@@ -90,8 +87,10 @@ int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg,
     } else {
         chunk = malloc(6 * index->nsamples);
 
-        if (fread(chunk, 1, 6 * index->nsamples, file) < 6 * index->nsamples)
+        if (fread(chunk, 1, 6 * index->nsamples, file) < 6 * index->nsamples) {
+            free(chunk);
             return 1;
+        }
 
         c = chunk;
     }

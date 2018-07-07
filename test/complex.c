@@ -136,14 +136,13 @@ int main() {
         0.000000};
 
     double *rp = real_probs;
-    double *p;
 
     jj = 0;
     for (i = 0; i < nvariants; ++i) {
         vg = bgen_open_variant_genotype(index, i);
 
         probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-        p = probabilities;
+        double *p = probabilities;
         bgen_read_variant_genotype(index, vg, probabilities);
 
         for (j = 0; j < nsamples; ++j) {

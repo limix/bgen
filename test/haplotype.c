@@ -71,7 +71,6 @@ int main() {
 
     bgen_close_variant_genotype(index, vg);
 
-    double *probabilities;
     double real_probs[] = {
         1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
         1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
@@ -83,7 +82,7 @@ int main() {
     for (i = 0; i < nvariants; ++i) {
         vg = bgen_open_variant_genotype(index, i);
 
-        probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
+        double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
 
         bgen_read_variant_genotype(index, vg, probabilities);
 

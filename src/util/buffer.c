@@ -1,6 +1,6 @@
+#include "util/buffer.h"
 #include "athr.h"
 #include "util/bits.h"
-#include "util/buffer.h"
 #include "zip/zstd_wrapper.h"
 #include <stdio.h>
 
@@ -25,8 +25,6 @@ int buffer_append(struct Buffer *b, void *mem, size_t size) {
 
 void *buffer_base(struct Buffer *b) { return b->base; }
 
-size_t buffer_size(struct Buffer *b) { return b->size; }
-
 int buffer_destroy(struct Buffer *b) {
     free(b->base);
     b->size = 0;
@@ -48,6 +46,7 @@ int buffer_store(const char *fp, struct Buffer *b) {
     size64 = b->size;
     if (fwrite(&size64, 1, 8, f) < 8) {
         perror("Error while writing buffer to file");
+        fclose(f);
         return 1;
     }
 
@@ -55,12 +54,14 @@ int buffer_store(const char *fp, struct Buffer *b) {
     size64 = dst_size;
     if (fwrite(&size64, 1, 8, f) < 8) {
         perror("Error while writing buffer to file");
+        fclose(f);
         return 1;
     }
 
     if (fwrite(dst, 1, dst_size, f) < dst_size) {
         perror("Error while writing buffer to file");
         free(dst);
+        fclose(f);
         return 1;
     }
 
@@ -130,8 +131,7 @@ int buffer_load(const char *fp, struct Buffer *b, int verbose) {
     }
 
     dst_size = b->size;
-    if (bgen_unzstd(compressed, (size_t)compressed_size, &(b->base),
-                    &dst_size)) {
+    if (bgen_unzstd(compressed, (size_t)compressed_size, &(b->base), &dst_size)) {
         goto err;
     }
 
@@ -156,7 +156,6 @@ err:
 
 int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
     size_t chunk_size = 5242880;
-    size_t read_size;
     char *last, *current;
     struct athr *athr;
     int nsteps = CEILDIV(size, chunk_size);
@@ -173,7 +172,7 @@ int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
 
     while (current < last) {
 
-        read_size = MIN(chunk_size, (size_t)(last - current));
+        size_t read_size = MIN(chunk_size, (size_t)(last - current));
         if (fread(current, 1, read_size, file) < read_size) {
             perror("Could not read compressed data");
             if (verbose)

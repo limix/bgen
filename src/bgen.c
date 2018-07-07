@@ -206,7 +206,8 @@ err:
     return NULL;
 }
 
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_string *samples) {
+BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
+                                struct bgen_string *samples) {
     size_t i;
 
     if (bgen->sample_ids_presence == 0)
@@ -263,7 +264,8 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
 }
 
 BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                             struct bgen_vi **index, int verbose) {
+                                                      struct bgen_vi **index,
+                                                      int verbose) {
     struct bgen_var *variants;
     uint32_t length;
     size_t i, nvariants;
@@ -334,7 +336,7 @@ err:
 }
 
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                 struct bgen_var *variants) {
+                                          struct bgen_var *variants) {
     size_t i, j;
 
     for (i = 0; i < (size_t)bgen->nvariants; ++i) {
@@ -355,31 +357,35 @@ BGEN_API void bgen_free_index(struct bgen_vi *index) {
     free(index);
 }
 
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index, size_t variant_idx) {
+BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index) {
     struct bgen_vg *vg;
     FILE *file;
 
-    if ((file = fopen(index->filepath, "rb")) == NULL) {
+    if ((file = fopen(vi->filepath, "rb")) == NULL) {
         perror("Could not open file ");
         return NULL;
     }
 
     vg = malloc(sizeof(struct bgen_vg));
-    vg->variant_idx = variant_idx;
+    vg->variant_idx = index;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (fseek(file, (long)index->start[variant_idx], SEEK_SET)) {
+    if (fseek(file, (long)vi->start[index], SEEK_SET)) {
         perror("Could not seek a variant ");
+        free(vg);
+        fclose(file);
         return NULL;
     }
 
-    if (index->layout == 1) {
-        bgen_read_probs_header_one(index, vg, file);
-    } else if (index->layout == 2) {
-        bgen_read_probs_header_two(index, vg, file);
+    if (vi->layout == 1) {
+        bgen_read_probs_header_one(vi, vg, file);
+    } else if (vi->layout == 2) {
+        bgen_read_probs_header_two(vi, vg, file);
     } else {
         fprintf(stderr, "Unrecognized layout type.\n");
+        free(vg);
+        fclose(file);
         return NULL;
     }
 
@@ -389,7 +395,7 @@ BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *index, size_
 }
 
 BGEN_API void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
-                                double *probabilities) {
+                                         double *probabilities) {
     if (index->layout == 1) {
         bgen_read_probs_one(vg, probabilities);
     } else if (index->layout == 2) {

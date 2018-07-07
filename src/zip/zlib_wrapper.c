@@ -7,8 +7,7 @@
 
 #include "bgen.h"
 
-int bgen_unzlib(const char *src, size_t src_size, char **dst,
-                size_t *dst_size) {
+int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size) {
     int e;
     z_stream strm;
 
@@ -30,7 +29,6 @@ int bgen_unzlib(const char *src, size_t src_size, char **dst,
     strm.next_out = (unsigned char *)*dst;
 
     e = inflate(&strm, Z_NO_FLUSH);
-    assert(e != Z_STREAM_ERROR);
 
     switch (e) {
     case Z_NEED_DICT:
@@ -43,18 +41,14 @@ int bgen_unzlib(const char *src, size_t src_size, char **dst,
         return EXIT_FAILURE;
     }
 
-    assert(strm.avail_out == 0);
-
     inflateEnd(&strm);
     return EXIT_SUCCESS;
 }
 
-int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst,
-                        size_t *dst_size) {
+int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *dst_size) {
     int ret;
     z_stream strm;
 
-    unsigned int just_wrote;
     unsigned int unused = *dst_size;
     char *cdst = *dst;
 
@@ -78,7 +72,6 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst,
         strm.next_out = (unsigned char *)cdst;
 
         ret = inflate(&strm, Z_NO_FLUSH);
-        assert(ret != Z_STREAM_ERROR);
 
         switch (ret) {
         case Z_NEED_DICT:
@@ -91,7 +84,7 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst,
             return EXIT_FAILURE;
         }
 
-        just_wrote = unused - strm.avail_out;
+        unsigned int just_wrote = unused - strm.avail_out;
 
         cdst += just_wrote;
         unused -= just_wrote;
