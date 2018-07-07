@@ -15,10 +15,10 @@ environment:
 
 build_script:
     - mkdir build.%BDIR% && cd build.%BDIR%
-    - appveyor DownloadFile https://raw.githubusercontent.com/horta/zlib.install/master/install.bat && install.bat
-    - set PATH=%programfiles%\zlib\bin;%PATH%
     - appveyor DownloadFile https://raw.githubusercontent.com/horta/zstd.install/master/install.bat && install.bat
     - set PATH=%programfiles%\zstd\bin;%PATH%
+    - appveyor DownloadFile https://raw.githubusercontent.com/horta/zlib.install/master/install.bat && install.bat
+    - set PATH=%programfiles%\zlib\bin;%PATH%
     - appveyor DownloadFile https://raw.githubusercontent.com/horta/almosthere/master/install.bat && install.bat
     - set PATH=%programfiles%\athr\bin;%PATH%
     - cmake .. -G"%PRJ_GEN%"
