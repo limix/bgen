@@ -6,14 +6,12 @@ notifications:
     on_build_failure: true
     on_build_status_changed: false
 
+
 environment:
-    matrix:
-      - PRJ_GEN: "Visual Studio 12 2013 Win64"
-        BDIR: msvc2013
-        ARCH: x64
-      - PRJ_GEN: "Visual Studio 14 2015 Win64"
-        BDIR: msvc2015
-        ARCH: x64
+  matrix:
+    - PRJ_GEN: "Visual Studio 14 2015 Win64"
+      BDIR: msvc2015
+      CFLAGS: /MD /GL
 
 build_script:
     - mkdir build.%BDIR% && cd build.%BDIR%
@@ -23,13 +21,11 @@ build_script:
     - set PATH=%programfiles%\zstd\bin;%PATH%
     - appveyor DownloadFile https://raw.githubusercontent.com/horta/almosthere/master/install.bat && install.bat
     - set PATH=%programfiles%\athr\bin;%PATH%
-    - cmake ..
+    - cmake .. -G"%PRJ_GEN%"
         -DCMAKE_BUILD_TYPE=Release
-        -DCMAKE_GENERATOR_PLATFORM=%ARCH%
         -DCMAKE_INSTALL_PREFIX=%APPVEYOR_BUILD_FOLDER%
     - cmake --build . --config Release --target install
     - ctest -V --output-on-failure -C Release
-    - appveyor DownloadFile https://raw.githubusercontent.com/limix/bgen/master/install.bat && install.bat
 
 test_script:
     - if NOT exist %APPVEYOR_BUILD_FOLDER%\lib\bgen.lib exit 1

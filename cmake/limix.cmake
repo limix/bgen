@@ -1,4 +1,4 @@
-# limix cmake module (1.0.0)
+# limix cmake module (1.0.1)
 #
 # Common configuration and handy functions for limix projects.
 #
@@ -18,7 +18,6 @@ function(display_welcome)
 endfunction(display_welcome)
 
 macro(limix_windows_config)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
   set_property(GLOBAL PROPERTY USE_FOLDERS ON)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
@@ -31,10 +30,6 @@ macro(limix_windows_config)
       CMAKE_C_FLAGS
       CMAKE_C_FLAGS_DEBUG
       CMAKE_C_FLAGS_RELEASE)
-
-  foreach(CompilerFlag ${CompilerFlags})
-    string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-  endforeach()
 endmacro(limix_windows_config)
 
 macro(limix_config)

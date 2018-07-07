@@ -1,19 +1,39 @@
 @echo off
 SETLOCAL
+pushd .
+cd /D %USERPROFILE%
 
 :: Log file
 SET ORIGIN=%cd%
 call :joinpath "%ORIGIN%" "install.log"
 SET LOG_FILE=%Result%
 
+VERIFY OTHER 2>nul
+SETLOCAL ENABLEEXTENSIONS
+IF ERRORLEVEL 1 ECHO Unable to enable extensions
+
 :: Configuration
-set VERSION_URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
+set "PREFIX=%programfiles%\bgen"
+set BRANCH=master
+set VERSION_URL=https://raw.githubusercontent.com/limix/bgen/%BRANCH%/VERSION
 call :winget "%VERSION_URL%" >>%LOG_FILE% 2>&1
 set /p VERSION=<VERSION && del VERSION
 set FILE=bgen-%VERSION%.zip
 set DIR=bgen-%VERSION%
 set URL=https://github.com/limix/bgen/archive/%VERSION%.zip
-IF "%ARCH%"=="" set ARCH=x64
+
+if exist "%PREFIX%" (
+  type nul > "%PREFIX%\touch" >>%LOG_FILE% 2>&1
+  if ERRORLEVEL 1 (echo You don't seem to have write permission for the "%PREFIX%" folder && popd && exit /B 1)
+  del /q "%PREFIX%\touch" ! >nul 2>&1
+) else (
+  mkdir "%PREFIX%" >>%LOG_FILE% 2>&1
+  if ERRORLEVEL 1 (echo You don't seem to have permission to create the "%PREFIX%" folder && popd && exit /B 1)
+)
+
+if DEFINED ARCH set ARCH=%ARCH:"=%
+if NOT DEFINED ARCH (set ARCH=x64) else if [%ARCH%]==[x86] (set ARCH=)
+set "CFLAGS=/MD /GL"
 
 echo [0/4] Library(bgen==%VERSION%)
 
@@ -26,21 +46,25 @@ copy /y nul %LOG_FILE% >nul 2>&1
 echo|set /p="[1/4] Downloading... "
 echo Fetching %URL% >>%LOG_FILE% 2>&1
 call :winget "%URL%" >>%LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && exit /B 1) else (echo done.)
+if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && popd && exit /B 1) else (echo done.)
 
 echo|set /p="[2/4] Extracting... "
 powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('%FILE%', '.'); }"
-if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && exit /B 1) else (echo done.)
+if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && popd && exit /B 1) else (echo done.)
 
 cd %DIR% && mkdir build && cd build
 
 echo|set /p="[3/4] Configuring... "
-cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_GENERATOR_PLATFORM=%ARCH% -DCMAKE_INSTALL_PREFIX="%programfiles%\bgen" >>%LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && exit /B 1) else (echo done.)
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_GENERATOR_PLATFORM=%ARCH% -DCMAKE_INSTALL_PREFIX="%PREFIX%" >>%LOG_FILE% 2>&1
+if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && popd && exit /B 1) else (echo done.)
 
 echo|set /p="[4/4] Compiling and installing... "
 cmake --build . --config Release --target install >>%LOG_FILE% 2>&1
-if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && exit /B 1) else (echo done.)
+if %ERRORLEVEL% NEQ 0 (echo FAILED. && type %LOG_FILE% && popd && exit /B 1)
+if NOT exist "%programfiles%\bgen\lib\bgen.lib" (echo FAILED. && type %LOG_FILE% && popd && exit /B 1)
+if NOT exist "%programfiles%\bgen\bin\bgen.dll" (echo FAILED. && type %LOG_FILE% && popd && exit /B 1)
+if NOT exist "%programfiles%\bgen\lib\bgen_static.lib" (echo FAILED. && type %LOG_FILE% && popd && exit /B 1)
+if NOT exist "%programfiles%\bgen\include\bgen.h" (echo FAILED. && type %LOG_FILE% && popd && exit /B 1) else (echo done.)
 
 cd %ORIGIN% >nul 2>&1
 del /Q %FILE% >nul 2>&1
