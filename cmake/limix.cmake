@@ -1,4 +1,4 @@
-# limix cmake module (1.0.1)
+# limix cmake module (1.0.2)
 #
 # Common configuration and handy functions for limix projects.
 #
@@ -45,6 +45,11 @@ macro(limix_config)
   macro(set_rpath)
     set(CMAKE_MACOSX_RPATH TRUE)
     set(CMAKE_BUILD_WITH_INSTALL_NAME_DIR FALSE)
+    if (NOT DEFINED CMAKE_INSTALL_RPATH)
+        if (DEFINED CMAKE_INSTALL_PREFIX)
+          set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+        endif()
+    endif()
   endmacro(set_rpath)
 
   set_rpath()
