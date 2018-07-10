@@ -154,8 +154,6 @@ int main() {
                 return 1;
 
             for (ii = 0; ii < bgen_ncombs(vg); ++ii) {
-                printf("%f ", *p);
-
                 if (*rp != *p && !(isnan(*rp) && isnan(*p)))
                     return 1;
                 ++rp;
@@ -163,7 +161,6 @@ int main() {
             }
             ++jj;
         }
-        printf("\n");
         bgen_close_variant_genotype(index, vg);
         free(probabilities);
     }
