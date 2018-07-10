@@ -1,6 +1,6 @@
 os:
-  - linux
-  - osx
+- linux
+- osx
 dist: trusty
 language: c
 sudo: required
@@ -15,11 +15,12 @@ script:
 - cmake .. -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR -DCMAKE_BUILD_TYPE=Release
 - make && make test && make install
 - popd && rm -rf build
-- test -e $TRAVIS_BUILD_DIR/include/bgen.h
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen.so; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen_static.a; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then test -e $TRAVIS_BUILD_DIR/include/bgen.h; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen.dylib; fi
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then test -e $TRAVIS_BUILD_DIR/lib/libbgen_static.a; fi
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then test -e $TRAVIS_BUILD_DIR/include/bgen.h; fi
 - bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
 after_success:
 - mkdir dist && pushd dist && cmake .. -DCMAKE_BUILD_TYPE=Release && popd
