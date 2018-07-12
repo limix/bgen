@@ -1,4 +1,4 @@
-# limix cmake module (1.0.2)
+# limix cmake module (1.0.3)
 #
 # Common configuration and handy functions for limix projects.
 #
@@ -108,6 +108,11 @@ function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
   easy_set_target_property(${NAME} VERSION ${VERSION})
   if(TYPE MATCHES "SHARED")
     easy_set_target_property(${NAME} PUBLIC_HEADER "${PUBLIC_HEADERS}")
+    
+    string(REPLACE "." ";" VERSION_LIST ${VERSION})
+    list(GET VERSION_LIST 0 VERSION_MAJOR)
+    easy_set_target_property(${NAME} SOVERSION ${VERSION_MAJOR})
+    
     easy_shared_install(${NAME})
   else()
     easy_static_install(${NAME})
