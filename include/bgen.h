@@ -29,10 +29,10 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "2.0.0"
+#define BGEN_VERSION "2.0.4"
 #define BGEN_VERSION_MAJOR 2
 #define BGEN_VERSION_MINOR 0
-#define BGEN_VERSION_PATCH 0
+#define BGEN_VERSION_PATCH 4
 
 #ifdef __cplusplus
 extern "C" {
@@ -83,8 +83,7 @@ BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
 
 /* Get array of sample identifications. */
-BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen,
-                                               int verbose);
+BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
 BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
                                 struct bgen_string *samples);
@@ -104,8 +103,7 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
    after use.
 */
 BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                                      struct bgen_vi **vi,
-                                                      int verbose);
+                                                      struct bgen_vi **vi, int verbose);
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
                                           struct bgen_var *variants);
 BGEN_API void bgen_free_index(struct bgen_vi *vi);
@@ -120,11 +118,9 @@ BGEN_API void bgen_free_index(struct bgen_vi *vi);
 
     Note: remember to call `bgen_close_variant_genotype` after use.
  */
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi,
-                                                    size_t index);
+BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
 /* Close a variant genotype handler. */
-BGEN_API void bgen_close_variant_genotype(struct bgen_vi *vi,
-                                          struct bgen_vg *vg);
+BGEN_API void bgen_close_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg);
 
 /* Read the probabilities of each possible genotype.
 
@@ -150,21 +146,20 @@ BGEN_API int bgen_phased(const struct bgen_vg *vg);
 
 /* Store variants metadata. */
 BGEN_API int bgen_store_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants,
-                                          struct bgen_vi *vi,
+                                          struct bgen_var *variants, struct bgen_vi *vi,
                                           const char *filepath);
 /* Read variants metadata from file. */
-BGEN_API struct bgen_var *
-bgen_load_variants_metadata(const struct bgen_file *bgen, const char *filepath,
-                            struct bgen_vi **vi, int verbose);
+BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
+                                                      const char *filepath,
+                                                      struct bgen_vi **vi, int verbose);
 /* Create a variants metadata file.
 
     Helper for easy creation of variants metadata file.
 
     Note: this file is not part of the bgen file format specification.
 */
-BGEN_API int bgen_create_variants_metadata_file(const char *bgen_fp,
-                                                const char *vi_fp, int verbose);
+BGEN_API int bgen_create_variants_metadata_file(const char *bgen_fp, const char *vi_fp,
+                                                int verbose);
 
 #ifdef __cplusplus
 }
