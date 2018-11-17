@@ -307,6 +307,9 @@ BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
             perror("Could not jump to a variants ");
             goto err;
         }
+
+        if ((variants + i)->nalleles > (*index)->max_nalleles)
+            (*index)->max_nalleles = (variants + i)->nalleles;
     }
 
     if (verbose)
@@ -356,6 +359,8 @@ BGEN_API void bgen_free_index(struct bgen_vi *index) {
     free(index->start);
     free(index);
 }
+
+BGEN_API int bgen_max_nalleles(struct bgen_vi *vi) { return vi->max_nalleles; }
 
 BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index) {
     struct bgen_vg *vg;

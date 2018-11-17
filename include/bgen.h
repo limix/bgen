@@ -29,10 +29,10 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "2.0.4"
+#define BGEN_VERSION "2.1.0"
 #define BGEN_VERSION_MAJOR 2
-#define BGEN_VERSION_MINOR 0
-#define BGEN_VERSION_PATCH 4
+#define BGEN_VERSION_MINOR 1
+#define BGEN_VERSION_PATCH 0
 
 #ifdef __cplusplus
 extern "C" {
@@ -107,6 +107,9 @@ BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
                                           struct bgen_var *variants);
 BGEN_API void bgen_free_index(struct bgen_vi *vi);
+
+/* Get the maximum number of alleles across the entire file. */
+BGEN_API int bgen_max_nalleles(struct bgen_vi *vi);
 
 /* Open a variant for genotype queries.
 

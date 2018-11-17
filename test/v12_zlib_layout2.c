@@ -75,6 +75,9 @@ int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
     else
         v = bgen_read_variants_metadata(bgen, index, 0);
 
+    if (v == NULL)
+        return 1;
+
     if (test_read_metadata(bgen, s, v))
         return 1;
 
@@ -180,13 +183,16 @@ int main() {
         const char *ix = get_example_index_filepath(i);
         int prec = get_example_precision(i);
 
+        printf("TEST 1\n");
         bgen_create_variants_metadata_file(ex, ix, 0);
+        printf("TEST 2\n");
 
         if (test_read(ex, NULL, prec))
             return 1;
-
+        printf("TEST 3\n");
         if (test_read(ex, ix, prec))
             return 1;
+        printf("TEST 4\n");
     }
 
     return 0;
