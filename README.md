@@ -51,6 +51,7 @@ We have also created an alternative, more [user-friendly BGEN specification](bge
 
 ## Acknowledgments
 
+- [Marc Jan Bonder](https://github.com/Bonder-MJ) for bug-reporting and improvement suggestions.
 - [Yan Wong](https://github.com/hyanwong) for bug-reporting and improvement suggestions.
 
 ## Authors
