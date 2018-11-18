@@ -58,7 +58,7 @@ struct bgen_vi *new_variants_index(const struct bgen_file *bgen) {
     vi->layout = bgen->layout;
     vi->nsamples = bgen->nsamples;
     vi->nvariants = bgen->nvariants;
-    vi->max_nalleles = -1;
+    vi->max_nalleles = 0;
 
     vi->start = malloc(bgen->nvariants * sizeof(uint64_t));
 

@@ -36,14 +36,17 @@ int main() {
         return 1;
 
     for (i = 0; i < nvariants; ++i) {
-        if (strncmp("A", variants[i].allele_ids[0].str,
-                    variants[i].allele_ids[0].len) != 0)
+        if (strncmp("A", variants[i].allele_ids[0].str, variants[i].allele_ids[0].len) !=
+            0)
             return 1;
 
-        if (strncmp("G", variants[i].allele_ids[1].str,
-                    variants[i].allele_ids[1].len) != 0)
+        if (strncmp("G", variants[i].allele_ids[1].str, variants[i].allele_ids[1].len) !=
+            0)
             return 1;
     }
+
+    if (bgen_max_nalleles(index) != 2)
+        return 1;
 
     bgen_free_variants_metadata(bgen, variants);
 
@@ -72,11 +75,10 @@ int main() {
     bgen_close_variant_genotype(index, vg);
 
     double real_probs[] = {
-        1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
-        1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
-        0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0,
-        1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
-        1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0};
+        1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
+        0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0,
+        1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0,
+        0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 
     jj = 0;
     for (i = 0; i < nvariants; ++i) {
