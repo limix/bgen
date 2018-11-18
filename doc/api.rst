@@ -215,7 +215,7 @@ Variant genotype
     ``0`` otherwise.
 
     .. note::
-        
+
         Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
@@ -228,7 +228,7 @@ Variant genotype
     Get the ploidy for a given locus and sample index.
 
     .. note::
-        
+
         Modified in version 2.0.0.
 
     :param vg: variant genotype handler.
@@ -240,7 +240,7 @@ Variant genotype
     Get the minimum ploidy of the variant.
 
     .. note::
-        
+
         Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
@@ -251,7 +251,7 @@ Variant genotype
     Get the maximum ploidy of the variant.
 
     .. note::
-        
+
         Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
@@ -269,7 +269,7 @@ Variant genotype
     Return ``1`` for phased or ``0`` for unphased genotype.
 
     .. note::
-        
+
         Implemented in version 2.0.0.
 
     :param vg: variant genotype handler.
@@ -316,6 +316,14 @@ Variant metadata
     Free memory associated with variants index.
 
     :param vi: variants index.
+
+.. function:: int bgen_max_nalleles(struct bgen_vi* vi)
+
+    Get the maximum number of alleles across the entire file.
+
+    :param vi: variants index.
+    :return: maximum number of alleles.
+
 
 Variants metadata file
 ^^^^^^^^^^^^^^^^^^^^^^
