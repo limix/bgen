@@ -72,6 +72,14 @@ struct bgen_cmf *bgen_create_metafile_open(const char *filepath, uint32_t nvaria
         return NULL;
     }
 
+    uint64_t metadata_size = 0;
+    if (fwrite(&metadata_size, sizeof(uint64_t), 1, c->fp) != 1) {
+        perror("Could not write the zeroed metadata size ");
+        free(c);
+        fclose(c->fp);
+        return NULL;
+    }
+
     c->npartitions = npartitions;
     c->nvariants = nvariants;
 
@@ -86,18 +94,15 @@ int bgen_create_metafile_write_loop(struct bgen_cmf *cmf,
     uint64_t size, i, j;
     uint64_t genotype_offset;
 
-    printf("Ponto 0\n");
     if ((cmf->offset = malloc(sizeof(uint64_t) * (cmf->npartitions + 1))) == NULL) {
         fprintf(stderr, "Could not allocate memory for offsets\n.");
         return 1;
     }
-    printf("Ponto 0.1: %d\n", cmf->npartitions);
 
     cmf->offset[0] = 0;
     i = 0;
     j = 0;
     while ((v = next(&genotype_offset, cb_args)) != NULL) {
-        printf("Ponto 1\n");
 
         if ((size = bgen_create_metafile_write_var(cmf->fp, v, genotype_offset)) == 0) {
             free(cmf->offset);
@@ -106,7 +111,7 @@ int bgen_create_metafile_write_loop(struct bgen_cmf *cmf,
             return 1;
         }
 
-        if (i / cmf->npartitions == 0) {
+        if (i % (cmf->nvariants / cmf->npartitions) == 0) {
             ++j;
             cmf->offset[j] = cmf->offset[j - 1];
         }
@@ -122,7 +127,7 @@ int bgen_create_metafile_write_loop(struct bgen_cmf *cmf,
         fwrite(cmf->offset + i, sizeof(uint64_t), 1, cmf->fp);
     }
 
-    fseek(cmf->fp, BGEN_HDR_LEN + sizeof(uint64_t), SEEK_SET);
+    fseek(cmf->fp, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET);
     fwrite(cmf->offset + cmf->npartitions, sizeof(uint64_t), 1, cmf->fp);
 
     return 0;

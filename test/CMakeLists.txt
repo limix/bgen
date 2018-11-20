@@ -6,7 +6,7 @@ limix_add_test(pbgen_example ${PROJECT_NAME} "pbgen_example.c")
 limix_add_test(metadata_example ${PROJECT_NAME} "metadata_example.c")
 limix_add_test(haplotype ${PROJECT_NAME} "haplotype.c")
 limix_add_test(complex ${PROJECT_NAME} "complex.c")
-limix_add_test(index3 ${PROJECT_NAME} "index.c")
+limix_add_test(index ${PROJECT_NAME} "index.c")
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)
