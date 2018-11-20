@@ -164,6 +164,9 @@ BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bg
 BGEN_API int bgen_create_variants_metadata_file(const char *bgen_fp, const char *vi_fp,
                                                 int verbose);
 
+BGEN_API int bgen_create_variants_metadata_file3(struct bgen_file *bgen,
+                                                 const char *filepath, int verbose);
+
 #ifdef __cplusplus
 }
 #endif

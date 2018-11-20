@@ -5,7 +5,9 @@ function(define_sources BASE_DIR _SOURCES)
         util/choose.c
         util/tpl.c
         util/buffer.c
+        util/endian.c
         variants_index.c
+        variants_index3.c
         layout/two.c
         layout/one.c
         tpl/tpl.c

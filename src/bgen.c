@@ -15,6 +15,7 @@
 #include "util/mem.h"
 #include "variant_genotype.h"
 #include "variants_index.h"
+#include "variants_index3.h"
 
 #include "util/string.h"
 
@@ -438,3 +439,72 @@ BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg) { return vg->max_ploidy; 
 BGEN_API int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
 
 BGEN_API int bgen_phased(const struct bgen_vg *vg) { return vg->phased; }
+
+struct bgen_cmf_next {
+    struct bgen_file *bgen;
+    uint32_t nvariants;
+};
+
+struct bgen_var *bgen_next_variant_metadata(uint64_t *genotype_offset, void *ctx) {
+
+    struct bgen_var *variant = malloc(sizeof(struct bgen_var));
+    struct bgen_cmf_next *self = ctx;
+    uint32_t length;
+
+    if (self->nvariants == 0)
+        return NULL;
+
+    if (bgen_read_variant(self->bgen, variant))
+        goto err;
+
+    *genotype_offset = ftell(self->bgen->file);
+
+    if (fread(&length, 1, 4, self->bgen->file) < 4)
+        goto err;
+
+    if (fseek(self->bgen->file, length, SEEK_CUR)) {
+        perror("Could not jump to the next variant ");
+        goto err;
+    }
+
+    --(self->nvariants);
+    return variant;
+err:
+    return NULL;
+}
+
+BGEN_API int bgen_create_variants_metadata_file3(struct bgen_file *bgen,
+                                                 const char *filepath, int verbose) {
+
+    struct bgen_cmf *cmf = bgen_create_metafile_open(filepath, bgen_nvariants(bgen), 2);
+    struct bgen_cmf_next next_ctx;
+    next_ctx.bgen = bgen;
+    next_ctx.nvariants = bgen_nvariants(bgen);
+
+    if (cmf == NULL)
+        return 1;
+
+    if ((bgen->file = fopen(bgen->filepath, "rb")) == NULL) {
+        perror("Could not open ");
+        return 1;
+    }
+
+    if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
+        perror("Could not jump to variants start ");
+        fclose(bgen->file);
+        return 1;
+    }
+
+    if (bgen_create_metafile_write_loop(cmf, &bgen_next_variant_metadata, &next_ctx,
+                                        verbose)) {
+        fclose(bgen->file);
+        return 1;
+    }
+    if (bgen_create_metafile_close(cmf)) {
+        fclose(bgen->file);
+        return 1;
+    }
+
+    fclose(bgen->file);
+    return 0;
+}
