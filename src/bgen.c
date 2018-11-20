@@ -1,25 +1,21 @@
 #define BGEN_API_EXPORTS
 
+#include "bgen.h"
+#include "athr.h"
+#include "bgen_err.h"
+#include "bgen_file.h"
+#include "index.h"
+#include "layout/one.h"
+#include "layout/two.h"
+#include "util/mem.h"
+#include "util/string.h"
+#include "variant_genotype.h"
+#include "variants_index.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "bgen.h"
-#include "bgen_err.h"
-#include "bgen_file.h"
-#include "layout/one.h"
-#include "layout/two.h"
-
-#include "util/mem.h"
-#include "variant_genotype.h"
-#include "variants_index.h"
-#include "variants_index3.h"
-
-#include "util/string.h"
-
-#include "athr.h"
 
 int bgen_read_header(struct bgen_file *bgen) {
     uint32_t header_length;
@@ -473,8 +469,8 @@ err:
     return NULL;
 }
 
-BGEN_API int bgen_create_variants_metadata_file3(struct bgen_file *bgen,
-                                                 const char *filepath, int verbose) {
+BGEN_API int bgen_create_index_file(struct bgen_file *bgen, const char *filepath,
+                                    int verbose) {
 
     struct bgen_cmf *cmf = bgen_create_metafile_open(filepath, bgen_nvariants(bgen), 2);
     struct bgen_cmf_next next_ctx;

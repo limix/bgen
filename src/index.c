@@ -23,7 +23,7 @@
  * [ uint64_t : position of partition 1 ], ...
  */
 
-#include "variants_index3.h"
+#include "index.h"
 #include "util/endian.h"
 #include <stdio.h>
 #include <stdlib.h>

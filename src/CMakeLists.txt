@@ -1,19 +1,20 @@
 function(define_sources BASE_DIR _SOURCES)
 
-    list(APPEND REL_SOURCES util/mem.c
-        util/string.c
-        util/choose.c
-        util/tpl.c
-        util/buffer.c
-        util/endian.c
-        variants_index.c
-        variants_index3.c
-        layout/two.c
+    list(APPEND REL_SOURCES
+        bgen.c
+        index.c
         layout/one.c
+        layout/two.c
         tpl/tpl.c
-        zip/zstd_wrapper.c
+        util/buffer.c
+        util/choose.c
+        util/endian.c
+        util/mem.c
+        util/string.c
+        util/tpl.c
+        variants_index.c
         zip/zlib_wrapper.c
-        bgen.c)
+        zip/zstd_wrapper.c)
 
     if(CMAKE_SYSTEM_NAME MATCHES Windows)
         list(APPEND REL_SOURCES tpl/win/mmap.c)

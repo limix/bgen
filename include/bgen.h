@@ -70,68 +70,75 @@ struct bgen_var {
     struct bgen_string *allele_ids;
 };
 
+/****************************************************************************************
+ * bgen_file specific functions. They don't require any pass over the bgen file.
+ ****************************************************************************************/
 /* Open a file and return a bgen file handler. */
 BGEN_API struct bgen_file *bgen_open(const char *filepath);
 /* Close a bgen file handler. */
 BGEN_API void bgen_close(struct bgen_file *bgen);
-
 /* Get the number of samples. */
 BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
 /* Get the number of variants. */
 BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 /* Check if the file contains sample identifications. */
 BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
-
 /* Get array of sample identifications. */
 BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
-                                struct bgen_string *samples);
+BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_string *);
+/****************************************************************************************/
 
-/* Read variants metadata and generate variants index.
-
-    Reading variants metadata (and generating the variants index) can be costly
-    as it requires accessing chunks of data across the file. We therefore
-    provide the functions
-        - bgen_store_variants_metadata
-        - bgen_load_variants_metadata
-        - bgen_create_variants_metadata_file
-    for storing and reading that information from an additional file. We refer
-    to this file as variants metadata file.
-
-    Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
-   after use.
-*/
-BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                                      struct bgen_vi **vi, int verbose);
-BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants);
-BGEN_API void bgen_free_index(struct bgen_vi *vi);
-
-/* Get the maximum number of alleles across the entire file. */
-BGEN_API int bgen_max_nalleles(struct bgen_vi *vi);
-
-/* Open a variant for genotype queries.
-
-    A variant genotype handler is needed to call
-        - bgen_read_variant_genotype
-        - bgen_nalleles
-        - bgen_ploidy
-        - bgen_ncombs
-
-    Note: remember to call `bgen_close_variant_genotype` after use.
+/****************************************************************************************
+ * Read variants metadata and generate variants index for bgen index versions 01-02.
+ *
+ *  DEPRECATED: Please, use `bgen_create_index_file` and its related functions instead.
+ *
+ *  Reading variants metadata (and generating the variants index) can be costly
+ *  as it requires accessing chunks of data across the file. We therefore
+ *  provide the functions
+ *      - bgen_store_variants_metadata
+ *      - bgen_load_variants_metadata
+ *      - bgen_create_variants_metadata_file
+ *  for storing and reading that information from an additional file. We refer
+ *  to this file as variants metadata file.
+ *
+ *  Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
+ * after use.
  */
+BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *,
+                                                      struct bgen_vi **, int);
+BGEN_API void bgen_free_variants_metadata(const struct bgen_file *, struct bgen_var *);
+BGEN_API void bgen_free_index(struct bgen_vi *);
+/* Store variants metadata. */
+BGEN_API int bgen_store_variants_metadata(const struct bgen_file *, struct bgen_var *,
+                                          struct bgen_vi *, const char *);
+/* Read variants metadata from file. */
+BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *,
+                                                      const char *, struct bgen_vi **,
+                                                      int);
+/* Create a variants metadata file.
+
+    Helper for easy creation of variants metadata file.
+
+    Note: this file is not part of the bgen file format specification.
+*/
+BGEN_API int bgen_create_variants_metadata_file(const char *, const char *, int);
+/* Get the maximum number of alleles across the entire file. */
+BGEN_API int bgen_max_nalleles(struct bgen_vi *);
+/****************************************************************************************/
+
+/****************************************************************************************
+ * Query a variant genotype.
+ *
+ * Open it, query it, and then close it.
+ */
+/* Open a variant for genotype queries. */
 BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
 /* Close a variant genotype handler. */
 BGEN_API void bgen_close_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg);
-
-/* Read the probabilities of each possible genotype.
-
-    The variant index and a variant genotype handler are required.
-    The number of probabilities can be found from `bgen_ncombs`.
-*/
-BGEN_API void bgen_read_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg,
-                                         double *probs);
+/* Read the probabilities of each possible genotype. */
+BGEN_API void bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *, double *);
 /* Get the number of alleles. */
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */
@@ -146,26 +153,9 @@ BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg);
 BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
 /* Return 1 for phased or 0 for unphased genotype. */
 BGEN_API int bgen_phased(const struct bgen_vg *vg);
+/****************************************************************************************/
 
-/* Store variants metadata. */
-BGEN_API int bgen_store_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants, struct bgen_vi *vi,
-                                          const char *filepath);
-/* Read variants metadata from file. */
-BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
-                                                      const char *filepath,
-                                                      struct bgen_vi **vi, int verbose);
-/* Create a variants metadata file.
-
-    Helper for easy creation of variants metadata file.
-
-    Note: this file is not part of the bgen file format specification.
-*/
-BGEN_API int bgen_create_variants_metadata_file(const char *bgen_fp, const char *vi_fp,
-                                                int verbose);
-
-BGEN_API int bgen_create_variants_metadata_file3(struct bgen_file *bgen,
-                                                 const char *filepath, int verbose);
+BGEN_API int bgen_create_index_file(struct bgen_file *, const char *, int);
 
 #ifdef __cplusplus
 }

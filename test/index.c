@@ -14,7 +14,7 @@ int main() {
     if ((bgen = bgen_open(filename)) == NULL)
         return 1;
 
-    if (bgen_create_variants_metadata_file3(bgen, "complex_index3.index", 1))
+    if (bgen_create_index_file(bgen, "complex_index03.index", 1))
         return 1;
 
     bgen_close(bgen);
