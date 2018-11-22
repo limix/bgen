@@ -118,8 +118,7 @@ BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_str *);
  *  Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
  * after use.
  */
-BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *,
-                                                      struct bgen_vi **, int);
+BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *, struct bgen_vi **, int);
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *, struct bgen_var *);
 BGEN_API void bgen_free_index(struct bgen_vi *);
 /* Store variants metadata. */

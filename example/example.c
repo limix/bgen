@@ -27,7 +27,7 @@ int main() {
     // alleles, etc.)
     // Notice that we also have a bgen_vi in return, used afterwards.
     struct bgen_vi *index;
-    struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index, 0);
+    struct bgen_var *variants = bgen_read_metadata(bgen, &index, 0);
 
     printf("RSID of the first variant: %.*s\n", (int)variants[0].rsid.len,
            variants[0].rsid.str);

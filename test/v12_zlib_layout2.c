@@ -72,7 +72,7 @@ int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
     if (fp1)
         v = bgen_load_variants_metadata(bgen, fp1, index, 0);
     else
-        v = bgen_read_variants_metadata(bgen, index, 0);
+        v = bgen_read_metadata(bgen, index, 0);
 
     if (v == NULL)
         return 1;

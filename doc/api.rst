@@ -17,7 +17,7 @@ of sample identifications.
 The allocated resources must be released by a subsequent call to
 :func:`bgen_free_samples`.
 
-The function :func:`bgen_read_variants_metadata` reads the metadata of all variants
+The function :func:`bgen_read_metadata` reads the metadata of all variants
 in the file (i.e., names, chromosomes, number of alleles, etc.).
 It returns the read information as an array of type :type:`bgen_var`.
 Let ``v`` be such an array.
@@ -26,7 +26,7 @@ The user can, for example, get the name of the i-th variant from
 After use, its resources have to be released by calling
 :func:`bgen_free_variants_metadata`.
 
-The function :func:`bgen_read_variants_metadata` also returns another important
+The function :func:`bgen_read_metadata` also returns another important
 structure: the variants index, :type:`bgen_vi`.
 It is used to locate the variants in a BGEN file.
 Importantly, the variants index can be used even after the BGEN file has
@@ -279,7 +279,7 @@ Variant genotype
 Variant metadata
 ^^^^^^^^^^^^^^^^
 
-.. function:: struct bgen_var* bgen_read_variants_metadata(struct bgen_file* bgen,\
+.. function:: struct bgen_var* bgen_read_metadata(struct bgen_file* bgen,\
     struct bgen_vi** vi, int verbose)
 
     Read variants metadata and index.

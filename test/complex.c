@@ -31,7 +31,7 @@ int main() {
     bgen_free_samples(bgen, sample_ids);
 
     struct bgen_vi *index;
-    struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index, 0);
+    struct bgen_var *variants = bgen_read_metadata(bgen, &index, 0);
 
     if (bgen_max_nalleles(index) != 8)
         return 1;

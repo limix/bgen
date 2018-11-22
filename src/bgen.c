@@ -20,6 +20,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define bopen_or_leave(BGEN)                                                            \
+    if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                  \
+        PERROR("Could not open bgen file %s", BGEN->filepath);                          \
+        goto err;                                                                       \
+    }
+
 int bgen_read_header(struct bgen_file *bgen) {
     uint32_t header_length;
     uint32_t magic_number;
@@ -80,10 +86,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath) {
 
     bgen->filepath = strdup(filepath);
 
-    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
-        PERROR("Could not open %s", bgen->filepath);
-        goto err;
-    }
+    bopen_or_leave(bgen);
 
     if (int_fread(bgen->file, &bgen->variants_start, 4))
         goto err;
@@ -139,7 +142,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     struct bgen_str *sample_ids;
     struct athr *at = NULL;
 
-    bgen->file = fopen(bgen->filepath, "rb");
+    bopen_or_leave(bgen);
 
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
@@ -235,19 +238,15 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
     return 0;
 }
 
-BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
-                                                      struct bgen_vi **index,
-                                                      int verbose) {
+BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
+                                             struct bgen_vi **index, int verbose) {
     struct bgen_var *variants;
     uint32_t length;
     size_t i, nvariants;
     struct athr *at = NULL;
 
     variants = NULL;
-    if ((bgen->file = fopen(bgen->filepath, "rb")) == NULL) {
-        perror("Could not open ");
-        goto err;
-    }
+    bopen_or_leave(bgen);
 
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
         perror("Could not jump to variants start ");
@@ -272,7 +271,7 @@ BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *bgen,
 
         (*index)->start[i] = ftell(bgen->file);
 
-        if (fread(&length, 1, 4, bgen->file) < 4)
+        if (uint32_t_fread(bgen->file, &length, 4))
             goto err;
 
         if (fseek(bgen->file, length, SEEK_CUR)) {
@@ -335,10 +334,15 @@ BGEN_API void bgen_free_index(struct bgen_vi *index) {
 BGEN_API int bgen_max_nalleles(struct bgen_vi *vi) { return vi->max_nalleles; }
 
 BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index) {
-    struct bgen_vg *vg;
-    FILE *file;
 
-    if ((file = fopen(vi->filepath, "rb")) == NULL) {
+    if (!vi) {
+        error("bgen_vi pointer cannot be null.");
+        return NULL;
+    }
+    struct bgen_vg *vg;
+    FILE *fp = NULL;
+
+    if (!(fp = fopen(vi->filepath, "rb"))) {
         perror("Could not open file ");
         return NULL;
     }
@@ -348,27 +352,31 @@ BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t i
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (fseek(file, (long)vi->start[index], SEEK_SET)) {
+    if (fseek(fp, (long)vi->start[index], SEEK_SET)) {
         perror("Could not seek a variant ");
         free(vg);
-        fclose(file);
+        fclose(fp);
         return NULL;
     }
 
     if (vi->layout == 1) {
-        bgen_read_probs_header_one(vi, vg, file);
+        bgen_read_probs_header_one(vi, vg, fp);
     } else if (vi->layout == 2) {
-        bgen_read_probs_header_two(vi, vg, file);
+        bgen_read_probs_header_two(vi, vg, fp);
     } else {
         fprintf(stderr, "Unrecognized layout type.\n");
         free(vg);
-        fclose(file);
+        fclose(fp);
         return NULL;
     }
 
-    fclose(file);
+    fclose(fp);
 
     return vg;
+
+err:
+    FCLOSE(fp);
+    return NULL;
 }
 
 BGEN_API void bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
@@ -465,10 +473,7 @@ BGEN_API int bgen_create_metafile(struct bgen_file *bgen, const char *filepath,
     next_ctx.bgen = bgen;
     next_ctx.nvariants = bgen_nvariants(bgen);
 
-    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
-        PERROR("Could not create %s", bgen->filepath);
-        goto err;
-    }
+    bopen_or_leave(bgen);
 
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
         perror("Could not jump to variants start ");

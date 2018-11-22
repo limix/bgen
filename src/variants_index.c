@@ -147,7 +147,7 @@ int bgen_create_variants_metadata_file(const char *bgen_fp, const char *index_fp
     if ((bgen = bgen_open(bgen_fp)) == NULL)
         return 1;
 
-    if ((variants = bgen_read_variants_metadata(bgen, &index, verbose)) == NULL)
+    if ((variants = bgen_read_metadata(bgen, &index, verbose)) == NULL)
         return 1;
 
     if (bgen_store_variants_metadata(bgen, variants, index, index_fp))
