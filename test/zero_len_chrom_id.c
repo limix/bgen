@@ -11,7 +11,7 @@ int main() {
     struct bgen_vi *index;
     struct bgen_file *bgen;
     struct bgen_var *variants;
-    struct bgen_string *samples;
+    struct bgen_str *samples;
 
     bgen = bgen_open("data/zero_len_chrom_id.bgen");
 

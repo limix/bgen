@@ -1,5 +1,5 @@
-#ifndef BGEN_VARIANTS_INDEX3_H
-#define BGEN_VARIANTS_INDEX3_H
+#ifndef INDEX3_H
+#define INDEX3_H
 
 #include "bgen.h"
 #include <stdio.h>
@@ -9,15 +9,11 @@
 #define BGEN_IDX_VER "03"
 #define BGEN_HDR_LEN 13
 
-struct bgen_cmf;
+struct cmf;
 
-struct bgen_cmf *bgen_create_metafile_open(const char *filepath, uint32_t nvariants,
-                                           uint32_t npartitions);
+struct cmf *create_metafile(const char *, uint32_t, uint32_t);
+int write_metafile(struct cmf *, struct bgen_var *(*next)(uint64_t *, void *), void *,
+                   int);
+int close_metafile(struct cmf *);
 
-int bgen_create_metafile_write_loop(struct bgen_cmf *cmf,
-                                    struct bgen_var *(*next)(uint64_t *, void *),
-                                    void *cb_args, int verbose);
-
-int bgen_create_metafile_close(struct bgen_cmf *cmf);
-
-#endif /* end of include guard: BGEN_VARIANTS_INDEX3_H */
+#endif

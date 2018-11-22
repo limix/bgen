@@ -34,7 +34,7 @@ int create_index(const char *bgen_filepath, const char *filepath) {
     if ((bgen = bgen_open(bgen_filepath)) == NULL)
         return 1;
 
-    if (bgen_create_index_file(bgen, filepath, 1))
+    if (bgen_create_metafile(bgen, filepath, 1))
         return 1;
 
     bgen_close(bgen);
@@ -83,7 +83,7 @@ int create_index(const char *bgen_filepath, const char *filepath) {
 }
 
 int use_index(const char *filepath) {
-    struct bgen_vm_idx *v;
+    struct bgen_idx *v;
     int nvariants;
     size_t i, j;
 
@@ -91,11 +91,11 @@ int use_index(const char *filepath) {
         return 1;
     }
 
-    int nparts = bgen_npartitions_metafile(v);
+    int nparts = bgen_metafile_nparts(v);
     if (nparts != 2)
         return 1;
 
-    int nvars = bgen_nvariants_metafile(v);
+    int nvars = bgen_metafile_nvars(v);
     if (nvars != 10)
         return 1;
 

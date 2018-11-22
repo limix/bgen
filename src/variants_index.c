@@ -53,7 +53,7 @@ struct bgen_vi *new_variants_index(const struct bgen_file *bgen) {
 
     vi = malloc(sizeof(struct bgen_vi));
 
-    vi->filepath = bgen_strdup(bgen->filepath);
+    vi->filepath = strdup(bgen->filepath);
     vi->compression = bgen->compression;
     vi->layout = bgen->layout;
     vi->nsamples = bgen->nsamples;
@@ -326,8 +326,7 @@ size_t read_alleles(void *mem, struct bgen_var *variants) {
 
     i = 0;
     while (tpl_unpack(tn, 1) > 0) {
-        variants[i].allele_ids =
-            malloc(variants[i].nalleles * sizeof(struct bgen_string));
+        variants[i].allele_ids = malloc(variants[i].nalleles * sizeof(struct bgen_str));
         size_t j = 0;
         while (tpl_unpack(tn, 2) > 0) {
             SET_STR(variants[i].allele_ids + j, &allele_id);

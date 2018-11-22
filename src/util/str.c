@@ -4,19 +4,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void str_alloc(struct bgen_string *v, size_t len) {
+void str_alloc(struct bgen_str *v, size_t len) {
     v->len = len;
     v->str = malloc(len + 1);
     v->str[len] = '\0';
 }
 
-void str_free(struct bgen_string *v) {
+void str_free(struct bgen_str *v) {
     free(v->str);
     v->str = NULL;
     v->len = 0;
 }
 
-int str_fread(FILE *fp, struct bgen_string *s, size_t len_size) {
+int str_fread(FILE *fp, struct bgen_str *s, size_t len_size) {
     uint64_t len;
     len = 0;
 
@@ -35,7 +35,7 @@ int str_fread(FILE *fp, struct bgen_string *s, size_t len_size) {
     return 0;
 }
 
-int str_fwrite(FILE *fp, const struct bgen_string *s, size_t len_size) {
+int str_fwrite(FILE *fp, const struct bgen_str *s, size_t len_size) {
 
     uint64_t len = s->len;
     if (fwrite(&len, len_size, 1, fp) != 1) {
@@ -51,4 +51,4 @@ int str_fwrite(FILE *fp, const struct bgen_string *s, size_t len_size) {
     return 0;
 }
 
-void str_printf(struct bgen_string s) { printf("%.*s\n", s.len, s.str); }
+void str_printf(struct bgen_str s) { printf("%.*s\n", s.len, s.str); }

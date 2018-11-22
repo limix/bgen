@@ -51,35 +51,35 @@ extern "C" {
 #include <math.h>
 #include <stdlib.h>
 
-struct bgen_string {
+struct bgen_str {
     int len;
     char *str;
 };
 
-struct bgen_file;   /* bgen file handler */
-struct bgen_vi;     /* variant index */
-struct bgen_vg;     /* variant genotype */
-struct bgen_vm_idx; /* variant metadata index */
+struct bgen_file; /* bgen file handler */
+struct bgen_vi;   /* variant index */
+struct bgen_vg;   /* variant genotype */
+struct bgen_idx;  /* variant metadata index */
 
 /* Variant metadata. */
 struct bgen_var {
-    struct bgen_string id;
-    struct bgen_string rsid;
-    struct bgen_string chrom;
+    struct bgen_str id;
+    struct bgen_str rsid;
+    struct bgen_str chrom;
     int position;
     int nalleles;
-    struct bgen_string *allele_ids;
+    struct bgen_str *allele_ids;
 };
 
 /* Variant metadata. */
 struct bgen_vm {
     int vaddr;
-    struct bgen_string id;
-    struct bgen_string rsid;
-    struct bgen_string chrom;
+    struct bgen_str id;
+    struct bgen_str rsid;
+    struct bgen_str chrom;
     int position;
     int nalleles;
-    struct bgen_string *allele_ids;
+    struct bgen_str *allele_ids;
 };
 
 /****************************************************************************************
@@ -96,9 +96,9 @@ BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 /* Check if the file contains sample identifications. */
 BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
 /* Get array of sample identifications. */
-BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose);
+BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
-BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_string *);
+BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_str *);
 /****************************************************************************************/
 
 /****************************************************************************************
@@ -167,13 +167,13 @@ BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
 BGEN_API int bgen_phased(const struct bgen_vg *vg);
 /****************************************************************************************/
 
-BGEN_API int bgen_create_index_file(struct bgen_file *, const char *, int);
-BGEN_API struct bgen_vm_idx *bgen_open_metafile(const char *filepath);
-BGEN_API int bgen_npartitions_metafile(struct bgen_vm_idx *);
-BGEN_API int bgen_nvariants_metafile(struct bgen_vm_idx *);
-BGEN_API struct bgen_vm *bgen_read_metavars(struct bgen_vm_idx *, int, int *);
+BGEN_API int bgen_create_metafile(struct bgen_file *, const char *, int);
+BGEN_API struct bgen_idx *bgen_open_metafile(const char *filepath);
+BGEN_API int bgen_metafile_nparts(struct bgen_idx *);
+BGEN_API int bgen_metafile_nvars(struct bgen_idx *);
+BGEN_API struct bgen_vm *bgen_read_metavars(struct bgen_idx *, int, int *);
 BGEN_API void bgen_free_metavars(struct bgen_vm *, int);
-BGEN_API int bgen_close_metafile(struct bgen_vm_idx *);
+BGEN_API int bgen_close_metafile(struct bgen_idx *);
 
 #ifdef __cplusplus
 }

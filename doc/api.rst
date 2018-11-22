@@ -41,7 +41,7 @@ The probabilities of each possible genotype can be found by a call to
 After use, the variant genotype handler has to be closed by
 a :func:`bgen_close_variant_genotype` call.
 
-Strings are represented by the :type:`bgen_string` type, which contains an
+Strings are represented by the :type:`bgen_str` type, which contains an
 array of characters and its length.
 
 File
@@ -84,7 +84,7 @@ File
     :param bgen: bgen file handler.
     :return: ``1`` for presence; ``0`` for absence.
 
-.. function:: struct bgen_string* bgen_read_samples(struct bgen_file* bgen,\
+.. function:: struct bgen_str* bgen_read_samples(struct bgen_file* bgen,\
     int verbose)
 
     Read sample identifications.
@@ -97,7 +97,7 @@ File
     :return: array of sample identifications.
 
 .. function:: void bgen_free_samples(const struct bgen_file* bgen,\
-    struct bgen_string* samples)
+    struct bgen_str* samples)
 
     Free memory associated with sample identifications.
 
@@ -107,7 +107,7 @@ File
 Types
 ^^^^^
 
-.. type:: bgen_string
+.. type:: bgen_str
 
     Represents a string.
 
@@ -137,15 +137,15 @@ Types
 
     Variant metadata.
 
-    .. member:: bgen_string id
+    .. member:: bgen_str id
 
         Variant identifier.
 
-    .. member:: bgen_string rsid
+    .. member:: bgen_str rsid
 
         Reference SNP cluster identifier.
 
-    .. member:: bgen_string chrom
+    .. member:: bgen_str chrom
 
         Chromosome.
 
@@ -157,7 +157,7 @@ Types
 
         Number of alleles.
 
-    .. member:: bgen_string * allele_ids
+    .. member:: bgen_str * allele_ids
 
         Array of allele identifiers.
 

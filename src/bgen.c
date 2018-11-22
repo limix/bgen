@@ -7,7 +7,10 @@
 #include "index.h"
 #include "layout/one.h"
 #include "layout/two.h"
+#include "util/file.h"
+#include "util/int.h"
 #include "util/mem.h"
+#include "util/print.h"
 #include "util/str.h"
 #include "variant_genotype.h"
 #include "variants_index.h"
@@ -19,45 +22,44 @@
 
 int bgen_read_header(struct bgen_file *bgen) {
     uint32_t header_length;
-    uint32_t nvariants;
-    uint32_t nsamples;
     uint32_t magic_number;
     uint32_t flags;
 
-    if (fread(&header_length, 1, 4, bgen->file) < 4) {
-        fprintf(stderr, "Could not read the header length.\n");
+    if (uint32_t_fread(bgen->file, &header_length, 4)) {
+        error("Could not read the header length.");
         return 1;
     }
 
-    if (fread(&nvariants, 1, 4, bgen->file) < 4) {
-        fprintf(stderr, "Could not read the number of variants.\n");
+    if (int_fread(bgen->file, &bgen->nvariants, 4)) {
+        error("Could not read the number of variants.");
         return 1;
     }
 
-    if (fread(&nsamples, 1, 4, bgen->file) < 4) {
-        fprintf(stderr, "Could not read the number of samples.\n");
+    if (int_fread(bgen->file, &bgen->nsamples, 4)) {
+        error("Could not read the number of samples.");
         return 1;
     }
 
-    if (fread(&magic_number, 1, 4, bgen->file) < 4) {
-        fprintf(stderr, "Could not read the magic number.\n");
+    if (uint32_t_fread(bgen->file, &magic_number, 4)) {
+        error("Could not read the magic number.");
         return 1;
     }
 
     if (magic_number != 1852139362) {
-        fprintf(stderr, "This is not a BGEN file: magic number mismatch.\n");
+        error("This is not a BGEN file: magic number mismatch.");
         return 1;
     }
 
-    fseek(bgen->file, header_length - 20, SEEK_CUR);
-
-    if (fread(&flags, 1, 4, bgen->file) < 4) {
-        fprintf(stderr, "Could not read the bgen flags.\n");
+    if (fseek(bgen->file, header_length - 20, SEEK_CUR)) {
+        error("Fseek error while reading a BGEN file.");
         return 1;
     }
 
-    bgen->nvariants = nvariants;
-    bgen->nsamples = nsamples;
+    if (uint32_t_fread(bgen->file, &flags, 4)) {
+        error("Could not read the bgen flags.");
+        return 1;
+    }
+
     bgen->compression = flags & 3;
     bgen->layout = (flags & (15 << 2)) >> 2;
     bgen->sample_ids_presence = (flags & (1 << 31)) >> 31;
@@ -70,30 +72,26 @@ int bgen_read_header(struct bgen_file *bgen) {
  *  File path to the bgen file.
  */
 BGEN_API struct bgen_file *bgen_open(const char *filepath) {
-    uint32_t offset;
-    struct bgen_file *bgen;
 
-    bgen = malloc(sizeof(struct bgen_file));
+    struct bgen_file *bgen = ALLOC(sizeof(struct bgen_file));
     bgen->samples_start = -1;
     bgen->variants_start = -1;
     bgen->file = NULL;
 
-    bgen->filepath = bgen_strdup(filepath);
+    bgen->filepath = strdup(filepath);
 
-    if ((bgen->file = fopen(bgen->filepath, "rb")) == NULL) {
-        perror("Could not open bgen file ");
+    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
+        PERROR("Could not open %s", bgen->filepath);
         goto err;
     }
 
-    if (fread(&offset, 1, 4, bgen->file) < 4) {
-        perror("Could not read offset ");
+    if (int_fread(bgen->file, &bgen->variants_start, 4))
         goto err;
-    }
 
-    bgen->variants_start = offset + 4;
+    bgen->variants_start += 4;
 
     if (bgen_read_header(bgen)) {
-        fprintf(stderr, "Could not read bgen header.");
+        fprintf(stderr, "Could not read bgen header.\n");
         goto err;
     }
 
@@ -109,32 +107,24 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath) {
     }
 
     if (fclose(bgen->file)) {
-        perror("Could not close file");
+        PERROR("Could not close %s", filepath);
         goto err;
     }
 
     return bgen;
 
 err:
-
-    if (bgen->file)
-        fclose(bgen->file);
-
-    if (bgen->filepath)
-        free(bgen->filepath);
-
-    if (bgen != NULL)
-        free(bgen);
-
+    FCLOSE(bgen->file);
+    if (bgen)
+        FREE(bgen->filepath);
+    FREE(bgen);
     return NULL;
 }
 
 BGEN_API void bgen_close(struct bgen_file *bgen) {
-    if (bgen->filepath)
-        free(bgen->filepath);
-
     if (bgen)
-        free(bgen);
+        FREE(bgen->filepath);
+    FREE(bgen);
 }
 
 BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
@@ -145,10 +135,8 @@ BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen) {
     return bgen->sample_ids_presence;
 }
 
-BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbose) {
-    uint32_t length, nsamples;
-    size_t i;
-    struct bgen_string *sample_ids;
+BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose) {
+    struct bgen_str *sample_ids;
     struct athr *at = NULL;
 
     bgen->file = fopen(bgen->filepath, "rb");
@@ -160,51 +148,43 @@ BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbo
         return NULL;
     }
 
-    sample_ids = malloc(bgen->nsamples * sizeof(struct bgen_string));
+    sample_ids = ALLOC(bgen->nsamples * sizeof(struct bgen_str));
 
-    if (fread(&length, 1, 4, bgen->file) < 4)
+    if (fseek(bgen->file, 8, SEEK_CUR))
         goto err;
 
-    if (fread(&nsamples, 1, 4, bgen->file) < 4)
-        goto err;
-
-    if (verbose) {
+    if (verbose)
         at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
-    }
 
-    for (i = 0; i < (size_t)bgen->nsamples; ++i) {
-        if (verbose) {
+    for (size_t i = 0; i < bgen->nsamples; ++i) {
+        if (verbose)
             athr_consume(at, 1);
-        }
+
         if (str_fread(bgen->file, sample_ids + i, 2))
             goto err;
     }
 
-    if (verbose) {
+    if (verbose)
         athr_finish(at);
-    }
 
     bgen->variants_start = ftell(bgen->file);
 
     if (fclose(bgen->file)) {
-        perror("Could not close the file.");
+        PERROR("Could not close %s", bgen->filepath);
         goto err;
     }
 
     return sample_ids;
 
 err:
-
-    if (bgen->file != NULL)
-        fclose(bgen->file);
-
-    if (sample_ids != NULL)
-        free(sample_ids);
+    FCLOSE(bgen->file);
+    FREE(sample_ids);
+    if (at)
+        athr_finish(at);
     return NULL;
 }
 
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
-                                struct bgen_string *samples) {
+BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *samples) {
     size_t i;
 
     if (bgen->sample_ids_presence == 0)
@@ -220,12 +200,9 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
 }
 
 int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
-    size_t i;
-    uint32_t nsamples, position;
-    uint16_t nalleles;
 
     if (bgen->layout == 1) {
-        if (fread(&nsamples, 1, 4, bgen->file) < 4)
+        if (fseek(bgen->file, 4, SEEK_CUR))
             return 1;
     }
 
@@ -238,21 +215,19 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
     if (str_fread(bgen->file, &v->chrom, 2))
         return 1;
 
-    if (fread(&position, 1, 4, bgen->file) < 4)
+    if (int_fread(bgen->file, &v->position, 4))
         return 1;
-
-    v->position = position;
 
     if (bgen->layout == 1)
-        nalleles = 2;
-    else if (fread(&nalleles, 1, 2, bgen->file) < 2)
+        v->nalleles = 2;
+    else if (int_fread(bgen->file, &v->nalleles, 2))
         return 1;
 
-    v->nalleles = nalleles;
+    v->allele_ids = ALLOC(v->nalleles * sizeof(struct bgen_str));
+    if (!v->allele_ids)
+        return 1;
 
-    v->allele_ids = malloc(nalleles * sizeof(struct bgen_string));
-
-    for (i = 0; i < (size_t)v->nalleles; ++i) {
+    for (size_t i = 0; i < v->nalleles; ++i) {
         if (str_fread(bgen->file, v->allele_ids + i, 4))
             return 1;
     }
@@ -469,38 +444,48 @@ err:
     return NULL;
 }
 
-BGEN_API int bgen_create_index_file(struct bgen_file *bgen, const char *filepath,
-                                    int verbose) {
+BGEN_API int bgen_create_metafile(struct bgen_file *bgen, const char *filepath,
+                                  int verbose) {
 
-    struct bgen_cmf *cmf = bgen_create_metafile_open(filepath, bgen_nvariants(bgen), 2);
+    if (!bgen) {
+        error("bgen_file pointer cannot be null.");
+        return 1;
+    }
+
+    if (!filepath) {
+        error("filepath pointer cannot be null.");
+        return 1;
+    }
+
+    struct cmf *cmf = create_metafile(filepath, bgen_nvariants(bgen), 2);
+    if (!cmf)
+        return 1;
+
     struct bgen_cmf_next next_ctx;
     next_ctx.bgen = bgen;
     next_ctx.nvariants = bgen_nvariants(bgen);
 
-    if (cmf == NULL)
-        return 1;
-
-    if ((bgen->file = fopen(bgen->filepath, "rb")) == NULL) {
-        perror("Could not open ");
-        return 1;
+    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
+        PERROR("Could not create %s", bgen->filepath);
+        goto err;
     }
 
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
         perror("Could not jump to variants start ");
         fclose(bgen->file);
-        return 1;
+        goto err;
     }
 
-    if (bgen_create_metafile_write_loop(cmf, &bgen_next_variant_metadata, &next_ctx,
-                                        verbose)) {
-        fclose(bgen->file);
-        return 1;
-    }
-    if (bgen_create_metafile_close(cmf)) {
-        fclose(bgen->file);
-        return 1;
-    }
+    if (write_metafile(cmf, &bgen_next_variant_metadata, &next_ctx, verbose))
+        goto err;
+
+    if (close_metafile(cmf))
+        goto err;
 
     fclose(bgen->file);
     return 0;
+err:
+    FCLOSE(bgen->file);
+    close_metafile(cmf);
+    return 1;
 }

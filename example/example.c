@@ -16,10 +16,9 @@ int main() {
     printf("Number of variants: %d\n", bgen_nvariants(bgen));
 
     // Reading sample identifications.
-    struct bgen_string *sample_ids = bgen_read_samples(bgen, 0);
+    struct bgen_str *sample_ids = bgen_read_samples(bgen, 0);
 
-    printf("First sample ID: %.*s\n", (int)sample_ids[0].len,
-           sample_ids[0].str);
+    printf("First sample ID: %.*s\n", (int)sample_ids[0].len, sample_ids[0].str);
 
     // Releasing memory associated with sample identifications.
     bgen_free_samples(bgen, sample_ids);
@@ -33,8 +32,7 @@ int main() {
     printf("RSID of the first variant: %.*s\n", (int)variants[0].rsid.len,
            variants[0].rsid.str);
 
-    printf("Number of alleles of the first variant: %d\n",
-           variants[0].nalleles);
+    printf("Number of alleles of the first variant: %d\n", variants[0].nalleles);
 
     // Releasing memory associated with variant identifications.
     bgen_free_variants_metadata(bgen, variants);

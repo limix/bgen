@@ -19,7 +19,7 @@ int main() {
     if ((nvariants = bgen_nvariants(bgen)) != 4)
         return 1;
 
-    struct bgen_string *sample_ids = bgen_read_samples(bgen, 0);
+    struct bgen_str *sample_ids = bgen_read_samples(bgen, 0);
 
     if (strncmp("sample_0", sample_ids[0].str, sample_ids[0].len) != 0)
         return 1;
