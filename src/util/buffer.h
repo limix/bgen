@@ -1,5 +1,5 @@
-#ifndef BGEN_UTIL_BUFFER_H
-#define BGEN_UTIL_BUFFER_H
+#ifndef BUFFER_H
+#define BUFFER_H
 
 #include "util/stdint.h"
 #include <stdlib.h>
@@ -14,4 +14,4 @@ int buffer_destroy(struct Buffer *b);
 int buffer_store(const char *fp, struct Buffer *b);
 int buffer_load(const char *fp, struct Buffer *b, int verbose);
 
-#endif /* end of include guard: BGEN_UTIL_BUFFER_H */
+#endif /* end of include guard: BUFFER_H */

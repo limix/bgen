@@ -9,8 +9,9 @@ function(define_sources BASE_DIR _SOURCES)
         util/buffer.c
         util/choose.c
         util/endian.c
+        util/int.c
         util/mem.c
-        util/string.c
+        util/str.c
         util/tpl.c
         variants_index.c
         zip/zlib_wrapper.c

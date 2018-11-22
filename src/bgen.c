@@ -8,7 +8,7 @@
 #include "layout/one.h"
 #include "layout/two.h"
 #include "util/mem.h"
-#include "util/string.h"
+#include "util/str.h"
 #include "variant_genotype.h"
 #include "variants_index.h"
 #include <assert.h>
@@ -176,7 +176,7 @@ BGEN_API struct bgen_string *bgen_read_samples(struct bgen_file *bgen, int verbo
         if (verbose) {
             athr_consume(at, 1);
         }
-        if (fread_string(bgen->file, sample_ids + i, 2))
+        if (str_fread(bgen->file, sample_ids + i, 2))
             goto err;
     }
 
@@ -229,13 +229,13 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
             return 1;
     }
 
-    if (fread_string(bgen->file, &v->id, 2))
+    if (str_fread(bgen->file, &v->id, 2))
         return 1;
 
-    if (fread_string(bgen->file, &v->rsid, 2))
+    if (str_fread(bgen->file, &v->rsid, 2))
         return 1;
 
-    if (fread_string(bgen->file, &v->chrom, 2))
+    if (str_fread(bgen->file, &v->chrom, 2))
         return 1;
 
     if (fread(&position, 1, 4, bgen->file) < 4)
@@ -253,7 +253,7 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
     v->allele_ids = malloc(nalleles * sizeof(struct bgen_string));
 
     for (i = 0; i < (size_t)v->nalleles; ++i) {
-        if (fread_string(bgen->file, v->allele_ids + i, 4))
+        if (str_fread(bgen->file, v->allele_ids + i, 4))
             return 1;
     }
 

@@ -1,12 +1,34 @@
 #include "bgen.h"
+#include "util/str.h"
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
+
+#ifdef ASSERT
+#undef ASSERT
+#endif
+
+#define ASSERT(x)                                                                       \
+    if (!(x))                                                                           \
+        return 1;
+
+int create_index(const char *bgen_filepath, const char *filepath);
+int use_index(const char *filepath);
 
 int main() {
 
     const char filepath[] = "complex_index03.index";
     const char bgen_filepath[] = "data/complex.23bits.bgen";
+
+    if (create_index(bgen_filepath, filepath))
+        return 1;
+
+    if (use_index(filepath))
+        return 1;
+    return 0;
+}
+
+int create_index(const char *bgen_filepath, const char *filepath) {
     struct bgen_file *bgen;
 
     if ((bgen = bgen_open(bgen_filepath)) == NULL)
@@ -51,7 +73,50 @@ int main() {
     if (u64 != 179)
         return 1;
 
-    fclose(fp);
+    fseek(fp, 13 + 4 + 8, SEEK_SET);
+    fread(&u64, sizeof(uint64_t), 1, fp);
+    if (u64 != 98)
+        return 1;
 
+    fclose(fp);
+    return 0;
+}
+
+int use_index(const char *filepath) {
+    struct bgen_vm_idx *v;
+    int nvariants;
+    size_t i, j;
+
+    if ((v = bgen_open_metafile(filepath)) == NULL) {
+        return 1;
+    }
+
+    int nparts = bgen_npartitions_metafile(v);
+    if (nparts != 2)
+        return 1;
+
+    int nvars = bgen_nvariants_metafile(v);
+    if (nvars != 10)
+        return 1;
+
+    struct bgen_vm *vm = bgen_read_metavars(v, 0, &nvariants);
+
+    ASSERT(vm[0].id.len == 0);
+    ASSERT(vm[0].rsid.len == 2);
+    ASSERT(strncmp(vm[0].rsid.str, "V1", 2) == 0);
+    ASSERT(strncmp(vm[0].chrom.str, "01", 2) == 0);
+    ASSERT(vm[0].nalleles == 2);
+    ASSERT(strncmp(vm[1].allele_ids[0].str, "A", 1) == 0);
+    ASSERT(strncmp(vm[1].allele_ids[1].str, "G", 1) == 0);
+
+    ASSERT(vm[4].id.len == 0);
+    ASSERT(strncmp(vm[4].rsid.str, "M5", 2) == 0);
+    ASSERT(strncmp(vm[4].chrom.str, "01", 2) == 0);
+    ASSERT(vm[4].nalleles == 2);
+    ASSERT(strncmp(vm[4].allele_ids[0].str, "A", 1) == 0);
+    ASSERT(strncmp(vm[4].allele_ids[1].str, "G", 1) == 0);
+
+    if (bgen_close_metafile(v))
+        return 1;
     return 0;
 }
