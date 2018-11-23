@@ -4,21 +4,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void FCLOSE(FILE *fp) {
+static inline void *fclose_nul(FILE *fp) {
     if (fp)
         fclose(fp);
+    return NULL;
 }
 
-static inline int FWRITE(const void *restrict buffer, size_t size,
-                         FILE *restrict stream) {
+static inline int fwrite1(const void *restrict buffer, size_t size,
+                          FILE *restrict stream) {
     return fwrite(buffer, size, 1, stream) != 1;
 }
 
-static inline int FREAD(void *restrict buffer, size_t size, FILE *restrict stream) {
+static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stream) {
     return fread(buffer, size, 1, stream) != 1;
 }
 
-#define PERROR(...)                                                                     \
+#define perror_fmt(...)                                                                 \
     fprintf(stderr, __VA_ARGS__);                                                       \
     perror("");
 
@@ -34,21 +35,21 @@ static inline int FREAD(void *restrict buffer, size_t size, FILE *restrict strea
         fputs("", stderr);                                                              \
     } while (0)
 
-#define DECLARE_TYPE_FREAD(TYPE) int TYPE##_fread(FILE *, TYPE *, size_t);
+#define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE *, TYPE *, size_t);
 
-DECLARE_TYPE_FREAD(int);
-DECLARE_TYPE_FREAD(unsigned);
-DECLARE_TYPE_FREAD(uint64_t);
-DECLARE_TYPE_FREAD(uint32_t);
-DECLARE_TYPE_FREAD(uint16_t);
+DECLARE_TYPE_FREAD(int, int);
+DECLARE_TYPE_FREAD(unsigned, unsigned);
+DECLARE_TYPE_FREAD(uint64_t, ui64);
+DECLARE_TYPE_FREAD(uint32_t, ui32);
+DECLARE_TYPE_FREAD(uint16_t, ui16);
 
-#define DECLARE_TYPE_FWRITE(TYPE) int TYPE##_fwrite(FILE *, TYPE, size_t);
+#define DECLARE_TYPE_FWRITE(TYPE, SUF) int fwrite_##SUF(FILE *, TYPE, size_t);
 
-DECLARE_TYPE_FWRITE(int);
-DECLARE_TYPE_FWRITE(unsigned);
-DECLARE_TYPE_FWRITE(uint64_t);
-DECLARE_TYPE_FWRITE(uint32_t);
-DECLARE_TYPE_FWRITE(uint16_t);
+DECLARE_TYPE_FWRITE(int, int);
+DECLARE_TYPE_FWRITE(unsigned, unsigned);
+DECLARE_TYPE_FWRITE(uint64_t, ui64);
+DECLARE_TYPE_FWRITE(uint32_t, ui32);
+DECLARE_TYPE_FWRITE(uint16_t, ui16);
 
 #undef DECLARE_TYPE_FREAD
 #undef DECLARE_TYPE_FWRITE

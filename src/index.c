@@ -53,12 +53,12 @@ struct bgen_idx {
 uint64_t write_metafile_var(FILE *fp, const struct bgen_var *v, uint64_t offset) {
     long start = ftell(fp);
 
-    uint64_t_fwrite(fp, offset, 8);
+    fwrite_ui64(fp, offset, 8);
     str_fwrite(fp, &(v->id), 2);
     str_fwrite(fp, &(v->rsid), 2);
     str_fwrite(fp, &(v->chrom), 2);
-    int_fwrite(fp, v->position, 4);
-    int_fwrite(fp, v->nalleles, 2);
+    fwrite_int(fp, v->position, 4);
+    fwrite_int(fp, v->nalleles, 2);
 
     for (size_t j = 0; j < v->nalleles; ++j)
         str_fwrite(fp, v->allele_ids + j, 4);
@@ -68,7 +68,7 @@ uint64_t write_metafile_var(FILE *fp, const struct bgen_var *v, uint64_t offset)
 
 struct cmf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts) {
 
-    struct cmf *c = ALLOC(sizeof(struct cmf));
+    struct cmf *c = dalloc(sizeof(struct cmf));
     if (!c)
         goto err;
 
@@ -85,10 +85,10 @@ struct cmf *create_metafile(const char *filepath, uint32_t nvars, uint32_t npart
         goto err;
     }
 
-    if (FWRITE(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), c->fp))
+    if (fwrite1(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), c->fp))
         goto err;
 
-    if (FWRITE(&nvars, sizeof(uint32_t), c->fp))
+    if (fwrite1(&nvars, sizeof(uint32_t), c->fp))
         goto err;
 
     if (fseek(c->fp, sizeof(uint64_t), SEEK_CUR))
@@ -100,8 +100,8 @@ struct cmf *create_metafile(const char *filepath, uint32_t nvars, uint32_t npart
     return c;
 err:
     if (c)
-        FCLOSE(c->fp);
-    FREE(c);
+        fclose_nul(c->fp);
+    free_nul(c);
     return NULL;
 }
 
@@ -112,7 +112,7 @@ int write_metafile(struct cmf *cmf, struct bgen_var *(*next)(uint64_t *, void *)
     uint64_t size;
     uint64_t offset;
 
-    cmf->offset = ALLOC(sizeof(uint64_t) * (cmf->npartitions + 1));
+    cmf->offset = dalloc(sizeof(uint64_t) * (cmf->npartitions + 1));
     if (cmf->offset == NULL)
         goto err;
 
@@ -130,22 +130,22 @@ int write_metafile(struct cmf *cmf, struct bgen_var *(*next)(uint64_t *, void *)
 
         cmf->offset[j] += size;
         ++i;
-        v = FREE(v);
+        v = free_nul(v);
     }
 
-    uint32_t_fwrite(cmf->fp, cmf->npartitions, sizeof(cmf->npartitions));
+    fwrite_ui32(cmf->fp, cmf->npartitions, sizeof(cmf->npartitions));
 
     for (i = 0; i < cmf->npartitions; ++i)
-        uint64_t_fwrite(cmf->fp, cmf->offset[i], sizeof(cmf->offset[i]));
+        fwrite_ui64(cmf->fp, cmf->offset[i], sizeof(cmf->offset[i]));
 
     fseek(cmf->fp, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET);
-    uint64_t_fwrite(cmf->fp, cmf->offset[cmf->npartitions], 4);
+    fwrite_ui64(cmf->fp, cmf->offset[cmf->npartitions], 4);
 
     return 0;
 
 err:
-    cmf->offset = FREE(cmf->offset);
-    FREE(v);
+    cmf->offset = free_nul(cmf->offset);
+    free_nul(v);
     return 1;
 }
 
@@ -154,9 +154,9 @@ int close_metafile(struct cmf *cmf) {
     if (!cmf)
         return 0;
 
-    FREE(cmf->offset);
-    FCLOSE(cmf->fp);
-    FREE(cmf);
+    free_nul(cmf->offset);
+    fclose_nul(cmf->fp);
+    free_nul(cmf);
 
     return 0;
 }
@@ -164,19 +164,19 @@ int close_metafile(struct cmf *cmf) {
 struct bgen_idx *bgen_open_metafile(const char *filepath) {
 
     FILE *fp = NULL;
-    struct bgen_idx *vm_idx = ALLOC(sizeof(struct bgen_idx));
+    struct bgen_idx *vm_idx = dalloc(sizeof(struct bgen_idx));
     if (!vm_idx)
         goto err;
 
     vm_idx->filepath = strdup(filepath);
 
     if (!(fp = fopen(vm_idx->filepath, "rb"))) {
-        PERROR("Could not open %s", vm_idx->filepath);
+        perror_fmt("Could not open %s", vm_idx->filepath);
         goto err;
     }
 
     char header[13];
-    if (FREAD(header, 13 * sizeof(char), fp))
+    if (fread1(header, 13 * sizeof(char), fp))
         goto err;
 
     if (strncmp(header, "bgen index 03", 13)) {
@@ -184,10 +184,10 @@ struct bgen_idx *bgen_open_metafile(const char *filepath) {
         goto err;
     }
 
-    if (FREAD(&(vm_idx->nvariants), sizeof(uint32_t), fp))
+    if (fread1(&(vm_idx->nvariants), sizeof(uint32_t), fp))
         goto err;
 
-    if (FREAD(&(vm_idx->metasize), sizeof(uint64_t), fp))
+    if (fread1(&(vm_idx->metasize), sizeof(uint64_t), fp))
         goto err;
 
     if (fseek(fp, vm_idx->metasize, SEEK_CUR)) {
@@ -195,13 +195,13 @@ struct bgen_idx *bgen_open_metafile(const char *filepath) {
         goto err;
     }
 
-    if (FREAD(&(vm_idx->npartitions), sizeof(uint32_t), fp))
+    if (fread1(&(vm_idx->npartitions), sizeof(uint32_t), fp))
         goto err;
 
-    vm_idx->ppos = ALLOC(sizeof(uint64_t));
+    vm_idx->ppos = dalloc(sizeof(uint64_t));
 
     for (size_t i = 0; i < vm_idx->npartitions; ++i) {
-        if (FREAD(vm_idx->ppos + i, sizeof(uint64_t), fp))
+        if (fread1(vm_idx->ppos + i, sizeof(uint64_t), fp))
             goto err;
     }
 
@@ -209,9 +209,9 @@ struct bgen_idx *bgen_open_metafile(const char *filepath) {
 
 err:
     if (vm_idx)
-        FREE(vm_idx->filepath);
-    FREE(vm_idx);
-    FCLOSE(fp);
+        free_nul(vm_idx->filepath);
+    free_nul(vm_idx);
+    fclose_nul(fp);
     return NULL;
 }
 
@@ -265,14 +265,14 @@ BGEN_API struct bgen_vm *bgen_read_metavars(struct bgen_idx *v, int part, int *n
     }
 
     for (i = 0; i < *nvars; ++i) {
-        int_fread(fp, &vars[i].vaddr, 8);
+        fread_int(fp, &vars[i].vaddr, 8);
 
         str_fread(fp, &vars[i].id, 2);
         str_fread(fp, &vars[i].rsid, 2);
         str_fread(fp, &vars[i].chrom, 2);
 
-        int_fread(fp, &vars[i].position, 4);
-        int_fread(fp, &vars[i].nalleles, 2);
+        fread_int(fp, &vars[i].position, 4);
+        fread_int(fp, &vars[i].nalleles, 2);
         vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
 
         for (j = 0; j < vars[i].nalleles; ++j) {

@@ -20,7 +20,7 @@
 
 #define bopen_or_leave(BGEN)                                                            \
     if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                  \
-        PERROR("Could not open bgen file %s", BGEN->filepath);                          \
+        perror_fmt("Could not open bgen file %s", BGEN->filepath);                      \
         goto err;                                                                       \
     }
 
@@ -29,22 +29,22 @@ int bgen_read_header(struct bgen_file *bgen) {
     uint32_t magic_number;
     uint32_t flags;
 
-    if (uint32_t_fread(bgen->file, &header_length, 4)) {
+    if (fread_ui32(bgen->file, &header_length, 4)) {
         error("Could not read the header length.");
         return 1;
     }
 
-    if (int_fread(bgen->file, &bgen->nvariants, 4)) {
+    if (fread_int(bgen->file, &bgen->nvariants, 4)) {
         error("Could not read the number of variants.");
         return 1;
     }
 
-    if (int_fread(bgen->file, &bgen->nsamples, 4)) {
+    if (fread_int(bgen->file, &bgen->nsamples, 4)) {
         error("Could not read the number of samples.");
         return 1;
     }
 
-    if (uint32_t_fread(bgen->file, &magic_number, 4)) {
+    if (fread_ui32(bgen->file, &magic_number, 4)) {
         error("Could not read the magic number.");
         return 1;
     }
@@ -59,7 +59,7 @@ int bgen_read_header(struct bgen_file *bgen) {
         return 1;
     }
 
-    if (uint32_t_fread(bgen->file, &flags, 4)) {
+    if (fread_ui32(bgen->file, &flags, 4)) {
         error("Could not read the bgen flags.");
         return 1;
     }
@@ -77,7 +77,7 @@ int bgen_read_header(struct bgen_file *bgen) {
  */
 BGEN_API struct bgen_file *bgen_open(const char *filepath) {
 
-    struct bgen_file *bgen = ALLOC(sizeof(struct bgen_file));
+    struct bgen_file *bgen = dalloc(sizeof(struct bgen_file));
     bgen->samples_start = -1;
     bgen->variants_start = -1;
     bgen->file = NULL;
@@ -86,7 +86,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath) {
 
     bopen_or_leave(bgen);
 
-    if (int_fread(bgen->file, &bgen->variants_start, 4))
+    if (fread_int(bgen->file, &bgen->variants_start, 4))
         goto err;
 
     bgen->variants_start += 4;
@@ -108,24 +108,24 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath) {
     }
 
     if (fclose(bgen->file)) {
-        PERROR("Could not close %s", filepath);
+        perror_fmt("Could not close %s", filepath);
         goto err;
     }
 
     return bgen;
 
 err:
-    FCLOSE(bgen->file);
+    fclose_nul(bgen->file);
     if (bgen)
-        FREE(bgen->filepath);
-    FREE(bgen);
+        free_nul(bgen->filepath);
+    free_nul(bgen);
     return NULL;
 }
 
 BGEN_API void bgen_close(struct bgen_file *bgen) {
     if (bgen)
-        FREE(bgen->filepath);
-    FREE(bgen);
+        free_nul(bgen->filepath);
+    free_nul(bgen);
 }
 
 BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
@@ -149,7 +149,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
         return NULL;
     }
 
-    sample_ids = ALLOC(bgen->nsamples * sizeof(struct bgen_str));
+    sample_ids = dalloc(bgen->nsamples * sizeof(struct bgen_str));
 
     if (fseek(bgen->file, 8, SEEK_CUR))
         goto err;
@@ -171,15 +171,15 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     bgen->variants_start = ftell(bgen->file);
 
     if (fclose(bgen->file)) {
-        PERROR("Could not close %s", bgen->filepath);
+        perror_fmt("Could not close %s", bgen->filepath);
         goto err;
     }
 
     return sample_ids;
 
 err:
-    FCLOSE(bgen->file);
-    FREE(sample_ids);
+    fclose_nul(bgen->file);
+    free_nul(sample_ids);
     if (at)
         athr_finish(at);
     return NULL;
@@ -216,15 +216,15 @@ int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
     if (str_fread(bgen->file, &v->chrom, 2))
         return 1;
 
-    if (int_fread(bgen->file, &v->position, 4))
+    if (fread_int(bgen->file, &v->position, 4))
         return 1;
 
     if (bgen->layout == 1)
         v->nalleles = 2;
-    else if (int_fread(bgen->file, &v->nalleles, 2))
+    else if (fread_int(bgen->file, &v->nalleles, 2))
         return 1;
 
-    v->allele_ids = ALLOC(v->nalleles * sizeof(struct bgen_str));
+    v->allele_ids = dalloc(v->nalleles * sizeof(struct bgen_str));
     if (!v->allele_ids)
         return 1;
 
@@ -269,7 +269,7 @@ BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
 
         (*index)->start[i] = ftell(bgen->file);
 
-        if (uint32_t_fread(bgen->file, &length, 4))
+        if (fread_ui32(bgen->file, &length, 4))
             goto err;
 
         if (fseek(bgen->file, length, SEEK_CUR)) {
@@ -373,7 +373,7 @@ BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t i
     return vg;
 
 err:
-    FCLOSE(fp);
+    fclose_nul(fp);
     return NULL;
 }
 
@@ -488,7 +488,7 @@ BGEN_API int bgen_create_metafile(struct bgen_file *bgen, const char *filepath,
     fclose(bgen->file);
     return 0;
 err:
-    FCLOSE(bgen->file);
+    fclose_nul(bgen->file);
     close_metafile(cmf);
     return 1;
 }
