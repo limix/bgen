@@ -25,13 +25,11 @@
 #define BGEN_API_EXPORTS
 
 #include "index.h"
-#include "util/bits.h"
-#include "util/endian.h"
-#include "util/file.h"
-#include "util/int.h"
-#include "util/mem.h"
-#include "util/print.h"
-#include "util/str.h"
+#include "bits.h"
+#include "endian.h"
+#include "io.h"
+#include "mem.h"
+#include "str.h"
 #include <stdio.h>
 #include <stdlib.h>
 

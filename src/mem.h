@@ -1,7 +1,7 @@
 #ifndef MEM_H
 #define MEM_H
 
-#include "util/print.h"
+#include "io.h"
 #include <stdlib.h>
 #include <string.h>
 

@@ -8,11 +8,11 @@
 #include "variants_index.h"
 
 #include "bgen.h"
-#include "util/bits.h"
+#include "bits.h"
 
 #include "bgen_file.h"
-#include "util/choose.h"
-#include "util/mem.h"
+#include "choose.h"
+#include "mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
 

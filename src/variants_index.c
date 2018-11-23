@@ -25,10 +25,10 @@
 #include "variants_index.h"
 #include "bgen.h"
 #include "bgen_file.h"
+#include "buffer.h"
+#include "mem.h"
+#include "tpl.h"
 #include "tpl/tpl.h"
-#include "util/buffer.h"
-#include "util/mem.h"
-#include "util/tpl.h"
 #include "zip/zstd_wrapper.h"
 
 #define SET_STR(dst, src)                                                               \

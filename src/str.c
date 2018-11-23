@@ -1,6 +1,6 @@
 #include "bgen.h"
 
-#include "util/stdint.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 

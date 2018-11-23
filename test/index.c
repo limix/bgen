@@ -1,5 +1,5 @@
 #include "bgen.h"
-#include "util/str.h"
+#include "str.h"
 #include <float.h>
 #include <stdio.h>
 #include <string.h>

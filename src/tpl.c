@@ -1,6 +1,6 @@
-#include "bgen.h"
 #include "tpl/tpl.h"
-#include "util/tpl.h"
+#include "bgen.h"
+#include "tpl.h"
 
 #include <stdlib.h>
 #include <string.h>

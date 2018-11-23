@@ -1,4 +1,4 @@
-#include "util/endian.h"
+#include "endian.h"
 
 int bgen_is_lendian(void) {
     int num = 1;

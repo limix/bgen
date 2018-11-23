@@ -2,17 +2,17 @@ function(define_sources BASE_DIR _SOURCES)
 
     list(APPEND REL_SOURCES
         bgen.c
+        buffer.c
+        choose.c
+        endian.c
         index.c
+        io.c
         layout/one.c
         layout/two.c
+        mem.c
+        str.c
+        tpl.c
         tpl/tpl.c
-        util/buffer.c
-        util/choose.c
-        util/endian.c
-        util/int.c
-        util/mem.c
-        util/str.c
-        util/tpl.c
         variants_index.c
         zip/zlib_wrapper.c
         zip/zstd_wrapper.c)

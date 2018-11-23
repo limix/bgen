@@ -1,6 +1,6 @@
-#include "util/buffer.h"
+#include "buffer.h"
 #include "athr.h"
-#include "util/bits.h"
+#include "bits.h"
 #include "zip/zstd_wrapper.h"
 #include <stdio.h>
 

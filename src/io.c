@@ -1,4 +1,4 @@
-#include "util/int.h"
+#include "io.h"
 
 #define DEFINE_TYPE_FREAD(TYPE)                                                         \
     int TYPE##_fread(FILE *fp, TYPE *value, size_t size) {                              \
@@ -43,6 +43,3 @@ DEFINE_TYPE_FWRITE(unsigned)
 DEFINE_TYPE_FWRITE(uint64_t)
 DEFINE_TYPE_FWRITE(uint32_t)
 DEFINE_TYPE_FWRITE(uint16_t)
-
-#undef DEFINE_TYPE_FREAD
-#undef DEFINE_TYPE_FWRITE

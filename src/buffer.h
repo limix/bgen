@@ -1,7 +1,7 @@
 #ifndef BUFFER_H
 #define BUFFER_H
 
-#include "util/stdint.h"
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
