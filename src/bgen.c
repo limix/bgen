@@ -10,6 +10,7 @@
 #include "layout/two.h"
 #include "mem.h"
 #include "str.h"
+#include "variant.h"
 #include "variant_genotype.h"
 #include "variants_index.h"
 #include <assert.h>
@@ -17,12 +18,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#define bopen_or_leave(BGEN)                                                            \
-    if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                  \
-        perror_fmt("Could not open bgen file %s", BGEN->filepath);                      \
-        goto err;                                                                       \
-    }
 
 /*
  * Read the header block defined as follows:
@@ -208,56 +203,6 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *s
     free(samples);
 }
 
-/* It assumes that the bgen file is open. */
-int bgen_read_variant(struct bgen_file *bgen, struct bgen_var *v) {
-    assert(bgen);
-    assert(bgen->file);
-    assert(v);
-
-    if (bgen->layout == 1) {
-        if (fseek(bgen->file, 4, SEEK_CUR))
-            goto err;
-    }
-
-    if (fread_str(bgen->file, &v->id, 2))
-        goto err;
-
-    if (fread_str(bgen->file, &v->rsid, 2))
-        goto err;
-
-    if (fread_str(bgen->file, &v->chrom, 2))
-        goto err;
-
-    if (fread_int(bgen->file, &v->position, 4))
-        goto err;
-
-    if (bgen->layout == 1)
-        v->nalleles = 2;
-    else if (fread_int(bgen->file, &v->nalleles, 2))
-        goto err;
-
-    v->allele_ids = dalloc(v->nalleles * sizeof(struct bgen_str));
-    if (!v->allele_ids)
-        goto err;
-
-    for (size_t i = 0; i < v->nalleles; ++i) {
-        if (fread_str(bgen->file, v->allele_ids + i, 4))
-            goto err;
-    }
-
-    return 0;
-err:
-    free_nul(v->id.str);
-    free_nul(v->rsid.str);
-    free_nul(v->chrom.str);
-    if (v->allele_ids) {
-        for (size_t i = 0; i < v->nalleles; ++i)
-            free_nul((v->allele_ids + i)->str);
-    }
-    free_nul(v->allele_ids);
-    return 1;
-}
-
 BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
                                              struct bgen_vi **index, int verbose) {
     assert(bgen);
@@ -283,7 +228,7 @@ BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
         if (verbose)
             athr_consume(at, 1);
 
-        if (bgen_read_variant(bgen, variants + i))
+        if (read_variant(bgen, variants + i))
             goto err;
 
         (*index)->start[i] = ftell(bgen->file);
@@ -445,80 +390,4 @@ BGEN_API int bgen_ncombs(const struct bgen_vg *vg) {
 BGEN_API int bgen_phased(const struct bgen_vg *vg) {
     assert(vg);
     return vg->phased;
-}
-
-struct bgen_cmf_next {
-    struct bgen_file *bgen;
-    uint32_t nvariants;
-};
-
-struct bgen_var *bgen_next_variant_metadata(uint64_t *genotype_offset, void *ctx) {
-
-    struct bgen_var *variant = malloc(sizeof(struct bgen_var));
-    struct bgen_cmf_next *self = ctx;
-    uint32_t length;
-
-    if (self->nvariants == 0)
-        return NULL;
-
-    if (bgen_read_variant(self->bgen, variant))
-        goto err;
-
-    *genotype_offset = ftell(self->bgen->file);
-
-    if (fread(&length, 1, 4, self->bgen->file) < 4)
-        goto err;
-
-    if (fseek(self->bgen->file, length, SEEK_CUR)) {
-        perror("Could not jump to the next variant ");
-        goto err;
-    }
-
-    --(self->nvariants);
-    return variant;
-err:
-    return NULL;
-}
-
-BGEN_API int bgen_create_metafile(struct bgen_file *bgen, const char *filepath,
-                                  int verbose) {
-
-    if (!bgen) {
-        error("bgen_file pointer cannot be null.");
-        return 1;
-    }
-
-    if (!filepath) {
-        error("filepath pointer cannot be null.");
-        return 1;
-    }
-
-    struct cmf *cmf = create_metafile(filepath, bgen_nvariants(bgen), 2);
-    if (!cmf)
-        return 1;
-
-    struct bgen_cmf_next next_ctx;
-    next_ctx.bgen = bgen;
-    next_ctx.nvariants = bgen_nvariants(bgen);
-
-    bopen_or_leave(bgen);
-
-    if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
-        perror("Could not jump to variants start ");
-        fclose(bgen->file);
-        goto err;
-    }
-
-    if (write_metafile(cmf, &bgen_next_variant_metadata, &next_ctx, verbose))
-        goto err;
-
-    if (close_metafile(cmf))
-        goto err;
-
-    fclose(bgen->file);
-    return 0;
-err:
-    fclose_nul(bgen->file);
-    close_metafile(cmf);
-    return 1;
 }

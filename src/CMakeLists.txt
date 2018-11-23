@@ -5,14 +5,15 @@ function(define_sources BASE_DIR _SOURCES)
         buffer.c
         choose.c
         endian.c
-        index.c
         io.c
         layout/one.c
         layout/two.c
         mem.c
+        metafile.c
         str.c
         tpl.c
         tpl/tpl.c
+        variant.c
         variants_index.c
         zip/zlib_wrapper.c
         zip/zstd_wrapper.c)
