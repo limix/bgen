@@ -20,8 +20,11 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
 }
 
 #define perror_fmt(...)                                                                 \
-    fprintf(stderr, __VA_ARGS__);                                                       \
-    perror("");
+    do {                                                                                \
+        fputs("Error: ", stderr);                                                       \
+        fprintf(stderr, __VA_ARGS__);                                                   \
+        perror("");                                                                     \
+    } while (0)
 
 #define echo(...)                                                                       \
     do {                                                                                \
@@ -31,8 +34,9 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
 
 #define error(...)                                                                      \
     do {                                                                                \
+        fputs("Error: ", stderr);                                                       \
         fprintf(stderr, __VA_ARGS__);                                                   \
-        fputs("", stderr);                                                              \
+        fputs("\n", stderr);                                                            \
     } while (0)
 
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE *, TYPE *, size_t);

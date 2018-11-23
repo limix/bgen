@@ -54,14 +54,14 @@ uint64_t write_metafile_var(FILE *fp, const struct bgen_var *v, uint64_t offset)
     long start = ftell(fp);
 
     fwrite_ui64(fp, offset, 8);
-    str_fwrite(fp, &(v->id), 2);
-    str_fwrite(fp, &(v->rsid), 2);
-    str_fwrite(fp, &(v->chrom), 2);
+    fwrite_str(fp, &(v->id), 2);
+    fwrite_str(fp, &(v->rsid), 2);
+    fwrite_str(fp, &(v->chrom), 2);
     fwrite_int(fp, v->position, 4);
     fwrite_int(fp, v->nalleles, 2);
 
     for (size_t j = 0; j < v->nalleles; ++j)
-        str_fwrite(fp, v->allele_ids + j, 4);
+        fwrite_str(fp, v->allele_ids + j, 4);
 
     return ftell(fp) - start;
 }
@@ -267,16 +267,16 @@ BGEN_API struct bgen_vm *bgen_read_metavars(struct bgen_idx *v, int part, int *n
     for (i = 0; i < *nvars; ++i) {
         fread_int(fp, &vars[i].vaddr, 8);
 
-        str_fread(fp, &vars[i].id, 2);
-        str_fread(fp, &vars[i].rsid, 2);
-        str_fread(fp, &vars[i].chrom, 2);
+        fread_str(fp, &vars[i].id, 2);
+        fread_str(fp, &vars[i].rsid, 2);
+        fread_str(fp, &vars[i].chrom, 2);
 
         fread_int(fp, &vars[i].position, 4);
         fread_int(fp, &vars[i].nalleles, 2);
         vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
 
         for (j = 0; j < vars[i].nalleles; ++j) {
-            str_fread(fp, vars[i].allele_ids + j, 4);
+            fread_str(fp, vars[i].allele_ids + j, 4);
         }
     }
 

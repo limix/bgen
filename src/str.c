@@ -16,7 +16,7 @@ void str_free(struct bgen_str *v) {
     v->len = 0;
 }
 
-int str_fread(FILE *fp, struct bgen_str *s, size_t len_size) {
+int fread_str(FILE *fp, struct bgen_str *s, size_t len_size) {
     uint64_t len;
     len = 0;
 
@@ -35,7 +35,7 @@ int str_fread(FILE *fp, struct bgen_str *s, size_t len_size) {
     return 0;
 }
 
-int str_fwrite(FILE *fp, const struct bgen_str *s, size_t len_size) {
+int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size) {
 
     uint64_t len = s->len;
     if (fwrite(&len, len_size, 1, fp) != 1) {

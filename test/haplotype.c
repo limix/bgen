@@ -72,7 +72,7 @@ int main() {
     if (bgen_phased(vg) != 1)
         return 1;
 
-    bgen_close_variant_genotype(index, vg);
+    bgen_close_variant_genotype(vg);
 
     double real_probs[] = {
         1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
@@ -95,7 +95,7 @@ int main() {
                 jj++;
             }
         }
-        bgen_close_variant_genotype(index, vg);
+        bgen_close_variant_genotype(vg);
         free(probabilities);
     }
 

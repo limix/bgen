@@ -150,7 +150,7 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
                     return 1;
             }
         }
-        bgen_close_variant_genotype(index, vg);
+        bgen_close_variant_genotype(vg);
         free(probabilities);
     }
 

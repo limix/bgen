@@ -4,8 +4,8 @@
 #include "bgen.h"
 #include <stdio.h>
 
-int str_fread(FILE *fp, struct bgen_str *s, size_t len_size);
-int str_fwrite(FILE *fp, const struct bgen_str *s, size_t len_size);
+int fread_str(FILE *fp, struct bgen_str *s, size_t len_size);
+int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size);
 void str_printf(struct bgen_str s);
 void str_alloc(struct bgen_str *v, size_t len);
 void str_free(struct bgen_str *v);

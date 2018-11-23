@@ -10,7 +10,7 @@ function.
 The user has to release resources by calling :func:`bgen_close` after its
 use.
 
-The function :func:`bgen_sample_ids_presence` can be used to detect
+The function :func:`bgen_contain_sample` can be used to detect
 whether the BGEN file contain sample identifications.
 If it does, the function :func:`bgen_read_samples` will return an array
 of sample identifications.
@@ -77,7 +77,7 @@ File
     :param bgen: bgen file handler.
     :return: number of variants.
 
-.. function:: int bgen_sample_ids_presence(const struct bgen_file* bgen)
+.. function:: int bgen_contain_sample(const struct bgen_file* bgen)
 
     Check whether sample identifications are actually present.
 

@@ -10,7 +10,7 @@ struct bgen_file {
     int nsamples;
     int compression;
     int layout;
-    int sample_ids_presence;
+    int contain_sample;
     int samples_start;
     int variants_start;
 };

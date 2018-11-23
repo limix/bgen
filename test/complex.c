@@ -75,7 +75,7 @@ int main() {
     vg = bgen_open_variant_genotype(index, 0);
     probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
     bgen_read_variant_genotype(index, vg, probabilities);
-    bgen_close_variant_genotype(index, vg);
+    bgen_close_variant_genotype(vg);
     free(probabilities);
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
@@ -84,7 +84,7 @@ int main() {
         vg = bgen_open_variant_genotype(index, i);
         if (bgen_phased(vg) != phased[i])
             return 1;
-        bgen_close_variant_genotype(index, vg);
+        bgen_close_variant_genotype(vg);
     }
 
     int ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
@@ -157,7 +157,7 @@ int main() {
             }
             ++jj;
         }
-        bgen_close_variant_genotype(index, vg);
+        bgen_close_variant_genotype(vg);
         free(probabilities);
     }
 

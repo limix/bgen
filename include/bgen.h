@@ -29,9 +29,9 @@
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
-#define BGEN_VERSION "2.1.0"
-#define BGEN_VERSION_MAJOR 2
-#define BGEN_VERSION_MINOR 1
+#define BGEN_VERSION "3.0.0"
+#define BGEN_VERSION_MAJOR 3
+#define BGEN_VERSION_MINOR 0
 #define BGEN_VERSION_PATCH 0
 
 #ifdef __cplusplus
@@ -94,7 +94,7 @@ BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
 /* Get the number of variants. */
 BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 /* Check if the file contains sample identifications. */
-BGEN_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
+BGEN_API int bgen_contain_sample(const struct bgen_file *bgen);
 /* Get array of sample identifications. */
 BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
@@ -147,9 +147,9 @@ BGEN_API int bgen_max_nalleles(struct bgen_vi *);
 /* Open a variant for genotype queries. */
 BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
 /* Close a variant genotype handler. */
-BGEN_API void bgen_close_variant_genotype(struct bgen_vi *vi, struct bgen_vg *vg);
+BGEN_API void bgen_close_variant_genotype(struct bgen_vg *vg);
 /* Read the probabilities of each possible genotype. */
-BGEN_API void bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *, double *);
+BGEN_API int bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *, double *);
 /* Get the number of alleles. */
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */
