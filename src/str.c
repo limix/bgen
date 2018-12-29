@@ -43,7 +43,7 @@ int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size) {
         return 1;
     }
 
-    if (fwrite(s->str, len * sizeof(char), 1, fp) != 1) {
+    if (fwrite(s->str, 1, len, fp) != len) {
         perror("Error while fwriting a string str ");
         return 1;
     }
