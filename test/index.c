@@ -30,6 +30,7 @@ int create_index(const char *bgen_filepath, const char *filepath) {
     bgen_close(bgen);
 
     FILE *fp = fopen(filepath, "rb");
+    assert_not_null(fp);
 
     char header[14];
     header[13] = '\0';
@@ -45,28 +46,22 @@ int create_index(const char *bgen_filepath, const char *filepath) {
     assert_equal_int(u32, 10);
 
     fread(&u64, sizeof(uint64_t), 1, fp);
-    if (u64 != 484)
-        return 1;
+    assert_equal_uint64(u64, 484);
 
     fseek(fp, u64, SEEK_CUR);
     fread(&u32, sizeof(uint32_t), 1, fp);
-    if (u32 != 2)
-        return 1;
+    assert_equal_int(u32, 2);
 
     fread(&u64, sizeof(uint64_t), 1, fp);
-    if (u64 != 0)
-        return 1;
+    assert_equal_uint64(u64, 0);
 
     fread(&u64, sizeof(uint64_t), 1, fp);
-    if (u64 != 179)
-        return 1;
+    assert_equal_uint64(u64, 179);
 
     fseek(fp, 13 + 4 + 8, SEEK_SET);
     fread(&u64, sizeof(uint64_t), 1, fp);
-    if (u64 != 98)
-        return 1;
+    assert_equal_uint64(u64, 98);
 
-    fclose(fp);
     return 0;
 }
 
@@ -80,14 +75,13 @@ int use_index(const char *filepath) {
     }
 
     int nparts = bgen_metafile_nparts(v);
-    if (nparts != 2)
-        return 1;
+    assert_equal_int(nparts, 2);
 
     int nvars = bgen_metafile_nvars(v);
-    if (nvars != 10)
-        return 1;
+    assert_equal_int(nvars, 10);
 
     struct bgen_vm *vm = bgen_read_partition(v, 0, &nvariants);
+    assert_not_null(vm);
 
     assert_equal_int(vm[0].id.len, 0);
     assert_equal_int(vm[0].rsid.len, 2);

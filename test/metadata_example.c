@@ -1,4 +1,5 @@
 #include "bgen.h"
+#include "cass.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -13,8 +14,7 @@ int main() {
 
     v = bgen_load_variants_metadata(bgen, "data/wrong.metadata", &index, 0);
     bgen_close(bgen);
-    if (v != NULL)
-        return 1;
+    assert_null(v);
 
     return 0;
 }
