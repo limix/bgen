@@ -23,6 +23,7 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
     do {                                                                                \
         fputs("Error: ", stderr);                                                       \
         fprintf(stderr, __VA_ARGS__);                                                   \
+        fprintf(stderr, ": ");                                                          \
         perror("");                                                                     \
     } while (0)
 

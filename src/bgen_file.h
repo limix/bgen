@@ -1,6 +1,7 @@
 #ifndef BGEN_BGEN_FILE_H
 #define BGEN_BGEN_FILE_H
 
+#include "io.h"
 #include <stdio.h>
 
 struct bgen_file {

@@ -8,9 +8,15 @@
 #undef ASSERT
 #endif
 
+void assertion_message(const char *file, int line, const char *msg) {
+    fprintf(stderr, "Fail at %s:%d: %s\n", file, line, msg);
+}
+
 #define ASSERT(x)                                                                       \
-    if (!(x))                                                                           \
-        return 1;
+    if (!(x)) {                                                                         \
+        assertion_message(__FILE__, __LINE__, "'" #x "' should be TRUE");               \
+        return 1;                                                                       \
+    }
 
 int create_index(const char *bgen_filepath, const char *filepath);
 int use_index(const char *filepath);
@@ -31,11 +37,9 @@ int main() {
 int create_index(const char *bgen_filepath, const char *filepath) {
     struct bgen_file *bgen;
 
-    if ((bgen = bgen_open(bgen_filepath)) == NULL)
-        return 1;
+    ASSERT((bgen = bgen_open(bgen_filepath)) != NULL)
 
-    if (bgen_create_metafile(bgen, filepath, 1))
-        return 1;
+    ASSERT(bgen_create_metafile(bgen, filepath, 1) != 0)
 
     bgen_close(bgen);
 
@@ -45,16 +49,14 @@ int create_index(const char *bgen_filepath, const char *filepath) {
     header[13] = '\0';
     fread(header, 13 * sizeof(char), 1, fp);
 
-    if (strncmp(header, "bgen index 03", 13))
-        return 1;
+    ASSERT(strncmp(header, "bgen index 03", 13) == 0);
 
     uint16_t u16;
     uint32_t u32;
     uint64_t u64;
 
     fread(&u32, sizeof(uint32_t), 1, fp);
-    if (u32 != 10)
-        return 1;
+    ASSERT(u32 == 10);
 
     fread(&u64, sizeof(uint64_t), 1, fp);
     if (u64 != 484)
@@ -83,7 +85,7 @@ int create_index(const char *bgen_filepath, const char *filepath) {
 }
 
 int use_index(const char *filepath) {
-    struct bgen_idx *v;
+    struct bgen_mf *v;
     int nvariants;
     size_t i, j;
 
@@ -99,7 +101,7 @@ int use_index(const char *filepath) {
     if (nvars != 10)
         return 1;
 
-    struct bgen_vm *vm = bgen_read_metavars(v, 0, &nvariants);
+    struct bgen_vm *vm = bgen_read_partition(v, 0, &nvariants);
 
     ASSERT(vm[0].id.len == 0);
     ASSERT(vm[0].rsid.len == 2);

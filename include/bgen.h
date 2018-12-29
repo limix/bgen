@@ -60,6 +60,7 @@ struct bgen_file; /* bgen file handler */
 struct bgen_vi;   /* variant index */
 struct bgen_vg;   /* variant genotype */
 struct bgen_idx;  /* variant metadata index */
+struct bgen_mf;   /* metafile */
 
 /* Variant metadata. */
 struct bgen_var {
@@ -166,13 +167,13 @@ BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
 BGEN_API int bgen_phased(const struct bgen_vg *vg);
 /****************************************************************************************/
 
-BGEN_API int bgen_create_metafile(struct bgen_file *, const char *, int);
-BGEN_API struct bgen_idx *bgen_open_metafile(const char *filepath);
-BGEN_API int bgen_metafile_nparts(struct bgen_idx *);
-BGEN_API int bgen_metafile_nvars(struct bgen_idx *);
-BGEN_API struct bgen_vm *bgen_read_metavars(struct bgen_idx *, int, int *);
+BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *, const char *, int);
+BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
+BGEN_API int bgen_metafile_nparts(struct bgen_mf *);
+BGEN_API int bgen_metafile_nvars(struct bgen_mf *);
+BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *, int, int *);
 BGEN_API void bgen_free_metavars(struct bgen_vm *, int);
-BGEN_API int bgen_close_metafile(struct bgen_idx *);
+BGEN_API int bgen_close_metafile(struct bgen_mf *);
 
 #ifdef __cplusplus
 }
