@@ -1,9 +1,9 @@
-/*******************************************************************************
+/***************************************************************************************
  * Project: bgen
  * Purpose: BGEN file reader
  * Author: Danilo Horta, danilo.horta@gmail.com
  * Language: C
- *******************************************************************************
+ ***************************************************************************************
  * The MIT License (MIT)
  *
  * Copyright (c) 2018 Danilo Horta
@@ -25,7 +25,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
- ******************************************************************************/
+ **************************************************************************************/
 #ifndef BGEN_BGEN_H
 #define BGEN_BGEN_H
 
@@ -83,9 +83,9 @@ struct bgen_vm {
     struct bgen_str *allele_ids;
 };
 
-/****************************************************************************************
+/***************************************************************************************
  * bgen_file specific functions. They don't require any pass over the bgen file.
- ****************************************************************************************/
+ **************************************************************************************/
 /* Open a file and return a bgen file handler. */
 BGEN_API struct bgen_file *bgen_open(const char *filepath);
 /* Close a bgen file handler. */
@@ -100,9 +100,9 @@ BGEN_API int bgen_contain_sample(const struct bgen_file *bgen);
 BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
 BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_str *);
-/****************************************************************************************/
+/**************************************************************************************/
 
-/****************************************************************************************
+/***************************************************************************************
  * Read variants metadata and generate variants index for bgen index versions 01-02.
  *
  *  DEPRECATED: Please, use `bgen_create_index_file` and its related functions instead.
@@ -119,7 +119,8 @@ BGEN_API void bgen_free_samples(const struct bgen_file *, struct bgen_str *);
  *  Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
  * after use.
  */
-BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *, struct bgen_vi **, int);
+BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *, struct bgen_vi **,
+                                             int);
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *, struct bgen_var *);
 BGEN_API void bgen_free_index(struct bgen_vi *);
 /* Store variants metadata. */
@@ -138,9 +139,9 @@ BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *,
 BGEN_API int bgen_create_variants_metadata_file(const char *, const char *, int);
 /* Get the maximum number of alleles across the entire file. */
 BGEN_API int bgen_max_nalleles(struct bgen_vi *);
-/****************************************************************************************/
+/**************************************************************************************/
 
-/****************************************************************************************
+/***************************************************************************************
  * Query a variant genotype.
  *
  * Open it, query it, and then close it.
@@ -165,7 +166,7 @@ BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg);
 BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
 /* Return 1 for phased or 0 for unphased genotype. */
 BGEN_API int bgen_phased(const struct bgen_vg *vg);
-/****************************************************************************************/
+/**************************************************************************************/
 
 BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *, const char *, int);
 BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
