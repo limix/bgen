@@ -18,6 +18,7 @@ int main() {
 
     if (use_index(filepath))
         return 1;
+
     return 0;
 }
 
@@ -70,9 +71,7 @@ int use_index(const char *filepath) {
     int nvariants;
     size_t i, j;
 
-    if ((v = bgen_open_metafile(filepath)) == NULL) {
-        return 1;
-    }
+    assert_not_null(v = bgen_open_metafile(filepath));
 
     int nparts = bgen_metafile_nparts(v);
     assert_equal_int(nparts, 2);
@@ -98,7 +97,20 @@ int use_index(const char *filepath) {
     assert_strncmp(vm[4].allele_ids[0].str, "A", 1);
     assert_strncmp(vm[4].allele_ids[1].str, "G", 1);
 
-    if (bgen_close_metafile(v))
-        return 1;
+    bgen_free_partition(vm, nvariants);
+
+    vm = bgen_read_partition(v, 1, &nvariants);
+    assert_not_null(vm);
+
+    assert_equal_int(vm[0].id.len, 0);
+    assert_equal_int(vm[0].rsid.len, 2);
+    assert_strncmp(vm[0].rsid.str, "M6", 2);
+    assert_strncmp(vm[0].chrom.str, "01", 2);
+    assert_equal_int(vm[0].nalleles, 4);
+    assert_strncmp(vm[1].allele_ids[0].str, "A", 1);
+    assert_strncmp(vm[1].allele_ids[1].str, "G", 1);
+
+    assert_equal_int(bgen_close_metafile(v), 0);
+
     return 0;
 }

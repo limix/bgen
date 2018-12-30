@@ -359,4 +359,17 @@ err:
     return NULL;
 }
 
+BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars) {
+    for (size_t i = 0; i < nvars; ++i) {
+        free(vm[i].id.str);
+        free(vm[i].rsid.str);
+        free(vm[i].chrom.str);
+        for (size_t j = 0; j < vm[i].nalleles; ++j) {
+            free(vm[i].allele_ids[j].str);
+        }
+        free(vm[i].allele_ids);
+    }
+    free(vm);
+}
+
 BGEN_API void bgen_free_metavars(struct bgen_vm *vm, int nvars) {}

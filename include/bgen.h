@@ -172,6 +172,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
 BGEN_API int bgen_metafile_nparts(struct bgen_mf *);
 BGEN_API int bgen_metafile_nvars(struct bgen_mf *);
 BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *, int, int *);
+BGEN_API void bgen_free_partition(struct bgen_vm *, int);
 BGEN_API void bgen_free_metavars(struct bgen_vm *, int);
 BGEN_API int bgen_close_metafile(struct bgen_mf *);
 
