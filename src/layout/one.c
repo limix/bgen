@@ -2,15 +2,15 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "depr/variants_index.h"
+#include "geno.h"
 #include "layout/one.h"
-#include "variant_genotype.h"
-#include "variants_index.h"
 
 #include "bgen.h"
 #include "bits.h"
 
-#include "bgen_file.h"
 #include "choose.h"
+#include "file.h"
 #include "mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"

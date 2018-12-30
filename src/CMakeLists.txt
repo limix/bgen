@@ -4,6 +4,8 @@ function(define_sources BASE_DIR _SOURCES)
         bgen.c
         buffer.c
         choose.c
+        depr/tpl.c
+        depr/variants_index.c
         endian.c
         io.c
         layout/one.c
@@ -11,10 +13,8 @@ function(define_sources BASE_DIR _SOURCES)
         mem.c
         metafile.c
         str.c
-        tpl.c
         tpl/tpl.c
         variant.c
-        variants_index.c
         zip/zlib_wrapper.c
         zip/zstd_wrapper.c)
 

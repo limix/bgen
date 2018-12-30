@@ -22,17 +22,17 @@
  * TPL fields not mentioned above.
  */
 
-#include "variants_index.h"
+#include "depr/variants_index.h"
 #include "bgen.h"
-#include "bgen_file.h"
 #include "buffer.h"
+#include "depr/tpl.h"
+#include "file.h"
 #include "mem.h"
-#include "tpl.h"
 #include "tpl/tpl.h"
 #include "zip/zstd_wrapper.h"
 
-#define SET_STR(dst, src)                                                               \
-    (dst)->len = (src)->len;                                                            \
+#define SET_STR(dst, src)                                                              \
+    (dst)->len = (src)->len;                                                           \
     (dst)->str = (src)->str;
 
 typedef struct tpl_string {
@@ -76,8 +76,9 @@ size_t read_genotype_offsets(void *mem, const struct bgen_file *bgen,
                              struct bgen_vi **vi);
 void *read_mem_size(void *mem, uint64_t *block_size);
 
-int bgen_store_variants_metadata(const struct bgen_file *bgen, struct bgen_var *variants,
-                                 struct bgen_vi *index, const char *fp) {
+int bgen_store_variants_metadata(const struct bgen_file *bgen,
+                                 struct bgen_var *variants, struct bgen_vi *index,
+                                 const char *fp) {
 
     struct Buffer *b;
 

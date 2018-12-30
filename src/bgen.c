@@ -2,8 +2,9 @@
 
 #include "bgen.h"
 #include "athr.h"
-#include "bgen_err.h"
-#include "bgen_file.h"
+#include "depr/variants_index.h"
+#include "file.h"
+#include "geno.h"
 #include "index.h"
 #include "io.h"
 #include "layout/one.h"
@@ -11,8 +12,6 @@
 #include "mem.h"
 #include "str.h"
 #include "variant.h"
-#include "variant_genotype.h"
-#include "variants_index.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -229,7 +228,7 @@ BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
         if (verbose)
             athr_consume(at, 1);
 
-        if (read_variant(bgen, variants + i))
+        if (read_next_variant(bgen, variants + i))
             goto err;
 
         (*index)->start[i] = ftell(bgen->file);

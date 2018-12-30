@@ -1,20 +1,17 @@
+#include "layout/two.h"
+#include "bgen.h"
+#include "bits.h"
+#include "choose.h"
+#include "depr/variants_index.h"
+#include "file.h"
+#include "geno.h"
+#include "mem.h"
+#include "zip/zlib_wrapper.h"
+#include "zip/zstd_wrapper.h"
 #include <assert.h>
 #include <math.h>
 #include <stdint.h>
 #include <stdlib.h>
-
-#include "layout/two.h"
-#include "variant_genotype.h"
-#include "variants_index.h"
-
-#include "bgen.h"
-#include "bits.h"
-
-#include "bgen_file.h"
-#include "choose.h"
-#include "mem.h"
-#include "zip/zlib_wrapper.h"
-#include "zip/zstd_wrapper.h"
 
 inline static int bgen_read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
 

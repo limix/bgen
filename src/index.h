@@ -1,5 +1,5 @@
-#ifndef INDEX3_H
-#define INDEX3_H
+#ifndef _BGEN_INDEX_H
+#define _BGEN_INDEX_H
 
 #include "bgen.h"
 #include <stdio.h>
@@ -12,4 +12,4 @@ int write_metafile(struct cmf *, struct bgen_var *(*next)(uint64_t *, void *), v
                    int);
 int close_metafile(struct cmf *);
 
-#endif
+#endif /* _BGEN_INDEX_H */

@@ -1,17 +1,27 @@
 #define BGEN_API_EXPORTS
 
 #include "metafile.h"
-#include "bgen_file.h"
 #include "bits.h"
 #include "endian.h"
+#include "file.h"
 #include "io.h"
 #include "mem.h"
 #include "str.h"
 #include "variant.h"
 #include <assert.h>
 
+struct next_variant_ctx
+{
+    struct bgen_file *bgen;
+    uint32_t nvariants;
+};
+
+/* callback type for fetching the next variant */
+typedef struct bgen_var *(next_variant_t)(uint64_t *, struct next_variant_ctx *);
+
 /* variant metadata index */
-struct bgen_idx {
+struct bgen_idx
+{
     uint32_t nvariants;
     /* block size */
     uint64_t metasize;
@@ -20,18 +30,15 @@ struct bgen_idx {
 };
 
 /* node for creating metadata file */
-struct bgen_mf {
+struct bgen_mf
+{
     char *filepath;
     FILE *fp;
     struct bgen_idx idx;
 };
 
-struct next_variant_ctx {
-    struct bgen_file *bgen;
-    uint32_t nvariants;
-};
-
-static struct bgen_mf *alloc_mf(void) {
+struct bgen_mf *alloc_mf(void)
+{
     struct bgen_mf *mf = dalloc(sizeof(struct bgen_mf));
     if (!mf)
         return NULL;
@@ -43,7 +50,8 @@ static struct bgen_mf *alloc_mf(void) {
     return mf;
 }
 
-static struct bgen_var *next_variant(uint64_t *genotype_offset, void *ctx) {
+struct bgen_var *next_variant(uint64_t *genotype_offset, struct next_variant_ctx *ctx)
+{
     struct bgen_var *variant = dalloc(sizeof(struct bgen_var));
     struct next_variant_ctx *self = ctx;
     uint32_t length;
@@ -51,7 +59,7 @@ static struct bgen_var *next_variant(uint64_t *genotype_offset, void *ctx) {
     if (self->nvariants == 0)
         goto err;
 
-    if (read_variant(self->bgen, variant))
+    if (read_next_variant(self->bgen, variant))
         goto err;
 
     *genotype_offset = ftell(self->bgen->file);
@@ -70,7 +78,8 @@ err:
     return free_nul(variant);
 }
 
-struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts) {
+struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts)
+{
     struct bgen_mf *mf = alloc_mf();
     if (!mf)
         goto err;
@@ -108,7 +117,8 @@ err:
     return NULL;
 }
 
-static uint64_t write_variant(FILE *fp, const struct bgen_var *v, uint64_t offset) {
+uint64_t write_variant(FILE *fp, const struct bgen_var *v, uint64_t offset)
+{
     long start = ftell(fp);
 
     fwrite_ui64(fp, offset, 8);
@@ -124,9 +134,14 @@ static uint64_t write_variant(FILE *fp, const struct bgen_var *v, uint64_t offse
     return ftell(fp) - start;
 }
 
-static int write_metafile(struct bgen_mf *mf,
-                          struct bgen_var *(*next)(uint64_t *, void *), void *cb_args,
-                          int verbose) {
+/* Write the body of the metafile.
+ *
+ * It consists in two blocks of data:
+ *  - The block containing the variants metadata.
+ *  - The block containing the offsets to the partitions of variants metadata.
+ */
+int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int verbose)
+{
     struct bgen_var *v = NULL;
     uint64_t size;
     uint64_t offset;
@@ -137,7 +152,8 @@ static int write_metafile(struct bgen_mf *mf,
 
     mf->idx.offset[0] = 0;
     size_t i = 0, j = 0;
-    while ((v = next(&offset, cb_args)) != NULL) {
+    /* Write the first block. */
+    while ((v = next(&offset, args)) != NULL) {
 
         if ((size = write_variant(mf->fp, v, offset)) == 0)
             goto err;
@@ -154,6 +170,7 @@ static int write_metafile(struct bgen_mf *mf,
 
     fwrite_ui32(mf->fp, mf->idx.npartitions, sizeof(mf->idx.npartitions));
 
+    /* Write the first block. */
     for (i = 0; i < mf->idx.npartitions; ++i)
         fwrite_ui64(mf->fp, mf->idx.offset[i], sizeof(mf->idx.offset[i]));
 
@@ -168,12 +185,13 @@ err:
     return 1;
 }
 
-BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen,
-                                              const char *filepath, int verbose) {
+BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char *fp,
+                                              int verbose)
+{
     assert(bgen);
     assert(filepath);
 
-    struct bgen_mf *mf = create_metafile(filepath, bgen_nvariants(bgen), 2);
+    struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), 2);
     if (!mf)
         goto err;
 
@@ -202,7 +220,8 @@ err:
     return NULL;
 }
 
-BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath) {
+BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
+{
     struct bgen_mf *mf = alloc_mf();
     if (!mf)
         goto err;
@@ -251,7 +270,8 @@ err:
     return NULL;
 }
 
-BGEN_API int bgen_close_metafile(struct bgen_mf *mf) {
+BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
+{
     assert(mf);
 
     free_nul(mf->idx.offset);
@@ -261,17 +281,20 @@ BGEN_API int bgen_close_metafile(struct bgen_mf *mf) {
     return 0;
 }
 
-BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf) {
+BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf)
+{
     assert(mf);
     return mf->idx.npartitions;
 }
 
-BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf) {
+BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf)
+{
     assert(mf);
     return mf->idx.nvariants;
 }
 
-BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part) {
+BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
+{
     assert(mf);
     assert(part >= 0);
 
@@ -279,7 +302,8 @@ BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part) {
     return MIN(size, mf->idx.nvariants - size * part);
 }
 
-BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *nvars) {
+BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *nvars)
+{
     struct bgen_vm *vars = NULL;
     FILE *fp = NULL;
 
@@ -359,17 +383,21 @@ err:
     return NULL;
 }
 
-BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars) {
+BGEN_API void bgen_free_metainfo(struct bgen_vm *vm)
+{
+    free(vm->id.str);
+    free(vm->rsid.str);
+    free(vm->chrom.str);
+    for (size_t j = 0; j < vm->nalleles; ++j) {
+        free(vm->allele_ids[j].str);
+    }
+    free(vm->allele_ids);
+}
+
+BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars)
+{
     for (size_t i = 0; i < nvars; ++i) {
-        free(vm[i].id.str);
-        free(vm[i].rsid.str);
-        free(vm[i].chrom.str);
-        for (size_t j = 0; j < vm[i].nalleles; ++j) {
-            free(vm[i].allele_ids[j].str);
-        }
-        free(vm[i].allele_ids);
+        bgen_free_metainfo(vm + i);
     }
     free(vm);
 }
-
-BGEN_API void bgen_free_metavars(struct bgen_vm *vm, int nvars) {}

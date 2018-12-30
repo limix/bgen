@@ -1,11 +1,11 @@
 #include "variant.h"
-#include "bgen_file.h"
+#include "file.h"
 #include "mem.h"
 #include "str.h"
 #include <assert.h>
 
 /* It assumes that the bgen file is open. */
-int read_variant(struct bgen_file *bgen, struct bgen_var *v) {
+int read_next_variant(struct bgen_file *bgen, struct bgen_var *v) {
     assert(bgen);
     assert(bgen->file);
     assert(v);

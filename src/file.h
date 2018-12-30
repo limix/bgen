@@ -1,5 +1,5 @@
-#ifndef BGEN_BGEN_FILE_H
-#define BGEN_BGEN_FILE_H
+#ifndef _BGEN_FILE_H
+#define _BGEN_FILE_H
 
 #include "io.h"
 #include <stdio.h>
@@ -22,4 +22,4 @@ struct bgen_file {
         goto err;                                                                      \
     }
 
-#endif /* end of include guard: BGEN_BGEN_FILE_H */
+#endif /* end of include guard: _BGEN_FILE_H */

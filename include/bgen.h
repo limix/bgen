@@ -26,8 +26,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef BGEN_BGEN_H
-#define BGEN_BGEN_H
+#ifndef BGEN_H
+#define BGEN_H
 
 #define BGEN_VERSION_MAJOR 3
 #define BGEN_VERSION_MINOR 0
@@ -49,4 +49,4 @@ extern "C" {
 }
 #endif
 
-#endif /* end of include guard: BGEN_BGEN_H */
+#endif /* end of include guard: BGEN_H */

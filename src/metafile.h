@@ -1,4 +1,5 @@
-/* This module reads and writes the bgen metafile.
+/*
+ * This module reads and writes the bgen metafile, for index version 03.
  *
  * A bgen metafile is defined as follows.
  *
@@ -16,13 +17,18 @@
  *     uint16_t, str : allele id
  *   ], ...
  * ], ...
- *
+ * [ uint32_t : number of partitions ],
+ * [
+ *   [
+ *     uint64_t : partition offset
+ *   ], ...
+ * ]
  */
-#ifndef METAFILE_H
-#define METAFILE_H
+#ifndef _BGEN_METAFILE_H
+#define _BGEN_METAFILE_H
 
 #define BGEN_IDX_NAME "bgen index "
 #define BGEN_IDX_VER "03"
 #define BGEN_HDR_LEN 13
 
-#endif
+#endif /* end of include guard: _BGEN_METAFILE_H */

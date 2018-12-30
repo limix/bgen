@@ -4,13 +4,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void str_alloc(struct bgen_str *v, size_t len) {
+void alloc_str(struct bgen_str *v, size_t len) {
     v->len = len;
     v->str = malloc(len + 1);
     v->str[len] = '\0';
 }
 
-void str_free(struct bgen_str *v) {
+void free_str(struct bgen_str *v) {
     free(v->str);
     v->str = NULL;
     v->len = 0;
@@ -25,7 +25,7 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size) {
         return 1;
     }
 
-    str_alloc(s, len);
+    alloc_str(s, len);
 
     if (fread(s->str, 1, s->len, fp) < (size_t)s->len) {
         perror("Error while freading a string str ");
@@ -51,4 +51,4 @@ int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size) {
     return 0;
 }
 
-void str_printf(struct bgen_str s) { printf("%.*s\n", s.len, s.str); }
+void printf_str(struct bgen_str s) { printf("%.*s\n", s.len, s.str); }

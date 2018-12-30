@@ -1,5 +1,5 @@
-#ifndef IO_H
-#define IO_H
+#ifndef _BGEN_IO_H
+#define _BGEN_IO_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,4 +59,4 @@ DECLARE_TYPE_FWRITE(uint16_t, ui16);
 #undef DECLARE_TYPE_FREAD
 #undef DECLARE_TYPE_FWRITE
 
-#endif
+#endif /* end of include guard: _BGEN_IO_H */

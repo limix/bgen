@@ -1,5 +1,5 @@
-#ifndef BGEN_VARIANT_GENOTYPE_H
-#define BGEN_VARIANT_GENOTYPE_H
+#ifndef _BGEN_VARIANT_GENOTYPE_H
+#define _BGEN_VARIANT_GENOTYPE_H
 
 #include <stddef.h>
 #include <stdint.h>
@@ -16,6 +16,6 @@ struct bgen_vg {
     char *chunk;
     char *current_chunk;
     size_t variant_idx;
-} bgen_vg;
+};
 
-#endif /* end of include guard: BGEN_VARIANT_GENOTYPE_H */
+#endif /* end of include guard: _BGEN_VARIANT_GENOTYPE_H */

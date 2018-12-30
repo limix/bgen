@@ -1,5 +1,5 @@
-#ifndef MEM_H
-#define MEM_H
+#ifndef _BGEN_MEM_H
+#define _BGEN_MEM_H
 
 #include "io.h"
 #include <stdlib.h>
@@ -26,4 +26,4 @@ static inline void *free_nul(void *p) {
 char *bgen_strdup(const char *src);
 void bgen_memcpy(void *dst, char **src, size_t n);
 
-#endif
+#endif /* end of include guard: _BGEN_MEM_H */
