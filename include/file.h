@@ -1,5 +1,5 @@
 /*
- * bgen_file specific functions. They don't require any pass over the bgen file.
+ * Open, close, and query bgen file.
  */
 #ifndef BGEN_FILE_H
 #define BGEN_FILE_H

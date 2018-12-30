@@ -1,7 +1,5 @@
 /*
- * Query a variant genotype.
- *
- * Open it, query it, and then close it.
+ * Open, query, and close a variant genotype.
  */
 #ifndef BGEN_GENO_H
 #define BGEN_GENO_H

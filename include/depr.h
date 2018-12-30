@@ -1,18 +1,18 @@
 /*
- * Read variants metadata and generate variants index for bgen index versions 01-02.
+ * DEPRECATED functions for metadata for bgen index versions 01 and 02.
  *
- *  DEPRECATED: Please, use the functions in the `meta.h` file instead.
+ * Please, use the functions in the `meta.h` file instead.
  *
- *  Reading variants metadata (and generating the variants index) can be costly
- *  as it requires accessing chunks of data across the file. We therefore
- *  provide the functions
- *      - bgen_store_variants_metadata
- *      - bgen_load_variants_metadata
- *      - bgen_create_variants_metadata_file
- *  for storing and reading that information from an additional file. We refer
- *  to this file as variants metadata file.
+ * Reading variants metadata (and generating the variants index) can be costly
+ * as it requires accessing chunks of data across the file. We therefore
+ * provide the functions
+ *     - bgen_store_variants_metadata
+ *     - bgen_load_variants_metadata
+ *     - bgen_create_variants_metadata_file
+ * for storing and reading that information from an additional file. We refer
+ * to this file as variants metadata file.
  *
- *  Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
+ * Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
  * after use.
  */
 #ifndef BGEN_DEPR_H

@@ -1,3 +1,6 @@
+/*
+ * Create and query a metafile.
+ */
 #ifndef BGEN_META_H
 #define BGEN_META_H
 
@@ -9,12 +12,12 @@ struct bgen_mf; /* metafile */
 
 /* Variant metadata. */
 struct bgen_vm {
-    int vaddr;
+    int vaddr; /* variant offset-address */
     struct bgen_str id;
     struct bgen_str rsid;
     struct bgen_str chrom;
-    int position;
-    int nalleles;
+    int position; /* base-pair position */
+    int nalleles; /* number of alleles */
     struct bgen_str *allele_ids;
 };
 
