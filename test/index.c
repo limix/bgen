@@ -3,6 +3,7 @@
 #include "str.h"
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int create_index(const char *bgen_filepath, const char *filepath);

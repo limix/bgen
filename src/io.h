@@ -19,25 +19,25 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
     return fread(buffer, size, 1, stream) != 1;
 }
 
-#define perror_fmt(...)                                                                 \
-    do {                                                                                \
-        fputs("Error: ", stderr);                                                       \
-        fprintf(stderr, __VA_ARGS__);                                                   \
-        fprintf(stderr, ": ");                                                          \
-        perror("");                                                                     \
+#define perror_fmt(...)                                                                \
+    do {                                                                               \
+        fputs("Error: ", stderr);                                                      \
+        fprintf(stderr, __VA_ARGS__);                                                  \
+        fprintf(stderr, ": ");                                                         \
+        perror("");                                                                    \
     } while (0)
 
-#define echo(...)                                                                       \
-    do {                                                                                \
-        printf(__VA_ARGS__);                                                            \
-        puts("");                                                                       \
+#define echo(...)                                                                      \
+    do {                                                                               \
+        printf(__VA_ARGS__);                                                           \
+        puts("");                                                                      \
     } while (0)
 
-#define error(...)                                                                      \
-    do {                                                                                \
-        fputs("Error: ", stderr);                                                       \
-        fprintf(stderr, __VA_ARGS__);                                                   \
-        fputs("\n", stderr);                                                            \
+#define error(...)                                                                     \
+    do {                                                                               \
+        fputs("Error: ", stderr);                                                      \
+        fprintf(stderr, __VA_ARGS__);                                                  \
+        fputs("\n", stderr);                                                           \
     } while (0)
 
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE *, TYPE *, size_t);

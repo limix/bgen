@@ -16,10 +16,10 @@ struct bgen_file {
     int variants_start;
 };
 
-#define bopen_or_leave(BGEN)                                                            \
-    if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                  \
-        perror_fmt("Could not open bgen file %s", BGEN->filepath);                      \
-        goto err;                                                                       \
+#define bopen_or_leave(BGEN)                                                           \
+    if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                 \
+        perror_fmt("Could not open bgen file %s", BGEN->filepath);                     \
+        goto err;                                                                      \
     }
 
 #endif /* end of include guard: BGEN_BGEN_FILE_H */

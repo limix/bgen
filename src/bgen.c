@@ -187,7 +187,8 @@ err:
     return free_nul(sample_ids);
 }
 
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *samples) {
+BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
+                                struct bgen_str *samples) {
     assert(bgen);
     assert(samples);
 

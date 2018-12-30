@@ -1,6 +1,7 @@
 #include "bgen.h"
 #include <float.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 int main() {
@@ -36,12 +37,12 @@ int main() {
         return 1;
 
     for (i = 0; i < nvariants; ++i) {
-        if (strncmp("A", variants[i].allele_ids[0].str, variants[i].allele_ids[0].len) !=
-            0)
+        if (strncmp("A", variants[i].allele_ids[0].str,
+                    variants[i].allele_ids[0].len) != 0)
             return 1;
 
-        if (strncmp("G", variants[i].allele_ids[1].str, variants[i].allele_ids[1].len) !=
-            0)
+        if (strncmp("G", variants[i].allele_ids[1].str,
+                    variants[i].allele_ids[1].len) != 0)
             return 1;
     }
 
