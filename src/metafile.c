@@ -386,7 +386,7 @@ err:
 BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars)
 {
     for (size_t i = 0; i < nvars; ++i) {
-        bgen_free_metadata(vm + i);
+        free_metadata(vm + i);
     }
     free(vm);
 }

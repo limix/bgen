@@ -1,5 +1,3 @@
-#define BGEN_API_EXPORTS
-
 #include "variant.h"
 #include "file.h"
 #include "mem.h"
@@ -70,7 +68,7 @@ struct bgen_vm *alloc_metadata(void)
     return v;
 }
 
-BGEN_API void bgen_free_metadata(struct bgen_vm *v)
+void free_metadata(struct bgen_vm *v)
 {
     free_str(&v->id);
     free_str(&v->rsid);
