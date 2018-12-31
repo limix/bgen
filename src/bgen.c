@@ -210,65 +210,9 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *s
     free(samples);
 }
 
-BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
-                                             struct bgen_vi **index, int verbose) {
-    assert(bgen);
-    assert(index);
-
-    struct bgen_var *variants = NULL;
-    uint32_t length;
-    size_t nvariants;
-    struct athr *at = NULL;
-
-    bopen_or_leave(bgen);
-
-    fseek(bgen->file, bgen->variants_start, SEEK_SET);
-    *index = new_variants_index(bgen);
-
-    nvariants = bgen->nvariants;
-    variants = dalloc(nvariants * sizeof(struct bgen_var));
-
-    if (verbose)
-        at = athr_create(nvariants, "Reading variants", ATHR_BAR);
-
-    for (size_t i = 0; i < nvariants; ++i) {
-        if (verbose)
-            athr_consume(at, 1);
-
-        if (read_next_variant(bgen, variants + i))
-            goto err;
-
-        (*index)->start[i] = ftell(bgen->file);
-
-        if (fread_ui32(bgen->file, &length, 4))
-            goto err;
-
-        if (fseek(bgen->file, length, SEEK_CUR)) {
-            error("Could not jump to a variant.");
-            goto err;
-        }
-
-        if ((variants + i)->nalleles > (*index)->max_nalleles)
-            (*index)->max_nalleles = (variants + i)->nalleles;
-    }
-
-    if (verbose)
-        athr_finish(at);
-
-    fclose(bgen->file);
-
-    return variants;
-
-err:
-    fclose_nul(bgen->file);
-    if (*index)
-        free_nul((*index)->start);
-    free_nul(variants);
-    return free_nul(*index);
-}
-
 BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants) {
+                                          struct bgen_var *variants)
+{
 
     assert(bgen);
     if (!variants)

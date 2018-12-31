@@ -7,7 +7,7 @@
 #include <assert.h>
 
 /* It assumes that the bgen file is open. */
-int read_next_variant(struct bgen_file *bgen, struct bgen_var *v)
+int read_next_variant(struct bgen_file *bgen, struct bgen_vm *v)
 {
     assert(bgen);
     assert(bgen->file);

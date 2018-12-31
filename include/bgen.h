@@ -35,7 +35,8 @@
 #define BGEN_VERSION "3.0.0"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "api.h"

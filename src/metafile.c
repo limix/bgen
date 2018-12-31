@@ -17,7 +17,7 @@ struct next_variant_ctx
 };
 
 /* callback type for fetching the next variant */
-typedef struct bgen_var *(next_variant_t)(uint64_t *, struct next_variant_ctx *);
+typedef struct bgen_vm *(next_variant_t)(uint64_t *, struct next_variant_ctx *);
 
 /* variant metadata index */
 struct bgen_idx
@@ -50,9 +50,9 @@ struct bgen_mf *alloc_mf(void)
     return mf;
 }
 
-struct bgen_var *next_variant(uint64_t *genotype_offset, struct next_variant_ctx *ctx)
+struct bgen_vm *next_variant(uint64_t *genotype_offset, struct next_variant_ctx *ctx)
 {
-    struct bgen_var *variant = dalloc(sizeof(struct bgen_var));
+    struct bgen_vm *variant = alloc_metadata();
     struct next_variant_ctx *self = ctx;
     uint32_t length;
 
@@ -117,7 +117,7 @@ err:
     return NULL;
 }
 
-uint64_t write_variant(FILE *fp, const struct bgen_var *v, uint64_t offset)
+uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
 {
     long start = ftell(fp);
 
@@ -142,7 +142,7 @@ uint64_t write_variant(FILE *fp, const struct bgen_var *v, uint64_t offset)
  */
 int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int verbose)
 {
-    struct bgen_var *v = NULL;
+    struct bgen_vm *v = NULL;
     uint64_t size;
     uint64_t offset;
 

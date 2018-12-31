@@ -6,6 +6,7 @@ function(define_sources BASE_DIR _SOURCES)
         choose.c
         depr/tpl.c
         depr/variants_index.c
+        depr/variant.c
         endian.c
         io.c
         layout/one.c
