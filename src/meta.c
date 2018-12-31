@@ -17,7 +17,7 @@ struct next_variant_ctx
 };
 
 /* callback type for fetching the next variant */
-typedef struct bgen_vm *(next_variant_t)(uint64_t *, struct next_variant_ctx *);
+typedef int(next_variant_t)(struct bgen_vm *, uint64_t *, struct next_variant_ctx *);
 
 /* variant metadata index */
 struct bgen_idx
@@ -50,32 +50,38 @@ struct bgen_mf *alloc_mf(void)
     return mf;
 }
 
-struct bgen_vm *next_variant(uint64_t *genotype_offset, struct next_variant_ctx *ctx)
+void free_mf(struct bgen_mf *mf)
 {
-    struct bgen_vm *variant = alloc_metadata();
-    struct next_variant_ctx *self = ctx;
+    if (mf) {
+        mf->filepath = free_nul(mf->filepath);
+        mf->fp = fclose_nul(mf->fp);
+        mf->idx.offset = free_nul(mf->idx.offset);
+    }
+    free_nul(mf);
+}
+
+int next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant_ctx *c)
+{
+    if (c->nvariants == 0)
+        goto err;
+
+    if (read_next_variant(c->bgen, vm))
+        goto err;
+
+    *geno_offset = ftell(c->bgen->file);
+
     uint32_t length;
-
-    if (self->nvariants == 0)
+    if (fread_ui32(c->bgen->file, &length, 4))
         goto err;
 
-    if (read_next_variant(self->bgen, variant))
-        goto err;
-
-    *genotype_offset = ftell(self->bgen->file);
-
-    if (fread_ui32(self->bgen->file, &length, 4))
-        goto err;
-
-    if (fseek(self->bgen->file, length, SEEK_CUR)) {
+    if (fseek(c->bgen->file, length, SEEK_CUR)) {
         perror_fmt("Could not jump to the next variant");
         goto err;
     }
 
-    --(self->nvariants);
-    return variant;
+    return --(c->nvariants);
 err:
-    return free_nul(variant);
+    return 0;
 }
 
 struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts)
@@ -83,9 +89,6 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
     struct bgen_mf *mf = alloc_mf();
     if (!mf)
         goto err;
-
-    mf->idx.offset = NULL;
-    mf->fp = NULL;
 
     if (!is_little_endian()) {
         error("This program does not support big-endian platforms yet.");
@@ -111,9 +114,7 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
 
     return mf;
 err:
-    if (mf)
-        fclose_nul(mf->fp);
-    free_nul(mf);
+    free_mf(mf);
     return NULL;
 }
 
@@ -142,7 +143,7 @@ uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
  */
 int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int verbose)
 {
-    struct bgen_vm *v = NULL;
+    struct bgen_vm vm;
     uint64_t size;
     uint64_t offset;
 
@@ -153,9 +154,9 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     mf->idx.offset[0] = 0;
     size_t i = 0, j = 0;
     /* Write the first block. */
-    while ((v = next(&offset, args)) != NULL) {
+    while (next(&vm, &offset, args)) {
 
-        if ((size = write_variant(mf->fp, v, offset)) == 0)
+        if ((size = write_variant(mf->fp, &vm, offset)) == 0)
             goto err;
 
         if (i % (mf->idx.nvariants / mf->idx.npartitions) == 0) {
@@ -165,7 +166,6 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
 
         mf->idx.offset[j] += size;
         ++i;
-        v = free_nul(v);
     }
 
     fwrite_ui32(mf->fp, mf->idx.npartitions, sizeof(mf->idx.npartitions));
@@ -178,10 +178,8 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     fwrite_ui64(mf->fp, mf->idx.offset[mf->idx.npartitions], 4);
 
     return 0;
-
 err:
     mf->idx.offset = free_nul(mf->idx.offset);
-    free_nul(v);
     return 1;
 }
 
@@ -195,9 +193,9 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     if (!mf)
         goto err;
 
-    struct next_variant_ctx next_ctx;
-    next_ctx.bgen = bgen;
-    next_ctx.nvariants = bgen_nvariants(bgen);
+    struct next_variant_ctx ctx;
+    ctx.bgen = bgen;
+    ctx.nvariants = bgen_nvariants(bgen);
 
     bopen_or_leave(bgen);
 
@@ -206,7 +204,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
         goto err;
     }
 
-    if (write_metafile(mf, &next_variant, &next_ctx, verbose))
+    if (write_metafile(mf, &next_variant, &ctx, verbose))
         goto err;
 
     if (bgen_close_metafile(mf))
@@ -358,28 +356,27 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
 err:
     if (vars != NULL) {
         for (i = 0; i < *nvars; ++i) {
+            free_metadata(vars + i);
+            /* if (vars[i].id.str != NULL) */
+            /*     free(vars[i].id.str); */
 
-            if (vars[i].id.str != NULL)
-                free(vars[i].id.str);
+            /* if (vars[i].rsid.str != NULL) */
+            /*     free(vars[i].rsid.str); */
 
-            if (vars[i].rsid.str != NULL)
-                free(vars[i].rsid.str);
+            /* if (vars[i].chrom.str != NULL) */
+            /*     free(vars[i].chrom.str); */
 
-            if (vars[i].chrom.str != NULL)
-                free(vars[i].chrom.str);
-
-            if (vars[i].allele_ids != NULL) {
-                for (j = 0; j < vars[i].nalleles; ++j) {
-                    if (vars[i].allele_ids[j].str != NULL)
-                        free(vars[i].allele_ids[j].str);
-                }
-                free(vars[i].allele_ids);
-            }
+            /* if (vars[i].allele_ids != NULL) { */
+            /*     for (j = 0; j < vars[i].nalleles; ++j) { */
+            /*         if (vars[i].allele_ids[j].str != NULL) */
+            /*             free(vars[i].allele_ids[j].str); */
+            /*     } */
+            /*     free(vars[i].allele_ids); */
+            /* } */
         }
         free(vars);
     }
-    if (fp != NULL)
-        fclose(fp);
+    fclose_nul(fp);
     return NULL;
 }
 

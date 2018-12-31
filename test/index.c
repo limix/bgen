@@ -51,7 +51,7 @@ int create_index(const char *bgen_filepath, const char *filepath)
     assert_equal_int(u32, 10);
 
     assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
-    assert_equal_uint64(u64, 484);
+    assert_equal_uint64(u64, 449);
 
     fseek(fp, u64, SEEK_CUR);
     assert_equal_int(fread(&u32, sizeof(uint32_t), 1, fp), 1);
