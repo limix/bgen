@@ -160,24 +160,19 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     size_t i = 0, j = 0;
     /* Write the first block. */
     while (next(&vm, &offset, args)) {
-        printf("writing next\n");
 
         if ((size = write_variant(mf->fp, &vm, offset)) == 0)
             goto err;
-        printf("variant size %ld\n", size);
 
         if (i % (mf->idx.nvariants / mf->idx.npartitions) == 0) {
             ++j;
             mf->idx.offset[j] = mf->idx.offset[j - 1];
-            printf("updating offset %d: %ld\n", j, mf->idx.offset[j]);
         }
 
         mf->idx.offset[j] += size;
-        printf("offset for %d: %ld\n", j, mf->idx.offset[j]);
         ++i;
         free_metadata(&vm);
     }
-    printf("i: %ld\n", i);
 
     fwrite_ui32(mf->fp, mf->idx.npartitions, sizeof(mf->idx.npartitions));
 
@@ -342,33 +337,24 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         goto err;
     }
 
-    printf("fseek: %lld\n", mf->idx.offset[part]);
     if (fseek(fp, mf->idx.offset[part], SEEK_CUR)) {
         perror("Could not fseek bgen index file");
         goto err;
     }
 
-    printf("nvars: %ld\n", *nvars);
     for (i = 0; i < *nvars; ++i) {
         fread_int(fp, &vars[i].vaddr, 8);
-        printf("vaddr: %ld\n", vars[i].vaddr);
 
         fread_str(fp, &vars[i].id, 2);
         fread_str(fp, &vars[i].rsid, 2);
         fread_str(fp, &vars[i].chrom, 2);
-        printf("id: %.*s\n", vars[i].id.len, vars[i].id.str);
-        printf("rsid: %.*s\n", vars[i].rsid.len, vars[i].rsid.str);
-        printf("chrom: %.*s\n", vars[i].chrom.len, vars[i].chrom.str);
 
         fread_int(fp, &vars[i].position, 4);
-        printf("position: %ld\n", vars[i].position);
         fread_int(fp, &vars[i].nalleles, 2);
-        printf("nalleles: %d\n", vars[i].nalleles);
         vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
 
         for (j = 0; j < vars[i].nalleles; ++j) {
             fread_str(fp, vars[i].allele_ids + j, 4);
-            printf_str(vars[i].allele_ids[j]);
         }
     }
 
