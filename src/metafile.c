@@ -383,21 +383,10 @@ err:
     return NULL;
 }
 
-BGEN_API void bgen_free_metainfo(struct bgen_vm *vm)
-{
-    free(vm->id.str);
-    free(vm->rsid.str);
-    free(vm->chrom.str);
-    for (size_t j = 0; j < vm->nalleles; ++j) {
-        free(vm->allele_ids[j].str);
-    }
-    free(vm->allele_ids);
-}
-
 BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars)
 {
     for (size_t i = 0; i < nvars; ++i) {
-        bgen_free_metainfo(vm + i);
+        bgen_free_metadata(vm + i);
     }
     free(vm);
 }

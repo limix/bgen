@@ -57,26 +57,26 @@ err:
     return 1;
 }
 
-// struct bgen_vm *alloc_metadata()
-// {
-//     struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
-//     v->allele_ids = NULL;
-//     v->id.str = NULL;
-//     v->rsid.str = NULL;
-//     v->chrom.str = NULL;
-//     v->position = -1;
-//     v->nalleles = -1;
-//     return v;
-// }
+struct bgen_vm *alloc_metadata(void)
+{
+    struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
+    v->allele_ids = NULL;
+    v->id.str = NULL;
+    v->rsid.str = NULL;
+    v->chrom.str = NULL;
+    v->position = -1;
+    v->nalleles = -1;
+    return v;
+}
 
-// BGEN_API void bgen_free_metadata(struct bgen_vm *v)
-// {
-//     free_str(&v->id);
-//     free_str(&v->rsid);
-//     free_str(&v->chrom);
-//     if (v->allele_ids) {
-//         for (size_t i = 0; i < v->nalleles; ++i)
-//             free_str(v->allele_ids + i);
-//     }
-//     free_nul(v->allele_ids);
-// }
+BGEN_API void bgen_free_metadata(struct bgen_vm *v)
+{
+    free_str(&v->id);
+    free_str(&v->rsid);
+    free_str(&v->chrom);
+    if (v->allele_ids) {
+        for (size_t i = 0; i < v->nalleles; ++i)
+            free_str(v->allele_ids + i);
+    }
+    free_nul(v->allele_ids);
+}
