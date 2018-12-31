@@ -15,8 +15,8 @@
  * Note: remember to call `bgen_free_variants_metadata` and `bgen_free_index`
  * after use.
  */
-#ifndef BGEN_DEPR_H
-#define BGEN_DEPR_H
+#ifndef BGEN_DEPR_META_H
+#define BGEN_DEPR_META_H
 
 #include "api.h"
 #include "file.h"
@@ -55,4 +55,4 @@ BGEN_API int bgen_create_variants_metadata_file(const char *, const char *, int)
 /* Get the maximum number of alleles across the entire file. */
 BGEN_API int bgen_max_nalleles(struct bgen_vi *);
 
-#endif /* BGEN_DEPR_H */
+#endif /* BGEN_DEPR_META_H */

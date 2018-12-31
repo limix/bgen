@@ -40,7 +40,8 @@ extern "C"
 #endif
 
 #include "api.h"
-#include "depr.h"
+#include "depr_bgen.h"
+#include "depr_meta.h"
 #include "file.h"
 #include "geno.h"
 #include "meta.h"

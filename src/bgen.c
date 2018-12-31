@@ -210,42 +210,7 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *s
     free(samples);
 }
 
-BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants)
-{
-
-    assert(bgen);
-    if (!variants)
-        return;
-
-    for (size_t i = 0; i < bgen->nvariants; ++i) {
-        for (size_t j = 0; j < variants[i].nalleles; ++j) {
-            free_nul(variants[i].allele_ids[j].str);
-        }
-        free_nul(variants[i].allele_ids);
-        free_nul(variants[i].id.str);
-        free_nul(variants[i].rsid.str);
-        free_nul(variants[i].chrom.str);
-    }
-    free_nul(variants);
-}
-
-BGEN_API void bgen_free_index(struct bgen_vi *index)
-{
-    if (index) {
-        free_nul(index->filepath);
-        free_nul(index->start);
-    }
-    free_nul(index);
-}
-
-BGEN_API int bgen_max_nalleles(struct bgen_vi *vi)
-{
-    assert(vi);
-    return vi->max_nalleles;
-}
-
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index)
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vi *vi, size_t index)
 {
 
     assert(vi);
@@ -286,8 +251,8 @@ err:
     return free_nul(vg);
 }
 
-BGEN_API int bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
-                                        double *probs)
+BGEN_API int bgen_read_genotype(struct bgen_vi *index, struct bgen_vg *vg,
+                                double *probs)
 {
     assert(index);
     assert(vg);
@@ -304,7 +269,7 @@ BGEN_API int bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *v
     return 0;
 }
 
-BGEN_API void bgen_close_variant_genotype(struct bgen_vg *vg)
+BGEN_API void bgen_close_genotype(struct bgen_vg *vg)
 {
     if (vg) {
         free_nul(vg->chunk);

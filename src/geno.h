@@ -4,7 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-struct bgen_vg {
+struct bgen_vg
+{
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t phased;

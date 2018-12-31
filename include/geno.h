@@ -11,11 +11,11 @@ struct bgen_vi; /* variant index */
 struct bgen_vg; /* variant genotype */
 
 /* Open a variant for genotype queries. */
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vi *vi, size_t index);
 /* Close a variant genotype handler. */
-BGEN_API void bgen_close_variant_genotype(struct bgen_vg *vg);
+BGEN_API void bgen_close_genotype(struct bgen_vg *vg);
 /* Read the probabilities of each possible genotype. */
-BGEN_API int bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *, double *);
+BGEN_API int bgen_read_genotype(struct bgen_vi *, struct bgen_vg *, double *);
 /* Get the number of alleles. */
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */
