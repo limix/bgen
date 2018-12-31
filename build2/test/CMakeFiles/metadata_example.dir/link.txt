@@ -1,0 +1,1 @@
+/usr/bin/cc -g  -rdynamic CMakeFiles/metadata_example.dir/metadata_example.c.o  -o metadata_example -Wl,-rpath,/bgen/build2:/usr/local/lib ../libbgen.so.3.0.0 -lz /usr/local/lib/libzstd.so /usr/local/lib/libathr.so 

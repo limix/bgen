@@ -145,10 +145,7 @@ uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
 int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int verbose)
 {
     struct bgen_vm vm;
-    vm.id.str = NULL;
-    vm.rsid.str = NULL;
-    vm.chrom.str = NULL;
-    vm.allele_ids = NULL;
+    init_metadata(&vm);
     uint64_t size;
     uint64_t offset;
 
@@ -321,10 +318,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
     int i, j;
     for (i = 0; i < *nvars; ++i) {
-        vars[i].id.str = NULL;
-        vars[i].rsid.str = NULL;
-        vars[i].chrom.str = NULL;
-        vars[i].allele_ids = NULL;
+        init_metadata(vars + i);
     }
 
     if ((fp = fopen(mf->filepath, "rb")) == NULL) {
@@ -363,22 +357,6 @@ err:
     if (vars != NULL) {
         for (i = 0; i < *nvars; ++i) {
             free_metadata(vars + i);
-            /* if (vars[i].id.str != NULL) */
-            /*     free(vars[i].id.str); */
-
-            /* if (vars[i].rsid.str != NULL) */
-            /*     free(vars[i].rsid.str); */
-
-            /* if (vars[i].chrom.str != NULL) */
-            /*     free(vars[i].chrom.str); */
-
-            /* if (vars[i].allele_ids != NULL) { */
-            /*     for (j = 0; j < vars[i].nalleles; ++j) { */
-            /*         if (vars[i].allele_ids[j].str != NULL) */
-            /*             free(vars[i].allele_ids[j].str); */
-            /*     } */
-            /*     free(vars[i].allele_ids); */
-            /* } */
         }
         free(vars);
     }

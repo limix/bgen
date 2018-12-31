@@ -55,9 +55,8 @@ err:
     return 1;
 }
 
-struct bgen_vm *alloc_metadata(void)
+void init_metadata(struct bgen_vm *v)
 {
-    struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
     v->vaddr = -1;
     v->allele_ids = NULL;
     v->id.str = NULL;
@@ -65,6 +64,13 @@ struct bgen_vm *alloc_metadata(void)
     v->chrom.str = NULL;
     v->position = -1;
     v->nalleles = -1;
+}
+
+struct bgen_vm *alloc_metadata(void)
+{
+    struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
+    if (v)
+        init_metadata(v);
     return v;
 }
 
