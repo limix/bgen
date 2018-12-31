@@ -5,11 +5,12 @@ function(define_sources BASE_DIR _SOURCES)
         buffer.c
         choose.c
         depr/tpl.c
-        depr/variants_index.c
         depr/variant.c
+        depr/variants_index.c
         endian.c
-        io.c
         file.c
+        geno.c
+        io.c
         layout/one.c
         layout/two.c
         mem.c

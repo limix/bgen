@@ -9,7 +9,8 @@
 #define BGEN_INDEX_VERSION "02"
 #define BGEN_HEADER_LENGTH 13
 
-struct bgen_vi {
+struct bgen_vi
+{
     char *filepath;
     uint32_t compression;
     uint32_t layout;

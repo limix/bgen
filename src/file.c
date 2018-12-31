@@ -1,9 +1,71 @@
 #define BGEN_API_EXPORTS
 
 #include "file.h"
+#include "athr.h"
 #include "bgen.h"
 #include "mem.h"
+#include "str.h"
 #include <assert.h>
+
+/*
+ * Read the header block defined as follows:
+ *
+ *   header length: 4 bytes
+ *   number of variants: 4 bytes
+ *   number of samples: 4 bytes
+ *   magic number: 4 bytes
+ *   unused space: header length minus 20 bytes
+ *   bgen flags: 4 bytes
+ */
+int read_bgen_header(struct bgen_file *bgen)
+{
+    assert(bgen);
+
+    uint32_t header_length;
+    uint32_t magic_number;
+    uint32_t flags;
+
+    if (fread_ui32(bgen->file, &header_length, 4)) {
+        error("Could not read the header length.");
+        return 1;
+    }
+
+    if (fread_int(bgen->file, &bgen->nvariants, 4)) {
+        error("Could not read the number of variants.");
+        return 1;
+    }
+
+    if (fread_int(bgen->file, &bgen->nsamples, 4)) {
+        error("Could not read the number of samples.");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &magic_number, 4)) {
+        error("Could not read the magic number.");
+        return 1;
+    }
+
+    if (magic_number != 1852139362) {
+        error("This is not a BGEN file: magic number mismatch.");
+        return 1;
+    }
+
+    if (fseek(bgen->file, header_length - 20, SEEK_CUR)) {
+        error("Fseek error while reading a BGEN file.");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &flags, 4)) {
+        error("Could not read the bgen flags.");
+        return 1;
+    }
+
+    bgen->compression = flags & 3;
+    bgen->layout = (flags & (15 << 2)) >> 2;
+    bgen->contain_sample = (flags & (1 << 31)) >> 31;
+
+    return 0;
+}
 
 BGEN_API struct bgen_file *bgen_open(const char *filepath)
 {
@@ -26,7 +88,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
 
     bgen->variants_start += 4;
 
-    if (bgen_read_header(bgen)) {
+    if (read_bgen_header(bgen)) {
         error("Could not read bgen header.");
         goto err;
     }
