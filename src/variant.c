@@ -77,5 +77,5 @@ void free_metadata(struct bgen_vm *v)
         for (size_t i = 0; i < v->nalleles; ++i)
             free_str(v->allele_ids + i);
     }
-    free_nul(v->allele_ids);
+    v->allele_ids = free_nul(v->allele_ids);
 }

@@ -13,7 +13,7 @@
  *   uint32_t,       : genetic position
  *   uint16_t,       : number of alleles
  *   [
- *     uint16_t, str : allele id
+ *     uint32_t, str : allele id
  *   ], ...
  * ], ...
  * [ uint32_t : number of partitions ],
