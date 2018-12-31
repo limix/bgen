@@ -1,7 +1,6 @@
 function(define_sources BASE_DIR _SOURCES)
 
     list(APPEND REL_SOURCES
-        bgen.c
         buffer.c
         choose.c
         depr/tpl.c
@@ -14,7 +13,7 @@ function(define_sources BASE_DIR _SOURCES)
         layout/one.c
         layout/two.c
         mem.c
-        metafile.c
+        meta.c
         str.c
         tpl/tpl.c
         variant.c

@@ -3,4 +3,4 @@
 
 int is_little_endian(void);
 
-#endif /* end of include guard: _BGEN_ENDIAN_H */
+#endif /* _BGEN_ENDIAN_H */

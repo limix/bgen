@@ -10,4 +10,4 @@ void printf_str(struct bgen_str s);
 void alloc_str(struct bgen_str *v, size_t len);
 void free_str(struct bgen_str *v);
 
-#endif /* end of include guard: _BGEN_STR_H */
+#endif /* _BGEN_STR_H */

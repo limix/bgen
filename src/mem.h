@@ -28,4 +28,4 @@ static inline void *free_nul(void *p)
 char *bgen_strdup(const char *src);
 void bgen_memcpy(void *dst, char **src, size_t n);
 
-#endif /* end of include guard: _BGEN_MEM_H */
+#endif /* _BGEN_MEM_H */

@@ -63,4 +63,4 @@ DECLARE_TYPE_FWRITE(uint16_t, ui16);
 #undef DECLARE_TYPE_FREAD
 #undef DECLARE_TYPE_FWRITE
 
-#endif /* end of include guard: _BGEN_IO_H */
+#endif /* _BGEN_IO_H */

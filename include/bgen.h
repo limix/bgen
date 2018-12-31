@@ -51,4 +51,4 @@ extern "C"
 }
 #endif
 
-#endif /* end of include guard: BGEN_H */
+#endif /* BGEN_H */

@@ -11,4 +11,4 @@
 
 #define CEILDIV(x, y) ((x + (y - 1)) / y)
 
-#endif /* end of include guard: _BGEN_BITS_H */
+#endif /* _BGEN_BITS_H */

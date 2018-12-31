@@ -23,4 +23,4 @@ struct bgen_file
         goto err;                                                                      \
     }
 
-#endif /* end of include guard: _BGEN_FILE_H */
+#endif /* _BGEN_FILE_H */

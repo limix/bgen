@@ -19,4 +19,4 @@ struct bgen_vg
     size_t variant_idx;
 };
 
-#endif /* end of include guard: _BGEN_VARIANT_GENOTYPE_H */
+#endif /* _BGEN_VARIANT_GENOTYPE_H */

@@ -14,4 +14,4 @@ int buffer_destroy(struct Buffer *b);
 int buffer_store(const char *fp, struct Buffer *b);
 int buffer_load(const char *fp, struct Buffer *b, int verbose);
 
-#endif /* end of include guard: BUFFER_H */
+#endif /* BUFFER_H */

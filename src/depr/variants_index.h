@@ -22,4 +22,4 @@ struct bgen_vi
 
 struct bgen_vi *new_variants_index(const struct bgen_file *);
 
-#endif /* end of include guard: BGEN_VARIANTS_INDEX_H */
+#endif /* BGEN_VARIANTS_INDEX_H */

@@ -1,6 +1,6 @@
 #define BGEN_API_EXPORTS
 
-#include "metafile.h"
+#include "meta.h"
 #include "bits.h"
 #include "endian.h"
 #include "file.h"

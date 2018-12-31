@@ -3,4 +3,4 @@
 
 int bgen_choose(int n, int k);
 
-#endif /* end of include guard: _BGEN_CHOOSE_H */
+#endif /* _BGEN_CHOOSE_H */

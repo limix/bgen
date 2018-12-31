@@ -7,4 +7,4 @@
 int bgen_read_probs_header_one(struct bgen_vi *, struct bgen_vg *, FILE *);
 void bgen_read_probs_one(struct bgen_vg *, double *);
 
-#endif /* end of include guard: _BGEN_LAYOUT_ONE_H */
+#endif /* _BGEN_LAYOUT_ONE_H */

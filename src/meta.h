@@ -24,11 +24,11 @@
  *   ], ...
  * ]
  */
-#ifndef _BGEN_METAFILE_H
-#define _BGEN_METAFILE_H
+#ifndef _BGEN_META_H
+#define _BGEN_META_H
 
 #define BGEN_IDX_NAME "bgen index "
 #define BGEN_IDX_VER "03"
 #define BGEN_HDR_LEN 13
 
-#endif /* end of include guard: _BGEN_METAFILE_H */
+#endif /* _BGEN_META_H */
