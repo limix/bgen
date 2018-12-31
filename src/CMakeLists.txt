@@ -9,6 +9,7 @@ function(define_sources BASE_DIR _SOURCES)
         depr/variant.c
         endian.c
         io.c
+        file.c
         layout/one.c
         layout/two.c
         mem.c

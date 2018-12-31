@@ -4,7 +4,8 @@
 #include "io.h"
 #include <stdio.h>
 
-struct bgen_file {
+struct bgen_file
+{
     char *filepath;
     FILE *file;
     int nvariants;
