@@ -60,6 +60,7 @@ err:
 struct bgen_vm *alloc_metadata(void)
 {
     struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
+    v->vaddr = -1;
     v->allele_ids = NULL;
     v->id.str = NULL;
     v->rsid.str = NULL;
