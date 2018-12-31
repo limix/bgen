@@ -1,21 +1,25 @@
 #ifndef _BGEN_IO_H
 #define _BGEN_IO_H
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void *fclose_nul(FILE *fp) {
+static inline void *fclose_nul(FILE *fp)
+{
     if (fp)
         fclose(fp);
     return NULL;
 }
 
 static inline int fwrite1(const void *restrict buffer, size_t size,
-                          FILE *restrict stream) {
+                          FILE *restrict stream)
+{
     return fwrite(buffer, size, 1, stream) != 1;
 }
 
-static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stream) {
+static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stream)
+{
     return fread(buffer, size, 1, stream) != 1;
 }
 

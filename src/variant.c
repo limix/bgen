@@ -1,3 +1,5 @@
+#define BGEN_API_EXPORTS
+
 #include "variant.h"
 #include "file.h"
 #include "mem.h"
@@ -5,7 +7,8 @@
 #include <assert.h>
 
 /* It assumes that the bgen file is open. */
-int read_next_variant(struct bgen_file *bgen, struct bgen_var *v) {
+int read_next_variant(struct bgen_file *bgen, struct bgen_var *v)
+{
     assert(bgen);
     assert(bgen->file);
     assert(v);
@@ -53,3 +56,27 @@ err:
     free_nul(v->allele_ids);
     return 1;
 }
+
+// struct bgen_vm *alloc_metadata()
+// {
+//     struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
+//     v->allele_ids = NULL;
+//     v->id.str = NULL;
+//     v->rsid.str = NULL;
+//     v->chrom.str = NULL;
+//     v->position = -1;
+//     v->nalleles = -1;
+//     return v;
+// }
+
+// BGEN_API void bgen_free_metadata(struct bgen_vm *v)
+// {
+//     free_str(&v->id);
+//     free_str(&v->rsid);
+//     free_str(&v->chrom);
+//     if (v->allele_ids) {
+//         for (size_t i = 0; i < v->nalleles; ++i)
+//             free_str(v->allele_ids + i);
+//     }
+//     free_nul(v->allele_ids);
+// }

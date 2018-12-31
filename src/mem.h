@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-static inline void *_dalloc(size_t size, const char *_file_, int _line_) {
+static inline void *_dalloc(size_t size, const char *_file_, int _line_)
+{
     void *p = malloc(size);
     if (p == NULL) {
         error("Error: could not allocate memory at %s, line %d.", _file_, _line_);
@@ -14,7 +15,8 @@ static inline void *_dalloc(size_t size, const char *_file_, int _line_) {
     return p;
 }
 
-static inline void *free_nul(void *p) {
+static inline void *free_nul(void *p)
+{
     if (p != NULL)
         free(p);
     return NULL;

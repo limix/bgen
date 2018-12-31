@@ -8,14 +8,17 @@
 #include <string.h>
 
 #ifndef isnan
-int isnan(double x) {
+int isnan(double x)
+{
 #if defined _MSC_VER
-    union {
+    union
+    {
         __int64 u;
         double f;
     } ieee754;
 #else
-    union {
+    union
+    {
         uint64_t u;
         double f;
     } ieee754;
@@ -26,7 +29,8 @@ int isnan(double x) {
 }
 #endif
 
-int ipow(int base, int exp) {
+int ipow(int base, int exp)
+{
     int result = 1;
     for (;;) {
         if (exp & 1)
@@ -40,7 +44,8 @@ int ipow(int base, int exp) {
     return result;
 }
 
-int test_read_metadata(struct bgen_file *bgen, struct bgen_str *s, struct bgen_var *v) {
+int test_read_metadata(struct bgen_file *bgen, struct bgen_str *s, struct bgen_var *v)
+{
     if (bgen_nsamples(bgen) != 500)
         return 1;
 
@@ -62,7 +67,8 @@ int test_read_metadata(struct bgen_file *bgen, struct bgen_str *s, struct bgen_v
     return 0;
 }
 
-int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
+int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index)
+{
     struct bgen_file *bgen;
     struct bgen_var *v;
     struct bgen_str *s;
@@ -90,7 +96,8 @@ int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index) {
     return 0;
 }
 
-int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
+int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec)
+{
     FILE *f;
     double prob[3];
     double eps = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
@@ -161,7 +168,8 @@ int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec) {
     return 0;
 }
 
-int test_read(const char *bgen_fp, const char *index_fp, int precision) {
+int test_read(const char *bgen_fp, const char *index_fp, int precision)
+{
     struct bgen_vi *index;
 
     if (test_reading(bgen_fp, index_fp, &index))
@@ -175,7 +183,8 @@ int test_read(const char *bgen_fp, const char *index_fp, int precision) {
     return 0;
 }
 
-int main() {
+int main()
+{
 
     size_t i;
 

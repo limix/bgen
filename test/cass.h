@@ -2,6 +2,7 @@
 #define CASS_H
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -12,26 +13,26 @@
     if (!(a == d)) {                                \
         cass_message(__FILE__, __LINE__);           \
         fprintf(stderr, " Items are not equal:\n"); \
-        fprintf(stderr, "  ACTUAL: %d\n", a);       \
-        fprintf(stderr, "  DESIRED: %d\n", d);      \
+        fprintf(stderr, "  ACTUAL: %d\n", (int)a);  \
+        fprintf(stderr, "  DESIRED: %d\n", (int)d); \
         return 1;                                   \
     }
 
-#define assert_equal_uint64(a, d)                          \
-    if (!(a == d)) {                                       \
-        cass_message(__FILE__, __LINE__);                  \
-        fprintf(stderr, " Items are not equal:\n");        \
-        fprintf(stderr, "  ACTUAL: %llu\n", (uint64_t)a);  \
-        fprintf(stderr, "  DESIRED: %llu\n", (uint64_t)d); \
-        return 1;                                          \
+#define assert_equal_uint64(a, d)                                 \
+    if (!(a == d)) {                                              \
+        cass_message(__FILE__, __LINE__);                         \
+        fprintf(stderr, " Items are not equal:\n");               \
+        fprintf(stderr, "  ACTUAL: %" PRIu64 "\n", (uint64_t)a);  \
+        fprintf(stderr, "  DESIRED: %" PRIu64 "\n", (uint64_t)d); \
+        return 1;                                                 \
     }
 
 #define assert_not_equal_int(a, d)                      \
     if (!(a != d)) {                                    \
         cass_message(__FILE__, __LINE__);               \
         fprintf(stderr, " Items are not different:\n"); \
-        fprintf(stderr, "  ACTUAL: %d\n", a);           \
-        fprintf(stderr, "  UNDESIRED: %d\n", d);        \
+        fprintf(stderr, "  ACTUAL: %d\n", (int)a);      \
+        fprintf(stderr, "  UNDESIRED: %d\n", (int)d);   \
         return 1;                                       \
     }
 

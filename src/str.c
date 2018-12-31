@@ -1,22 +1,25 @@
 #include "bgen.h"
-
+#include "mem.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void alloc_str(struct bgen_str *v, size_t len) {
+void alloc_str(struct bgen_str *v, size_t len)
+{
     v->len = len;
     v->str = malloc(len + 1);
     v->str[len] = '\0';
 }
 
-void free_str(struct bgen_str *v) {
-    free(v->str);
+void free_str(struct bgen_str *v)
+{
+    free_nul(v->str);
     v->str = NULL;
     v->len = 0;
 }
 
-int fread_str(FILE *fp, struct bgen_str *s, size_t len_size) {
+int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
+{
     uint64_t len;
     len = 0;
 
@@ -35,7 +38,8 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size) {
     return 0;
 }
 
-int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size) {
+int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size)
+{
 
     uint64_t len = s->len;
     if (fwrite(&len, len_size, 1, fp) != 1) {

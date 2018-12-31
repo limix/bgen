@@ -2,6 +2,7 @@
 #include "cass.h"
 #include "str.h"
 #include <float.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +10,8 @@
 int create_index(const char *bgen_filepath, const char *filepath);
 int use_index(const char *filepath);
 
-int main() {
+int main()
+{
 
     const char filepath[] = "complex_index03.index";
     const char bgen_filepath[] = "data/complex.23bits.bgen";
@@ -23,7 +25,8 @@ int main() {
     return 0;
 }
 
-int create_index(const char *bgen_filepath, const char *filepath) {
+int create_index(const char *bgen_filepath, const char *filepath)
+{
     struct bgen_file *bgen;
 
     assert_not_null(bgen = bgen_open(bgen_filepath));
@@ -36,7 +39,7 @@ int create_index(const char *bgen_filepath, const char *filepath) {
 
     char header[14];
     header[13] = '\0';
-    fread(header, 13 * sizeof(char), 1, fp);
+    assert_equal_int(fread(header, 13 * sizeof(char), 1, fp), 1);
 
     assert_strncmp(header, "bgen index 03", 13);
 
@@ -44,30 +47,31 @@ int create_index(const char *bgen_filepath, const char *filepath) {
     uint32_t u32;
     uint64_t u64;
 
-    fread(&u32, sizeof(uint32_t), 1, fp);
+    assert_equal_int(fread(&u32, sizeof(uint32_t), 1, fp), 1);
     assert_equal_int(u32, 10);
 
-    fread(&u64, sizeof(uint64_t), 1, fp);
+    assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 484);
 
     fseek(fp, u64, SEEK_CUR);
-    fread(&u32, sizeof(uint32_t), 1, fp);
+    assert_equal_int(fread(&u32, sizeof(uint32_t), 1, fp), 1);
     assert_equal_int(u32, 2);
 
-    fread(&u64, sizeof(uint64_t), 1, fp);
+    assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 0);
 
-    fread(&u64, sizeof(uint64_t), 1, fp);
+    assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 179);
 
     fseek(fp, 13 + 4 + 8, SEEK_SET);
-    fread(&u64, sizeof(uint64_t), 1, fp);
+    assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 98);
 
     return 0;
 }
 
-int use_index(const char *filepath) {
+int use_index(const char *filepath)
+{
     struct bgen_mf *v;
     int nvariants;
     size_t i, j;

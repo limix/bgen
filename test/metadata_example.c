@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-int main() {
+int main()
+{
     struct bgen_file *bgen;
     struct bgen_vi *index = NULL;
     struct bgen_var *v;

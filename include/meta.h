@@ -1,5 +1,4 @@
-/*
- * Create and query a metafile.
+/* Create and query a metafile.
  */
 #ifndef BGEN_META_H
 #define BGEN_META_H

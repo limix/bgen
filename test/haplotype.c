@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main()
+{
 
     size_t i, j, ii, jj;
     const char filename[] = "data/haplotypes.bgen";

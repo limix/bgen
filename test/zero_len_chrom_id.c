@@ -8,7 +8,8 @@
 #define SUCCESS EXIT_SUCCESS
 #define FAIL EXIT_FAILURE
 
-int main() {
+int main()
+{
     struct bgen_vi *index;
     struct bgen_file *bgen;
     struct bgen_var *variants;

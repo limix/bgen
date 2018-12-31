@@ -24,7 +24,8 @@
 #include "str.h"
 
 /* Variant metadata. DEPRECATED: Please, use bgen_vm instead. */
-struct bgen_var {
+struct bgen_var
+{
     struct bgen_str id;
     struct bgen_str rsid;
     struct bgen_str chrom;

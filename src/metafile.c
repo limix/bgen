@@ -189,7 +189,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
                                               int verbose)
 {
     assert(bgen);
-    assert(filepath);
+    assert(fp);
 
     struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), 2);
     if (!mf)
@@ -256,7 +256,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->fp))
         goto err;
 
-    mf->idx.offset = dalloc(sizeof(uint64_t));
+    mf->idx.offset = dalloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
         if (fread1(mf->idx.offset + i, sizeof(uint64_t), mf->fp))
@@ -314,7 +314,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
 
     int chunk = mf->idx.nvariants / mf->idx.npartitions;
     *nvars = MIN(chunk, mf->idx.nvariants - chunk * part);
-    vars = malloc((*nvars) * sizeof(struct bgen_vm));
+    vars = dalloc(*nvars * sizeof(struct bgen_vm));
     int i, j;
     for (i = 0; i < *nvars; ++i) {
         vars[i].id.str = NULL;
