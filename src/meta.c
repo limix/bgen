@@ -60,12 +60,12 @@ void free_mf(struct bgen_mf *mf)
     free_nul(mf);
 }
 
-int next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant_ctx *c)
+int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant_ctx *c)
 {
     if (c->nvariants == 0)
         goto err;
 
-    if (read_next_variant(c->bgen, vm))
+    if (next_variant(c->bgen, vm))
         goto err;
 
     *geno_offset = ftell(c->bgen->file);
@@ -207,7 +207,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
         goto err;
     }
 
-    if (write_metafile(mf, &next_variant, &ctx, verbose))
+    if (write_metafile(mf, &_next_variant, &ctx, verbose))
         goto err;
 
     if (bgen_close_metafile(mf))
