@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static inline void *fclose_nul(FILE *fp)
+static inline int fclose_nul(FILE *fp)
 {
     if (fp)
-        fclose(fp);
-    return NULL;
+        return fclose(fp);
+    return 0;
 }
 
 static inline int fwrite1(const void *restrict buffer, size_t size,

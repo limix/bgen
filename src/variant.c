@@ -4,7 +4,15 @@
 #include "str.h"
 #include <assert.h>
 
-/* It assumes that the bgen file is open. */
+/* Fetch the next variant metadata from a bgen file.
+ *
+ * The user is responsible for freeing the allocated memory by calling
+ * :func:`free_metadata`.
+ *
+ * Note
+ * ----
+ * It assumes that the bgen file is open.
+ */
 int next_variant(struct bgen_file *bgen, struct bgen_vm *v)
 {
     assert(bgen);

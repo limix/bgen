@@ -1,3 +1,5 @@
+/* Read, alloc, and free variant metadata.
+ */
 #ifndef _BGEN_VARIANT_H
 #define _BGEN_VARIANT_H
 

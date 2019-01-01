@@ -23,10 +23,11 @@ typedef int(next_variant_t)(struct bgen_vm *, uint64_t *, struct next_variant_ct
 struct bgen_idx
 {
     uint32_t nvariants;
-    /* block size */
+    /* size of the variants metadata block */
     uint64_t metasize;
     uint32_t npartitions;
-    uint64_t *offset;
+    /* array of partition offsets */
+    uint64_t *poffset;
 };
 
 /* node for creating metadata file */
@@ -45,21 +46,22 @@ struct bgen_mf *alloc_mf(void)
 
     mf->filepath = NULL;
     mf->fp = NULL;
-    mf->idx.offset = NULL;
+    mf->idx.poffset = NULL;
 
     return mf;
 }
 
-void free_mf(struct bgen_mf *mf)
-{
-    if (mf) {
-        mf->filepath = free_nul(mf->filepath);
-        mf->fp = fclose_nul(mf->fp);
-        mf->idx.offset = free_nul(mf->idx.offset);
-    }
-    free_nul(mf);
-}
-
+/* Fetch the variant metada and record the genotype offset.
+ *
+ * Parameters
+ * ----------
+ * vm
+ *   Variant metadata.
+ * geno_offset
+ *   Genotype address in the bgen file.
+ * c
+ *   Context for the callback.
+ */
 int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant_ctx *c)
 {
     if (c->nvariants == 0)
@@ -97,9 +99,11 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
     }
 
     if (!(mf->fp = fopen(filepath, "wb"))) {
-        perror("Could not create file ");
+        perror_fmt("Could not create file %s", filepath);
         goto err;
     }
+
+    mf->filepath = strdup(filepath);
 
     if (fwrite1(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), mf->fp))
         goto err;
@@ -115,10 +119,11 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
 
     return mf;
 err:
-    free_mf(mf);
+    bgen_close_metafile(mf);
     return NULL;
 }
 
+/* Write variant genotype to file and return the block size. */
 uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
 {
     long start = ftell(fp);
@@ -149,11 +154,11 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     uint64_t size;
     uint64_t offset;
 
-    mf->idx.offset = dalloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
-    if (mf->idx.offset == NULL)
+    mf->idx.poffset = dalloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
+    if (mf->idx.poffset == NULL)
         goto err;
 
-    mf->idx.offset[0] = 0;
+    mf->idx.poffset[0] = 0;
     size_t i = 0, j = 0;
     /* Write the first block. */
     while (next(&vm, &offset, args)) {
@@ -161,37 +166,35 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
         if ((size = write_variant(mf->fp, &vm, offset)) == 0)
             goto err;
 
+        /* true for the first variant of every partition */
         if (i % (mf->idx.nvariants / mf->idx.npartitions) == 0) {
             ++j;
-            mf->idx.offset[j] = mf->idx.offset[j - 1];
+            mf->idx.poffset[j] = mf->idx.poffset[j - 1];
         }
 
-        mf->idx.offset[j] += size;
+        mf->idx.poffset[j] += size;
         ++i;
         free_metadata(&vm);
     }
 
     fwrite_ui32(mf->fp, mf->idx.npartitions, sizeof(mf->idx.npartitions));
 
-    /* Write the first block. */
+    /* Write the second block. */
     for (i = 0; i < mf->idx.npartitions; ++i)
-        fwrite_ui64(mf->fp, mf->idx.offset[i], sizeof(uint64_t));
+        fwrite_ui64(mf->fp, mf->idx.poffset[i], sizeof(uint64_t));
 
     fseek(mf->fp, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET);
-    fwrite_ui64(mf->fp, mf->idx.offset[mf->idx.npartitions], sizeof(uint64_t));
+    fwrite_ui64(mf->fp, mf->idx.poffset[mf->idx.npartitions], sizeof(uint64_t));
 
     return 0;
 err:
-    mf->idx.offset = free_nul(mf->idx.offset);
+    mf->idx.poffset = free_nul(mf->idx.poffset);
     return 1;
 }
 
 BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char *fp,
                                               int verbose)
 {
-    assert(bgen);
-    assert(fp);
-
     struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), 2);
     if (!mf)
         goto err;
@@ -203,7 +206,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     bopen_or_leave(bgen);
 
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
-        perror_fmt("Could not jump to the variants start");
+        perror("Could not jump to the variants start");
         goto err;
     }
 
@@ -257,10 +260,10 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->fp))
         goto err;
 
-    mf->idx.offset = dalloc(mf->idx.npartitions * sizeof(uint64_t));
+    mf->idx.poffset = dalloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
-        if (fread1(mf->idx.offset + i, sizeof(uint64_t), mf->fp))
+        if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->fp))
             goto err;
     }
 
@@ -273,32 +276,28 @@ err:
 
 BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
 {
-    assert(mf);
-
-    free_nul(mf->idx.offset);
-    fclose_nul(mf->fp);
-    free_nul(mf->filepath);
-
+    if (mf) {
+        if (fclose_nul(mf->fp)) {
+            perror_fmt("Could not close the %s file.", mf->filepath);
+            return 1;
+        }
+        free_nul(mf->filepath);
+        free_nul(mf->idx.poffset);
+        free_nul(mf);
+    }
     return 0;
 }
 
-BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf)
-{
-    assert(mf);
-    return mf->idx.npartitions;
-}
+BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf) { return mf->idx.npartitions; }
 
-BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf)
-{
-    assert(mf);
-    return mf->idx.nvariants;
-}
+BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf) { return mf->idx.nvariants; }
 
 BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
 {
-    assert(mf);
-    assert(part >= 0);
-
+    if (part < 0) {
+        error("Invalid partition number: %d", part);
+        return -1;
+    }
     int size = mf->idx.nvariants / mf->idx.npartitions;
     return imin(size, mf->idx.nvariants - size * part);
 }
@@ -309,17 +308,15 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     FILE *fp = NULL;
 
     if (part >= mf->idx.npartitions) {
-        error("The provided partition number is out-of-range.");
+        error("The provided partition number %d is out-of-range.", part);
         goto err;
     }
 
     int chunk = mf->idx.nvariants / mf->idx.npartitions;
     *nvars = imin(chunk, mf->idx.nvariants - chunk * part);
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
-    int i, j;
-    for (i = 0; i < *nvars; ++i) {
+    for (int i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
-    }
 
     if ((fp = fopen(mf->filepath, "rb")) == NULL) {
         perror("Could not open bgen index file");
@@ -331,12 +328,12 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         goto err;
     }
 
-    if (fseek(fp, mf->idx.offset[part], SEEK_CUR)) {
+    if (fseek(fp, mf->idx.poffset[part], SEEK_CUR)) {
         perror("Could not fseek bgen index file");
         goto err;
     }
 
-    for (i = 0; i < *nvars; ++i) {
+    for (int i = 0; i < *nvars; ++i) {
         fread_int(fp, &vars[i].vaddr, 8);
 
         fread_str(fp, &vars[i].id, 2);
@@ -345,29 +342,23 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
 
         fread_int(fp, &vars[i].position, 4);
         fread_int(fp, &vars[i].nalleles, 2);
-        vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
+        vars[i].allele_ids = dalloc(sizeof(struct bgen_str) * vars[i].nalleles);
 
-        for (j = 0; j < vars[i].nalleles; ++j) {
+        for (int j = 0; j < vars[i].nalleles; ++j)
             fread_str(fp, vars[i].allele_ids + j, 4);
-        }
     }
 
     return vars;
 err:
-    if (vars != NULL) {
-        for (i = 0; i < *nvars; ++i) {
-            free_metadata(vars + i);
-        }
-        free(vars);
-    }
+    if (vars != NULL)
+        bgen_free_partition(vars, *nvars);
     fclose_nul(fp);
     return NULL;
 }
 
-BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvars)
+BGEN_API void bgen_free_partition(struct bgen_vm *vars, int nvars)
 {
-    for (size_t i = 0; i < nvars; ++i) {
-        free_metadata(vm + i);
-    }
-    free(vm);
+    for (size_t i = 0; i < nvars; ++i)
+        free_metadata(vars + i);
+    free(vars);
 }
