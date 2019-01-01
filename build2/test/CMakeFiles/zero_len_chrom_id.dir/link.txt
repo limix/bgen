@@ -1,1 +1,0 @@
-/usr/bin/cc -g  -rdynamic CMakeFiles/zero_len_chrom_id.dir/zero_len_chrom_id.c.o  -o zero_len_chrom_id -Wl,-rpath,/bgen/build2:/usr/local/lib ../libbgen.so.3.0.0 -lz /usr/local/lib/libzstd.so /usr/local/lib/libathr.so 
