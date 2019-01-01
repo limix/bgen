@@ -1,22 +1,25 @@
 #include "buffer.h"
 #include "athr.h"
-#include "bits.h"
+#include "min.h"
 #include "zip/zstd_wrapper.h"
 #include <stdio.h>
 
-struct Buffer {
+struct Buffer
+{
     void *base;
     size_t size;
 };
 
-struct Buffer *buffer_create() {
+struct Buffer *buffer_create()
+{
     struct Buffer *b = malloc(sizeof(struct Buffer));
     b->base = NULL;
     b->size = 0;
     return b;
 }
 
-int buffer_append(struct Buffer *b, void *mem, size_t size) {
+int buffer_append(struct Buffer *b, void *mem, size_t size)
+{
     b->base = realloc(b->base, b->size + size);
     memcpy((char *)b->base + b->size, mem, size);
     b->size += size;
@@ -25,14 +28,16 @@ int buffer_append(struct Buffer *b, void *mem, size_t size) {
 
 void *buffer_base(struct Buffer *b) { return b->base; }
 
-int buffer_destroy(struct Buffer *b) {
+int buffer_destroy(struct Buffer *b)
+{
     free(b->base);
     b->size = 0;
     free(b);
     return 0;
 }
 
-int buffer_store(const char *fp, struct Buffer *b) {
+int buffer_store(const char *fp, struct Buffer *b)
+{
     FILE *f;
     uint64_t size64;
     size_t dst_size;
@@ -77,7 +82,8 @@ int buffer_store(const char *fp, struct Buffer *b) {
 
 int buffer_load_loop(FILE *file, char *data, size_t size, int verbose);
 
-int buffer_load(const char *fp, struct Buffer *b, int verbose) {
+int buffer_load(const char *fp, struct Buffer *b, int verbose)
+{
     FILE *f;
     uint64_t uncompressed_size, compressed_size;
     size_t dst_size;
@@ -154,16 +160,19 @@ err:
     return 1;
 }
 
-int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
+inline static int ceildiv(size_t x, size_t y) { return (x + (y - 1)) / y; }
+
+int buffer_load_loop(FILE *file, char *data, size_t size, int verbose)
+{
     size_t chunk_size = 5242880;
     char *last, *current;
     struct athr *athr;
-    int nsteps = CEILDIV(size, chunk_size);
+    int nsteps = ceildiv(size, chunk_size);
 
     current = data;
     last = data + size;
 
-    chunk_size = MIN(size, chunk_size);
+    chunk_size = smin(size, chunk_size);
     if (verbose) {
         athr = athr_create(nsteps, "Loading index");
     } else {
@@ -172,7 +181,7 @@ int buffer_load_loop(FILE *file, char *data, size_t size, int verbose) {
 
     while (current < last) {
 
-        size_t read_size = MIN(chunk_size, (size_t)(last - current));
+        size_t read_size = smin(chunk_size, (size_t)(last - current));
         if (fread(current, 1, read_size, file) < read_size) {
             perror("Could not read compressed data");
             if (verbose)

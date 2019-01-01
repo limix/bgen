@@ -13,7 +13,7 @@ function(define_sources BASE_DIR _SOURCES)
         layout/one.c
         layout/two.c
         mem.c
-        meta.c
+        metafile.c
         str.c
         tpl/tpl.c
         variant.c

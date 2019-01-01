@@ -1,6 +1,5 @@
 #include "layout/two.h"
 #include "bgen.h"
-#include "bits.h"
 #include "choose.h"
 #include "depr/variants_index.h"
 #include "file.h"
@@ -13,24 +12,29 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define BIT(var, bit) ((var & (1 << bit)) != 0)
+
 inline static int bgen_read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
 
 inline static int bgen_read_missingness(char ploidy_miss) { return ploidy_miss >> 7; }
 
-inline static int get_bit(const char *mem, int bit_idx) {
+inline static int get_bit(const char *mem, int bit_idx)
+{
     int bytes = bit_idx / 8;
 
-    return GetBit(*(mem + bytes), bit_idx % 8);
+    return BIT(*(mem + bytes), bit_idx % 8);
 }
 
-inline static void set_array_nan(double *p, size_t n) {
+inline static void set_array_nan(double *p, size_t n)
+{
     size_t i;
     for (i = 0; i < n; ++i) {
         p[i] = NAN;
     }
 }
 
-void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
+void bgen_read_phased_genotype(struct bgen_vg *vg, double *p)
+{
     int nalleles, nbits, max_ploidy;
     uint64_t uip_sum, ui_prob;
     uint64_t sample_start, haplo_start, allele_start;
@@ -87,7 +91,8 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p) {
     }
 }
 
-void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
+void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p)
+{
     int nalleles, nbits, max_ploidy, max_ncombs;
     uint64_t uip_sum, ui_prob;
     uint64_t sample_start, geno_start;
@@ -144,7 +149,8 @@ void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p) {
     }
 }
 
-char *bgen_uncompress_two(struct bgen_vi *idx, FILE *file) {
+char *bgen_uncompress_two(struct bgen_vi *idx, FILE *file)
+{
     size_t clength, ulength;
     char *cchunk;
     char *uchunk;
@@ -194,7 +200,8 @@ err:
     return NULL;
 }
 
-int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file) {
+int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
+{
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t min_ploidy, max_ploidy, phased, nbits;
@@ -255,7 +262,8 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *fi
     return EXIT_SUCCESS;
 }
 
-void bgen_read_probs_two(struct bgen_vg *vg, double *p) {
+void bgen_read_probs_two(struct bgen_vg *vg, double *p)
+{
     if (vg->phased)
         bgen_read_phased_genotype(vg, p);
     else

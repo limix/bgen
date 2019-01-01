@@ -1,11 +1,11 @@
 #define BGEN_API_EXPORTS
 
-#include "meta.h"
-#include "bits.h"
 #include "endian.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
+#include "meta.h"
+#include "min.h"
 #include "str.h"
 #include "variant.h"
 #include <assert.h>
@@ -300,7 +300,7 @@ BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
     assert(part >= 0);
 
     int size = mf->idx.nvariants / mf->idx.npartitions;
-    return MIN(size, mf->idx.nvariants - size * part);
+    return imin(size, mf->idx.nvariants - size * part);
 }
 
 BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *nvars)
@@ -314,7 +314,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     }
 
     int chunk = mf->idx.nvariants / mf->idx.npartitions;
-    *nvars = MIN(chunk, mf->idx.nvariants - chunk * part);
+    *nvars = imin(chunk, mf->idx.nvariants - chunk * part);
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
     int i, j;
     for (i = 0; i < *nvars; ++i) {

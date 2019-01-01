@@ -1,21 +1,18 @@
+#include "layout/one.h"
+#include "bgen.h"
+#include "choose.h"
+#include "depr/variants_index.h"
+#include "file.h"
+#include "geno.h"
+#include "mem.h"
+#include "zip/zlib_wrapper.h"
+#include "zip/zstd_wrapper.h"
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 
-#include "depr/variants_index.h"
-#include "geno.h"
-#include "layout/one.h"
-
-#include "bgen.h"
-#include "bits.h"
-
-#include "choose.h"
-#include "file.h"
-#include "mem.h"
-#include "zip/zlib_wrapper.h"
-#include "zip/zstd_wrapper.h"
-
-void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities) {
+void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities)
+{
     uint16_t ui_prob;
 
     double denom = 32768;
@@ -40,11 +37,13 @@ void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities) {
     }
 }
 
-void bgen_read_probs_one(struct bgen_vg *vg, double *p) {
+void bgen_read_probs_one(struct bgen_vg *vg, double *p)
+{
     bgen_read_unphased_one(vg, p);
 }
 
-char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file) {
+char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file)
+{
     size_t clength, ulength;
     char *cchunk, *uchunk;
 
@@ -77,7 +76,8 @@ char *bgen_uncompress_layout1(struct bgen_vi *index, FILE *file) {
     return uchunk;
 }
 
-int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg, FILE *file) {
+int bgen_read_probs_header_one(struct bgen_vi *index, struct bgen_vg *vg, FILE *file)
+{
     char *c;
     char *chunk;
 
