@@ -39,13 +39,13 @@ extern "C"
 {
 #endif
 
-#include "bgen/api.h"
-#include "bgen/depr_bgen.h"
-#include "bgen/depr_meta.h"
-#include "bgen/file.h"
-#include "bgen/geno.h"
-#include "bgen/meta.h"
-#include "bgen/str.h"
+#include "api.h"
+#include "depr_bgen.h"
+#include "depr_meta.h"
+#include "file.h"
+#include "geno.h"
+#include "meta.h"
+#include "str.h"
 
 #ifdef __cplusplus
 }

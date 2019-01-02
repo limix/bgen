@@ -1,4 +1,4 @@
-# limix cmake module (1.0.3)
+# limix cmake module (1.1.0)
 #
 # Common configuration and handy functions for limix projects.
 #
@@ -70,7 +70,7 @@ macro(limix_process_default_dirs)
   add_subdirectory(include)
 
   define_sources(src SOURCES)
-  define_public_headers(include HEADERS)
+  define_public_headers(include HEADERS PRIVATE_HEADERS)
 endmacro(limix_process_default_dirs)
 
 macro(limix_initialise)
@@ -78,6 +78,11 @@ macro(limix_initialise)
   file(STRINGS ${CMAKE_HOME_DIRECTORY}/VERSION PROJECT_VERSION)
   file(STRINGS ${CMAKE_HOME_DIRECTORY}/WELCOME WELCOME)
   file(STRINGS ${CMAKE_HOME_DIRECTORY}/GITHUB_URL GITHUB_URL)
+  set(LIMIX_CMAKE_ENVIRONMENT TRUE)
+  if( UNIX AND NOT BEOS )
+    # Used by check_symbol_exists:
+    set(CMAKE_REQUIRED_LIBRARIES m)
+  endif()
   display_welcome()
 endmacro(limix_initialise)
 
@@ -90,7 +95,8 @@ function(easy_shared_install TARGET_NAME)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-          PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+          PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+          PRIVATE_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TARGET_NAME})
 endfunction(easy_shared_install)
 
 function(easy_static_install TARGET_NAME)
@@ -99,7 +105,30 @@ function(easy_static_install TARGET_NAME)
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endfunction(easy_static_install)
 
-function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
+function(limix_require_cmath_library)
+  include(CheckSymbolExists)
+
+  set(LIMIX_CMAKE_CMATH_LIBRARY "" PARENT_SCOPE)
+  if (WIN32)
+    return()
+  endif()
+
+  CHECK_SYMBOL_EXISTS(pow math.h HAVE_EXP)
+  if(NOT HAVE_EXP)
+    unset(HAVE_EXP)
+    CHECK_SYMBOL_EXISTS(exp math.h HAVE_EXP)
+    if(HAVE_EXP)
+      set(LIMIX_CMAKE_CMATH_LIBRARY "m" PARENT_SCOPE)
+    else()
+      set(msg "No pow() found. Please, check for standard math library for C.")
+      message(FATAL_ERROR "${msg}")
+    endif()
+  else()
+    set(LIMIX_CMAKE_CMATH_LIBRARY "m" PARENT_SCOPE)
+  endif()
+endfunction()
+
+function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS PRIVATE_HEADERS LIBS)
   if(TYPE MATCHES "STATIC")
     set(NAME "${NAME}_static")
   endif()
@@ -108,11 +137,12 @@ function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
   easy_set_target_property(${NAME} VERSION ${VERSION})
   if(TYPE MATCHES "SHARED")
     easy_set_target_property(${NAME} PUBLIC_HEADER "${PUBLIC_HEADERS}")
-    
+    easy_set_target_property(${NAME} PRIVATE_HEADER "${PRIVATE_HEADERS}")
+
     string(REPLACE "." ";" VERSION_LIST ${VERSION})
     list(GET VERSION_LIST 0 VERSION_MAJOR)
     easy_set_target_property(${NAME} SOVERSION ${VERSION_MAJOR})
-    
+
     easy_shared_install(${NAME})
   else()
     easy_static_install(${NAME})
@@ -121,15 +151,21 @@ function(add_library_type TYPE NAME VERSION SOURCES PUBLIC_HEADERS LIBS)
   target_link_libraries(${NAME} "${LIBS}")
 endfunction(add_library_type)
 
-function(limix_add_library NAME VERSION SRCS HDRS LIBS)
-  add_library_type("SHARED" ${NAME} ${VERSION} "${SRCS}" "${HDRS}" "${LIBS}")
-  add_library_type("STATIC" ${NAME} ${VERSION} "${SRCS}" "${HDRS}" "${LIBS}")
+function(limix_add_library NAME VERSION SRCS HDRS PRIV_HDRS LIBS)
+  add_library_type("SHARED" ${NAME} ${VERSION} "${SRCS}" "${HDRS}" "${PRIV_HDRS}"
+      "${LIBS}")
+  add_library_type("STATIC" ${NAME} ${VERSION} "${SRCS}" "${HDRS}" "${PRIV_HDRS}"
+      "${LIBS}")
 endfunction(limix_add_library)
 
 macro(limix_add_test NAME LIBRARY SOURCES)
-  add_executable(${NAME} ${SOURCES})
-  target_link_libraries(${NAME} ${LIBRARY})
-  add_test(test_${NAME} ${NAME} -E environment)
+  add_executable(test_${NAME} ${SOURCES})
+  target_link_libraries(test_${NAME} ${LIBRARY})
+  if (LIMIX_CMAKE_ENVIRONMENT)
+    add_test(test_${NAME} test_${NAME} -E environment)
+  else()
+    add_test(test_${NAME} test_${NAME})
+  endif()
   file(TO_CMAKE_PATH "$ENV{PATH}" MYPATH)
 
   list(APPEND MYPATH ${CMAKE_BINARY_DIR})

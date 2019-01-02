@@ -1,10 +1,10 @@
 #define BGEN_API_EXPORTS
 
 #include "athr.h"
+#include "bgen.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
-#include "meta.h"
 #include "min.h"
 #include "str.h"
 #include "variant.h"
