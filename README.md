@@ -49,6 +49,47 @@ Refer to [documentation](https://bgen.readthedocs.io/) for usage and API descrip
 The original specification can be found at [http://www.well.ox.ac.uk/~gav/bgen_format/](http://www.well.ox.ac.uk/~gav/bgen_format/).
 We have also created an alternative, more [user-friendly BGEN specification](bgen-file-format.pdf).
 
+## Development
+
+Create a `build` folder, configure, build and test it.
+The option `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` will create the
+`compile_commands.json` file, which is often used by a language server
+protocol to provide context to your editor.
+
+```bash
+mkdir build
+cd build
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ..
+make
+make test
+```
+
+[Valgrind](http://www.valgrind.org/) can be used to detect memory leak and wrong memory access.
+Docker can be used to test it on a Linux distribution.
+From the project folder, enter
+
+```bash
+docker run --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+    -v $(pwd):/$(basename $(pwd)) -w /$(basename $(pwd)) -it ubuntu /bin/bash
+```
+
+The above options make sure that gdb can be used in the docker container.
+A couple of dependencies have to be installed first:
+
+```bash
+apt-get update && apt-get upgrade --yes
+apt-get install build-essential curl zlib1g-dev cmake gdb
+bash <(curl -fsSL https://raw.githubusercontent.com/horta/almosthere/master/install)
+bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
+```
+
+After everything has been compiled, you can enter the `test` folder and fire valgrind:
+
+```bash
+cd test
+valgrind --leak-check=full --show-leak-kinds=all ./index
+```
+
 ## Acknowledgments
 
 - [Marc Jan Bonder](https://github.com/Bonder-MJ) for bug-reporting and improvement suggestions.
