@@ -9,34 +9,30 @@
 #include "mem.h"
 #include <assert.h>
 
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vi *vi, size_t index)
+#if BGEN_OPEN_GENOTYPE == 3
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_vm *vm)
 {
+    bopen_or_leave(bgen);
 
-    assert(vi);
-    assert(vi->filepath);
+    /* if (!(fp = fopen(bgen->filepath, "rb"))) { */
+    /*     perror_fmt("Could not open %s", vm->filepath); */
+    /*     goto err; */
+    /* } */
 
-    struct bgen_vg *vg = NULL;
-    FILE *fp = NULL;
-
-    if (!(fp = fopen(vi->filepath, "rb"))) {
-        perror_fmt("Could not open %s", vi->filepath);
-        goto err;
-    }
-
-    vg = dalloc(sizeof(struct bgen_vg));
+    struct bgen_vg *vg = dalloc(sizeof(struct bgen_vg));
     vg->variant_idx = index;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (fseek(fp, (long)vi->start[index], SEEK_SET)) {
-        perror_fmt("Could not seek a variant in %s", vi->filepath);
+    if (fseek(fp, (long)vm->vaddr, SEEK_SET)) {
+        perror_fmt("Could not seek a variant in %s", vm->filepath);
         goto err;
     }
 
-    if (vi->layout == 1) {
-        bgen_read_probs_header_one(vi, vg, fp);
-    } else if (vi->layout == 2) {
-        read_probs_header_two(vi, vg, fp);
+    if (bgen->layout == 1) {
+        bgen_read_probs_header_one(vm, vg, fp);
+    } else if (bgen->layout == 2) {
+        read_probs_header_two(vm, vg, fp);
     } else {
         error("Unrecognized layout type.");
         goto err;
@@ -46,12 +42,14 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vi *vi, size_t index)
     return vg;
 
 err:
-    fclose_nul(fp);
+    fclose_nul(bgen->fp);
+    bgen->file = NULL;
     return free_nul(vg);
 }
+#endif
 
-BGEN_API int bgen_read_genotype(struct bgen_vi *index, struct bgen_vg *vg,
-                                double *probs)
+BGEN_DEPRECATED BGEN_API int bgen_read_genotype(struct bgen_vi *index,
+                                                struct bgen_vg *vg, double *probs)
 {
     assert(index);
     assert(vg);

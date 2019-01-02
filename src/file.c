@@ -69,8 +69,6 @@ int read_bgen_header(struct bgen_file *bgen)
 
 BGEN_API struct bgen_file *bgen_open(const char *filepath)
 {
-    assert(filepath);
-
     struct bgen_file *bgen = dalloc(sizeof(struct bgen_file));
     if (!bgen)
         goto err;
@@ -106,6 +104,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
 err:
     if (bgen) {
         fclose_nul(bgen->file);
+        bgen->file = NULL;
         free_nul(bgen->filepath);
     }
     return free_nul(bgen);
