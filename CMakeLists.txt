@@ -16,6 +16,10 @@ include_directories("${ZSTD_INCLUDE_DIRS}")
 find_package(ATHR REQUIRED)
 include_directories("${ATHR_INCLUDE_DIRS}")
 
+if(NOT MSVC)
+  add_compile_options(-Wall -Wextra -pedantic -Werror -Wno-missing-field-initializers)
+endif(NOT MSVC)
+
 limix_process_default_dirs()
 
 limix_add_library(${PROJECT_NAME} ${PROJECT_VERSION} "${SOURCES}" "${HEADERS}"

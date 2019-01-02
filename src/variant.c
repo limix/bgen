@@ -45,7 +45,7 @@ int next_variant(struct bgen_file *bgen, struct bgen_vm *v)
     if (!v->allele_ids)
         goto err;
 
-    for (size_t i = 0; i < v->nalleles; ++i) {
+    for (size_t i = 0; i < (size_t)v->nalleles; ++i) {
         if (fread_str(bgen->file, v->allele_ids + i, 4))
             goto err;
     }
@@ -56,7 +56,7 @@ err:
     free_nul(v->rsid.str);
     free_nul(v->chrom.str);
     if (v->allele_ids) {
-        for (size_t i = 0; i < v->nalleles; ++i)
+        for (size_t i = 0; i < (size_t)v->nalleles; ++i)
             free_nul((v->allele_ids + i)->str);
     }
     free_nul(v->allele_ids);
@@ -88,7 +88,7 @@ void free_metadata(struct bgen_vm *v)
     free_str(&v->rsid);
     free_str(&v->chrom);
     if (v->allele_ids) {
-        for (size_t i = 0; i < v->nalleles; ++i)
+        for (size_t i = 0; i < (size_t)v->nalleles; ++i)
             free_str(v->allele_ids + i);
     }
     v->allele_ids = free_nul(v->allele_ids);

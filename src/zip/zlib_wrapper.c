@@ -7,7 +7,8 @@
 
 #include "bgen.h"
 
-int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size) {
+int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size)
+{
     int e;
     z_stream strm;
 
@@ -29,23 +30,24 @@ int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size) 
     strm.next_out = (unsigned char *)*dst;
 
     e = inflate(&strm, Z_NO_FLUSH);
-
-    switch (e) {
-    case Z_NEED_DICT:
+    if (e == Z_NEED_DICT) {
         e = Z_DATA_ERROR;
-
-    case Z_DATA_ERROR:
-    case Z_MEM_ERROR:
-        inflateEnd(&strm);
-        fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
-        return EXIT_FAILURE;
+        goto err;
     }
+
+    if (e == Z_DATA_ERROR || e == Z_MEM_ERROR)
+        goto err;
 
     inflateEnd(&strm);
     return EXIT_SUCCESS;
+err:
+    inflateEnd(&strm);
+    fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
+    return EXIT_FAILURE;
 }
 
-int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *dst_size) {
+int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *dst_size)
+{
     int ret;
     z_stream strm;
 
@@ -73,16 +75,13 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
 
         ret = inflate(&strm, Z_NO_FLUSH);
 
-        switch (ret) {
-        case Z_NEED_DICT:
+        if (ret == Z_NEED_DICT) {
             ret = Z_DATA_ERROR;
-
-        case Z_DATA_ERROR:
-        case Z_MEM_ERROR:
-            inflateEnd(&strm);
-            fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(ret));
-            return EXIT_FAILURE;
+            goto err;
         }
+
+        if (ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)
+            goto err;
 
         unsigned int just_wrote = unused - strm.avail_out;
 
@@ -110,4 +109,8 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
 
     inflateEnd(&strm);
     return EXIT_SUCCESS;
+err:
+    inflateEnd(&strm);
+    fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(ret));
+    return EXIT_FAILURE;
 }

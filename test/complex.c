@@ -5,7 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-int main() {
+int main()
+{
 
     size_t i, j, ii, jj;
     const char filename[] = "data/complex.23bits.bgen";
@@ -54,7 +55,7 @@ int main() {
                           "GTTTTTT", "A", "G"};
 
     jj = 0;
-    for (i = 0; i < nvariants; ++i) {
+    for (i = 0; i < (size_t)nvariants; ++i) {
         if (variants[i].nalleles != correct_nalleles[i])
             return 1;
         if (variants[i].position != position[i])
@@ -82,7 +83,7 @@ int main() {
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
-    for (i = 0; i < nvariants; ++i) {
+    for (i = 0; i < (size_t)nvariants; ++i) {
         vg = bgen_open_variant_genotype(index, i);
         if (bgen_phased(vg) != phased[i])
             return 1;
@@ -136,14 +137,14 @@ int main() {
     double *rp = real_probs;
 
     jj = 0;
-    for (i = 0; i < nvariants; ++i) {
+    for (i = 0; i < (size_t)nvariants; ++i) {
         vg = bgen_open_variant_genotype(index, i);
 
         probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
         double *p = probabilities;
         bgen_read_variant_genotype(index, vg, probabilities);
 
-        for (j = 0; j < nsamples; ++j) {
+        for (j = 0; j < (size_t)nsamples; ++j) {
 
             if (ploidys[jj] != bgen_ploidy(vg, j))
                 return 1;
@@ -151,7 +152,7 @@ int main() {
             if (bgen_missing(vg, j) != 0)
                 return 1;
 
-            for (ii = 0; ii < bgen_ncombs(vg); ++ii) {
+            for (ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
                 if (*rp != *p && !(isnan(*rp) && isnan(*p)))
                     return 1;
                 ++rp;

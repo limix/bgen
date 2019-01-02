@@ -23,8 +23,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define TPL_VERSION 1.6
 
-static const char id[] = "$Id: tpl.c 192 2009-04-24 10:35:30Z thanson $";
-
 #include <stdarg.h> /* va_list */
 #include <stdio.h>  /* printf (tpl_hook.oops default function) */
 #include <stdlib.h> /* malloc */
@@ -68,18 +66,18 @@ typedef unsigned __int64 uint64_t;
 #define TPL_MAGIC "tpl"
 
 /* macro to add a structure to a doubly-linked list */
-#define DL_ADD(head, add)                                                               \
-    do {                                                                                \
-        if (head) {                                                                     \
-            (add)->prev = (head)->prev;                                                 \
-            (head)->prev->next = (add);                                                 \
-            (head)->prev = (add);                                                       \
-            (add)->next = NULL;                                                         \
-        } else {                                                                        \
-            (head) = (add);                                                             \
-            (head)->prev = (head);                                                      \
-            (head)->next = NULL;                                                        \
-        }                                                                               \
+#define DL_ADD(head, add)                                                              \
+    do {                                                                               \
+        if (head) {                                                                    \
+            (add)->prev = (head)->prev;                                                \
+            (head)->prev->next = (add);                                                \
+            (head)->prev = (add);                                                      \
+            (add)->next = NULL;                                                        \
+        } else {                                                                       \
+            (head) = (add);                                                            \
+            (head)->prev = (head);                                                     \
+            (head)->next = NULL;                                                       \
+        }                                                                              \
     } while (0);
 
 #define fatal_oom() tpl_hook.fatal("out of memory\n")
@@ -124,13 +122,15 @@ typedef unsigned __int64 uint64_t;
 #define ERR_UNSUPPORTED_FLAGS (-11)
 
 /* access to A(...) nodes by index */
-typedef struct tpl_pidx {
+typedef struct tpl_pidx
+{
     struct tpl_node *node;
     struct tpl_pidx *next, *prev;
 } tpl_pidx;
 
 /* A(...) node datum */
-typedef struct tpl_atyp {
+typedef struct tpl_atyp
+{
     uint32_t num; /* num elements */
     size_t sz;    /* size of each backbone's datum */
     struct tpl_backbone *bb, *bbtail;
@@ -138,7 +138,8 @@ typedef struct tpl_atyp {
 } tpl_atyp;
 
 /* backbone to extend A(...) lists dynamically */
-typedef struct tpl_backbone {
+typedef struct tpl_backbone
+{
     struct tpl_backbone *next;
     /* when this structure is malloc'd, extra space is alloc'd at the
      * end to store the backbone "datum", and data points to it. */
@@ -150,14 +151,16 @@ typedef struct tpl_backbone {
 } tpl_backbone;
 
 /* mmap record */
-typedef struct tpl_mmap_rec {
+typedef struct tpl_mmap_rec
+{
     int fd;
     void *text;
     size_t text_sz;
 } tpl_mmap_rec;
 
 /* root node datum */
-typedef struct tpl_root_data {
+typedef struct tpl_root_data
+{
     int flags;
     tpl_pidx *pidx;
     tpl_mmap_rec mmap;
@@ -166,7 +169,8 @@ typedef struct tpl_root_data {
 } tpl_root_data;
 
 /* node type to size mapping */
-struct tpl_type_t {
+struct tpl_type_t
+{
     char c;
     int sz;
 };
@@ -202,22 +206,26 @@ static int tpl_gather_blocking(int fd, void **img, size_t *sz);
  * causes d to be aligned at +8 (this is actually faster on x86).
  * Also SPARC and x86_64 seem to align always on +8.
  */
-struct tpl_double_alignment_detector {
+struct tpl_double_alignment_detector
+{
     char a;
     double d; /* some platforms align this on +4, others on +8 */
 };
 
 /* this is another case where alignment varies. mac os x/gcc was observed
  * to align the int64_t at +4 under -m32 and at +8 under -m64 */
-struct tpl_int64_alignment_detector {
+struct tpl_int64_alignment_detector
+{
     int i;
     int64_t j; /* some platforms align this on +4, others on +8 */
 };
 
-typedef struct {
+typedef struct
+{
     size_t inter_elt_len; /* padded inter-element len; i.e. &a[1].field - &a[0].field */
-    tpl_node *iter_start_node; /* node to jump back to, as we start each new iteration */
-    size_t iternum; /* current iteration number (total req'd. iter's in n->num) */
+    tpl_node
+        *iter_start_node; /* node to jump back to, as we start each new iteration */
+    size_t iternum;       /* current iteration number (total req'd. iter's in n->num) */
 } tpl_pound_data;
 
 /* Hooks for customizing tpl mem alloc, error handling, etc. Set defaults. */
@@ -231,7 +239,6 @@ tpl_hook_t tpl_hook = {
 };
 
 static const char tpl_fmt_chars[] = "AS($)BiucsfIUjv#";  /* valid format chars */
-static const char tpl_S_fmt_chars[] = "iucsfIUjv#$()";   /* valid within S(...) */
 static const char tpl_datapeek_ok_chars[] = "iucsfIUjv"; /* valid in datapeek */
 static const struct tpl_type_t tpl_types[] = {
     /* [TPL_TYPE_ROOT] =   */ {'r', 0},
@@ -250,7 +257,8 @@ static const struct tpl_type_t tpl_types[] = {
 };
 
 /* default error-reporting function. Just writes to stderr. */
-static int tpl_oops(const char *fmt, ...) {
+static int tpl_oops(const char *fmt, ...)
+{
     va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
@@ -258,7 +266,8 @@ static int tpl_oops(const char *fmt, ...) {
     return 0;
 }
 
-static tpl_node *tpl_node_new(tpl_node *parent) {
+static tpl_node *tpl_node_new(tpl_node *parent)
+{
     tpl_node *n;
     if ((n = tpl_hook.malloc(sizeof(tpl_node))) == NULL) {
         fatal_oom();
@@ -281,7 +290,8 @@ static tpl_node *tpl_node_new(tpl_node *parent) {
  * on Sparc, and apparently on 64 bit x86. We use a helper structure
  * to detect whether double is aligned in this compilation environment.
  */
-char *calc_field_addr(tpl_node *parent, int type, char *struct_addr, int ordinal) {
+char *calc_field_addr(tpl_node *parent, int type, char *struct_addr, int ordinal)
+{
     tpl_node *prev;
     int offset;
     int align_sz;
@@ -309,7 +319,8 @@ char *calc_field_addr(tpl_node *parent, int type, char *struct_addr, int ordinal
     return struct_addr + offset;
 }
 
-TPL_API tpl_node *tpl_map(char *fmt, ...) {
+TPL_API tpl_node *tpl_map(char *fmt, ...)
+{
     va_list ap;
     tpl_node *tn;
 
@@ -319,7 +330,8 @@ TPL_API tpl_node *tpl_map(char *fmt, ...) {
     return tn;
 }
 
-TPL_API tpl_node *tpl_map_va(char *fmt, va_list ap) {
+TPL_API tpl_node *tpl_map_va(char *fmt, va_list ap)
+{
     int lparen_level = 0, expect_lparen = 0, t = 0, in_structure = 0, ordinal = 0;
     int in_nested_structure = 0;
     char *c, *peek, *struct_addr = NULL, *struct_next;
@@ -445,7 +457,7 @@ TPL_API tpl_node *tpl_map_va(char *fmt, va_list ap) {
                     tpl_hook.fatal("non-positive iteration count %d\n", pound_num);
                 }
                 if (num_contig_fxlens >=
-                    (sizeof(contig_fxlens) / sizeof(contig_fxlens[0]))) {
+                    (int)(sizeof(contig_fxlens) / sizeof(contig_fxlens[0]))) {
                     tpl_hook.fatal("contiguous # exceeds hardcoded limit\n");
                 }
                 contig_fxlens[num_contig_fxlens++] = pound_num;
@@ -606,7 +618,8 @@ fail:
     return NULL;
 }
 
-static int tpl_unmap_file(tpl_mmap_rec *mr) {
+static int tpl_unmap_file(tpl_mmap_rec *mr)
+{
 
     if (munmap(mr->text, mr->text_sz) == -1) {
         tpl_hook.oops("Failed to munmap: %s\n", strerror(errno));
@@ -617,7 +630,8 @@ static int tpl_unmap_file(tpl_mmap_rec *mr) {
     return 0;
 }
 
-static void tpl_free_keep_map(tpl_node *r) {
+static void tpl_free_keep_map(tpl_node *r)
+{
     int mmap_bits = (TPL_RDONLY | TPL_FILE);
     int ufree_bits = (TPL_MEM | TPL_UFREE);
     tpl_node *nxtc, *c;
@@ -714,7 +728,8 @@ static void tpl_free_keep_map(tpl_node *r) {
     ((tpl_root_data *)(r->data))->flags = 0; /* reset flags */
 }
 
-TPL_API void tpl_free(tpl_node *r) {
+TPL_API void tpl_free(tpl_node *r)
+{
     int mmap_bits = (TPL_RDONLY | TPL_FILE);
     int ufree_bits = (TPL_MEM | TPL_UFREE);
     tpl_node *nxtc, *c;
@@ -816,7 +831,8 @@ TPL_API void tpl_free(tpl_node *r) {
 }
 
 /* Find the i'th packable ('A' node) */
-static tpl_node *tpl_find_i(tpl_node *n, int i) {
+static tpl_node *tpl_find_i(tpl_node *n, int i)
+{
     int j = 0;
     tpl_pidx *pidx;
     if (n->type != TPL_TYPE_ROOT)
@@ -830,13 +846,15 @@ static tpl_node *tpl_find_i(tpl_node *n, int i) {
     return NULL;
 }
 
-static void *tpl_cpv(void *datav, const void *data, size_t sz) {
+static void *tpl_cpv(void *datav, const void *data, size_t sz)
+{
     if (sz > 0)
         memcpy(datav, data, sz);
     return (void *)((uintptr_t)datav + sz);
 }
 
-static void *tpl_extend_backbone(tpl_node *n) {
+static void *tpl_extend_backbone(tpl_node *n)
+{
     tpl_backbone *bb;
     bb = (tpl_backbone *)tpl_hook.malloc(
         sizeof(tpl_backbone) +
@@ -865,7 +883,8 @@ static void *tpl_extend_backbone(tpl_node *n) {
 static char *tpl_fmt(tpl_node *r) { return ((tpl_root_data *)(r->data))->fmt; }
 
 /* Get the fmt # lengths as a contiguous buffer of ints (length num_fxlens) */
-static int *tpl_fxlens(tpl_node *r, int *num_fxlens) {
+static int *tpl_fxlens(tpl_node *r, int *num_fxlens)
+{
     *num_fxlens = ((tpl_root_data *)(r->data))->num_fxlens;
     return ((tpl_root_data *)(r->data))->fxlens;
 }
@@ -874,7 +893,8 @@ static int *tpl_fxlens(tpl_node *r, int *num_fxlens) {
  * already been set up with the proper space. The backbone is walked
  * which was obtained from the tpl_atyp header passed in.
  */
-static void *tpl_dump_atyp(tpl_node *n, tpl_atyp *at, void *dv) {
+static void *tpl_dump_atyp(tpl_node *n, tpl_atyp *at, void *dv)
+{
     tpl_backbone *bb;
     tpl_node *c;
     void *datav;
@@ -950,7 +970,8 @@ static void *tpl_dump_atyp(tpl_node *n, tpl_atyp *at, void *dv) {
 }
 
 /* figure the serialization output size needed for tpl whose root is n*/
-static size_t tpl_ser_osz(tpl_node *n) {
+static size_t tpl_ser_osz(tpl_node *n)
+{
     tpl_node *c, *np;
     size_t sz, itermax;
     tpl_bin *binp;
@@ -1021,7 +1042,8 @@ static size_t tpl_ser_osz(tpl_node *n) {
     return sz;
 }
 
-TPL_API int tpl_dump(tpl_node *r, int mode, ...) {
+TPL_API int tpl_dump(tpl_node *r, int mode, ...)
+{
     va_list ap;
     char *filename, *bufv;
     void **addr_out, *buf, *pa_addr;
@@ -1112,7 +1134,8 @@ TPL_API int tpl_dump(tpl_node *r, int mode, ...) {
  * adequate size to hold the serialized tpl. The sz parameter must be
  * the result of tpl_ser_osz(r).
  */
-static int tpl_dump_to_mem(tpl_node *r, void *addr, size_t sz) {
+static int tpl_dump_to_mem(tpl_node *r, void *addr, size_t sz)
+{
     uint32_t slen, sz32;
     int *fxlens, num_fxlens, i;
     void *dv;
@@ -1201,7 +1224,8 @@ static int tpl_dump_to_mem(tpl_node *r, void *addr, size_t sz) {
     return 0;
 }
 
-static int tpl_cpu_bigendian() {
+static int tpl_cpu_bigendian()
+{
     unsigned i = 1;
     char *c;
     c = (char *)&i;
@@ -1216,7 +1240,8 @@ static int tpl_cpu_bigendian() {
  * should exactly match the buffer size (bufsz) and the internal
  * recorded size (intlsz)
  */
-static int tpl_sanity(tpl_node *r, int excess_ok) {
+static int tpl_sanity(tpl_node *r, int excess_ok)
+{
     uint32_t intlsz;
     int found_nul = 0, rc, octothorpes = 0, num_fxlens, *fxlens, flen;
     void *d, *dv;
@@ -1299,7 +1324,8 @@ static int tpl_sanity(tpl_node *r, int excess_ok) {
     return 0;
 }
 
-static void *tpl_find_data_start(void *d) {
+static void *tpl_find_data_start(void *d)
+{
     int octothorpes = 0;
     d = (void *)((uintptr_t)d + 4); /* skip TPL_MAGIC and flags byte */
     d = (void *)((uintptr_t)d + 4); /* skip int32 overall len */
@@ -1314,7 +1340,8 @@ static void *tpl_find_data_start(void *d) {
     return d;
 }
 
-static int tpl_needs_endian_swap(void *d) {
+static int tpl_needs_endian_swap(void *d)
+{
     char *c;
     int cpu_is_bigendian;
     c = (char *)d;
@@ -1322,16 +1349,18 @@ static int tpl_needs_endian_swap(void *d) {
     return ((c[3] & TPL_FL_BIGENDIAN) == cpu_is_bigendian) ? 0 : 1;
 }
 
-static size_t tpl_size_for(char c) {
+static size_t tpl_size_for(char c)
+{
     int i;
-    for (i = 0; i < sizeof(tpl_types) / sizeof(tpl_types[0]); i++) {
+    for (i = 0; i < (int)(sizeof(tpl_types) / sizeof(tpl_types[0])); i++) {
         if (tpl_types[i].c == c)
             return tpl_types[i].sz;
     }
     return 0;
 }
 
-TPL_API char *tpl_peek(int mode, ...) {
+TPL_API char *tpl_peek(int mode, ...)
+{
     va_list ap;
     int xendian = 0, found_nul = 0, old_string_format = 0;
     char *filename = NULL, *datapeek_f = NULL, *datapeek_c, *datapeek_s;
@@ -1511,7 +1540,8 @@ fail:
 /* tpl_jot(TPL_FILE, "file.tpl", "si", &s, &i); */
 /* tpl_jot(TPL_MEM, &buf, &sz, "si", &s, &i); */
 /* tpl_jot(TPL_FD, fd, "si", &s, &i); */
-TPL_API int tpl_jot(int mode, ...) {
+TPL_API int tpl_jot(int mode, ...)
+{
     va_list ap;
     char *filename, *fmt;
     size_t *sz;
@@ -1563,7 +1593,8 @@ fail:
     return rc;
 }
 
-TPL_API int tpl_load(tpl_node *r, int mode, ...) {
+TPL_API int tpl_load(tpl_node *r, int mode, ...)
+{
     va_list ap;
     int rc = 0, fd = 0;
     char *filename = NULL;
@@ -1640,7 +1671,8 @@ TPL_API int tpl_load(tpl_node *r, int mode, ...) {
     return 0;
 }
 
-TPL_API int tpl_Alen(tpl_node *r, int i) {
+TPL_API int tpl_Alen(tpl_node *r, int i)
+{
     tpl_node *n;
 
     n = tpl_find_i(r, i);
@@ -1653,7 +1685,8 @@ TPL_API int tpl_Alen(tpl_node *r, int i) {
     return ((tpl_atyp *)(n->data))->num;
 }
 
-static void tpl_free_atyp(tpl_node *n, tpl_atyp *atyp) {
+static void tpl_free_atyp(tpl_node *n, tpl_atyp *atyp)
+{
     tpl_backbone *bb, *bbnxt;
     tpl_node *c;
     void *dv;
@@ -1727,7 +1760,8 @@ static void tpl_free_atyp(tpl_node *n, tpl_atyp *atyp) {
 /* determine (by walking) byte length of serialized r/A node at address dv
  * returns 0 on success, or -1 if the tpl isn't trustworthy (fails consistency)
  */
-static int tpl_serlen(tpl_node *r, tpl_node *n, void *dv, size_t *serlen) {
+static int tpl_serlen(tpl_node *r, tpl_node *n, void *dv, size_t *serlen)
+{
     uint32_t slen;
     int num = 0, fidx;
     tpl_node *c;
@@ -1827,7 +1861,8 @@ static int tpl_serlen(tpl_node *r, tpl_node *n, void *dv, size_t *serlen) {
     return 0;
 }
 
-static int tpl_mmap_output_file(char *filename, size_t sz, void **text_out) {
+static int tpl_mmap_output_file(char *filename, size_t sz, void **text_out)
+{
     void *text;
     int fd, perms;
 
@@ -1860,7 +1895,8 @@ static int tpl_mmap_output_file(char *filename, size_t sz, void **text_out) {
     return fd;
 }
 
-static int tpl_mmap_file(char *filename, tpl_mmap_rec *mr) {
+static int tpl_mmap_file(char *filename, tpl_mmap_rec *mr)
+{
     struct stat stat_buf;
 
     if ((mr->fd = open(filename, O_RDONLY)) == -1) {
@@ -1885,7 +1921,8 @@ static int tpl_mmap_file(char *filename, tpl_mmap_rec *mr) {
     return 0;
 }
 
-TPL_API int tpl_pack(tpl_node *r, int i) {
+TPL_API int tpl_pack(tpl_node *r, int i)
+{
     tpl_node *n, *child, *np;
     void *datav = NULL;
     size_t sz, itermax;
@@ -2057,7 +2094,8 @@ TPL_API int tpl_pack(tpl_node *r, int i) {
     return 0;
 }
 
-TPL_API int tpl_unpack(tpl_node *r, int i) {
+TPL_API int tpl_unpack(tpl_node *r, int i)
+{
     tpl_node *n, *c, *np;
     uint32_t slen;
     int rc = 1, fidx;
@@ -2206,7 +2244,8 @@ TPL_API int tpl_unpack(tpl_node *r, int i) {
 }
 
 /* Specialized function that unpacks only the root's A nodes, after tpl_load  */
-static int tpl_unpackA0(tpl_node *r) {
+static int tpl_unpackA0(tpl_node *r)
+{
     tpl_node *n, *c;
     uint32_t slen;
     int rc = 1, fidx, i;
@@ -2281,7 +2320,8 @@ static int tpl_unpackA0(tpl_node *r) {
 }
 
 /* In-place byte order swapping of a word of length "len" bytes */
-static void tpl_byteswap(void *word, int len) {
+static void tpl_byteswap(void *word, int len)
+{
     int i;
     char c, *w;
     w = (char *)word;
@@ -2292,7 +2332,8 @@ static void tpl_byteswap(void *word, int len) {
     }
 }
 
-static void tpl_fatal(const char *fmt, ...) {
+static void tpl_fatal(const char *fmt, ...)
+{
     va_list ap;
     char exit_msg[100];
 
@@ -2304,7 +2345,8 @@ static void tpl_fatal(const char *fmt, ...) {
     exit(-1);
 }
 
-TPL_API int tpl_gather(int mode, ...) {
+TPL_API int tpl_gather(int mode, ...)
+{
     va_list ap;
     int fd, rc = 0;
     size_t *szp, sz;
@@ -2348,7 +2390,8 @@ TPL_API int tpl_gather(int mode, ...) {
  * This is intended as a blocking call i.e. for use with a blocking fd.
  * It can be given a non-blocking fd, but the read spins if we have to wait.
  */
-static int tpl_gather_blocking(int fd, void **img, size_t *sz) {
+static int tpl_gather_blocking(int fd, void **img, size_t *sz)
+{
     char preamble[8];
     int i = 0, rc;
     uint32_t tpllen;
@@ -2396,7 +2439,7 @@ static int tpl_gather_blocking(int fd, void **img, size_t *sz) {
         rc = read(fd, &((*(char **)img)[i]), tpllen - i);
         i += (rc > 0) ? rc : 0;
     } while ((rc == -1 && (errno == EINTR || errno == EAGAIN)) ||
-             (rc > 0 && i < tpllen));
+             (rc > 0 && i < (int)tpllen));
 
     if (rc < 0) {
         tpl_hook.oops("tpl_gather_fd_blocking failed: %s\n", strerror(errno));
@@ -2406,7 +2449,7 @@ static int tpl_gather_blocking(int fd, void **img, size_t *sz) {
         /* tpl_hook.oops("tpl_gather_fd_blocking: eof\n"); */
         tpl_hook.free(*img);
         return 0;
-    } else if (i != tpllen) {
+    } else if (i != (int)tpllen) {
         tpl_hook.oops("internal error\n");
         tpl_hook.free(*img);
         return -1;
@@ -2418,7 +2461,8 @@ static int tpl_gather_blocking(int fd, void **img, size_t *sz) {
 /* Used by select()-driven apps which want to gather tpl images piecemeal */
 /* the file descriptor must be non-blocking for this functino to work. */
 static int tpl_gather_nonblocking(int fd, tpl_gather_t **gs, tpl_gather_cb *cb,
-                                  void *data) {
+                                  void *data)
+{
     char buf[TPL_GATHER_BUFLEN], *img, *tpl;
     int rc, keep_looping, cbrc = 0;
     size_t catlen;
@@ -2536,7 +2580,8 @@ static int tpl_gather_nonblocking(int fd, tpl_gather_t **gs, tpl_gather_cb *cb,
 
 /* gather tpl piecemeal from memory buffer (not fd) e.g., from a lower-level api */
 static int tpl_gather_mem(char *buf, size_t len, tpl_gather_t **gs, tpl_gather_cb *cb,
-                          void *data) {
+                          void *data)
+{
     char *img, *tpl;
     int keep_looping, cbrc = 0;
     size_t catlen;

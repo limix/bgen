@@ -37,7 +37,7 @@ int main()
     if (variants[0].nalleles != 2)
         return 1;
 
-    for (i = 0; i < nvariants; ++i) {
+    for (i = 0; i < (size_t)nvariants; ++i) {
         if (strncmp("A", variants[i].allele_ids[0].str,
                     variants[i].allele_ids[0].len) != 0)
             return 1;
@@ -83,15 +83,15 @@ int main()
         0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 
     jj = 0;
-    for (i = 0; i < nvariants; ++i) {
+    for (i = 0; i < (size_t)nvariants; ++i) {
         vg = bgen_open_variant_genotype(index, i);
 
         double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
 
         bgen_read_variant_genotype(index, vg, probabilities);
 
-        for (ii = 0; ii < nsamples; ++ii) {
-            for (j = 0; j < bgen_ncombs(vg); ++j) {
+        for (ii = 0; ii < (size_t)nsamples; ++ii) {
+            for (j = 0; j < (size_t)bgen_ncombs(vg); ++j) {
                 if (probabilities[ii * bgen_ncombs(vg) + j] != real_probs[jj])
                     return 1;
                 jj++;

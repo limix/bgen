@@ -159,7 +159,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     if (verbose)
         at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
 
-    for (size_t i = 0; i < bgen->nsamples; ++i) {
+    for (size_t i = 0; i < (size_t)bgen->nsamples; ++i) {
         if (verbose)
             athr_consume(at, 1);
 
@@ -193,7 +193,7 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *s
     if (samples == NULL)
         return;
 
-    for (size_t i = 0; i < bgen->nsamples; ++i)
+    for (size_t i = 0; i < (size_t)bgen->nsamples; ++i)
         free_nul(samples[i].str);
 
     free(samples);

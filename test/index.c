@@ -43,7 +43,6 @@ int create_index(const char *bgen_filepath, const char *filepath)
 
     assert_strncmp(header, "bgen index 03", 13);
 
-    uint16_t u16;
     uint32_t u32;
     uint64_t u64;
 
@@ -74,7 +73,6 @@ int use_index(const char *filepath)
 {
     struct bgen_mf *v;
     int nvariants;
-    size_t i, j;
 
     assert_not_null(v = bgen_open_metafile(filepath));
 

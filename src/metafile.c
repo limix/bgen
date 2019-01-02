@@ -141,7 +141,7 @@ uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
     fwrite_int(fp, v->position, 4);
     fwrite_int(fp, v->nalleles, 2);
 
-    for (size_t j = 0; j < v->nalleles; ++j)
+    for (size_t j = 0; j < (size_t)v->nalleles; ++j)
         fwrite_str(fp, v->allele_ids + j, 4);
 
     return ftell(fp) - start;
@@ -163,6 +163,9 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     mf->idx.poffset = dalloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
     if (mf->idx.poffset == NULL)
         goto err;
+
+    if (verbose)
+        printf("TODO\n");
 
     mf->idx.poffset[0] = 0;
     size_t i = 0, j = 0;
@@ -313,7 +316,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     struct bgen_vm *vars = NULL;
     FILE *fp = NULL;
 
-    if (part >= mf->idx.npartitions) {
+    if ((uint32_t)part >= mf->idx.npartitions) {
         error("The provided partition number %d is out-of-range.", part);
         goto err;
     }
@@ -369,7 +372,7 @@ err:
 
 BGEN_API void bgen_free_partition(struct bgen_vm *vars, int nvars)
 {
-    for (size_t i = 0; i < nvars; ++i)
+    for (size_t i = 0; i < (size_t)nvars; ++i)
         free_metadata(vars + i);
     free(vars);
 }

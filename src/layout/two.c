@@ -90,7 +90,7 @@ void read_phased_genotype(struct bgen_vg *vg, double *p)
                 ui_prob = 0;
                 offset = sample_start + haplo_start + allele_start;
 
-                for (bi = 0; bi < nbits; ++bi) {
+                for (bi = 0; bi < (size_t)nbits; ++bi) {
 
                     if (get_bit(vg->current_chunk, (int)(bi + offset))) {
                         ui_prob |= ((uint64_t)1 << bi);
@@ -151,7 +151,7 @@ void read_unphased_genotype(struct bgen_vg *vg, double *p)
             ui_prob = 0;
             offset = sample_start + geno_start;
 
-            for (bi = 0; bi < nbits; ++bi) {
+            for (bi = 0; bi < (size_t)nbits; ++bi) {
 
                 if (get_bit(vg->current_chunk, (int)(bi + offset))) {
                     ui_prob |= ((uint64_t)1 << bi);

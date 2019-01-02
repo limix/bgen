@@ -32,8 +32,8 @@ BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
     if (!variants)
         return;
 
-    for (size_t i = 0; i < bgen->nvariants; ++i) {
-        for (size_t j = 0; j < variants[i].nalleles; ++j) {
+    for (size_t i = 0; i < (size_t)bgen->nvariants; ++i) {
+        for (size_t j = 0; j < (size_t)variants[i].nalleles; ++j) {
             free_nul(variants[i].allele_ids[j].str);
         }
         free_nul(variants[i].allele_ids);
@@ -76,7 +76,7 @@ int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
     if (!v->allele_ids)
         goto err;
 
-    for (size_t i = 0; i < v->nalleles; ++i) {
+    for (size_t i = 0; i < (size_t)v->nalleles; ++i) {
         if (fread_str(bgen->file, v->allele_ids + i, 4))
             goto err;
     }
@@ -87,7 +87,7 @@ err:
     free_nul(v->rsid.str);
     free_nul(v->chrom.str);
     if (v->allele_ids) {
-        for (size_t i = 0; i < v->nalleles; ++i)
+        for (size_t i = 0; i < (size_t)v->nalleles; ++i)
             free_nul((v->allele_ids + i)->str);
     }
     free_nul(v->allele_ids);
@@ -133,7 +133,7 @@ BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
             goto err;
         }
 
-        if ((variants + i)->nalleles > (*index)->max_nalleles)
+        if ((uint32_t)(variants + i)->nalleles > (*index)->max_nalleles)
             (*index)->max_nalleles = (variants + i)->nalleles;
     }
 
