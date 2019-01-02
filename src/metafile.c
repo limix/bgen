@@ -1,5 +1,6 @@
 #define BGEN_API_EXPORTS
 
+#include "athr.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
@@ -159,13 +160,14 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
     init_metadata(&vm);
     uint64_t size;
     uint64_t offset;
+    struct athr *at = NULL;
 
     mf->idx.poffset = dalloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
     if (mf->idx.poffset == NULL)
         goto err;
 
     if (verbose)
-        printf("TODO\n");
+        at = athr_create(mf->idx.nvariants, "Writing variants", ATHR_BAR);
 
     mf->idx.poffset[0] = 0;
     size_t i = 0, j = 0;
@@ -174,6 +176,9 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
 
         if ((size = write_variant(mf->fp, &vm, offset)) == 0)
             goto err;
+
+        if (verbose)
+            athr_consume(at, 1);
 
         /* true for the first variant of every partition */
         if (i % (mf->idx.nvariants / mf->idx.npartitions) == 0) {
@@ -185,6 +190,8 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
         ++i;
         free_metadata(&vm);
     }
+    if (verbose)
+        athr_finish(at);
 
     fwrite_ui32(mf->fp, mf->idx.npartitions, sizeof(mf->idx.npartitions));
 
