@@ -354,6 +354,11 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
             fread_str(fp, vars[i].allele_ids + j, 4);
     }
 
+    if (fclose_nul(fp)) {
+        perror_fmt("Could not close file after reading partition");
+        goto err;
+    }
+
     return vars;
 err:
     if (vars != NULL)

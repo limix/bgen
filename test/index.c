@@ -67,7 +67,7 @@ int create_index(const char *bgen_filepath, const char *filepath)
     assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 98);
 
-    return 0;
+    return fclose(fp);
 }
 
 int use_index(const char *filepath)
@@ -114,6 +114,8 @@ int use_index(const char *filepath)
     assert_equal_int(vm[0].nalleles, 4);
     assert_strncmp(vm[1].allele_ids[0].str, "A", 1);
     assert_strncmp(vm[1].allele_ids[1].str, "G", 1);
+
+    bgen_free_partition(vm, nvariants);
 
     assert_equal_int(bgen_close_metafile(v), 0);
 
