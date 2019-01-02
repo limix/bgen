@@ -48,7 +48,8 @@ struct bgen_vm
     struct bgen_str *allele_ids;
 };
 
-BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *, const char *, int);
+BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *, const char *, int,
+                                              int);
 BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
 BGEN_API int bgen_metafile_nparts(struct bgen_mf *);
 BGEN_API int bgen_metafile_nvars(struct bgen_mf *);

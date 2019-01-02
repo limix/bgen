@@ -51,6 +51,8 @@ struct bgen_mf *alloc_mf(void)
     return mf;
 }
 
+inline static int ceildiv(size_t x, size_t y) { return (x + (y - 1)) / y; }
+
 /* Fetch the variant metada and record the genotype offset.
  *
  * Parameters
@@ -167,10 +169,11 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
         goto err;
 
     if (verbose)
-        at = athr_create(mf->idx.nvariants, "Writing variants", ATHR_BAR);
+        at = athr_create(mf->idx.nvariants, "Writing variants", ATHR_BAR | ATHR_ETA);
 
     mf->idx.poffset[0] = 0;
     size_t i = 0, j = 0;
+    int part_size = ceildiv(mf->idx.nvariants, mf->idx.npartitions);
     /* Write the first block. */
     while (next(&vm, &offset, args)) {
 
@@ -181,7 +184,7 @@ int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int ver
             athr_consume(at, 1);
 
         /* true for the first variant of every partition */
-        if (i % (mf->idx.nvariants / mf->idx.npartitions) == 0) {
+        if (i % part_size == 0) {
             ++j;
             mf->idx.poffset[j] = mf->idx.poffset[j - 1];
         }
@@ -209,9 +212,9 @@ err:
 }
 
 BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char *fp,
-                                              int verbose)
+                                              int nparts, int verbose)
 {
-    struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), 2);
+    struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), nparts);
     if (!mf)
         goto err;
 
@@ -229,8 +232,12 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     if (write_metafile(mf, &_next_variant, &ctx, verbose))
         goto err;
 
-    if (bgen_close_metafile(mf))
+    /* if (bgen_close_metafile(mf)) */
+    /*     goto err; */
+
+    if (fclose_nul(mf->fp))
         goto err;
+    mf->fp = NULL;
 
     fclose(bgen->file);
     return mf;
@@ -243,8 +250,10 @@ err:
 BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
 {
     struct bgen_mf *mf = alloc_mf();
-    if (!mf)
+    if (!mf) {
+        error("Could not allocate resources for metafile.");
         goto err;
+    }
 
     mf->filepath = strdup(filepath);
 
@@ -254,33 +263,43 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     }
 
     char header[13];
-    if (fread1(header, 13 * sizeof(char), mf->fp))
+    if (fread1(header, 13 * sizeof(char), mf->fp)) {
+        perror_fmt("Could not fetch the metafile header");
         goto err;
+    }
 
     if (strncmp(header, "bgen index 03", 13)) {
         error("Unrecognized bgen index version: %.13s.", header);
         goto err;
     }
 
-    if (fread1(&(mf->idx.nvariants), sizeof(uint32_t), mf->fp))
+    if (fread1(&(mf->idx.nvariants), sizeof(uint32_t), mf->fp)) {
+        perror_fmt("Could not read the number of variants from metafile");
         goto err;
+    }
 
-    if (fread1(&(mf->idx.metasize), sizeof(uint64_t), mf->fp))
+    if (fread1(&(mf->idx.metasize), sizeof(uint64_t), mf->fp)) {
+        perror_fmt("Could not read the metasize from metafile");
         goto err;
+    }
 
     if (fseek(mf->fp, mf->idx.metasize, SEEK_CUR)) {
         error("Could to fseek to the number of partitions.");
         goto err;
     }
 
-    if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->fp))
+    if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->fp)) {
+        perror_fmt("Could not read the number of partitions");
         goto err;
+    }
 
     mf->idx.poffset = dalloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
-        if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->fp))
+        if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->fp)) {
+            perror_fmt("Could not read partition offsets");
             goto err;
+        }
     }
 
     return mf;
@@ -297,6 +316,7 @@ BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
             perror_fmt("Could not close the %s file.", mf->filepath);
             return 1;
         }
+        mf->fp = NULL;
         free_nul(mf->filepath);
         free_nul(mf->idx.poffset);
         free_nul(mf);
