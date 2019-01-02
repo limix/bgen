@@ -1,6 +1,5 @@
 #define BGEN_API_EXPORTS
 
-#include "endian.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
@@ -85,6 +84,13 @@ int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant
 err:
     free_metadata(vm);
     return 0;
+}
+
+int is_little_endian(void)
+{
+    int num = 1;
+
+    return *(char *)&num == 1;
 }
 
 struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts)

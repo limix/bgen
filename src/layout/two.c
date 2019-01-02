@@ -54,7 +54,7 @@ int choose(int n, int k)
     return ans;
 }
 
-void bgen_read_phased_genotype(struct bgen_vg *vg, double *p)
+void read_phased_genotype(struct bgen_vg *vg, double *p)
 {
     int nalleles, nbits, max_ploidy;
     uint64_t uip_sum, ui_prob;
@@ -112,7 +112,7 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p)
     }
 }
 
-void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p)
+void read_unphased_genotype(struct bgen_vg *vg, double *p)
 {
     int nalleles, nbits, max_ploidy, max_ncombs;
     uint64_t uip_sum, ui_prob;
@@ -170,7 +170,7 @@ void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p)
     }
 }
 
-char *bgen_uncompress_two(struct bgen_vi *idx, FILE *file)
+char *uncompress_two(struct bgen_vi *idx, FILE *file)
 {
     size_t clength, ulength;
     char *cchunk;
@@ -221,7 +221,7 @@ err:
     return NULL;
 }
 
-int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
+int read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -233,7 +233,7 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *fi
     size_t i;
 
     if (idx->compression > 0) {
-        if ((chunk = bgen_uncompress_two(idx, file)) == NULL)
+        if ((chunk = uncompress_two(idx, file)) == NULL)
             return 1;
         c = chunk;
         bgen_memcpy(&nsamples, &c, 4);
@@ -283,10 +283,10 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *fi
     return EXIT_SUCCESS;
 }
 
-void bgen_read_probs_two(struct bgen_vg *vg, double *p)
+void read_probs_two(struct bgen_vg *vg, double *p)
 {
     if (vg->phased)
-        bgen_read_phased_genotype(vg, p);
+        read_phased_genotype(vg, p);
     else
-        bgen_read_unphased_genotype(vg, p);
+        read_unphased_genotype(vg, p);
 }

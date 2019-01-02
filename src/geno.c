@@ -36,7 +36,7 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vi *vi, size_t index)
     if (vi->layout == 1) {
         bgen_read_probs_header_one(vi, vg, fp);
     } else if (vi->layout == 2) {
-        bgen_read_probs_header_two(vi, vg, fp);
+        read_probs_header_two(vi, vg, fp);
     } else {
         error("Unrecognized layout type.");
         goto err;
@@ -60,7 +60,7 @@ BGEN_API int bgen_read_genotype(struct bgen_vi *index, struct bgen_vg *vg,
     if (index->layout == 1) {
         bgen_read_probs_one(vg, probs);
     } else if (index->layout == 2) {
-        bgen_read_probs_two(vg, probs);
+        read_probs_two(vg, probs);
     } else {
         error("Unrecognized layout type.");
         return 1;
