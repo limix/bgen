@@ -1,9 +1,9 @@
 #include "layout/two.h"
 #include "bgen.h"
-#include "choose.h"
 #include "depr/variants_index.h"
 #include "file.h"
 #include "geno.h"
+#include "math.h"
 #include "mem.h"
 #include "zip/zlib_wrapper.h"
 #include "zip/zstd_wrapper.h"
@@ -14,9 +14,9 @@
 
 #define BIT(var, bit) ((var & (1 << bit)) != 0)
 
-inline static int bgen_read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
+inline static int read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
 
-inline static int bgen_read_missingness(char ploidy_miss) { return ploidy_miss >> 7; }
+inline static int read_missingness(char ploidy_miss) { return ploidy_miss >> 7; }
 
 inline static int get_bit(const char *mem, int bit_idx)
 {
@@ -27,10 +27,31 @@ inline static int get_bit(const char *mem, int bit_idx)
 
 inline static void set_array_nan(double *p, size_t n)
 {
-    size_t i;
-    for (i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i)
         p[i] = NAN;
+}
+
+/* Number of ways to choose `k` elements from a total of `n`. */
+int choose(int n, int k)
+{
+    int ans;
+    int j;
+
+    ans = 1;
+
+    k = k > n - k ? n - k : k;
+    j = 1;
+
+    for (; j <= k; j++, n--) {
+        if (n % j == 0) {
+            ans *= n / j;
+        } else if (ans % j == 0) {
+            ans = ans / j * n;
+        } else {
+            ans = (ans * n) / j;
+        }
     }
+    return ans;
 }
 
 void bgen_read_phased_genotype(struct bgen_vg *vg, double *p)
@@ -49,10 +70,10 @@ void bgen_read_phased_genotype(struct bgen_vg *vg, double *p)
 
     sample_start = 0;
     for (j = 0; j < vg->nsamples; ++j) {
-        int ploidy = bgen_read_ploidy(vg->plo_miss[j]);
+        int ploidy = read_ploidy(vg->plo_miss[j]);
         pend = p + max_ploidy * nalleles;
 
-        if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
+        if (read_missingness(vg->plo_miss[j]) != 0) {
             set_array_nan(p, (size_t)(pend - p));
             p = pend;
             sample_start += nbits * ploidy * (nalleles - 1);
@@ -106,16 +127,16 @@ void bgen_read_unphased_genotype(struct bgen_vg *vg, double *p)
     denom = (double)((((uint64_t)1 << nbits)) - 1);
     double *pend;
 
-    max_ncombs = bgen_choose(nalleles + max_ploidy - 1, nalleles - 1);
+    max_ncombs = choose(nalleles + max_ploidy - 1, nalleles - 1);
 
     sample_start = 0;
     for (j = 0; j < vg->nsamples; ++j) {
         pend = p + max_ncombs;
-        int ploidy = bgen_read_ploidy(vg->plo_miss[j]);
+        int ploidy = read_ploidy(vg->plo_miss[j]);
 
-        int ncombs = bgen_choose(nalleles + ploidy - 1, nalleles - 1);
+        int ncombs = choose(nalleles + ploidy - 1, nalleles - 1);
 
-        if (bgen_read_missingness(vg->plo_miss[j]) != 0) {
+        if (read_missingness(vg->plo_miss[j]) != 0) {
             set_array_nan(p, (size_t)(pend - p));
             p = pend;
             sample_start += nbits * (ncombs - 1);
@@ -255,7 +276,7 @@ int bgen_read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *fi
     if (phased)
         vg->ncombs = nalleles * vg->max_ploidy;
     else
-        vg->ncombs = bgen_choose(nalleles + vg->max_ploidy - 1, nalleles - 1);
+        vg->ncombs = choose(nalleles + vg->max_ploidy - 1, nalleles - 1);
     vg->chunk = chunk;
     vg->current_chunk = c;
 

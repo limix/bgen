@@ -1,6 +1,5 @@
 #include "layout/one.h"
 #include "bgen.h"
-#include "choose.h"
 #include "depr/variants_index.h"
 #include "file.h"
 #include "geno.h"

@@ -1,8 +1,7 @@
 function(define_sources BASE_DIR _SOURCES)
 
     list(APPEND REL_SOURCES
-        buffer.c
-        choose.c
+        depr/buffer.c
         depr/tpl.c
         depr/variant.c
         depr/variants_index.c

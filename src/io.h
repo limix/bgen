@@ -1,3 +1,4 @@
+/* Define low-level io read and write functions. */
 #ifndef _BGEN_IO_H
 #define _BGEN_IO_H
 
@@ -12,12 +13,14 @@ static inline int fclose_nul(FILE *fp)
     return 0;
 }
 
+/* Write a single block of data with a given size. */
 static inline int fwrite1(const void *restrict buffer, size_t size,
                           FILE *restrict stream)
 {
     return fwrite(buffer, size, 1, stream) != 1;
 }
 
+/* Read a single block of data with a given size. */
 static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stream)
 {
     return fread(buffer, size, 1, stream) != 1;
@@ -44,6 +47,7 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
         fputs("\n", stderr);                                                           \
     } while (0)
 
+/* Define fread_int, fread_ui64 and like. */
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE *, TYPE *, size_t);
 
 DECLARE_TYPE_FREAD(int, int);
@@ -52,6 +56,7 @@ DECLARE_TYPE_FREAD(uint64_t, ui64);
 DECLARE_TYPE_FREAD(uint32_t, ui32);
 DECLARE_TYPE_FREAD(uint16_t, ui16);
 
+/* Define fwrite_int, fwrite_ui64 and like. */
 #define DECLARE_TYPE_FWRITE(TYPE, SUF) int fwrite_##SUF(FILE *, TYPE, size_t);
 
 DECLARE_TYPE_FWRITE(int, int);
