@@ -78,7 +78,7 @@ A couple of dependencies have to be installed first:
 
 ```bash
 apt-get update && apt-get upgrade --yes
-apt-get install build-essential curl zlib1g-dev cmake gdb
+apt-get install build-essential curl zlib1g-dev cmake gdb valgrind --yes
 bash <(curl -fsSL https://raw.githubusercontent.com/horta/almosthere/master/install)
 bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
 ```

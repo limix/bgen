@@ -7,24 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-int create_index(const char *bgen_filepath, const char *filepath);
-int use_index(const char *filepath);
-
-int main()
-{
-
-    const char filepath[] = "complex_index03.index";
-    const char bgen_filepath[] = "data/complex.23bits.bgen";
-
-    if (create_index(bgen_filepath, filepath))
-        return 1;
-
-    if (use_index(filepath))
-        return 1;
-
-    return 0;
-}
-
 int create_index(const char *bgen_filepath, const char *filepath)
 {
     struct bgen_file *bgen;
@@ -33,6 +15,12 @@ int create_index(const char *bgen_filepath, const char *filepath)
     assert_not_null(bgen_create_metafile(bgen, filepath, 1));
 
     bgen_close(bgen);
+
+    return 0;
+}
+
+int check_metafile(const char *filepath)
+{
 
     FILE *fp = fopen(filepath, "rb");
     assert_not_null(fp);
@@ -116,6 +104,50 @@ int use_index(const char *filepath)
     bgen_free_partition(vm, nvariants);
 
     assert_equal_int(bgen_close_metafile(v), 0);
+
+    return 0;
+}
+
+int use_index_wrongly(const char *filepath)
+{
+    struct bgen_mf *v;
+    int nvariants;
+
+    assert_null(v = bgen_open_metafile("wrong-path"));
+
+    assert_not_null(v = bgen_open_metafile(filepath));
+
+    int nparts = bgen_metafile_nparts(v);
+    assert_equal_int(nparts, 2);
+
+    int nvars = bgen_metafile_nvars(v);
+    assert_equal_int(nvars, 10);
+
+    struct bgen_vm *vm = bgen_read_partition(v, 3, &nvariants);
+    assert_null(vm);
+
+    assert_equal_int(bgen_close_metafile(v), 0);
+
+    return 0;
+}
+
+int main()
+{
+
+    const char filepath[] = "complex_index03.index";
+    const char bgen_filepath[] = "data/complex.23bits.bgen";
+
+    if (create_index(bgen_filepath, filepath))
+        return 1;
+
+    if (check_metafile(filepath))
+        return 1;
+
+    if (use_index(filepath))
+        return 1;
+
+    if (use_index_wrongly(filepath))
+        return 1;
 
     return 0;
 }
