@@ -1,7 +1,7 @@
 #include "buffer.h"
 #include "athr.h"
 #include "min.h"
-#include "zip/zstd_wrapper.h"
+#include "zip/zstd.h"
 #include <stdio.h>
 
 struct Buffer

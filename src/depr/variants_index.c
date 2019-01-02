@@ -29,7 +29,7 @@
 #include "file.h"
 #include "mem.h"
 #include "tpl/tpl.h"
-#include "zip/zstd_wrapper.h"
+#include "zip/zstd.h"
 
 #define SET_STR(dst, src)                                                              \
     (dst)->len = (src)->len;                                                           \

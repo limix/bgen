@@ -4,8 +4,8 @@
 #include "file.h"
 #include "geno.h"
 #include "mem.h"
-#include "zip/zlib_wrapper.h"
-#include "zip/zstd_wrapper.h"
+#include "zip/zlib.h"
+#include "zip/zstd.h"
 #include <assert.h>
 #include <math.h>
 #include <stdlib.h>

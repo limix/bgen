@@ -1,6 +1,7 @@
-#include "zip/zstd_wrapper.h"
+#include "zip/zstd.h"
 
-int bgen_unzstd(const char *src, size_t src_size, void **dst, size_t *dst_size) {
+int bgen_unzstd(const char *src, size_t src_size, void **dst, size_t *dst_size)
+{
     size_t dSize = ZSTD_decompress(*dst, *dst_size, src, src_size);
 
     if (ZSTD_isError(dSize)) {
@@ -11,7 +12,8 @@ int bgen_unzstd(const char *src, size_t src_size, void **dst, size_t *dst_size) 
     return 0;
 }
 
-char *bgen_zstd(const char *src, size_t src_size, size_t *dst_size) {
+char *bgen_zstd(const char *src, size_t src_size, size_t *dst_size)
+{
 
     char *dst;
     size_t dst_capacity;
@@ -20,8 +22,7 @@ char *bgen_zstd(const char *src, size_t src_size, size_t *dst_size) {
     dst_capacity = ZSTD_compressBound(src_size) + src_size;
     dst = malloc(dst_capacity);
 
-    dst_size_ =
-        ZSTD_compress(dst, dst_capacity, src, src_size, 5);
+    dst_size_ = ZSTD_compress(dst, dst_capacity, src, src_size, 5);
 
     if (ZSTD_isError(dst_size_)) {
         fprintf(stderr, "error encoding: %s \n", ZSTD_getErrorName(dst_size_));

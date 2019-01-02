@@ -5,8 +5,8 @@
 #include "geno.h"
 #include "math.h"
 #include "mem.h"
-#include "zip/zlib_wrapper.h"
-#include "zip/zstd_wrapper.h"
+#include "zip/zlib.h"
+#include "zip/zstd.h"
 #include <assert.h>
 #include <math.h>
 #include <stdint.h>

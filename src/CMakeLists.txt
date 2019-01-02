@@ -15,8 +15,8 @@ function(define_sources BASE_DIR _SOURCES)
         str.c
         tpl/tpl.c
         variant.c
-        zip/zlib_wrapper.c
-        zip/zstd_wrapper.c)
+        zip/zlib.c
+        zip/zstd.c)
 
     if(CMAKE_SYSTEM_NAME MATCHES Windows)
         list(APPEND REL_SOURCES tpl/win/mmap.c)

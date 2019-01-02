@@ -1,11 +1,9 @@
-#include "zlib_wrapper.h"
-
+#include "zip/zlib.h"
+#include "bgen.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>
-
-#include "bgen.h"
 
 int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size)
 {
