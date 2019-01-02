@@ -212,7 +212,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     bopen_or_leave(bgen);
 
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
-        perror("Could not jump to the variants start");
+        perror_fmt("Could not jump to the variants start");
         goto err;
     }
 
@@ -325,17 +325,17 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         init_metadata(vars + i);
 
     if ((fp = fopen(mf->filepath, "rb")) == NULL) {
-        perror("Could not open bgen index file");
+        perror_fmt("Could not open bgen index file");
         goto err;
     }
 
     if (fseek(fp, 13 + 4 + 8, SEEK_SET)) {
-        perror("Could not fseek bgen index file");
+        perror_fmt("Could not fseek bgen index file");
         goto err;
     }
 
     if (fseek(fp, mf->idx.poffset[part], SEEK_CUR)) {
-        perror("Could not fseek bgen index file");
+        perror_fmt("Could not fseek bgen index file");
         goto err;
     }
 
