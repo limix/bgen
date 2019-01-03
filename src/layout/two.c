@@ -236,7 +236,7 @@ int read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
         if ((chunk = uncompress_two(idx, file)) == NULL)
             return 1;
         c = chunk;
-        bgen_memcpy(&nsamples, &c, 4);
+        memcpy_walk(&nsamples, &c, 4);
     } else {
         if (fread(&nsamples, 1, 4, file) < 4)
             return 1;
@@ -251,9 +251,9 @@ int read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
         c = chunk;
     }
 
-    bgen_memcpy(&nalleles, &c, 2);
-    bgen_memcpy(&min_ploidy, &c, 1);
-    bgen_memcpy(&max_ploidy, &c, 1);
+    memcpy_walk(&nalleles, &c, 2);
+    memcpy_walk(&min_ploidy, &c, 1);
+    memcpy_walk(&max_ploidy, &c, 1);
     vg->min_ploidy = min_ploidy;
     vg->max_ploidy = max_ploidy;
 
@@ -264,8 +264,8 @@ int read_probs_header_two(struct bgen_vi *idx, struct bgen_vg *vg, FILE *file)
     }
     c += nsamples;
 
-    bgen_memcpy(&phased, &c, 1);
-    bgen_memcpy(&nbits, &c, 1);
+    memcpy_walk(&phased, &c, 1);
+    memcpy_walk(&nbits, &c, 1);
 
     vg->nsamples = nsamples;
     vg->nalleles = nalleles;

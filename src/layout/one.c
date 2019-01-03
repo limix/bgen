@@ -24,7 +24,7 @@ void bgen_read_unphased_one(struct bgen_vg *vg, double *probabilities)
         unsigned int ui_prob_sum = 0;
 
         for (i = 0; i < 3; ++i) {
-            bgen_memcpy(&ui_prob, &chunk, 2);
+            memcpy_walk(&ui_prob, &chunk, 2);
             probabilities[j * 3 + i] = ui_prob / denom;
             ui_prob_sum += ui_prob;
         }
