@@ -17,6 +17,7 @@ struct bgen_vg
     char *chunk;
     char *current_chunk;
     size_t variant_idx;
+    size_t vaddr;
 };
 
 #endif /* _BGEN_VARIANT_GENOTYPE_H */

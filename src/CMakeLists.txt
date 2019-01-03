@@ -7,6 +7,7 @@ function(define_sources BASE_DIR _SOURCES)
         depr/variants_index.c
         file.c
         geno.c
+        index.c
         io.c
         layout/one.c
         layout/two.c

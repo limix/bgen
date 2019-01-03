@@ -7,6 +7,16 @@
 #include "str.h"
 #include <assert.h>
 
+int close_bgen_file(struct bgen_file *bgen)
+{
+    if (!fclose_nul(bgen->file)) {
+        perror_fmt("Could not close bgen file %s", bgen->filepath);
+        return 1;
+    }
+    bgen->file = NULL;
+    return 0;
+}
+
 /*
  * Read the header block defined as follows:
  *
@@ -94,17 +104,13 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
     /* if they actually exist */
     bgen->samples_start = ftell(bgen->file);
 
-    if (fclose(bgen->file)) {
-        perror_fmt("Could not close %s", filepath);
-        goto err;
-    }
+    close_bgen_file(bgen);
 
     return bgen;
 
 err:
     if (bgen) {
-        fclose_nul(bgen->file);
-        bgen->file = NULL;
+        close_bgen_file(bgen);
         free_nul(bgen->filepath);
     }
     return free_nul(bgen);
@@ -170,12 +176,11 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
         athr_finish(at);
 
     bgen->variants_start = ftell(bgen->file);
-    fclose(bgen->file);
-
+    close_bgen_file(bgen);
     return sample_ids;
 
 err:
-    fclose_nul(bgen->file);
+    close_bgen_file(bgen);
     if (at)
         athr_finish(at);
     return free_nul(sample_ids);

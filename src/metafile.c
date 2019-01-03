@@ -232,17 +232,15 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     if (write_metafile(mf, &_next_variant, &ctx, verbose))
         goto err;
 
-    /* if (bgen_close_metafile(mf)) */
-    /*     goto err; */
-
     if (fclose_nul(mf->fp))
         goto err;
     mf->fp = NULL;
 
-    fclose(bgen->file);
+    close_bgen_file(bgen);
     return mf;
+
 err:
-    fclose_nul(bgen->file);
+    close_bgen_file(bgen);
     bgen_close_metafile(mf);
     return NULL;
 }

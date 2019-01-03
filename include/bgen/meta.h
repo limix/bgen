@@ -56,9 +56,5 @@ BGEN_API int bgen_metafile_nvars(struct bgen_mf *);
 BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *, int, int *);
 BGEN_API void bgen_free_partition(struct bgen_vm *, int);
 BGEN_API int bgen_close_metafile(struct bgen_mf *);
-#if BGEN_OPEN_GENOTYPE == 3
-/* Open a variant for genotype queries. */
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_vm *);
-#endif
 
 #endif /* BGEN_META_H */

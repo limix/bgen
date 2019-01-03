@@ -34,15 +34,6 @@
 #define BGEN_VERSION_PATCH 0
 #define BGEN_VERSION "3.0.0"
 
-/* Possible values are `1` or `3`:
- * - Define as `1` for `bgen_open_genotype` signature from bgen version 1.x, which
- *   is deprecated.
- * - Define as `3` for `bgen_open_genotype` signature from bgen version 3.x.
- */
-#ifndef BGEN_OPEN_GENOTYPE
-#define BGEN_OPEN_GENOTYPE 1
-#endif
-
 #ifdef __cplusplus
 extern "C"
 {

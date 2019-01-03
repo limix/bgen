@@ -23,4 +23,6 @@ struct bgen_file
         goto err;                                                                      \
     }
 
+int close_bgen_file(struct bgen_file *bgen);
+
 #endif /* _BGEN_FILE_H */
