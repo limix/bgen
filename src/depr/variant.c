@@ -174,8 +174,6 @@ BGEN_DEPRECATED struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi,
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    printf("vi->start[index]: %ld\n", (long)vi->start[index]);
-
     if (fseek(fp, (long)vi->start[index], SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", vi->filepath);
         goto err;
