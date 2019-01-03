@@ -9,13 +9,27 @@
 #include "str.h"
 #include <assert.h>
 
-BGEN_API int bgen_max_nalleles(struct bgen_vi *vi)
+BGEN_DEPRECATED int bgen_read_genotype(struct bgen_vi *idx, struct bgen_vg *vg,
+                                       double *probs)
+{
+    if (idx->layout == 1) {
+        bgen_read_probs_one(vg, probs);
+    } else if (idx->layout == 2) {
+        read_probs_two(vg, probs);
+    } else {
+        error("Unrecognized layout type %d", idx->layout);
+        return 1;
+    }
+    return 0;
+}
+
+BGEN_DEPRECATED int bgen_max_nalleles(struct bgen_vi *vi)
 {
     assert(vi);
     return vi->max_nalleles;
 }
 
-BGEN_API void bgen_free_index(struct bgen_vi *index)
+BGEN_DEPRECATED void bgen_free_index(struct bgen_vi *index)
 {
     if (index) {
         free_nul(index->filepath);
@@ -24,8 +38,8 @@ BGEN_API void bgen_free_index(struct bgen_vi *index)
     free_nul(index);
 }
 
-BGEN_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
-                                          struct bgen_var *variants)
+BGEN_DEPRECATED void bgen_free_variants_metadata(const struct bgen_file *bgen,
+                                                 struct bgen_var *variants)
 {
 
     assert(bgen);
@@ -94,8 +108,8 @@ err:
     return 1;
 }
 
-BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
-                                             struct bgen_vi **index, int verbose)
+BGEN_DEPRECATED struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
+                                                    struct bgen_vi **index, int verbose)
 {
     struct bgen_var *variants = NULL;
     uint32_t length;
@@ -144,7 +158,8 @@ err:
     return free_nul(*index);
 }
 
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index)
+BGEN_DEPRECATED struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi,
+                                                           size_t index)
 {
     struct bgen_vg *vg = NULL;
     FILE *fp = NULL;
@@ -183,8 +198,8 @@ err:
     return free_nul(vg);
 }
 
-BGEN_API int bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
-                                        double *probs)
+BGEN_DEPRECATED int bgen_read_variant_genotype(struct bgen_vi *index,
+                                               struct bgen_vg *vg, double *probs)
 {
     if (index->layout == 1) {
         bgen_read_probs_one(vg, probs);
@@ -197,7 +212,7 @@ BGEN_API int bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *v
     return 0;
 }
 
-BGEN_API void bgen_close_variant_genotype(struct bgen_vg *vg)
+BGEN_DEPRECATED void bgen_close_variant_genotype(struct bgen_vg *vg)
 {
     if (vg) {
         free_nul(vg->chunk);

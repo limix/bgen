@@ -4,7 +4,6 @@
 
 #include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 static inline int fclose_nul(FILE *fp)
 {
@@ -37,14 +36,21 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
 #define echo(...)                                                                      \
     do {                                                                               \
         printf(__VA_ARGS__);                                                           \
-        puts("");                                                                      \
+        puts(".");                                                                     \
+    } while (0)
+
+#define warn(...)                                                                      \
+    do {                                                                               \
+        fputs("Warning: ", stdout);                                                    \
+        printf(__VA_ARGS__);                                                           \
+        puts(".");                                                                     \
     } while (0)
 
 #define error(...)                                                                     \
     do {                                                                               \
         fputs("Error: ", stderr);                                                      \
         fprintf(stderr, __VA_ARGS__);                                                  \
-        fputs("\n", stderr);                                                           \
+        fputs(".\n", stderr);                                                          \
     } while (0)
 
 /* Define fread_int, fread_ui64 and like. */

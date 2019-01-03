@@ -16,6 +16,7 @@ struct bgen_vg
     uint8_t max_ploidy;
     char *chunk;
     char *current_chunk;
+    /* Deprecated: used by bgen versions 1 and 2. Use `vaddr` instead. */
     size_t variant_idx;
     size_t vaddr;
 };

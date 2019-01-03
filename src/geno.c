@@ -9,13 +9,32 @@
 #include "mem.h"
 #include <assert.h>
 
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_vm *vm)
+struct bgen_vg *create_vg()
 {
     struct bgen_vg *vg = dalloc(sizeof(struct bgen_vg));
-    vg->variant_idx = 0;
-    vg->vaddr = vm->vaddr;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
+    vg->current_chunk = NULL;
+    return vg;
+}
+
+int free_vg(struct bgen_vg *vg)
+{
+    if (vg) {
+        vg->plo_miss = free_nul(vg->plo_miss);
+        vg->current_chunk = vg->chunk = free_nul(vg->chunk);
+    }
+    return free_nul(vg) != NULL;
+}
+
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_vm *vm)
+{
+    struct bgen_vg *vg = create_vg();
+    if (!vg) {
+        error("Could not open genotype");
+        goto err;
+    }
+    vg->vaddr = vm->vaddr;
 
     if (fseek(bgen->file, (long)vm->vaddr, SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", bgen->filepath);
@@ -30,7 +49,7 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_
     } else if (bgen->layout == 2) {
         read_probs_header_two(&vi, vg, bgen->file);
     } else {
-        error("Unrecognized layout type.");
+        error("Unrecognized layout type %d", bgen->layout);
         goto err;
     }
 
@@ -40,28 +59,7 @@ err:
     return free_nul(vg);
 }
 
-BGEN_DEPRECATED BGEN_API int bgen_read_genotype(struct bgen_vi *index,
-                                                struct bgen_vg *vg, double *probs)
-{
-    if (index->layout == 1) {
-        bgen_read_probs_one(vg, probs);
-    } else if (index->layout == 2) {
-        read_probs_two(vg, probs);
-    } else {
-        error("Unrecognized layout type.");
-        return 1;
-    }
-    return 0;
-}
-
-BGEN_API void bgen_close_genotype(struct bgen_vg *vg)
-{
-    if (vg) {
-        free_nul(vg->chunk);
-        free_nul(vg->plo_miss);
-    }
-    free_nul(vg);
-}
+BGEN_API void bgen_close_genotype(struct bgen_vg *vg) { free_vg(vg); }
 
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 

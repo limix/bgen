@@ -24,8 +24,10 @@ static inline void *free_nul(void *p)
 
 #define dalloc(SIZE) _dalloc(SIZE, __FILE__, __LINE__)
 
-// Duplicate a string.
-char *bgen_strdup(const char *src);
-void bgen_memcpy(void *dst, char **src, size_t n);
+static inline void bgen_memcpy(void *dst, char **src, size_t n)
+{
+    memcpy(dst, *src, n);
+    *src = *src + n;
+}
 
 #endif /* _BGEN_MEM_H */

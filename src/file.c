@@ -16,7 +16,7 @@ int close_bgen_file(struct bgen_file *bgen)
         if (ferror(bgen->file))
             perror_fmt("Could not close bgen file %s", filepath);
         else
-            error("Could not close bgen file %s. Maybe it has already been closed.",
+            error("Could not close bgen file %s. Maybe it has already been closed",
                   filepath);
         bgen->file = NULL;
         return 1;
@@ -42,37 +42,35 @@ int read_bgen_header(struct bgen_file *bgen)
     uint32_t flags;
 
     if (fread_ui32(bgen->file, &header_length, 4)) {
-        error("Could not read the header length.");
+        error("Could not read the header length");
         return 1;
     }
 
     if (fread_int(bgen->file, &bgen->nvariants, 4)) {
-        error("Could not read the number of variants.");
+        error("Could not read the number of variants");
         return 1;
     }
 
     if (fread_int(bgen->file, &bgen->nsamples, 4)) {
-        error("Could not read the number of samples.");
+        error("Could not read the number of samples");
         return 1;
     }
 
     if (fread_ui32(bgen->file, &magic_number, 4)) {
-        error("Could not read the magic number.");
+        error("Could not read the magic number");
         return 1;
     }
 
-    if (magic_number != 1852139362) {
-        error("This is not a BGEN file: magic number mismatch.");
-        return 1;
-    }
+    if (magic_number != 1852139362)
+        warn("This is might not be a BGEN file: magic number mismatch");
 
     if (fseek(bgen->file, header_length - 20, SEEK_CUR)) {
-        error("Fseek error while reading a BGEN file.");
+        error("Fseek error while reading a BGEN file");
         return 1;
     }
 
     if (fread_ui32(bgen->file, &flags, 4)) {
-        error("Could not read the bgen flags.");
+        error("Could not read the bgen flags");
         return 1;
     }
 
@@ -100,13 +98,15 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
         goto err;
     }
 
-    if (fread_int(bgen->file, &bgen->variants_start, 4))
+    if (fread_int(bgen->file, &bgen->variants_start, 4)) {
+        error("Could not read the `variants_start` field");
         goto err;
+    }
 
     bgen->variants_start += 4;
 
     if (read_bgen_header(bgen)) {
-        error("Could not read bgen header.");
+        error("Could not read bgen header");
         goto err;
     }
 
@@ -149,24 +149,32 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (bgen->contain_sample == 0) {
-        error("This bgen file does not contain sample ids.");
-        goto err;
+        warn("This bgen file does not contain sample ids");
+        return NULL;
     }
 
     sample_ids = dalloc(bgen->nsamples * sizeof(struct bgen_str));
 
-    if (fseek(bgen->file, 8, SEEK_CUR))
+    if (fseek(bgen->file, 8, SEEK_CUR)) {
+        perror("Could not fseek eight bytes forward");
         goto err;
+    }
 
-    if (verbose)
+    if (verbose) {
         at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
-
+        if (!at) {
+            error("Could not create a progress bar");
+            goto err;
+        }
+    }
     for (size_t i = 0; i < (size_t)bgen->nsamples; ++i) {
         if (verbose)
             athr_consume(at, 1);
 
-        if (fread_str(bgen->file, sample_ids + i, 2))
+        if (fread_str(bgen->file, sample_ids + i, 2)) {
+            error("Could not read the %lu-th sample id", i);
             goto err;
+        }
     }
 
     if (verbose)
@@ -186,11 +194,11 @@ BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *s
     if (bgen->contain_sample == 0)
         return;
 
-    if (samples == NULL)
+    if (!samples)
         return;
 
     for (size_t i = 0; i < (size_t)bgen->nsamples; ++i)
-        free_nul(samples[i].str);
+        free_str(samples + i);
 
     free(samples);
 }

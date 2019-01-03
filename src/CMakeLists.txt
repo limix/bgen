@@ -11,7 +11,6 @@ function(define_sources BASE_DIR _SOURCES)
         io.c
         layout/one.c
         layout/two.c
-        mem.c
         metafile.c
         str.c
         tpl/tpl.c
