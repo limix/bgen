@@ -370,7 +370,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     }
 
     for (int i = 0; i < *nvars; ++i) {
-        fread_int(fp, &vars[i].vaddr, 8);
+        fread_long(fp, &vars[i].vaddr, 8);
 
         fread_str(fp, &vars[i].id, 2);
         fread_str(fp, &vars[i].rsid, 2);

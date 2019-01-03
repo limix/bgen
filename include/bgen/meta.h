@@ -39,7 +39,7 @@ struct bgen_mf; /* metafile */
 /* Variant metadata. */
 struct bgen_vm
 {
-    int vaddr; /* variant offset-address */
+    long vaddr; /* variant offset-address */
     struct bgen_str id;
     struct bgen_str rsid;
     struct bgen_str chrom;

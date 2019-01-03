@@ -51,6 +51,7 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE *, TYPE *, size_t);
 
 DECLARE_TYPE_FREAD(int, int)
+DECLARE_TYPE_FREAD(long, long)
 DECLARE_TYPE_FREAD(unsigned, unsigned)
 DECLARE_TYPE_FREAD(uint64_t, ui64)
 DECLARE_TYPE_FREAD(uint32_t, ui32)
@@ -60,6 +61,7 @@ DECLARE_TYPE_FREAD(uint16_t, ui16)
 #define DECLARE_TYPE_FWRITE(TYPE, SUF) int fwrite_##SUF(FILE *, TYPE, size_t);
 
 DECLARE_TYPE_FWRITE(int, int)
+DECLARE_TYPE_FWRITE(long, long)
 DECLARE_TYPE_FWRITE(unsigned, unsigned)
 DECLARE_TYPE_FWRITE(uint64_t, ui64)
 DECLARE_TYPE_FWRITE(uint32_t, ui32)
