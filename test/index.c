@@ -12,8 +12,10 @@ int create_index(const char *bgen_filepath, const char *filepath)
     struct bgen_file *bgen;
 
     assert_not_null(bgen = bgen_open(bgen_filepath));
-    assert_not_null(bgen_create_metafile(bgen, filepath, 2, 1));
+    struct bgen_mf *mf = bgen_create_metafile(bgen, filepath, 2, 1);
+    assert_not_null(mf);
 
+    bgen_close_metafile(mf);
     bgen_close(bgen);
 
     return 0;

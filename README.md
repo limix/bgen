@@ -87,7 +87,7 @@ After everything has been compiled, you can enter the `test` folder and fire val
 
 ```bash
 cd test
-valgrind --leak-check=full --show-leak-kinds=all ./index
+valgrind --leak-check=full --show-leak-kinds=all ./test_index
 ```
 
 ## Acknowledgments

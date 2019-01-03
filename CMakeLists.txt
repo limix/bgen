@@ -17,7 +17,7 @@ find_package(ATHR REQUIRED)
 include_directories("${ATHR_INCLUDE_DIRS}")
 
 if(NOT MSVC)
-  add_compile_options(-Wall -Wextra -no-pedantic -Werror -Wno-missing-field-initializers)
+    add_compile_options(-Wall -Wextra -Wno-pedantic -Werror -Wno-missing-field-initializers)
 endif(NOT MSVC)
 
 limix_process_default_dirs()

@@ -9,7 +9,7 @@
 
 int close_bgen_file(struct bgen_file *bgen)
 {
-    if (!fclose_nul(bgen->file)) {
+    if (fclose_nul(bgen->file)) {
         perror_fmt("Could not close bgen file %s", bgen->filepath);
         return 1;
     }
