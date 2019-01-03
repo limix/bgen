@@ -97,15 +97,10 @@ err:
 BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
                                              struct bgen_vi **index, int verbose)
 {
-    assert(bgen);
-    assert(index);
-
     struct bgen_var *variants = NULL;
     uint32_t length;
     size_t nvariants;
     struct athr *at = NULL;
-
-    bopen_or_leave(bgen);
 
     fseek(bgen->file, bgen->variants_start, SEEK_SET);
     *index = new_variants_index(bgen);
@@ -140,12 +135,9 @@ BGEN_API struct bgen_var *bgen_read_metadata(struct bgen_file *bgen,
     if (verbose)
         athr_finish(at);
 
-    fclose(bgen->file);
-
     return variants;
 
 err:
-    fclose_nul(bgen->file);
     if (*index)
         free_nul((*index)->start);
     free_nul(variants);
@@ -154,10 +146,6 @@ err:
 
 BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index)
 {
-
-    assert(vi);
-    assert(vi->filepath);
-
     struct bgen_vg *vg = NULL;
     FILE *fp = NULL;
 
@@ -170,6 +158,8 @@ BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t i
     vg->variant_idx = index;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
+
+    printf("vi->start[index]: %ld\n", (long)vi->start[index]);
 
     if (fseek(fp, (long)vi->start[index], SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", vi->filepath);
@@ -196,10 +186,6 @@ err:
 BGEN_API int bgen_read_variant_genotype(struct bgen_vi *index, struct bgen_vg *vg,
                                         double *probs)
 {
-    assert(index);
-    assert(vg);
-    assert(probs);
-
     if (index->layout == 1) {
         bgen_read_probs_one(vg, probs);
     } else if (index->layout == 2) {

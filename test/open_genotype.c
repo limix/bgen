@@ -1,18 +1,17 @@
 #include "bgen.h"
+#include "cass.h"
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main()
+int test_file()
 {
-
-    size_t i, j, ii, jj;
+    size_t i, jj;
     const char filename[] = "data/complex.23bits.bgen";
     struct bgen_file *bgen;
     int nsamples, nvariants;
-    double *probabilities;
 
     if ((bgen = bgen_open(filename)) == NULL)
         return 1;
@@ -73,25 +72,85 @@ int main()
 
     bgen_close(bgen);
 
-    struct bgen_vg *vg;
+    return 0;
+}
 
-    vg = bgen_open_genotype(bgen, 0);
-    probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-    bgen_read_variant_genotype(index, vg, probabilities);
-    bgen_close_variant_genotype(vg);
-    free(probabilities);
+int test_geno()
+{
+    const char filename[] = "data/complex.23bits.bgen";
+    struct bgen_file *bgen;
+
+    if ((bgen = bgen_open(filename)) == NULL)
+        return 1;
+
+    struct bgen_mf *mf =
+        bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
+
+    assert_equal_int(bgen_metafile_nparts(mf), 3);
+    assert_equal_int(bgen_metafile_nvars(mf), 10);
+
+    int nvars;
+    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
+
+    struct bgen_vg *vg = bgen_open_genotype(bgen, vm + 0);
+
+    assert_equal_int(bgen_nalleles(vg), 2);
+    assert_equal_int(bgen_missing(vg, 0), 0);
+    assert_equal_int(bgen_missing(vg, 1), 0);
+    assert_equal_int(bgen_missing(vg, 2), 0);
+    assert_equal_int(bgen_ploidy(vg, 0), 1);
+    assert_equal_int(bgen_ploidy(vg, 1), 2);
+    assert_equal_int(bgen_ploidy(vg, 2), 2);
+    assert_equal_int(bgen_min_ploidy(vg), 1);
+    assert_equal_int(bgen_max_ploidy(vg), 2);
+    assert_equal_int(bgen_ncombs(vg), 3);
+    assert_equal_int(bgen_phased(vg), 0);
+
+    bgen_close_genotype(vg);
+
+    vg = bgen_open_genotype(bgen, vm + 1);
+
+    assert_equal_int(bgen_nalleles(vg), 2);
+    assert_equal_int(bgen_missing(vg, 0), 0);
+    assert_equal_int(bgen_missing(vg, 1), 0);
+    assert_equal_int(bgen_missing(vg, 2), 0);
+    assert_equal_int(bgen_ploidy(vg, 0), 1);
+    assert_equal_int(bgen_ploidy(vg, 1), 1);
+    assert_equal_int(bgen_ploidy(vg, 2), 1);
+    assert_equal_int(bgen_min_ploidy(vg), 1);
+    assert_equal_int(bgen_max_ploidy(vg), 1);
+    assert_equal_int(bgen_ncombs(vg), 2);
+    assert_equal_int(bgen_phased(vg), 1);
+
+    bgen_close_genotype(vg);
+
+    bgen_free_partition(vm, nvars);
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
-    for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_open_genotype(index, i);
-        if (bgen_phased(vg) != phased[i])
-            return 1;
-        bgen_close_variant_genotype(vg);
+    size_t i = 0;
+    for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
+        vm = bgen_read_partition(mf, j, &nvars);
+        for (size_t l = 0; l < (size_t)nvars; ++l) {
+            vg = bgen_open_genotype(bgen, vm + l);
+            if (bgen_phased(vg) != phased[i])
+                return 1;
+            bgen_close_genotype(vg);
+            ++i;
+        }
+        bgen_free_partition(vm, nvars);
     }
 
+    /* for (size_t i = 0; i < (size_t)bgen_nvariants(bgen); ++i) { */
+    /*     vg = bgen_open_genotype(bgen, vm + i); */
+    /*     if (bgen_phased(vg) != phased[i]) */
+    /*         return 1; */
+    /*     bgen_close_genotype(vg); */
+    /* } */
+#if 0
     int ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
+
     double real_probs[] = {
         1.000000, 0.000000, NAN,      1.000000, 0.000000, 0.000000, 1.000000, 0.000000,
         0.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000,
@@ -165,6 +224,21 @@ int main()
     }
 
     bgen_free_index(index);
+
+    bgen_close_metafile(mf);
+    bgen_close(bgen);
+
+#endif
+    return 0;
+}
+
+int main()
+{
+    if (test_file())
+        return 1;
+
+    if (test_geno())
+        return 1;
 
     return 0;
 }

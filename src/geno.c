@@ -11,14 +11,11 @@
 
 BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_vm *vm)
 {
-
     struct bgen_vg *vg = dalloc(sizeof(struct bgen_vg));
     vg->variant_idx = 0;
     vg->vaddr = vm->vaddr;
     vg->plo_miss = NULL;
     vg->chunk = NULL;
-
-    bopen_or_leave(bgen);
 
     if (fseek(bgen->file, (long)vm->vaddr, SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", bgen->filepath);
@@ -37,11 +34,9 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_
         goto err;
     }
 
-    close_bgen_file(bgen);
     return vg;
 
 err:
-    close_bgen_file(bgen);
     return free_nul(vg);
 }
 

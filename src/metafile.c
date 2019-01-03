@@ -222,8 +222,6 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     ctx.bgen = bgen;
     ctx.nvariants = bgen_nvariants(bgen);
 
-    bopen_or_leave(bgen);
-
     if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
         perror_fmt("Could not jump to the variants start");
         goto err;
@@ -236,11 +234,9 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
         goto err;
     mf->fp = NULL;
 
-    close_bgen_file(bgen);
     return mf;
 
 err:
-    close_bgen_file(bgen);
     bgen_close_metafile(mf);
     return NULL;
 }
@@ -346,7 +342,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         goto err;
     }
 
-    int chunk = mf->idx.nvariants / mf->idx.npartitions;
+    int chunk = ceildiv(mf->idx.nvariants, mf->idx.npartitions);
     *nvars = imin(chunk, mf->idx.nvariants - chunk * part);
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
     for (int i = 0; i < *nvars; ++i)

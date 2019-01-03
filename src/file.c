@@ -9,8 +9,16 @@
 
 int close_bgen_file(struct bgen_file *bgen)
 {
+    char unknown[] = "`[unknown]`";
+    const char *filepath = bgen->filepath ? bgen->filepath : unknown;
+
     if (fclose_nul(bgen->file)) {
-        perror_fmt("Could not close bgen file %s", bgen->filepath);
+        if (ferror(bgen->file))
+            perror_fmt("Could not close bgen file %s", filepath);
+        else
+            error("Could not close bgen file %s. Maybe it has already been closed.",
+                  filepath);
+        bgen->file = NULL;
         return 1;
     }
     bgen->file = NULL;
@@ -29,8 +37,6 @@ int close_bgen_file(struct bgen_file *bgen)
  */
 int read_bgen_header(struct bgen_file *bgen)
 {
-    assert(bgen);
-
     uint32_t header_length;
     uint32_t magic_number;
     uint32_t flags;
@@ -89,7 +95,10 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
 
     bgen->filepath = strdup(filepath);
 
-    bopen_or_leave(bgen);
+    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
+        perror_fmt("Could not open bgen file %s", bgen->filepath);
+        goto err;
+    }
 
     if (fread_int(bgen->file, &bgen->variants_start, 4))
         goto err;
@@ -104,51 +113,39 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
     /* if they actually exist */
     bgen->samples_start = ftell(bgen->file);
 
-    close_bgen_file(bgen);
-
     return bgen;
 
 err:
     if (bgen) {
         close_bgen_file(bgen);
-        free_nul(bgen->filepath);
+        bgen->filepath = free_nul(bgen->filepath);
     }
     return free_nul(bgen);
 }
 
 BGEN_API void bgen_close(struct bgen_file *bgen)
 {
-    if (bgen)
-        free_nul(bgen->filepath);
+    if (bgen) {
+        close_bgen_file(bgen);
+        bgen->filepath = free_nul(bgen->filepath);
+    }
     free_nul(bgen);
 }
 
-BGEN_API int bgen_nsamples(const struct bgen_file *bgen)
-{
-    assert(bgen);
-    return bgen->nsamples;
-}
+BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
 
-BGEN_API int bgen_nvariants(const struct bgen_file *bgen)
-{
-    assert(bgen);
-    return bgen->nvariants;
-}
+BGEN_API int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
 
 BGEN_API int bgen_contain_sample(const struct bgen_file *bgen)
 {
-    assert(bgen);
     return bgen->contain_sample;
 }
 
 BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
 {
-    assert(bgen);
-
     struct bgen_str *sample_ids = NULL;
     struct athr *at = NULL;
 
-    bopen_or_leave(bgen);
     fseek(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (bgen->contain_sample == 0) {
@@ -176,11 +173,9 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
         athr_finish(at);
 
     bgen->variants_start = ftell(bgen->file);
-    close_bgen_file(bgen);
     return sample_ids;
 
 err:
-    close_bgen_file(bgen);
     if (at)
         athr_finish(at);
     return free_nul(sample_ids);
@@ -188,9 +183,6 @@ err:
 
 BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *samples)
 {
-    assert(bgen);
-    assert(samples);
-
     if (bgen->contain_sample == 0)
         return;
 
