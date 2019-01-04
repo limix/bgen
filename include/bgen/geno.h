@@ -16,7 +16,7 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *, struct bgen_vm *
 /* Close a variant genotype handler. */
 BGEN_API void bgen_close_genotype(struct bgen_vg *vg);
 /* Read the probabilities of each possible genotype. */
-BGEN_API int bgen_read_genotype(struct bgen_vi *, struct bgen_vg *, double *);
+BGEN_API int bgen_read_genotype(struct bgen_file *, struct bgen_vg *, double *);
 /* Get the number of alleles. */
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */

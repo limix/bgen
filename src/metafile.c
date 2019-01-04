@@ -387,7 +387,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         goto err;
     }
 
-    *nvars = bgen_metafile_nvars(mf);
+    *nvars = bgen_partition_nvars(mf, part);
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
     for (int i = 0; i < *nvars; ++i)
         init_metadata(vars + i);

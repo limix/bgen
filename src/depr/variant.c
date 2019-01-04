@@ -9,20 +9,6 @@
 #include "str.h"
 #include <assert.h>
 
-BGEN_DEPRECATED int bgen_read_genotype(struct bgen_vi *idx, struct bgen_vg *vg,
-                                       double *probs)
-{
-    if (idx->layout == 1) {
-        bgen_read_probs_one(vg, probs);
-    } else if (idx->layout == 2) {
-        read_probs_two(vg, probs);
-    } else {
-        error("Unrecognized layout type %d", idx->layout);
-        return 1;
-    }
-    return 0;
-}
-
 BGEN_DEPRECATED int bgen_max_nalleles(struct bgen_vi *vi)
 {
     assert(vi);

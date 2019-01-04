@@ -36,10 +36,8 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
     if (fread(s->str, 1, s->len, fp) < (size_t)s->len) {
         if (ferror(fp))
             perror("Error while freading a string str");
-        else {
-            fprintf(stderr, "Error while freading a string str:");
-            fprintf(stderr, " unexpected end of file.\n");
-        }
+        else
+            error("Unexpected end of file while reading a string");
         return 1;
     }
 
@@ -62,13 +60,9 @@ int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size)
 
         if (ferror(fp))
             perror("Error while fwriting a string str");
-        else {
-            fprintf(stderr, "Error while fwriting a string str:");
-            fprintf(stderr, " unexpected end of file.\n");
-        }
+        else
+            error("Unexpected end of file while writing a string");
         return 1;
     }
     return 0;
 }
-
-void printf_str(struct bgen_str s) { printf("%.*s\n", s.len, s.str); }

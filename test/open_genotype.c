@@ -141,13 +141,6 @@ int test_geno()
         bgen_free_partition(vm, nvars);
     }
 
-    /* for (size_t i = 0; i < (size_t)bgen_nvariants(bgen); ++i) { */
-    /*     vg = bgen_open_genotype(bgen, vm + i); */
-    /*     if (bgen_phased(vg) != phased[i]) */
-    /*         return 1; */
-    /*     bgen_close_genotype(vg); */
-    /* } */
-#if 0
     int ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
 
@@ -195,40 +188,42 @@ int test_geno()
 
     double *rp = real_probs;
 
-    jj = 0;
-    for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_open_genotype(index, i);
+    int nsamples = bgen_nsamples(bgen);
+    size_t jj = 0;
+    for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
+        vm = bgen_read_partition(mf, j, &nvars);
+        for (size_t l = 0; l < (size_t)nvars; ++l) {
+            vg = bgen_open_genotype(bgen, vm + l);
 
-        probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-        double *p = probabilities;
-        bgen_read_variant_genotype(index, vg, probabilities);
+            double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
+            double *p = probabilities;
+            bgen_read_genotype(bgen, vg, probabilities);
 
-        for (j = 0; j < (size_t)nsamples; ++j) {
+            for (j = 0; j < (size_t)nsamples; ++j) {
 
-            if (ploidys[jj] != bgen_ploidy(vg, j))
-                return 1;
-
-            if (bgen_missing(vg, j) != 0)
-                return 1;
-
-            for (ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
-                if (*rp != *p && !(isnan(*rp) && isnan(*p)))
+                if (ploidys[jj] != bgen_ploidy(vg, j))
                     return 1;
-                ++rp;
-                ++p;
-            }
-            ++jj;
-        }
-        bgen_close_variant_genotype(vg);
-        free(probabilities);
-    }
 
-    bgen_free_index(index);
+                if (bgen_missing(vg, j) != 0)
+                    return 1;
+
+                for (size_t ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
+                    if (*rp != *p && !(isnan(*rp) && isnan(*p)))
+                        return 1;
+                    ++rp;
+                    ++p;
+                }
+                ++jj;
+            }
+            free(probabilities);
+            bgen_close_genotype(vg);
+        }
+        bgen_free_partition(vm, nvars);
+    }
 
     bgen_close_metafile(mf);
     bgen_close(bgen);
 
-#endif
     return 0;
 }
 

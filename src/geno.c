@@ -61,6 +61,20 @@ err:
 
 BGEN_API void bgen_close_genotype(struct bgen_vg *vg) { free_vg(vg); }
 
+BGEN_API int bgen_read_genotype(struct bgen_file *bgen, struct bgen_vg *vg,
+                                double *probs)
+{
+    if (bgen->layout == 1) {
+        bgen_read_probs_one(vg, probs);
+    } else if (bgen->layout == 2) {
+        read_probs_two(vg, probs);
+    } else {
+        error("Unrecognized layout type %d", bgen->layout);
+        return 1;
+    }
+    return 0;
+}
+
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 
 BGEN_API int bgen_missing(const struct bgen_vg *vg, size_t index)
