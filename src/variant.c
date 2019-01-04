@@ -13,65 +13,54 @@
  * ----
  * It assumes that the bgen file is open.
  */
-int next_variant(struct bgen_file *bgen, struct bgen_vm *v)
+int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
 {
-    assert(bgen);
-    assert(bgen->file);
-    assert(v);
-
     if (bgen->layout == 1) {
         if (fseek(bgen->file, 4, SEEK_CUR))
             goto err;
     }
 
-    if (fread_str(bgen->file, &v->id, 2))
+    if (fread_str(bgen->file, &vm->id, 2))
         goto err;
 
-    if (fread_str(bgen->file, &v->rsid, 2))
+    if (fread_str(bgen->file, &vm->rsid, 2))
         goto err;
 
-    if (fread_str(bgen->file, &v->chrom, 2))
+    if (fread_str(bgen->file, &vm->chrom, 2))
         goto err;
 
-    if (fread_int(bgen->file, &v->position, 4))
+    if (fread_int(bgen->file, &vm->position, 4))
         goto err;
 
     if (bgen->layout == 1)
-        v->nalleles = 2;
-    else if (fread_int(bgen->file, &v->nalleles, 2))
+        vm->nalleles = 2;
+    else if (fread_int(bgen->file, &vm->nalleles, 2))
         goto err;
 
-    v->allele_ids = dalloc(v->nalleles * sizeof(struct bgen_str));
-    if (!v->allele_ids)
+    vm->allele_ids = dalloc(vm->nalleles * sizeof(struct bgen_str));
+    if (!vm->allele_ids)
         goto err;
 
-    for (size_t i = 0; i < (size_t)v->nalleles; ++i) {
-        if (fread_str(bgen->file, v->allele_ids + i, 4))
+    for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
+        if (fread_str(bgen->file, vm->allele_ids + i, 4))
             goto err;
     }
 
     return 0;
 err:
-    free_nul(v->id.str);
-    free_nul(v->rsid.str);
-    free_nul(v->chrom.str);
-    if (v->allele_ids) {
-        for (size_t i = 0; i < (size_t)v->nalleles; ++i)
-            free_nul((v->allele_ids + i)->str);
-    }
-    free_nul(v->allele_ids);
+    free_metadata(vm);
     return 1;
 }
 
-void init_metadata(struct bgen_vm *v)
+void init_metadata(struct bgen_vm *vm)
 {
-    v->vaddr = -1;
-    v->allele_ids = NULL;
-    v->id.str = NULL;
-    v->rsid.str = NULL;
-    v->chrom.str = NULL;
-    v->position = -1;
-    v->nalleles = -1;
+    vm->vaddr = -1;
+    vm->allele_ids = NULL;
+    vm->id.str = NULL;
+    vm->rsid.str = NULL;
+    vm->chrom.str = NULL;
+    vm->position = -1;
+    vm->nalleles = -1;
 }
 
 struct bgen_vm *alloc_metadata(void)
@@ -82,14 +71,14 @@ struct bgen_vm *alloc_metadata(void)
     return v;
 }
 
-void free_metadata(struct bgen_vm *v)
+void free_metadata(struct bgen_vm *vm)
 {
-    free_str(&v->id);
-    free_str(&v->rsid);
-    free_str(&v->chrom);
-    if (v->allele_ids) {
-        for (size_t i = 0; i < (size_t)v->nalleles; ++i)
-            free_str(v->allele_ids + i);
+    free_str(&vm->id);
+    free_str(&vm->rsid);
+    free_str(&vm->chrom);
+    if (vm->allele_ids) {
+        for (size_t i = 0; i < (size_t)vm->nalleles; ++i)
+            free_str(vm->allele_ids + i);
     }
-    v->allele_ids = free_nul(v->allele_ids);
+    vm->allele_ids = free_nul(vm->allele_ids);
 }
