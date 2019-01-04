@@ -5,16 +5,22 @@
 #define BGEN_DEPR_BGEN_H
 
 #include "api.h"
+#include "file.h"
 #include <stddef.h>
 
 struct bgen_vi; /* variant index */
 struct bgen_vg; /* variant genotype */
 
 /* Open a variant for genotype queries. */
-BGEN_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi, size_t index);
+BGEN_DEPRECATED_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *vi,
+                                                               size_t index);
 /* Close a variant genotype handler. */
-BGEN_API void bgen_close_variant_genotype(struct bgen_vg *vg);
+BGEN_DEPRECATED_API void bgen_close_variant_genotype(struct bgen_vi *,
+                                                     struct bgen_vg *);
 /* Read the probabilities of each possible genotype. */
-BGEN_API int bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *, double *);
+BGEN_DEPRECATED_API int bgen_read_variant_genotype(struct bgen_vi *, struct bgen_vg *,
+                                                   double *);
+/* Check if the file contains sample identifications. */
+BGEN_DEPRECATED_API int bgen_sample_ids_presence(const struct bgen_file *bgen);
 
 #endif /* BGEN_DEPR_BGEN_H */

@@ -5,6 +5,7 @@ function(define_sources BASE_DIR _SOURCES)
         depr/tpl.c
         depr/variant.c
         depr/variants_index.c
+        depr/file.c
         file.c
         geno.c
         index.c

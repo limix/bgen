@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -16,6 +17,15 @@
         fprintf(stderr, "  ACTUAL: %d\n", (int)a);  \
         fprintf(stderr, "  DESIRED: %d\n", (int)d); \
         return 1;                                   \
+    }
+
+#define assert_almost_equal(a, d)                      \
+    if (fabs(a - d) > 1e-7) {                          \
+        cass_message(__FILE__, __LINE__);              \
+        fprintf(stderr, " Items are not close:\n");    \
+        fprintf(stderr, "  ACTUAL: %f\n", (double)a);  \
+        fprintf(stderr, "  DESIRED: %f\n", (double)d); \
+        return 1;                                      \
     }
 
 #define assert_equal_uint64(a, d)                                 \

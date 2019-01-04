@@ -62,7 +62,7 @@ int read_bgen_header(struct bgen_file *bgen)
     }
 
     if (magic_number != 1852139362)
-        warn("This is might not be a BGEN file: magic number mismatch");
+        warn("This might not be a BGEN file: magic number mismatch");
 
     if (fseek(bgen->file, header_length - 20, SEEK_CUR)) {
         error("Fseek error while reading a BGEN file");
@@ -76,7 +76,7 @@ int read_bgen_header(struct bgen_file *bgen)
 
     bgen->compression = flags & 3;
     bgen->layout = (flags & (15 << 2)) >> 2;
-    bgen->contain_sample = (flags & (1 << 31)) >> 31;
+    bgen->sample_ids_presence = bgen->contain_sample = (flags & (1 << 31)) >> 31;
 
     return 0;
 }

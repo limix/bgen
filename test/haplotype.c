@@ -29,7 +29,7 @@ int main()
     bgen_free_samples(bgen, sample_ids);
 
     struct bgen_vi *index;
-    struct bgen_var *variants = bgen_read_metadata(bgen, &index, 0);
+    struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index, 0);
 
     if (strncmp("RS1", variants[0].rsid.str, variants[0].rsid.len) != 0)
         return 1;
@@ -74,7 +74,7 @@ int main()
     if (bgen_phased(vg) != 1)
         return 1;
 
-    bgen_close_variant_genotype(vg);
+    bgen_close_variant_genotype(index, vg);
 
     double real_probs[] = {
         1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0,
@@ -97,7 +97,7 @@ int main()
                 jj++;
             }
         }
-        bgen_close_variant_genotype(vg);
+        bgen_close_variant_genotype(index, vg);
         free(probabilities);
     }
 
