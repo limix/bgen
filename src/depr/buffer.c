@@ -30,9 +30,12 @@ void *buffer_base(struct Buffer *b) { return b->base; }
 
 int buffer_destroy(struct Buffer *b)
 {
-    free(b->base);
-    b->size = 0;
-    free(b);
+    if (b) {
+        if (b->base)
+            free(b->base);
+        b->size = 0;
+        free(b);
+    }
     return 0;
 }
 

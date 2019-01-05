@@ -61,18 +61,18 @@ int check_metafile(const char *filepath)
 
 int use_index(const char *filepath)
 {
-    struct bgen_mf *v;
+    struct bgen_mf *mf;
     int nvariants;
 
-    assert_not_null(v = bgen_open_metafile(filepath));
+    assert_not_null(mf = bgen_open_metafile(filepath));
 
-    int nparts = bgen_metafile_nparts(v);
+    int nparts = bgen_metafile_nparts(mf);
     assert_equal_int(nparts, 2);
 
-    int nvars = bgen_metafile_nvars(v);
+    int nvars = bgen_metafile_nvars(mf);
     assert_equal_int(nvars, 10);
 
-    struct bgen_vm *vm = bgen_read_partition(v, 0, &nvariants);
+    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
     assert_not_null(vm);
 
     assert_equal_int(vm[0].id.len, 0);
@@ -92,7 +92,7 @@ int use_index(const char *filepath)
 
     bgen_free_partition(vm, nvariants);
 
-    vm = bgen_read_partition(v, 1, &nvariants);
+    vm = bgen_read_partition(mf, 1, &nvariants);
     assert_not_null(vm);
 
     assert_equal_int(vm[0].id.len, 0);
@@ -105,30 +105,30 @@ int use_index(const char *filepath)
 
     bgen_free_partition(vm, nvariants);
 
-    assert_equal_int(bgen_close_metafile(v), 0);
+    assert_equal_int(bgen_close_metafile(mf), 0);
 
     return 0;
 }
 
 int use_index_wrongly(const char *filepath)
 {
-    struct bgen_mf *v;
+    struct bgen_mf *mf;
     int nvariants;
 
-    assert_null(v = bgen_open_metafile("wrong-path"));
+    assert_null(mf = bgen_open_metafile("wrong-path"));
 
-    assert_not_null(v = bgen_open_metafile(filepath));
+    assert_not_null(mf = bgen_open_metafile(filepath));
 
-    int nparts = bgen_metafile_nparts(v);
+    int nparts = bgen_metafile_nparts(mf);
     assert_equal_int(nparts, 2);
 
-    int nvars = bgen_metafile_nvars(v);
+    int nvars = bgen_metafile_nvars(mf);
     assert_equal_int(nvars, 10);
 
-    struct bgen_vm *vm = bgen_read_partition(v, 3, &nvariants);
+    struct bgen_vm *vm = bgen_read_partition(mf, 3, &nvariants);
     assert_null(vm);
 
-    assert_equal_int(bgen_close_metafile(v), 0);
+    assert_equal_int(bgen_close_metafile(mf), 0);
 
     return 0;
 }

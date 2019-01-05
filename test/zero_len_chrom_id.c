@@ -5,9 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SUCCESS EXIT_SUCCESS
-#define FAIL EXIT_FAILURE
-
 int main()
 {
     struct bgen_vi *index;
@@ -18,24 +15,25 @@ int main()
     bgen = bgen_open("data/zero_len_chrom_id.bgen");
 
     if (bgen == NULL)
-        return FAIL;
+        return 1;
 
     if (bgen_nsamples(bgen) != 182)
-        return FAIL;
+        return 1;
 
     if (bgen_nvariants(bgen) != 50)
-        return FAIL;
+        return 1;
 
     samples = bgen_read_samples(bgen, 0);
 
     if (samples == NULL)
-        return FAIL;
+        return 1;
 
     variants = bgen_read_variants_metadata(bgen, &index, 0);
     if (variants == NULL)
-        return FAIL;
+        return 1;
 
     bgen_free_index(index);
+    bgen_close(bgen);
 
-    return EXIT_SUCCESS;
+    return 0;
 }

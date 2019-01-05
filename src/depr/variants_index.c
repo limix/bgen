@@ -104,33 +104,34 @@ int bgen_store_variants_metadata(const struct bgen_file *bgen,
 }
 
 struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
-                                             const char *fp, struct bgen_vi **vi,
+                                             const char *filepath, struct bgen_vi **vi,
                                              int verbose)
 {
     struct Buffer *b;
-    struct bgen_var *variants;
+    struct bgen_var *variants = NULL;
     char header[BGEN_HEADER_LENGTH];
     void *mem;
     size_t read_len;
 
     b = buffer_create();
 
-    if (buffer_load(fp, b, verbose)) {
-        fprintf(stderr, "Could not load buffer for %s.\n", fp);
-        return NULL;
+    if (buffer_load(filepath, b, verbose)) {
+        error("Could not load buffer for %s", filepath);
+        goto err;
     }
     mem = buffer_base(b);
 
     read_len = read_header(mem, header);
     if (read_len == 0) {
-        fprintf(stderr, "Could not read the header of %s.\n", fp);
-        return NULL;
+        error("Could not read the header of %s", filepath);
+        goto err;
     }
-    if (!(header[11] == '0' && header[11] == '1')) {
+    if (!(header[11] == '0' && header[11] == '1'))
         mem = (char *)mem + read_len;
-    }
 
-    variants = malloc(bgen->nvariants * sizeof(struct bgen_var));
+    variants = dalloc(bgen->nvariants * sizeof(struct bgen_var));
+    if (!variants)
+        goto err;
 
     read_len = read_variants(mem, variants);
     mem = (char *)mem + read_len;
@@ -142,6 +143,11 @@ struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
 
     buffer_destroy(b);
     return variants;
+
+err:
+    buffer_destroy(b);
+    free_nul(variants);
+    return NULL;
 }
 
 int bgen_create_variants_metadata_file(const char *bgen_fp, const char *index_fp,

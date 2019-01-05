@@ -53,9 +53,13 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_
         goto err;
     }
 
+    free_nul(vi.filepath);
+    free_nul(vi.start);
     return vg;
 
 err:
+    free_nul(vi.filepath);
+    free_nul(vi.start);
     return free_nul(vg);
 }
 

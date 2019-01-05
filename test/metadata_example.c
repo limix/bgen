@@ -9,13 +9,12 @@ int main()
     struct bgen_vi *index = NULL;
     struct bgen_var *v;
 
-    if ((bgen = bgen_open("data/example.14bits.bgen")) == NULL) {
-        return 1;
-    }
+    assert_not_null(bgen = bgen_open("data/example.14bits.bgen"));
 
     v = bgen_load_variants_metadata(bgen, "data/wrong.metadata", &index, 0);
-    bgen_close(bgen);
     assert_null(v);
+
+    bgen_close(bgen);
 
     return 0;
 }

@@ -69,7 +69,7 @@ int test_file()
     }
 
     bgen_free_variants_metadata(bgen, variants);
-
+    bgen_free_index(index);
     bgen_close(bgen);
 
     return 0;

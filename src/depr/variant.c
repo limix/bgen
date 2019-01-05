@@ -27,8 +27,6 @@ BGEN_DEPRECATED_API void bgen_free_index(struct bgen_vi *index)
 BGEN_DEPRECATED_API void bgen_free_variants_metadata(const struct bgen_file *bgen,
                                                      struct bgen_var *variants)
 {
-
-    assert(bgen);
     if (!variants)
         return;
 
@@ -44,12 +42,14 @@ BGEN_DEPRECATED_API void bgen_free_variants_metadata(const struct bgen_file *bge
     free_nul(variants);
 }
 
+void fix_str(struct bgen_str *s)
+{
+    s->str = realloc(s->str, s->len + 1);
+    s->str[s->len] = '\0';
+}
+
 int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
 {
-    assert(bgen);
-    assert(bgen->file);
-    assert(v);
-
     if (bgen->layout == 1) {
         if (fseek(bgen->file, 4, SEEK_CUR))
             goto err;
@@ -57,12 +57,15 @@ int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
 
     if (fread_str(bgen->file, &v->id, 2))
         goto err;
+    fix_str(&(v->id));
 
     if (fread_str(bgen->file, &v->rsid, 2))
         goto err;
+    fix_str(&(v->rsid));
 
     if (fread_str(bgen->file, &v->chrom, 2))
         goto err;
+    fix_str(&(v->chrom));
 
     if (fread_int(bgen->file, &v->position, 4))
         goto err;
@@ -79,6 +82,7 @@ int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
     for (size_t i = 0; i < (size_t)v->nalleles; ++i) {
         if (fread_str(bgen->file, v->allele_ids + i, 4))
             goto err;
+        fix_str(v->allele_ids + i);
     }
 
     return 0;

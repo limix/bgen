@@ -115,7 +115,7 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
         goto err;
     }
 
-    if (!(mf->file = fopen(filepath, "wb"))) {
+    if (!(mf->file = fopen(filepath, "w+b"))) {
         perror_fmt("Could not create file %s", filepath);
         goto err;
     }
@@ -275,11 +275,15 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     }
 
     struct next_variant_ctx ctx = {bgen, bgen_nvariants(bgen)};
-    if (write_metafile(mf, &_next_variant, &ctx, verbose))
+    if (write_metafile(mf, &_next_variant, &ctx, verbose)) {
+        error("Could not write metafile");
         goto err;
+    }
 
-    if (fflush(mf->file))
+    if (fflush(mf->file)) {
+        perror_fmt("Could not fflush");
         goto err;
+    }
 
     return mf;
 err:
@@ -380,7 +384,7 @@ BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
 BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *nvars)
 {
     struct bgen_vm *vars = NULL;
-    FILE *file = NULL;
+    FILE *file = mf->file;
 
     if ((uint32_t)part >= mf->idx.npartitions) {
         error("The provided partition number %d is out-of-range", part);
@@ -392,10 +396,10 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     for (int i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
 
-    if ((file = fopen(mf->filepath, "rb")) == NULL) {
-        perror_fmt("Could not open bgen index file");
-        goto err;
-    }
+    /* if ((file = fopen(mf->filepath, "rb")) == NULL) { */
+    /*     perror_fmt("Could not open bgen index file"); */
+    /*     goto err; */
+    /* } */
 
     if (fseek(file, 13 + 4 + 8, SEEK_SET)) {
         perror_fmt("Could not fseek bgen index file");
@@ -426,7 +430,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
 err:
     if (vars)
         bgen_free_partition(vars, *nvars);
-    fclose_nul(file);
+    /* fclose_nul(file); */
     return NULL;
 }
 
