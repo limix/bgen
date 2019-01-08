@@ -34,25 +34,28 @@ struct bgen_var
     struct bgen_str *allele_ids;
 };
 
-BGEN_API struct bgen_var *bgen_read_variants_metadata(struct bgen_file *,
-                                                      struct bgen_vi **, int);
-BGEN_API void bgen_free_variants_metadata(const struct bgen_file *, struct bgen_var *);
-BGEN_API void bgen_free_index(struct bgen_vi *);
+BGEN_DEPRECATED_API struct bgen_var *
+bgen_read_variants_metadata(struct bgen_file *, struct bgen_vi **, int);
+BGEN_DEPRECATED_API void bgen_free_variants_metadata(const struct bgen_file *,
+                                                     struct bgen_var *);
+BGEN_DEPRECATED_API void bgen_free_index(struct bgen_vi *);
 /* Store variants metadata. */
-BGEN_API int bgen_store_variants_metadata(const struct bgen_file *, struct bgen_var *,
-                                          struct bgen_vi *, const char *);
+BGEN_DEPRECATED_API int bgen_store_variants_metadata(const struct bgen_file *,
+                                                     struct bgen_var *,
+                                                     struct bgen_vi *, const char *);
 /* Read variants metadata from file. */
-BGEN_API struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *,
-                                                      const char *, struct bgen_vi **,
-                                                      int);
+BGEN_DEPRECATED_API struct bgen_var *
+bgen_load_variants_metadata(const struct bgen_file *, const char *, struct bgen_vi **,
+                            int);
 /* Create a variants metadata file.
 
     Helper for easy creation of variants metadata file.
 
     Note: this file is not part of the bgen file format specification.
 */
-BGEN_API int bgen_create_variants_metadata_file(const char *, const char *, int);
+BGEN_DEPRECATED_API int bgen_create_variants_metadata_file(const char *, const char *,
+                                                           int);
 /* Get the maximum number of alleles across the entire file. */
-BGEN_API int bgen_max_nalleles(struct bgen_vi *);
+BGEN_DEPRECATED_API int bgen_max_nalleles(struct bgen_vi *);
 
 #endif /* BGEN_DEPR_META_H */

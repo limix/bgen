@@ -79,9 +79,10 @@ size_t read_genotype_offsets(void *mem, const struct bgen_file *bgen,
                              struct bgen_vi **vi);
 void *read_mem_size(void *mem, uint64_t *block_size);
 
-int bgen_store_variants_metadata(const struct bgen_file *bgen,
-                                 struct bgen_var *variants, struct bgen_vi *index,
-                                 const char *fp)
+BGEN_DEPRECATED_API int bgen_store_variants_metadata(const struct bgen_file *bgen,
+                                                     struct bgen_var *variants,
+                                                     struct bgen_vi *index,
+                                                     const char *fp)
 {
 
     struct Buffer *b;
@@ -103,9 +104,9 @@ int bgen_store_variants_metadata(const struct bgen_file *bgen,
     return 0;
 }
 
-struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
-                                             const char *filepath, struct bgen_vi **vi,
-                                             int verbose)
+BGEN_DEPRECATED_API struct bgen_var *
+bgen_load_variants_metadata(const struct bgen_file *bgen, const char *filepath,
+                            struct bgen_vi **vi, int verbose)
 {
     struct Buffer *b;
     struct bgen_var *variants = NULL;
@@ -150,8 +151,9 @@ err:
     return NULL;
 }
 
-int bgen_create_variants_metadata_file(const char *bgen_fp, const char *index_fp,
-                                       int verbose)
+BGEN_DEPRECATED_API int bgen_create_variants_metadata_file(const char *bgen_fp,
+                                                           const char *index_fp,
+                                                           int verbose)
 {
     struct bgen_file *bgen;
     struct bgen_var *variants;
