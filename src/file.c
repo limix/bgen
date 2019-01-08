@@ -136,7 +136,7 @@ BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples
 
 BGEN_API int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
 
-BGEN_API int bgen_contain_sample(const struct bgen_file *bgen)
+BGEN_API int bgen_contain_samples(const struct bgen_file *bgen)
 {
     return bgen->contain_sample;
 }

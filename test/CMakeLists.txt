@@ -9,6 +9,7 @@ limix_add_test(complex ${PROJECT_NAME} "complex.c")
 limix_add_test(index ${PROJECT_NAME} "index.c")
 limix_add_test(open_genotype ${PROJECT_NAME} "open_genotype.c")
 limix_add_test(assert_interface_2 ${PROJECT_NAME} "assert_interface_2.c")
+limix_add_test(assert_interface_3 ${PROJECT_NAME} "assert_interface_3.c")
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)

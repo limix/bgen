@@ -109,7 +109,7 @@ struct bgen_var *bgen_load_variants_metadata(const struct bgen_file *bgen,
 {
     struct Buffer *b;
     struct bgen_var *variants = NULL;
-    char header[BGEN_HEADER_LENGTH];
+    char header[BGEN_HEADER_LENGTH + 1];
     void *mem;
     size_t read_len;
 
@@ -288,7 +288,8 @@ size_t read_header(void *mem, char *header)
     }
 
     if (tpl_unpack(tn, 0)) {
-        strncpy(header, BGEN_INDEX_NAME BGEN_INDEX_VERSION, BGEN_HEADER_LENGTH);
+        strncpy(header, BGEN_INDEX_NAME BGEN_INDEX_VERSION "\0",
+                BGEN_HEADER_LENGTH + 1);
         return (size_t)(block_size + sizeof(uint64_t));
     }
 

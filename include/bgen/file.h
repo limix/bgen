@@ -17,8 +17,8 @@ BGEN_API void bgen_close(struct bgen_file *bgen);
 BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
 /* Get the number of variants. */
 BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
-/* Check if the file contains sample identifications. */
-BGEN_API int bgen_contain_sample(const struct bgen_file *bgen);
+/* Check if the file contain sample identifications. */
+BGEN_API int bgen_contain_samples(const struct bgen_file *bgen);
 /* Get array of sample identifications. */
 BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose);
 /* Free array of sample identifications. */
