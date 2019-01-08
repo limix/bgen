@@ -185,8 +185,9 @@ int test_genotype_haplotypes_by_loading_metadata()
         1.00000000000000000000, 1.00000000000000000000, 0.00000000000000000000,
         1.00000000000000000000, 0.00000000000000000000, 0.00000000000000000000,
         1.00000000000000000000};
+    assert_equal_int(bgen_metafile_nvars(mf), 4);
     double *probs_ptr = &probs[0];
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < (size_t)bgen_metafile_nparts(mf); ++i) {
         int nvars;
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
