@@ -16,6 +16,10 @@ include_directories("${ZSTD_INCLUDE_DIRS}")
 find_package(ATHR REQUIRED)
 include_directories("${ATHR_INCLUDE_DIRS}")
 
+if (NOT c_restrict IN_LIST CMAKE_C_COMPILE_FEATURES)
+    add_compile_definitions(restrict)
+endif()
+
 if(NOT MSVC)
     add_compile_options(-Wall -Wextra -Wno-pedantic -Werror -Wno-missing-field-initializers -Wno-deprecated-declarations)
 endif(NOT MSVC)
