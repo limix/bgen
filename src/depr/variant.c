@@ -1,3 +1,5 @@
+#define BGEN_API_EXPORTS
+
 #include "depr/variant.h"
 #include "athr.h"
 #include "depr/variants_index.h"

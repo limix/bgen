@@ -21,6 +21,7 @@
  * library, which means that the resulting file will have
  * TPL fields not mentioned above.
  */
+#define BGEN_API_EXPORTS
 
 #include "depr/variants_index.h"
 #include "bgen.h"
