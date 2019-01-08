@@ -17,7 +17,7 @@ find_package(ATHR REQUIRED)
 include_directories("${ATHR_INCLUDE_DIRS}")
 
 if (NOT c_restrict IN_LIST CMAKE_C_COMPILE_FEATURES)
-    add_compile_definitions(restrict)
+    add_compile_definitions(restrict= )
 endif()
 
 if(NOT MSVC)
