@@ -14,8 +14,6 @@
 /* Borrowed from GLIB. */
 #if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 1)
 #define BGEN_DEPR __attribute__((__deprecated__))
-#elif defined(_MSC_VER) && (_MSC_VER >= 1300)
-#define BGEN_DEPR __declspec(deprecated)
 #else
 #define BGEN_DEPR
 #endif
