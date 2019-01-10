@@ -27,16 +27,16 @@ int free_vg(struct bgen_vg *vg)
     return free_nul(vg) != NULL;
 }
 
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, struct bgen_vm *vm)
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, long vaddr)
 {
     struct bgen_vg *vg = create_vg();
     if (!vg) {
         error("Could not open genotype");
         goto err;
     }
-    vg->vaddr = vm->vaddr;
+    vg->vaddr = vaddr;
 
-    if (fseek(bgen->file, (long)vm->vaddr, SEEK_SET)) {
+    if (fseek(bgen->file, vaddr, SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", bgen->filepath);
         goto err;
     }

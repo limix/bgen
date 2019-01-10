@@ -12,7 +12,7 @@ struct bgen_vi; /* variant index */
 struct bgen_vg; /* variant genotype */
 
 /* Open a variant for genotype queries. */
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *, struct bgen_vm *);
+BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *, long);
 /* Close a variant genotype handler. */
 BGEN_API void bgen_close_genotype(struct bgen_vg *vg);
 /* Read the probabilities of each possible genotype. */

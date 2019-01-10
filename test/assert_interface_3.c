@@ -46,7 +46,7 @@ int test_create_meteadata_haplotypes()
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm);
+    struct bgen_vg *vg = bgen_open_genotype(bgen, vm->vaddr);
     assert_not_null(vg);
 
     assert_equal_int(bgen_nalleles(vg), 2);
@@ -112,7 +112,7 @@ int test_genotype_haplotypes_by_creating_metadata()
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg *vg = bgen_open_genotype(bgen, vm + ii);
+            struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].vaddr);
             assert_not_null(vg);
 
             assert_equal_int(bgen_nalleles(vg), nalleles[i]);
@@ -192,7 +192,7 @@ int test_genotype_haplotypes_by_loading_metadata()
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg *vg = bgen_open_genotype(bgen, vm + ii);
+            struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].vaddr);
             assert_not_null(vg);
 
             assert_equal_int(bgen_nalleles(vg), nalleles[i]);

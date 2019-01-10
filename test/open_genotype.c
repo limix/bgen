@@ -92,7 +92,7 @@ int test_geno()
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm + 0);
+    struct bgen_vg *vg = bgen_open_genotype(bgen, vm[0].vaddr);
 
     assert_equal_int(bgen_nalleles(vg), 2);
     assert_equal_int(bgen_missing(vg, 0), 0);
@@ -108,7 +108,7 @@ int test_geno()
 
     bgen_close_genotype(vg);
 
-    vg = bgen_open_genotype(bgen, vm + 1);
+    vg = bgen_open_genotype(bgen, vm[1].vaddr);
 
     assert_equal_int(bgen_nalleles(vg), 2);
     assert_equal_int(bgen_missing(vg, 0), 0);
@@ -132,7 +132,7 @@ int test_geno()
     for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
-            vg = bgen_open_genotype(bgen, vm + l);
+            vg = bgen_open_genotype(bgen, vm[l].vaddr);
             if (bgen_phased(vg) != phased[i])
                 return 1;
             bgen_close_genotype(vg);
@@ -193,7 +193,7 @@ int test_geno()
     for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
-            vg = bgen_open_genotype(bgen, vm + l);
+            vg = bgen_open_genotype(bgen, vm[l].vaddr);
 
             double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
             double *p = probabilities;

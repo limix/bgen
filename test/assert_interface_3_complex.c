@@ -40,7 +40,7 @@ int test_create_metadata_complex()
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm);
+    struct bgen_vg *vg = bgen_open_genotype(bgen, vm->vaddr);
     assert_not_null(vg);
 
     assert_equal_int(bgen_nalleles(vg), 2);
@@ -123,7 +123,7 @@ int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg *vg = bgen_open_genotype(bgen, vm + ii);
+            struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].vaddr);
             assert_not_null(vg);
 
             assert_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));
