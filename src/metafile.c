@@ -10,6 +10,8 @@
 #include "variant.h"
 #include <assert.h>
 
+static_assert(sizeof(long) >= 8, "Code relies on long being exactly at least 8 bytes");
+
 /* context for reading the next variant */
 struct next_variant_ctx
 {
@@ -52,7 +54,7 @@ struct bgen_mf *alloc_mf(void)
     return mf;
 }
 
-inline static int ceildiv(size_t x, size_t y) { return (x + (y - 1)) / y; }
+inline static uint32_t ceildiv(uint32_t x, uint32_t y) { return (x + (y - 1)) / y; }
 
 /* Fetch the variant metada and record the genotype offset.
  *
@@ -327,7 +329,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
         goto err;
     }
 
-    if (fseek(mf->file, mf->idx.metasize, SEEK_CUR)) {
+    if (fseek(mf->file, (long)mf->idx.metasize, SEEK_CUR)) {
         error("Could to fseek to the number of partitions");
         goto err;
     }
@@ -406,7 +408,7 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
         goto err;
     }
 
-    if (fseek(file, mf->idx.poffset[part], SEEK_CUR)) {
+    if (fseek(file, (long)mf->idx.poffset[part], SEEK_CUR)) {
         perror_fmt("Could not fseek bgen index file");
         goto err;
     }
