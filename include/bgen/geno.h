@@ -20,9 +20,9 @@ BGEN_API int bgen_read_genotype(struct bgen_file *, struct bgen_vg *, double *);
 /* Get the number of alleles. */
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg);
 /* Return 1 if variant is missing for the sample; 0 otherwise. */
-BGEN_API int bgen_missing(const struct bgen_vg *vg, size_t index);
+BGEN_API int bgen_missing(const struct bgen_vg *vg, int index);
 /* Get the ploidy. */
-BGEN_API int bgen_ploidy(const struct bgen_vg *vg, size_t index);
+BGEN_API int bgen_ploidy(const struct bgen_vg *vg, int index);
 /* Get the minimum ploidy of the variant. */
 BGEN_API int bgen_min_ploidy(const struct bgen_vg *vg);
 /* Get the maximum ploidy of the variant. */

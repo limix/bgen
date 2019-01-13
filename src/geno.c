@@ -81,12 +81,12 @@ BGEN_API int bgen_read_genotype(struct bgen_file *bgen, struct bgen_vg *vg,
 
 BGEN_API int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
 
-BGEN_API int bgen_missing(const struct bgen_vg *vg, size_t index)
+BGEN_API int bgen_missing(const struct bgen_vg *vg, int index)
 {
     return vg->plo_miss[index] >> 7;
 }
 
-BGEN_API int bgen_ploidy(const struct bgen_vg *vg, size_t index)
+BGEN_API int bgen_ploidy(const struct bgen_vg *vg, int index)
 {
     return vg->plo_miss[index] & 127;
 }

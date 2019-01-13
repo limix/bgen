@@ -34,6 +34,9 @@
 #define BGEN_VERSION_PATCH 0
 #define BGEN_VERSION "3.0.0"
 
+#include <assert.h>
+static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
+
 #ifdef __cplusplus
 extern "C"
 {
