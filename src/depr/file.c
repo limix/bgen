@@ -1,3 +1,5 @@
+#define BGEN_API_EXPORTS
+
 #include "file.h"
 #include "bgen.h"
 
