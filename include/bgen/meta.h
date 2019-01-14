@@ -1,6 +1,7 @@
-/* Create and query a metafile, for index version 03.
+/** Create and query a metafile.
+ * @file bgen/meta.h
  *
- * A bgen metafile is defined as follows.
+ * A bgen metafile is defined as follows:
  *
  * [ header block of 13 characters ], : "bgen index 03"
  * [ uint32_t : number of variants ],
@@ -22,6 +23,8 @@
  *     uint64_t : partition offset
  *   ], ...
  * ]
+ *
+ * Version 03.
  */
 #ifndef BGEN_META_H
 #define BGEN_META_H
@@ -34,27 +37,72 @@
 #define BGEN_IDX_VER "03"
 #define BGEN_HDR_LEN 13
 
-struct bgen_mf; /* metafile */
+struct bgen_mf; /** metafile handler */
 
-/* Variant metadata. */
+/** Variant metadata. */
 struct bgen_vm
 {
-    long vaddr; /* variant offset-address */
-    struct bgen_str id;
-    struct bgen_str rsid;
-    struct bgen_str chrom;
-    int position; /* base-pair position */
-    int nalleles; /* number of alleles */
-    struct bgen_str *allele_ids;
+    long vaddr;                  /**< variant offset-address */
+    struct bgen_str id;          /**< variant identification. */
+    struct bgen_str rsid;        /**< rsid */
+    struct bgen_str chrom;       /**< chromossome nane */
+    int position;                /**< base-pair position */
+    int nalleles;                /**< number of alleles */
+    struct bgen_str *allele_ids; /**< allele ids */
 };
 
-BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *, const char *, int,
-                                              int);
+/** Create a bgen metafile.
+ *
+ * A bgen metafile contains variant metadata (id, rsid, chrom, alleles) and variant
+ * addresses. Those variants are divided in partitions.
+ *
+ * @param bgen Bgen file handler.
+ * @param filepath File path to the metafile.
+ * @param npartitions Number of partitions.
+ * @param verbose `1` for showing progress; `0` otherwise.
+ * @return Metafile handler. `NULL` on failure.
+ */
+BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen,
+                                              const char *filepath, int npartitions,
+                                              int verbose);
+/** Open a bgen metafile.
+ *
+ * @param filepath File path to the metafile.
+ * @return Metafile handler. `NULL` on failure.
+ */
 BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
-BGEN_API int bgen_metafile_nparts(struct bgen_mf *);
-BGEN_API int bgen_metafile_nvars(struct bgen_mf *);
-BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *, int, int *);
-BGEN_API void bgen_free_partition(struct bgen_vm *, int);
-BGEN_API int bgen_close_metafile(struct bgen_mf *);
+/** Get the number of partitions.
+ *
+ * @param mf Metafile handler.
+ * @return Number of partitions.
+ */
+BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf);
+/** Get the number of variants.
+ *
+ * @param mf Metafile handler.
+ * @return Number of variants.
+ */
+BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf);
+/** Read a partition of variants.
+ *
+ * @param mf Metafile handler.
+ * @param index Partition index.
+ * @param nvariants Number of variants of the partition.
+ * @return Array of variant metadata.
+ */
+BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int index,
+                                             int *nvariants);
+/** Free a partition.
+ *
+ * @param vm Array of variant metatada.
+ * @param nvariants Number of variants of the partition.
+ */
+BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvariants);
+/** Close a metafile handler.
+ *
+ * @param mf Metafile handler.
+ * @return `0` on success; `1` otherwise.
+ */
+BGEN_API int bgen_close_metafile(struct bgen_mf *mf);
 
 #endif /* BGEN_META_H */

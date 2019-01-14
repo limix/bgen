@@ -1,8 +1,7 @@
-/*
- * Project: bgen
- * Purpose: BGEN file reader
- * Author: Danilo Horta, danilo.horta@gmail.com
- * Language: C
+/** BGEN file reader
+ * @file bgen.h
+ * @author Danilo Horta
+ * @copyright The MIT License (MIT)
  *
  * The MIT License (MIT)
  *
