@@ -79,7 +79,7 @@ int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant
     if (next_variant(c->bgen, vm))
         goto err;
 
-    *geno_offset = ftell(c->bgen->file);
+    *geno_offset = LONG_TELL(c->bgen->file);
 
     uint32_t length;
     if (fread_ui32(c->bgen->file, &length, 4)) {
@@ -143,7 +143,7 @@ err:
 /* Write variant genotype to file and return the block size. */
 uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
 {
-    long start = ftell(fp);
+    OFF_T start = LONG_TELL(fp);
 
     fwrite_ui64(fp, offset, 8);
     fwrite_str(fp, &(v->id), 2);
@@ -155,7 +155,7 @@ uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
     for (size_t j = 0; j < (size_t)v->nalleles; ++j)
         fwrite_str(fp, v->allele_ids + j, 4);
 
-    return ftell(fp) - start;
+    return LONG_TELL(fp) - start;
 }
 
 int write_metadata_block(struct bgen_mf *mf, next_variant_t *next, void *args,

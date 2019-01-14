@@ -98,7 +98,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
         goto err;
     }
 
-    if (fread_int(bgen->file, &bgen->variants_start, 4)) {
+    if (fread_off(bgen->file, &bgen->variants_start, 4)) {
         error("Could not read the `variants_start` field");
         goto err;
     }
@@ -111,7 +111,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
     }
 
     /* if they actually exist */
-    bgen->samples_start = ftell(bgen->file);
+    bgen->samples_start = LONG_TELL(bgen->file);
 
     return bgen;
 
@@ -180,7 +180,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     if (verbose)
         athr_finish(at);
 
-    bgen->variants_start = ftell(bgen->file);
+    bgen->variants_start = LONG_TELL(bgen->file);
     return sample_ids;
 
 err:

@@ -124,7 +124,7 @@ bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index, int 
         if (read_next_variant_depr(bgen, variants + i))
             goto err;
 
-        (*index)->start[i] = ftell(bgen->file);
+        (*index)->start[i] = LONG_TELL(bgen->file);
 
         if (fread_ui32(bgen->file, &length, 4))
             goto err;
