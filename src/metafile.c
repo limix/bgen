@@ -10,8 +10,6 @@
 #include "variant.h"
 #include <assert.h>
 
-static_assert(sizeof(long) >= 8, "Code relies on long being exactly at least 8 bytes");
-
 /* context for reading the next variant */
 struct next_variant_ctx
 {
@@ -89,7 +87,7 @@ int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant
         goto err;
     }
 
-    if (fseek(c->bgen->file, length, SEEK_CUR)) {
+    if (LONG_SEEK(c->bgen->file, length, SEEK_CUR)) {
         perror_fmt("Could not jump to the next variant");
         goto err;
     }
@@ -130,7 +128,7 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
     if (fwrite1(&nvars, sizeof(uint32_t), mf->file))
         goto err;
 
-    if (fseek(mf->file, sizeof(uint64_t), SEEK_CUR))
+    if (LONG_SEEK(mf->file, sizeof(uint64_t), SEEK_CUR))
         goto err;
 
     mf->idx.npartitions = nparts;
@@ -222,7 +220,7 @@ int write_offsets_block(struct bgen_mf *mf)
         }
     }
 
-    if (fseek(mf->file, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET)) {
+    if (LONG_SEEK(mf->file, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET)) {
         perror_fmt("Could not fseek");
         goto err;
     }
@@ -271,7 +269,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     if (!mf)
         goto err;
 
-    if (fseek(bgen->file, bgen->variants_start, SEEK_SET)) {
+    if (LONG_SEEK(bgen->file, bgen->variants_start, SEEK_SET)) {
         perror_fmt("Could not jump to the variants start");
         goto err;
     }
@@ -329,7 +327,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
         goto err;
     }
 
-    if (fseek(mf->file, (long)mf->idx.metasize, SEEK_CUR)) {
+    if (LONG_SEEK(mf->file, mf->idx.metasize, SEEK_CUR)) {
         error("Could to fseek to the number of partitions");
         goto err;
     }
@@ -403,12 +401,12 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     /*     goto err; */
     /* } */
 
-    if (fseek(file, 13 + 4 + 8, SEEK_SET)) {
+    if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
         perror_fmt("Could not fseek bgen index file");
         goto err;
     }
 
-    if (fseek(file, (long)mf->idx.poffset[part], SEEK_CUR)) {
+    if (LONG_SEEK(file, mf->idx.poffset[part], SEEK_CUR)) {
         perror_fmt("Could not fseek bgen index file");
         goto err;
     }

@@ -1,5 +1,6 @@
 #include "bgen.h"
 #include "cass.h"
+#include "file.h"
 #include "str.h"
 #include <float.h>
 #include <stdint.h>
@@ -42,7 +43,7 @@ int check_metafile(const char *filepath)
     assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 484);
 
-    fseek(fp, u64, SEEK_CUR);
+    LONG_SEEK(fp, u64, SEEK_CUR);
     assert_equal_int(fread(&u32, sizeof(uint32_t), 1, fp), 1);
     assert_equal_int(u32, 2);
 
@@ -52,7 +53,7 @@ int check_metafile(const char *filepath)
     assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 179);
 
-    fseek(fp, 13 + 4 + 8, SEEK_SET);
+    LONG_SEEK(fp, 13 + 4 + 8, SEEK_SET);
     assert_equal_int(fread(&u64, sizeof(uint64_t), 1, fp), 1);
     assert_equal_uint64(u64, 98);
 

@@ -53,7 +53,7 @@ void fix_str(struct bgen_str *s)
 int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
 {
     if (bgen->layout == 1) {
-        if (fseek(bgen->file, 4, SEEK_CUR))
+        if (LONG_SEEK(bgen->file, 4, SEEK_CUR))
             goto err;
     }
 
@@ -108,7 +108,7 @@ bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index, int 
     size_t nvariants;
     struct athr *at = NULL;
 
-    fseek(bgen->file, bgen->variants_start, SEEK_SET);
+    LONG_SEEK(bgen->file, bgen->variants_start, SEEK_SET);
     *index = new_variants_index(bgen);
 
     nvariants = bgen->nvariants;
@@ -129,7 +129,7 @@ bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index, int 
         if (fread_ui32(bgen->file, &length, 4))
             goto err;
 
-        if (fseek(bgen->file, length, SEEK_CUR)) {
+        if (LONG_SEEK(bgen->file, length, SEEK_CUR)) {
             error("Could not jump to a variant.");
             goto err;
         }
@@ -166,7 +166,7 @@ BGEN_DEPRECATED_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *v
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (fseek(fp, (long)vi->start[index], SEEK_SET)) {
+    if (LONG_SEEK(fp, vi->start[index], SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", vi->filepath);
         goto err;
     }

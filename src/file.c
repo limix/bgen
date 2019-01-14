@@ -64,7 +64,7 @@ int read_bgen_header(struct bgen_file *bgen)
     if (magic_number != 1852139362)
         warn("This might not be a BGEN file: magic number mismatch");
 
-    if (fseek(bgen->file, header_length - 20, SEEK_CUR)) {
+    if (LONG_SEEK(bgen->file, header_length - 20, SEEK_CUR)) {
         error("Fseek error while reading a BGEN file");
         return 1;
     }
@@ -146,7 +146,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
     struct bgen_str *sample_ids = NULL;
     struct athr *at = NULL;
 
-    fseek(bgen->file, bgen->samples_start, SEEK_SET);
+    LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (bgen->contain_sample == 0) {
         warn("This bgen file does not contain sample ids");
@@ -155,7 +155,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
 
     sample_ids = dalloc(bgen->nsamples * sizeof(struct bgen_str));
 
-    if (fseek(bgen->file, 8, SEEK_CUR)) {
+    if (LONG_SEEK(bgen->file, 8, SEEK_CUR)) {
         perror("Could not fseek eight bytes forward");
         goto err;
     }

@@ -36,7 +36,7 @@ BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, long vaddr)
     }
     vg->vaddr = vaddr;
 
-    if (fseek(bgen->file, vaddr, SEEK_SET)) {
+    if (LONG_SEEK(bgen->file, vaddr, SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", bgen->filepath);
         goto err;
     }

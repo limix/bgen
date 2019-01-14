@@ -16,7 +16,7 @@
 int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
 {
     if (bgen->layout == 1) {
-        if (fseek(bgen->file, 4, SEEK_CUR))
+        if (LONG_SEEK(bgen->file, 4, SEEK_CUR))
             goto err;
     }
 
