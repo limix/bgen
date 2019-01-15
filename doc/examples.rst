@@ -2,12 +2,18 @@
 Examples
 ********
 
+Create metafile
+^^^^^^^^^^^^^^^
+
 .. literalinclude :: ../example/create_metafile.c
    :language: c
 
 Output::
 
    Finished successfully.
+
+Read samples
+^^^^^^^^^^^^
 
 .. literalinclude :: ../example/read_samples.c
    :language: c
@@ -19,6 +25,8 @@ Output::
    First sample ID: sample_001
    Second sample ID: sample_002
 
+Read metadata
+^^^^^^^^^^^^^
 
 .. literalinclude :: ../example/read_metadata.c
    :language: c
@@ -33,6 +41,9 @@ Output::
    Number of alleles: 2
    First allele: A
    Second allele: A
+
+Read probabilities
+^^^^^^^^^^^^^^^^^^
 
 .. literalinclude :: ../example/read_probability.c
    :language: c
