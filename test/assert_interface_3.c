@@ -50,7 +50,7 @@ int test_create_meteadata_haplotypes()
     assert_not_null(vg);
 
     assert_equal_int(bgen_nalleles(vg), 2);
-    for (size_t i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {
         assert_equal_int(bgen_missing(vg, i), 0);
         assert_equal_int(bgen_ploidy(vg, i), 2);
     }
@@ -107,7 +107,7 @@ int test_genotype_haplotypes_by_creating_metadata()
         1.00000000000000000000, 0.00000000000000000000, 0.00000000000000000000,
         1.00000000000000000000};
     double *probs_ptr = &probs[0];
-    for (size_t i = 0; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {
         int nvars;
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
@@ -187,7 +187,7 @@ int test_genotype_haplotypes_by_loading_metadata()
         1.00000000000000000000};
     assert_equal_int(bgen_metafile_nvariants(mf), 4);
     double *probs_ptr = &probs[0];
-    for (size_t i = 0; i < (size_t)bgen_metafile_npartitions(mf); ++i) {
+    for (int i = 0; i < bgen_metafile_npartitions(mf); ++i) {
         int nvars;
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
@@ -196,7 +196,7 @@ int test_genotype_haplotypes_by_loading_metadata()
             assert_not_null(vg);
 
             assert_equal_int(bgen_nalleles(vg), nalleles[i]);
-            for (size_t j = 0; j < (size_t)nsamples; ++j) {
+            for (int j = 0; j < nsamples; ++j) {
                 assert_equal_int(bgen_missing(vg, j), 0);
                 assert_equal_int(bgen_ploidy(vg, j), 2);
             }

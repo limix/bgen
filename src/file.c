@@ -76,7 +76,8 @@ int read_bgen_header(struct bgen_file *bgen)
 
     bgen->compression = flags & 3;
     bgen->layout = (flags & (15 << 2)) >> 2;
-    bgen->sample_ids_presence = bgen->contain_sample = (flags & (1 << 31)) >> 31;
+    bgen->sample_ids_presence = bgen->contain_sample =
+        (flags & ((uint32_t)1 << 31)) >> 31;
 
     return 0;
 }
@@ -153,7 +154,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
         return NULL;
     }
 
-    sample_ids = dalloc(bgen->nsamples * sizeof(struct bgen_str));
+    sample_ids = dalloc((size_t)bgen->nsamples * sizeof(struct bgen_str));
 
     if (LONG_SEEK(bgen->file, 8, SEEK_CUR)) {
         perror("Could not fseek eight bytes forward");
@@ -172,7 +173,7 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
             athr_consume(at, 1);
 
         if (fread_str(bgen->file, sample_ids + i, 2)) {
-            error("Could not read the %lu-th sample id", i);
+            error("Could not read the %zu-th sample id", i);
             goto err;
         }
     }

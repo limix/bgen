@@ -22,9 +22,9 @@ int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size)
         return EXIT_FAILURE;
     }
 
-    strm.avail_in = src_size;
+    strm.avail_in = (uInt)src_size;
 
-    strm.avail_out = *dst_size;
+    strm.avail_out = (uInt)*dst_size;
     strm.next_out = (unsigned char *)*dst;
 
     e = inflate(&strm, Z_NO_FLUSH);
@@ -49,7 +49,7 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
     int ret;
     z_stream strm;
 
-    unsigned int unused = *dst_size;
+    uInt unused = *dst_size;
     char *cdst = *dst;
 
     strm.zalloc = Z_NULL;
@@ -64,7 +64,7 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
         return EXIT_FAILURE;
     }
 
-    strm.avail_in = src_size;
+    strm.avail_in = (uInt)src_size;
     strm.next_in = (unsigned char *)src;
 
     while (1) {
@@ -81,7 +81,7 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
         if (ret == Z_DATA_ERROR || ret == Z_MEM_ERROR)
             goto err;
 
-        unsigned int just_wrote = unused - strm.avail_out;
+        uInt just_wrote = unused - strm.avail_out;
 
         cdst += just_wrote;
         unused -= just_wrote;
@@ -98,7 +98,7 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
                 return EXIT_FAILURE;
             }
 
-            unused = *dst_size;
+            unused = (uInt)*dst_size;
             *dst_size += unused;
             *dst = (char *)realloc(*dst, *dst_size);
             cdst = *dst + unused;

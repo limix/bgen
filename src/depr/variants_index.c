@@ -32,8 +32,8 @@
 #include "tpl/tpl.h"
 #include "zip/zstd.h"
 
-#define SET_STR(dst, src)                                                              \
-    (dst)->len = (src)->len;                                                           \
+#define SET_STR16(dst, src)                                                            \
+    (dst)->len = (uint16_t)(src)->len;                                                 \
     (dst)->str = (src)->str;
 
 typedef struct tpl_string
@@ -58,13 +58,13 @@ struct bgen_vi *new_variants_index(const struct bgen_file *bgen)
     vi = malloc(sizeof(struct bgen_vi));
 
     vi->filepath = strdup(bgen->filepath);
-    vi->compression = bgen->compression;
-    vi->layout = bgen->layout;
-    vi->nsamples = bgen->nsamples;
-    vi->nvariants = bgen->nvariants;
+    vi->compression = (uint32_t)bgen->compression;
+    vi->layout = (uint32_t)bgen->layout;
+    vi->nsamples = (uint32_t)bgen->nsamples;
+    vi->nvariants = (uint32_t)bgen->nvariants;
     vi->max_nalleles = 0;
 
-    vi->start = malloc(bgen->nvariants * sizeof(uint64_t));
+    vi->start = malloc((size_t)bgen->nvariants * sizeof(uint64_t));
 
     return vi;
 }
@@ -92,11 +92,11 @@ BGEN_DEPRECATED_API int bgen_store_variants_metadata(const struct bgen_file *bge
 
     if (append_header(b))
         return 1;
-    if (append_variants(bgen->nvariants, variants, b))
+    if (append_variants((size_t)bgen->nvariants, variants, b))
         return 1;
-    if (append_alleles(bgen->nvariants, variants, b))
+    if (append_alleles((size_t)bgen->nvariants, variants, b))
         return 1;
-    if (append_genotype_offsets(bgen->nvariants, index->start, b))
+    if (append_genotype_offsets((size_t)bgen->nvariants, index->start, b))
         return 1;
 
     buffer_store(fp, b);
@@ -131,7 +131,7 @@ bgen_load_variants_metadata(const struct bgen_file *bgen, const char *filepath,
     if (!(header[11] == '0' && header[11] == '1'))
         mem = (char *)mem + read_len;
 
-    variants = dalloc(bgen->nvariants * sizeof(struct bgen_var));
+    variants = dalloc((size_t)bgen->nvariants * sizeof(struct bgen_var));
     if (!variants)
         goto err;
 
@@ -233,12 +233,12 @@ int append_variants(size_t nvariants, struct bgen_var *variants, struct Buffer *
     tn = tpl_map("A(S($(vs)$(vs)$(vs)uv))", &tpl_variant);
 
     for (i = 0; i < nvariants; ++i) {
-        SET_STR(&tpl_variant.id, &variants[i].id);
-        SET_STR(&tpl_variant.rsid, &variants[i].rsid);
-        SET_STR(&tpl_variant.chrom, &variants[i].chrom);
+        SET_STR16(&tpl_variant.id, &variants[i].id);
+        SET_STR16(&tpl_variant.rsid, &variants[i].rsid);
+        SET_STR16(&tpl_variant.chrom, &variants[i].chrom);
 
-        tpl_variant.position = variants[i].position;
-        tpl_variant.nalleles = variants[i].nalleles;
+        tpl_variant.position = (uint32_t)variants[i].position;
+        tpl_variant.nalleles = (uint16_t)variants[i].nalleles;
 
         tpl_pack(tn, 1);
     }
@@ -264,7 +264,7 @@ int append_alleles(size_t nvariants, struct bgen_var *variants, struct Buffer *b
 
     for (i = 0; i < nvariants; ++i) {
         for (j = 0; j < (size_t)variants[i].nalleles; ++j) {
-            SET_STR(&allele_id, variants[i].allele_ids + j);
+            SET_STR16(&allele_id, variants[i].allele_ids + j);
             tpl_pack(tn, 2);
         }
         tpl_pack(tn, 1);
@@ -318,11 +318,11 @@ size_t read_variants(void *mem, struct bgen_var *variants)
 
     i = 0;
     while (tpl_unpack(tn, 1) > 0) {
-        SET_STR(&variants[i].id, &v.id);
-        SET_STR(&variants[i].rsid, &v.rsid);
-        SET_STR(&variants[i].chrom, &v.chrom);
+        SET_STR16(&variants[i].id, &v.id);
+        SET_STR16(&variants[i].rsid, &v.rsid);
+        SET_STR16(&variants[i].chrom, &v.chrom);
 
-        variants[i].position = v.position;
+        variants[i].position = (int)v.position;
         variants[i].nalleles = v.nalleles;
 
         ++i;
@@ -350,10 +350,11 @@ size_t read_alleles(void *mem, struct bgen_var *variants)
 
     i = 0;
     while (tpl_unpack(tn, 1) > 0) {
-        variants[i].allele_ids = malloc(variants[i].nalleles * sizeof(struct bgen_str));
+        variants[i].allele_ids =
+            malloc((size_t)variants[i].nalleles * sizeof(struct bgen_str));
         size_t j = 0;
         while (tpl_unpack(tn, 2) > 0) {
-            SET_STR(variants[i].allele_ids + j, &allele_id);
+            SET_STR16(variants[i].allele_ids + j, &allele_id);
             ++j;
         }
 

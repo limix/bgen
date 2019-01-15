@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void alloc_str(struct bgen_str *v, size_t len)
+void alloc_str(struct bgen_str *v, int len)
 {
     v->len = len;
     if (len > 0)

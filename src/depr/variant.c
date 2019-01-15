@@ -14,7 +14,7 @@
 BGEN_DEPRECATED_API int bgen_max_nalleles(struct bgen_vi *vi)
 {
     assert(vi);
-    return vi->max_nalleles;
+    return (int)vi->max_nalleles;
 }
 
 BGEN_DEPRECATED_API void bgen_free_index(struct bgen_vi *index)
@@ -46,7 +46,7 @@ BGEN_DEPRECATED_API void bgen_free_variants_metadata(const struct bgen_file *bge
 
 void fix_str(struct bgen_str *s)
 {
-    s->str = realloc(s->str, s->len + 1);
+    s->str = realloc(s->str, (size_t)s->len + 1);
     s->str[s->len] = '\0';
 }
 
@@ -77,7 +77,7 @@ int read_next_variant_depr(struct bgen_file *bgen, struct bgen_var *v)
     else if (fread_int(bgen->file, &v->nalleles, 2))
         goto err;
 
-    v->allele_ids = dalloc(v->nalleles * sizeof(struct bgen_str));
+    v->allele_ids = dalloc((size_t)v->nalleles * sizeof(struct bgen_str));
     if (!v->allele_ids)
         goto err;
 
@@ -105,26 +105,26 @@ bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index, int 
 {
     struct bgen_var *variants = NULL;
     uint32_t length;
-    size_t nvariants;
+    int nvariants;
     struct athr *at = NULL;
 
     LONG_SEEK(bgen->file, bgen->variants_start, SEEK_SET);
     *index = new_variants_index(bgen);
 
     nvariants = bgen->nvariants;
-    variants = dalloc(nvariants * sizeof(struct bgen_var));
+    variants = dalloc((size_t)nvariants * sizeof(struct bgen_var));
 
     if (verbose)
         at = athr_create(nvariants, "Reading variants", ATHR_BAR);
 
-    for (size_t i = 0; i < nvariants; ++i) {
+    for (int i = 0; i < nvariants; ++i) {
         if (verbose)
             athr_consume(at, 1);
 
         if (read_next_variant_depr(bgen, variants + i))
             goto err;
 
-        (*index)->start[i] = LONG_TELL(bgen->file);
+        (*index)->start[i] = (uint64_t)LONG_TELL(bgen->file);
 
         if (fread_ui32(bgen->file, &length, 4))
             goto err;
@@ -135,7 +135,7 @@ bgen_read_variants_metadata(struct bgen_file *bgen, struct bgen_vi **index, int 
         }
 
         if ((uint32_t)(variants + i)->nalleles > (*index)->max_nalleles)
-            (*index)->max_nalleles = (variants + i)->nalleles;
+            (*index)->max_nalleles = (uint32_t)(variants + i)->nalleles;
     }
 
     if (verbose)
@@ -166,7 +166,7 @@ BGEN_DEPRECATED_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *v
     vg->plo_miss = NULL;
     vg->chunk = NULL;
 
-    if (LONG_SEEK(fp, vi->start[index], SEEK_SET)) {
+    if (LONG_SEEK(fp, (OFF_T)vi->start[index], SEEK_SET)) {
         perror_fmt("Could not seek a variant in %s", vi->filepath);
         goto err;
     }

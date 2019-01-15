@@ -163,14 +163,14 @@ err:
     return 1;
 }
 
-inline static int ceildiv(size_t x, size_t y) { return (x + (y - 1)) / y; }
+inline static size_t ceildiv(size_t x, size_t y) { return (x + (y - (size_t)1)) / y; }
 
 int buffer_load_loop(FILE *file, char *data, size_t size, int verbose)
 {
     size_t chunk_size = 5242880;
     char *last, *current;
     struct athr *athr;
-    int nsteps = ceildiv(size, chunk_size);
+    size_t nsteps = ceildiv(size, chunk_size);
 
     current = data;
     last = data + size;
