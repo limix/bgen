@@ -33,22 +33,31 @@
 #include "file.h"
 #include "str.h"
 
+/** Metafile index name. */
 #define BGEN_IDX_NAME "bgen index "
+/** Metafile index version. */
 #define BGEN_IDX_VER "03"
+/** Metafile index name length. */
 #define BGEN_HDR_LEN 13
 
-struct bgen_mf; /** metafile handler */
+struct bgen_file;
+/** Metafile handler.
+ * @struct bgen_mf
+ */
+struct bgen_mf;
 
-/** Variant metadata. */
+/** Variant metadata.
+ * @struct bgen_vm
+ */
 struct bgen_vm
 {
-    long vaddr;                  /**< variant offset-address */
-    struct bgen_str id;          /**< variant identification. */
-    struct bgen_str rsid;        /**< rsid */
-    struct bgen_str chrom;       /**< chromossome nane */
-    int position;                /**< base-pair position */
-    int nalleles;                /**< number of alleles */
-    struct bgen_str *allele_ids; /**< allele ids */
+    long vaddr;                  /**< Vasdsdrianteealso:: offset-address. */
+    struct bgen_str id;          /**< Variant identification. */
+    struct bgen_str rsid;        /**< RSID. */
+    struct bgen_str chrom;       /**< Chromossome name. */
+    int position;                /**< Base-pair position. */
+    int nalleles;                /**< Number of alleles. */
+    struct bgen_str *allele_ids; /**< Allele ids. */
 };
 
 /** Create a bgen metafile.
@@ -58,7 +67,8 @@ struct bgen_vm
  *
  * @param bgen Bgen file handler.
  * @param filepath File path to the metafile.
- * @param npartitions Number of partitions.
+ * @param npartitions Number of partitions as to be between `1` and the number of
+ * samples.
  * @param verbose `1` for showing progress; `0` otherwise.
  * @return Metafile handler. `NULL` on failure.
  */

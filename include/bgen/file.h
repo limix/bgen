@@ -7,9 +7,15 @@
 #include "api.h"
 #include "str.h"
 
-struct bgen_file; /**< bgen file handler */
+/** Bgen file handler.
+ * @struct bgen_file
+ */
+struct bgen_file;
 
 /** Open a file and return a bgen file handler.
+ *
+ * Remember to call @ref bgen_close to close the file and release
+ * resources after the interaction has finished.
  *
  * @param filepath File path to the bgen file.
  * @return Bgen file handler.
@@ -34,11 +40,18 @@ BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
 BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
 /** Check if the file contain sample identifications.
  *
+ * \rst
+ * .. seealso::
+ *     Please, refer to the |bgen format specification| for more details.
+ * \endrst
+ *
  * @param bgen Bgen file handler.
  * @return `1` if bgen file contains the sample ids; `0` otherwise.
  */
 BGEN_API int bgen_contain_samples(const struct bgen_file *bgen);
 /** Return array of sample identifications.
+ *
+ * The size of this array is given be the @ref bgen_nsamples function.
  *
  * @param bgen Bgen file handler.
  * @param verbose `1` to show progress; `0` otherwise.

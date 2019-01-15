@@ -28,9 +28,13 @@
 #ifndef BGEN_H
 #define BGEN_H
 
+/** Major bgen version. */
 #define BGEN_VERSION_MAJOR 3
+/** Minor bgen version. */
 #define BGEN_VERSION_MINOR 0
+/** Minor bgen version. */
 #define BGEN_VERSION_PATCH 0
+/** Bgen version. */
 #define BGEN_VERSION "3.0.0"
 
 #include <assert.h>
@@ -42,8 +46,7 @@ extern "C"
 #endif
 
 #include "bgen/api.h"
-#include "bgen/depr_bgen.h"
-#include "bgen/depr_meta.h"
+#include "bgen/depr.h"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"

@@ -1,19 +1,26 @@
 /** Handy string definition.
- * @file: str.h
+ * @file: bgen/str.h
  */
 #ifndef BGEN_STR_H
 #define BGEN_STR_H
 
 #include "bgen/api.h"
 
-/** String. */
+/** String.
+ * @struct bgen_str
+ */
 struct bgen_str
 {
     int len;   /**< String length. */
     char *str; /**< Array of characters. */
 };
 
-/** String. */
+/** String.
+ * \rst
+ * .. deprecated:: 3.0.0
+ *     Use :cpp:type:`bgen_str` instead.
+ * \endrst
+ */
 struct bgen_string
 {
     int len;   /**< String length. */
