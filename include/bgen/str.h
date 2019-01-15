@@ -18,7 +18,7 @@ struct bgen_str
 /** String.
  * \rst
  * .. deprecated:: 3.0.0
- *     Use :cpp:type:`bgen_str` instead.
+ *     Please, use :cpp:type:`bgen_str` instead.
  * \endrst
  */
 struct bgen_string

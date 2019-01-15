@@ -67,10 +67,10 @@ int use_index(const char *filepath)
 
     assert_not_null(mf = bgen_open_metafile(filepath));
 
-    int nparts = bgen_metafile_nparts(mf);
+    int nparts = bgen_metafile_npartitions(mf);
     assert_equal_int(nparts, 2);
 
-    int nvars = bgen_metafile_nvars(mf);
+    int nvars = bgen_metafile_nvariants(mf);
     assert_equal_int(nvars, 10);
 
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
@@ -120,10 +120,10 @@ int use_index_wrongly(const char *filepath)
 
     assert_not_null(mf = bgen_open_metafile(filepath));
 
-    int nparts = bgen_metafile_nparts(mf);
+    int nparts = bgen_metafile_npartitions(mf);
     assert_equal_int(nparts, 2);
 
-    int nvars = bgen_metafile_nvars(mf);
+    int nvars = bgen_metafile_nvariants(mf);
     assert_equal_int(nvars, 10);
 
     struct bgen_vm *vm = bgen_read_partition(mf, 3, &nvariants);

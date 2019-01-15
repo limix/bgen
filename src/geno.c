@@ -65,7 +65,7 @@ err:
 
 BGEN_API void bgen_close_genotype(struct bgen_vg *vg) { free_vg(vg); }
 
-BGEN_API int bgen_read_genotype(struct bgen_file *bgen, struct bgen_vg *vg,
+BGEN_API int bgen_read_genotype(const struct bgen_file *bgen, struct bgen_vg *vg,
                                 double *probs)
 {
     if (bgen->layout == 1) {

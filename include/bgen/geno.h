@@ -44,7 +44,8 @@ BGEN_API void bgen_close_genotype(struct bgen_vg *vg);
  * @param p Array of probabilities.
  * @return `0` if it succeeded; `1` otherwise.
  */
-BGEN_API int bgen_read_genotype(struct bgen_file *bgen, struct bgen_vg *vg, double *p);
+BGEN_API int bgen_read_genotype(const struct bgen_file *bgen, struct bgen_vg *vg,
+                                double *p);
 /** Get the number of alleles.
  *
  * @param vg Variant genotype handler.

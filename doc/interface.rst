@@ -17,29 +17,27 @@ of sample identifications.
 The allocated resources must be released by a subsequent call to
 :cpp:func:`bgen_free_samples`.
 
-The function :cpp:func:`bgen_read_variants_metadata` reads the metadata of all variants
-in the file (i.e., names, chromosomes, number of alleles, etc.).
-It returns the read information as an array of type :cpp:type:`bgen_var`.
+The function :cpp:func:`bgen_read_partition` reads the variants metadata in the
+corresponding partition (i.e., names, chromosomes, number of alleles, etc.).
+It returns the read information as an array of type :cpp:type:`bgen_vm`.
 Let ``v`` be such an array.
 The user can, for example, get the name of the i-th variant from
 ``v[i].id`` or its genetic position from ``v[i].position``.
 After use, its resources have to be released by calling
-:cpp:func:`bgen_free_variants_metadata`.
+:cpp:func:`bgen_free_partition`.
 
-The function :cpp:func:`bgen_read_variants_metadata` also returns another important
-structure: the variants index, :cpp:type:`bgen_vi`.
+The function :cpp:func:`bgen_read_partition` also returns another important
+information: the variant address.
 It is used to locate the variants in a BGEN file.
-Importantly, the variants index can be used even after the BGEN file has
-been closed by a :cpp:func:`bgen_close` call.
 
 To fetch a genotype information, the user has to first get a variant genotype
-handler (:cpp:type:`bgen_vg`) by calling :cpp:func:`bgen_open_variant_genotype`.
+handler (:cpp:type:`bgen_vg`) by calling :cpp:func:`bgen_open_genotype`.
 The number of possible genotypes of a given variant, for example, can then be
 found by a call to :cpp:func:`bgen_ncombs`.
 The probabilities of each possible genotype can be found by a call to
-:cpp:func:`bgen_read_variant_genotype`.
+:cpp:func:`bgen_read_genotype`.
 After use, the variant genotype handler has to be closed by
-a :cpp:func:`bgen_close_variant_genotype` call.
+a :cpp:func:`bgen_close_genotype` call.
 
 Strings are represented by the :cpp:type:`bgen_str` type, which contains an
 array of characters and its length.
@@ -87,8 +85,8 @@ Metadata
 
 .. doxygenfunction:: bgen_create_metafile
 .. doxygenfunction:: bgen_open_metafile
-.. doxygenfunction:: bgen_metafile_nparts
-.. doxygenfunction:: bgen_metafile_nvars
+.. doxygenfunction:: bgen_metafile_npartitions
+.. doxygenfunction:: bgen_metafile_nvariants
 .. doxygenfunction:: bgen_read_partition
 .. doxygenfunction:: bgen_free_partition
 .. doxygenfunction:: bgen_close_metafile

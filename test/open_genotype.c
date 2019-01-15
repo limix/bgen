@@ -86,8 +86,8 @@ int test_geno()
     struct bgen_mf *mf =
         bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 3);
-    assert_equal_int(bgen_metafile_nvars(mf), 10);
+    assert_equal_int(bgen_metafile_npartitions(mf), 3);
+    assert_equal_int(bgen_metafile_nvariants(mf), 10);
 
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
@@ -129,7 +129,7 @@ int test_geno()
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
     size_t i = 0;
-    for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
+    for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_open_genotype(bgen, vm[l].vaddr);
@@ -190,7 +190,7 @@ int test_geno()
 
     int nsamples = bgen_nsamples(bgen);
     size_t jj = 0;
-    for (size_t j = 0; j < (size_t)bgen_metafile_nparts(mf); ++j) {
+    for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_open_genotype(bgen, vm[l].vaddr);

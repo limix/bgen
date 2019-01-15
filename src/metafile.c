@@ -367,11 +367,17 @@ BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
     return 0;
 }
 
-BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf) { return mf->idx.npartitions; }
+BGEN_API int bgen_metafile_npartitions(const struct bgen_mf *mf)
+{
+    return mf->idx.npartitions;
+}
 
-BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf) { return mf->idx.nvariants; }
+BGEN_API int bgen_metafile_nvariants(const struct bgen_mf *mf)
+{
+    return mf->idx.nvariants;
+}
 
-BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
+int bgen_partition_nvars(const struct bgen_mf *mf, int part)
 {
     if (part < 0) {
         error("Invalid partition number: %d", part);
@@ -381,7 +387,8 @@ BGEN_API int bgen_partition_nvars(struct bgen_mf *mf, int part)
     return imin(size, mf->idx.nvariants - size * part);
 }
 
-BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *nvars)
+BGEN_API struct bgen_vm *bgen_read_partition(const struct bgen_mf *mf, int part,
+                                             int *nvars)
 {
     struct bgen_vm *vars = NULL;
     FILE *file = mf->file;
@@ -395,11 +402,6 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
     vars = dalloc((*nvars) * sizeof(struct bgen_vm));
     for (int i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
-
-    /* if ((file = fopen(mf->filepath, "rb")) == NULL) { */
-    /*     perror_fmt("Could not open bgen index file"); */
-    /*     goto err; */
-    /* } */
 
     if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
         perror_fmt("Could not fseek bgen index file");
@@ -430,7 +432,6 @@ BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int part, int *
 err:
     if (vars)
         bgen_free_partition(vars, *nvars);
-    /* fclose_nul(file); */
     return NULL;
 }
 

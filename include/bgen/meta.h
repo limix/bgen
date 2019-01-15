@@ -86,13 +86,13 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
  * @param mf Metafile handler.
  * @return Number of partitions.
  */
-BGEN_API int bgen_metafile_nparts(struct bgen_mf *mf);
+BGEN_API int bgen_metafile_npartitions(const struct bgen_mf *mf);
 /** Get the number of variants.
  *
  * @param mf Metafile handler.
  * @return Number of variants.
  */
-BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf);
+BGEN_API int bgen_metafile_nvariants(const struct bgen_mf *mf);
 /** Read a partition of variants.
  *
  * @param mf Metafile handler.
@@ -100,7 +100,7 @@ BGEN_API int bgen_metafile_nvars(struct bgen_mf *mf);
  * @param nvariants Number of variants of the partition.
  * @return Array of variant metadata.
  */
-BGEN_API struct bgen_vm *bgen_read_partition(struct bgen_mf *mf, int index,
+BGEN_API struct bgen_vm *bgen_read_partition(const struct bgen_mf *mf, int index,
                                              int *nvariants);
 /** Free a partition.
  *

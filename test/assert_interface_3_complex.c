@@ -34,8 +34,8 @@ int test_create_metadata_complex()
         bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.1", 4, 0);
     assert_not_null(mf);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 4);
-    assert_equal_int(bgen_metafile_nvars(mf), 10);
+    assert_equal_int(bgen_metafile_npartitions(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 10);
 
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
@@ -67,8 +67,8 @@ int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
 {
     assert_not_null(mf);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 4);
-    assert_equal_int(bgen_metafile_nvars(mf), 10);
+    assert_equal_int(bgen_metafile_npartitions(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 10);
 
     double probs[] = {
         1.0000, 0.0000, NAN,    1.0000, 0.0000, 0.0000, 1.0000, 0.0000, 0.0000, 0.0000,
@@ -118,7 +118,7 @@ int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
     int *phased_ptr = phased + 0;
 
-    for (size_t i = 0; i < (size_t)bgen_metafile_nparts(mf); ++i) {
+    for (size_t i = 0; i < (size_t)bgen_metafile_npartitions(mf); ++i) {
         int nvars;
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 

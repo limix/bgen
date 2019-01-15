@@ -40,8 +40,8 @@ int test_create_meteadata_haplotypes()
     struct bgen_mf *mf = bgen_create_metafile(bgen, "haplotypes.bgen.metadata.1", 4, 0);
     assert_not_null(mf);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 4);
-    assert_equal_int(bgen_metafile_nvars(mf), 4);
+    assert_equal_int(bgen_metafile_npartitions(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 4);
 
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
@@ -74,8 +74,8 @@ int test_genotype_haplotypes_by_creating_metadata()
     struct bgen_mf *mf = bgen_create_metafile(bgen, "haplotypes.bgen.metadata.2", 4, 0);
     assert_not_null(mf);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 4);
-    assert_equal_int(bgen_metafile_nvars(mf), 4);
+    assert_equal_int(bgen_metafile_npartitions(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 4);
 
     int nalleles[] = {2, 2, 2, 2};
     int min_ploidy[] = {2, 2, 2, 2};
@@ -153,8 +153,8 @@ int test_genotype_haplotypes_by_loading_metadata()
     struct bgen_mf *mf = bgen_open_metafile("haplotypes.bgen.metadata.2");
     assert_not_null(mf);
 
-    assert_equal_int(bgen_metafile_nparts(mf), 4);
-    assert_equal_int(bgen_metafile_nvars(mf), 4);
+    assert_equal_int(bgen_metafile_npartitions(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 4);
 
     int nalleles[] = {2, 2, 2, 2};
     int min_ploidy[] = {2, 2, 2, 2};
@@ -185,9 +185,9 @@ int test_genotype_haplotypes_by_loading_metadata()
         1.00000000000000000000, 1.00000000000000000000, 0.00000000000000000000,
         1.00000000000000000000, 0.00000000000000000000, 0.00000000000000000000,
         1.00000000000000000000};
-    assert_equal_int(bgen_metafile_nvars(mf), 4);
+    assert_equal_int(bgen_metafile_nvariants(mf), 4);
     double *probs_ptr = &probs[0];
-    for (size_t i = 0; i < (size_t)bgen_metafile_nparts(mf); ++i) {
+    for (size_t i = 0; i < (size_t)bgen_metafile_npartitions(mf); ++i) {
         int nvars;
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
