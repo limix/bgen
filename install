@@ -2,24 +2,36 @@
 
 URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
 VERSION=$(curl -s $URL)
+ORIG_DIR=$(pwd)
 
 echo "[0/5] Library(bgen==$VERSION)"
 
-tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
-logfile="$tmpdir/bgen.log"
+tmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir')
+logfile="$(mktemp 2>/dev/null --suffix=bgen.log ||\
+           mktemp -t 'tmpdir' --suffix=bgen.log)"
 exec 3> "$logfile"
 
+FILE=bgen-$VERSION.tar.gz
+DIR=bgen-$VERSION
+URL=https://github.com/limix/bgen/archive/$VERSION.tar.gz
+
+trap cleanup EXIT
 function cleanup
 {
     exec 3>&-
     rm -rf "$tmpdir" >/dev/null 2>&1 || true
+    cd "$ORIG_DIR"
 }
 
-trap cleanup EXIT
+trap ctrl_c INT
+function ctrl_c()
+{
+    echo "Log file path: $logfile"
+}
 
 function silent_run
 {
-    eval "$@ 2>&3 1>&3"
+    eval "$@" 2>&3 1>&3
 }
 
 function do_then_sudo
@@ -33,23 +45,21 @@ function do_then_sudo
 function failed
 {
     echo "FAILED."
-    echo "[_/_] Log output from $logfile:"
-    exec 3>&- && cat $logfile
-    cleanup
+    echo "[_/5] Log output:"
+    echo ""
+    echo "$logfile"
+    echo ""
+    echo "Log file path: $logfile"
     exit 1
 }
 
 function succeeded
 {
     cleanup
+    rm -rf "$logfile" >/dev/null 2>&1 || true
 }
 
-FILE=bgen-$VERSION.tar.gz
-DIR=bgen-$VERSION
-URL=https://github.com/limix/bgen/archive/$VERSION.tar.gz
-
-rm $FILE >/dev/null 2>&1 || true
-rm -rf $DIR >/dev/null 2>&1 || true
+cd $tmpdir
 
 echo -n "[1/5] Downloading... "
 silent_run curl -o $FILE -L $URL
@@ -79,3 +89,4 @@ if type "ldconfig" >/dev/null 2>&1; then
 fi
 
 succeeded
+
