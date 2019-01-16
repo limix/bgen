@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
 VERSION=$(curl -s $URL)
@@ -7,10 +7,11 @@ echo "[0/5] Library(bgen==$VERSION)"
 
 tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
 logfile="$tmpdir/bgen.log"
-exec 3>"$logfile"
+exec 3> "$logfile"
 
 function cleanup
 {
+    exec 3>&-
     rm -rf "$tmpdir" >/dev/null 2>&1 || true
 }
 
@@ -18,12 +19,7 @@ trap cleanup EXIT
 
 function silent_run
 {
-    eval "$@ >/dev/null 2>&1"
-}
-
-function silent_trun
-{
-    eval "$@ >/dev/null 2>&1 || true"
+    eval "$@ 2>&3 1>&3"
 }
 
 function do_then_sudo
@@ -38,16 +34,22 @@ function failed
 {
     echo "FAILED."
     echo "[_/_] Log output from $logfile:"
-    cat $logfile
+    exec 3>&- && cat $logfile
+    cleanup
     exit 1
+}
+
+function succeeded
+{
+    cleanup
 }
 
 FILE=bgen-$VERSION.tar.gz
 DIR=bgen-$VERSION
 URL=https://github.com/limix/bgen/archive/$VERSION.tar.gz
 
-silent_trun rm $FILE
-silent_trun rm -rf $DIR
+rm $FILE >/dev/null 2>&1 || true
+rm -rf $DIR >/dev/null 2>&1 || true
 
 echo -n "[1/5] Downloading... "
 silent_run curl -o $FILE -L $URL
@@ -72,8 +74,8 @@ echo -n "[5/5] Installing... "
 silent_run do_then_sudo make install
 [ $? == 0 ] && echo "done." || { failed; exit 1; }
 
-rm "$logfile" || true
-
 if type "ldconfig" >/dev/null 2>&1; then
     silent_run do_then_sudo ldconfig
 fi
+
+succeeded
