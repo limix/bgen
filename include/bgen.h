@@ -33,11 +33,14 @@
 /** Minor bgen version. */
 #define BGEN_VERSION_MINOR 0
 /** Minor bgen version. */
-#define BGEN_VERSION_PATCH 0
+#define BGEN_VERSION_PATCH 1
 /** Bgen version. */
-#define BGEN_VERSION "3.0.0"
+#define BGEN_VERSION "3.0.1"
 
 #include <assert.h>
+#ifndef static_assert
+#define static_assert _Static_assert
+#endif
 static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
 
 #ifdef __cplusplus
