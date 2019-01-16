@@ -1,33 +1,68 @@
 #!/usr/bin/env bash
 
-URL=https://raw.githubusercontent.com/limix/bgen/master/VERSION
-VERSION=$(curl -s $URL)
-ORIG_DIR=$(pwd)
+# Configuration
+GITHUB_DOMAIN=limix
+GITHUB_PROJECT=bgen
 
-echo "[0/5] Library(bgen==$VERSION)"
+# Implementation
+verurl=https://raw.githubusercontent.com/$GITHUB_DOMAIN/$GITHUB_PROJECT/master/VERSION
+version=$(curl -s $verurl)
+orig_dir=$(pwd)
+tarfile=$GITHUB_PROJECT-$version.tar.gz
+tarurl=https://github.com/$GITHUB_DOMAIN/$GITHUB_PROJECT/archive/$version.tar.gz
 
-tmpdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir')
-logfile="$(mktemp 2>/dev/null --suffix=bgen.log ||\
-           mktemp -t 'tmpdir' --suffix=bgen.log)"
+function error
+{
+    >&2 echo "Error: $1"
+}
+
+function set_tempdir
+{
+    fix=$1
+    if tmpdir=$(mktemp -d --suffix=$fix 2>/dev/null); then
+        return 0
+    fi
+
+    if tmpdir=$(mktemp -d -t $fix); then
+        return 0
+    fi
+
+    error "Could not create a temporary directory."
+    exit 1
+}
+set_tempdir $GITHUB_PROJECT
+
+function set_logfile
+{
+    fix=$1
+    if logfile=$(mktemp --suffix=$fix.log 2>/dev/null); then
+        return 0
+    fi
+
+    if logfile=$(mktemp -t $fix.log); then
+        return 0
+    fi
+
+    error "Could not create a log file."
+    exit 1
+}
+set_logfile $GITHUB_PROJECT
+
 exec 3> "$logfile"
 
-FILE=bgen-$VERSION.tar.gz
-DIR=bgen-$VERSION
-URL=https://github.com/limix/bgen/archive/$VERSION.tar.gz
-
-trap cleanup EXIT
 function cleanup
 {
     exec 3>&-
     rm -rf "$tmpdir" >/dev/null 2>&1 || true
-    cd "$ORIG_DIR"
+    cd "$orig_dir"
 }
+trap cleanup EXIT
 
-trap ctrl_c INT
 function ctrl_c()
 {
     echo "Log file path: $logfile"
 }
+trap ctrl_c INT
 
 function silent_run
 {
@@ -42,12 +77,20 @@ function do_then_sudo
     fi
 }
 
+function run_ldconfig
+{
+    if type "ldconfig" >/dev/null 2>&1; then
+        silent_run do_then_sudo ldconfig
+    fi
+}
+
 function failed
 {
+    exec 3>&-
     echo "FAILED."
-    echo "[_/5] Log output:"
+    echo "[_/6] Log output:"
     echo ""
-    echo "$logfile"
+    cat "$logfile"
     echo ""
     echo "Log file path: $logfile"
     exit 1
@@ -59,34 +102,36 @@ function succeeded
     rm -rf "$logfile" >/dev/null 2>&1 || true
 }
 
+echo "[0/6] Library($GITHUB_PROJECT==$version)"
 cd $tmpdir
 
-echo -n "[1/5] Downloading... "
-silent_run curl -o $FILE -L $URL
-[ $? == 0 ] && echo "done." || { failed; exit 1; }
+echo -n "[1/6] Downloading... "
+silent_run curl -o $tarfile -L $tarurl
+[ $? == 0 ] && echo "done." || failed
 
-tar xzf $FILE && cd $DIR
-mkdir build && cd build
+echo -n "[2/6] Extracting... "
+[ -e $tarfile ] || failed
+silent_run tar xzf $tarfile || failed
+[ -e ${tarfile%.tar.gz} ] || failed
+silent_run cd ${tarfile%.tar.gz} || failed
+silent_run mkdir build || failed
+silent_run cd build
+[ $? == 0 ] && echo "done." || failed
 
-echo -n "[2/5] Configuring... "
-silent_run cmake ..
-[ $? == 0 ] && echo "done." || { failed; exit 1; }
+echo -n "[3/6] Configuring... "
+silent_run cmake -DCMAKE_BUILD_TYPE=Release ..
+[ $? == 0 ] && echo "done." || failed
 
-echo -n "[3/5] Compiling... "
+echo -n "[4/6] Compiling... "
 silent_run make
-[ $? == 0 ] && echo "done." || { failed; exit 1; }
+[ $? == 0 ] && echo "done." || failed
 
-echo -n "[4/5] Testing... "
+echo -n "[5/6] Testing... "
 silent_run make test
-[ $? == 0 ] && echo "done." || { failed; exit 1; }
+[ $? == 0 ] && echo "done." || failed
 
-echo -n "[5/5] Installing... "
-silent_run do_then_sudo make install
-[ $? == 0 ] && echo "done." || { failed; exit 1; }
-
-if type "ldconfig" >/dev/null 2>&1; then
-    silent_run do_then_sudo ldconfig
-fi
+echo -n "[6/6] Installing... "
+silent_run do_then_sudo make install && run_ldconfig
+[ $? == 0 ] && echo "done." || failed
 
 succeeded
-
