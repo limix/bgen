@@ -37,12 +37,6 @@
 /** Bgen version. */
 #define BGEN_VERSION "3.0.1"
 
-#include <assert.h>
-#ifndef static_assert
-#define static_assert _Static_assert
-#endif
-static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -53,10 +47,13 @@ extern "C"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"
+#include "bgen/platform.h"
 #include "bgen/str.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
 
 #endif /* BGEN_H */
