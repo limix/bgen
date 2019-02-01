@@ -88,7 +88,7 @@ int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant
     }
 
     if (LONG_SEEK(c->bgen->file, length, SEEK_CUR)) {
-        perror_fmt("Could not jump to the next variant");
+        perror_fmt(c->bgen->file, "Could not jump to the next variant");
         goto err;
     }
 
@@ -116,7 +116,7 @@ struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t n
     }
 
     if (!(mf->file = fopen(filepath, "w+b"))) {
-        perror_fmt("Could not create file %s", filepath);
+        perror_fmt(mf->file, "Could not create file %s", filepath);
         goto err;
     }
 
@@ -221,7 +221,7 @@ int write_offsets_block(struct bgen_mf *mf)
     }
 
     if (LONG_SEEK(mf->file, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET)) {
-        perror_fmt("Could not fseek");
+        perror_fmt(mf->file, "Could not fseek");
         goto err;
     }
 
@@ -270,7 +270,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
         goto err;
 
     if (LONG_SEEK(bgen->file, bgen->variants_start, SEEK_SET)) {
-        perror_fmt("Could not jump to the variants start");
+        perror_fmt(bgen->file, "Could not jump to the variants start");
         goto err;
     }
 
@@ -281,7 +281,7 @@ BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char
     }
 
     if (fflush(mf->file)) {
-        perror_fmt("Could not fflush");
+        perror_fmt(mf->file, "Could not fflush");
         goto err;
     }
 
@@ -302,13 +302,13 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     mf->filepath = strdup(filepath);
 
     if (!(mf->file = fopen(mf->filepath, "rb"))) {
-        perror_fmt("Could not open %s", mf->filepath);
+        perror_fmt(mf->file, "Could not open %s", mf->filepath);
         goto err;
     }
 
     char header[13];
     if (fread1(header, 13 * sizeof(char), mf->file)) {
-        perror_fmt("Could not fetch the metafile header");
+        perror_fmt(mf->file, "Could not fetch the metafile header");
         goto err;
     }
 
@@ -318,12 +318,12 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     }
 
     if (fread1(&(mf->idx.nvariants), sizeof(uint32_t), mf->file)) {
-        perror_fmt("Could not read the number of variants from metafile");
+        perror_fmt(mf->file, "Could not read the number of variants from metafile");
         goto err;
     }
 
     if (fread1(&(mf->idx.metasize), sizeof(uint64_t), mf->file)) {
-        perror_fmt("Could not read the metasize from metafile");
+        perror_fmt(mf->file, "Could not read the metasize from metafile");
         goto err;
     }
 
@@ -333,7 +333,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
     }
 
     if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->file)) {
-        perror_fmt("Could not read the number of partitions");
+        perror_fmt(mf->file, "Could not read the number of partitions");
         goto err;
     }
 
@@ -341,7 +341,7 @@ BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
         if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->file)) {
-            perror_fmt("Could not read partition offsets");
+            perror_fmt(mf->file, "Could not read partition offsets");
             goto err;
         }
     }
@@ -356,7 +356,7 @@ BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
 {
     if (mf) {
         if (fclose_nul(mf->file)) {
-            perror_fmt("Could not close the %s file", mf->filepath);
+            perror_fmt(mf->file, "Could not close the %s file", mf->filepath);
             return 1;
         }
         mf->file = NULL;
@@ -404,12 +404,12 @@ BGEN_API struct bgen_vm *bgen_read_partition(const struct bgen_mf *mf, int part,
         init_metadata(vars + i);
 
     if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
-        perror_fmt("Could not fseek bgen index file");
+        perror_fmt(file, "Could not fseek bgen index file");
         goto err;
     }
 
     if (LONG_SEEK(file, mf->idx.poffset[part], SEEK_CUR)) {
-        perror_fmt("Could not fseek bgen index file");
+        perror_fmt(file, "Could not fseek bgen index file");
         goto err;
     }
 

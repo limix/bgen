@@ -14,7 +14,7 @@ int close_bgen_file(struct bgen_file *bgen)
 
     if (fclose_nul(bgen->file)) {
         if (ferror(bgen->file))
-            perror_fmt("Could not close bgen file %s", filepath);
+            perror_fmt(bgen->file, "Could not close bgen file %s", filepath);
         else
             error("Could not close bgen file %s. Maybe it has already been closed",
                   filepath);
@@ -95,7 +95,7 @@ BGEN_API struct bgen_file *bgen_open(const char *filepath)
     bgen->filepath = strdup(filepath);
 
     if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
-        perror_fmt("Could not open bgen file %s", bgen->filepath);
+        perror_fmt(bgen->file, "Could not open bgen file %s", bgen->filepath);
         goto err;
     }
 

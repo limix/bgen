@@ -157,7 +157,7 @@ BGEN_DEPRECATED_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *v
     FILE *fp = NULL;
 
     if (!(fp = fopen(vi->filepath, "rb"))) {
-        perror_fmt("Could not open %s", vi->filepath);
+        perror_fmt(fp, "Could not open %s", vi->filepath);
         goto err;
     }
 
@@ -167,7 +167,7 @@ BGEN_DEPRECATED_API struct bgen_vg *bgen_open_variant_genotype(struct bgen_vi *v
     vg->chunk = NULL;
 
     if (LONG_SEEK(fp, (OFF_T)vi->start[index], SEEK_SET)) {
-        perror_fmt("Could not seek a variant in %s", vi->filepath);
+        perror_fmt(fp, "Could not seek a variant in %s", vi->filepath);
         goto err;
     }
 

@@ -22,7 +22,7 @@ struct bgen_file
 
 #define bopen_or_leave(BGEN)                                                           \
     if (!(BGEN->file = fopen(BGEN->filepath, "rb"))) {                                 \
-        perror_fmt("Could not open bgen file %s", BGEN->filepath);                     \
+        perror_fmt(BGEN->file, "Could not open bgen file %s", BGEN->filepath);         \
         goto err;                                                                      \
     }
 

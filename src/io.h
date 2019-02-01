@@ -50,12 +50,19 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
     return fread(buffer, size, 1, stream) != 1;
 }
 
-#define perror_fmt(...)                                                                \
+#define perror_fmt(fp, ...)                                                            \
     do {                                                                               \
         fputs("Error: ", stderr);                                                      \
         fprintf(stderr, __VA_ARGS__);                                                  \
         fprintf(stderr, ": ");                                                         \
-        perror("");                                                                    \
+        if (!fp)                                                                       \
+            fprintf(stderr, "NULL pointer\n");                                         \
+        else if (feof(fp))                                                             \
+            fprintf(stderr, "unexpected end of file\n");                               \
+        else if (ferror(fp))                                                           \
+            perror("");                                                                \
+        else                                                                           \
+            fprintf(stderr, "unknown\n");                                              \
     } while (0)
 
 #define echo(...)                                                                      \
