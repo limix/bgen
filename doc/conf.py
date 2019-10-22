@@ -11,8 +11,6 @@ with open(os.path.join(folder, "..", "VERSION")) as f:
     version = f.read().strip()
 
 extensions = ["sphinx.ext.viewcode", "breathe"]
-
-
 breathe_projects = {"bgen": "doxyxml/"}
 breathe_default_project = "bgen"
 templates_path = ["_templates"]
