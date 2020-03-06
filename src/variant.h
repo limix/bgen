@@ -3,7 +3,7 @@
 #ifndef _BGEN_VARIANT_H
 #define _BGEN_VARIANT_H
 
-#include "bgen.h"
+#include "bgen/bgen.h"
 
 int next_variant(struct bgen_file *bgen, struct bgen_vm *v);
 void init_metadata(struct bgen_vm *v);

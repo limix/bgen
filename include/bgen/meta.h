@@ -29,9 +29,9 @@
 #ifndef BGEN_META_H
 #define BGEN_META_H
 
-#include "api.h"
-#include "file.h"
-#include "str.h"
+#include "bgen/api.h"
+#include "bgen/file.h"
+#include "bgen/str.h"
 
 /** Metafile index name. */
 #define BGEN_IDX_NAME "bgen index "
@@ -115,4 +115,4 @@ BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvariants);
  */
 BGEN_API int bgen_close_metafile(struct bgen_mf *mf);
 
-#endif /* BGEN_META_H */
+#endif

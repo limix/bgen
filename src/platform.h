@@ -1,5 +1,5 @@
-#ifndef _BGEN_PLATFORM_H
-#define _BGEN_PLATFORM_H
+#ifndef BGEN_PLATFORM_H
+#define BGEN_PLATFORM_H
 
 /* **************************************
  *  Detect 64-bit OS
@@ -41,4 +41,4 @@
 #endif
 #endif
 
-#endif /* _BGEN_PLATFORM_H */
+#endif

@@ -25,24 +25,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef BGEN_H
-#define BGEN_H
+#ifndef BGEN_BGEN_H
+#define BGEN_BGEN_H
 
 /** Major bgen version. */
-#define BGEN_VERSION_MAJOR 3
+#define BGEN_VERSION_MAJOR 4
 /** Minor bgen version. */
 #define BGEN_VERSION_MINOR 0
 /** Minor bgen version. */
-#define BGEN_VERSION_PATCH 4
+#define BGEN_VERSION_PATCH 0
 /** Bgen version. */
-#define BGEN_VERSION "3.0.4"
+#define BGEN_VERSION "4.0.0"
+
+/* static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes") */
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#include "bgen/api.h"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"
@@ -53,6 +54,4 @@ extern "C"
 }
 #endif
 
-static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes");
-
-#endif /* BGEN_H */
+#endif

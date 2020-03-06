@@ -1,5 +1,5 @@
 #include "layout/two.h"
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "depr/variants_index.h"
 #include "file.h"
 #include "geno.h"

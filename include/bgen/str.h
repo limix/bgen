@@ -4,8 +4,6 @@
 #ifndef BGEN_STR_H
 #define BGEN_STR_H
 
-#include "bgen/api.h"
-
 /** String.
  * @struct bgen_str
  */
@@ -27,4 +25,4 @@ struct bgen_string
     char *str; /**< Array of characters. */
 } BGEN_DEPRECATED;
 
-#endif /* BGEN_STR_H */
+#endif

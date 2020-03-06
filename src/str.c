@@ -1,4 +1,4 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "mem.h"
 #include <stdint.h>
 #include <stdio.h>

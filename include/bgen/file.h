@@ -4,8 +4,8 @@
 #ifndef BGEN_FILE_H
 #define BGEN_FILE_H
 
-#include "api.h"
-#include "str.h"
+#include "bgen/api.h"
+#include "bgen/str.h"
 
 /** Bgen file handler.
  * @struct bgen_file
@@ -66,4 +66,4 @@ BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
 BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
                                 struct bgen_str *sample_ids);
 
-#endif /* BGEN_FILE_H */
+#endif

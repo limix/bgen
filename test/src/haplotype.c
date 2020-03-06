@@ -1,4 +1,4 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>

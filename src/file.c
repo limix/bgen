@@ -2,7 +2,7 @@
 
 #include "file.h"
 #include "athr.h"
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "mem.h"
 #include "str.h"
 #include <assert.h>
@@ -76,7 +76,7 @@ int read_bgen_header(struct bgen_file *bgen)
 
     bgen->compression = flags & 3;
     bgen->layout = (flags & (15 << 2)) >> 2;
-    bgen->sample_ids_presence = bgen->contain_sample =
+    bgen->contain_sample =
         (flags & ((uint32_t)1 << 31)) >> 31;
 
     return 0;

@@ -1,7 +1,7 @@
 #define BGEN_API_EXPORTS
 
 #include "geno.h"
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "depr/variants_index.h"
 #include "file.h"
 #include "layout/one.h"

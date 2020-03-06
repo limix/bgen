@@ -1,7 +1,7 @@
 #ifndef _BGEN_FILE_H
 #define _BGEN_FILE_H
 
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "io.h"
 #include <assert.h>
 #include <stdio.h>
@@ -15,7 +15,6 @@ struct bgen_file
     int compression;
     int layout;
     int contain_sample;
-    int sample_ids_presence BGEN_DEPRECATED;
     OFF_T samples_start;
     OFF_T variants_start;
 };

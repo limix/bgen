@@ -4,8 +4,8 @@
 #ifndef BGEN_GENO_H
 #define BGEN_GENO_H
 
-#include "api.h"
-#include "meta.h"
+#include "bgen/api.h"
+#include "bgen/meta.h"
 #include <stddef.h>
 
 /** Variant index.
@@ -99,4 +99,4 @@ BGEN_API int bgen_ncombs(const struct bgen_vg *vg);
  */
 BGEN_API int bgen_phased(const struct bgen_vg *vg);
 
-#endif /* BGEN_GENO_H */
+#endif

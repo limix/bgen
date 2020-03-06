@@ -1,5 +1,5 @@
 #include "zip/zlib.h"
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

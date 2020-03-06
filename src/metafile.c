@@ -1,6 +1,6 @@
 #define BGEN_API_EXPORTS
 
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
