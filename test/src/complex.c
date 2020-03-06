@@ -1,49 +1,45 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
+#include "cass.h"
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main()
-{
+void test_complex(void);
 
+int main(void)
+{
+    test_complex();
+    return cass_status();
+}
+
+void test_complex(void)
+{
     size_t i, j, ii, jj;
     const char filename[] = "data/complex.23bits.bgen";
     struct bgen_file *bgen;
     int nsamples, nvariants;
     double *probabilities;
 
-    if ((bgen = bgen_open(filename)) == NULL)
-        return 1;
-
-    if ((nsamples = bgen_nsamples(bgen)) != 4)
-        return 1;
-
-    if ((nvariants = bgen_nvariants(bgen)) != 10)
-        return 1;
+    cass_cond((bgen = bgen_open(filename)) != NULL);
+    cass_cond((nsamples = bgen_nsamples(bgen)) == 4);
+    cass_cond((nvariants = bgen_nvariants(bgen)) == 10);
 
     struct bgen_str *sample_ids = bgen_read_samples(bgen, 0);
 
-    if (strncmp("sample_0", sample_ids[0].str, sample_ids[0].len) != 0)
-        return 1;
-
-    if (strncmp("sample_3", sample_ids[3].str, sample_ids[3].len) != 0)
-        return 1;
+    cass_cond(bgen_str_equal(BGEN_STR("sample_0"), sample_ids[0]));
+    cass_cond(bgen_str_equal(BGEN_STR("sample_3"), sample_ids[3]));
 
     bgen_free_samples(bgen, sample_ids);
 
-    struct bgen_vi *index;
-    struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index, 0);
+    struct bgen_mf *mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata", 1, 0);
 
-    if (bgen_max_nalleles(index) != 8)
-        return 1;
+    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
+    cass_cond(nvariants == 10);
 
-    if (strncmp("V1", variants[0].rsid.str, variants[0].rsid.len) != 0)
-        return 1;
-
-    if (strncmp("M10", variants[9].rsid.str, variants[9].rsid.len) != 0)
-        return 1;
+    cass_cond(bgen_str_equal(BGEN_STR("V1"), vm[0].rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("M10"), vm[9].rsid));
 
     int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     int correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
@@ -56,39 +52,19 @@ int main()
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
-        if (variants[i].nalleles != correct_nalleles[i])
-            return 1;
-        if (variants[i].position != position[i])
-            return 1;
-        for (int j = 0; j < variants[i].nalleles; ++j) {
+        cass_cond(vm[i].nalleles == correct_nalleles[i]);
+        cass_cond(vm[i].position == position[i]);
 
-            if (strncmp(allele_ids[jj], variants[i].allele_ids[j].str,
-                        variants[i].allele_ids[j].len) != 0)
-                return 1;
+        for (int j = 0; j < vm[i].nalleles; ++j) {
+
+            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), vm[i].allele_ids[j]));
             ++jj;
         }
     }
 
-    bgen_free_variants_metadata(bgen, variants);
-
-    bgen_close(bgen);
-
-    struct bgen_vg *vg;
-
-    vg = bgen_open_variant_genotype(index, 0);
-    probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-    bgen_read_variant_genotype(index, vg, probabilities);
-    bgen_close_variant_genotype(index, vg);
-    free(probabilities);
+    bgen_free_partition(vm, nvariants);
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
-
-    for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_open_variant_genotype(index, i);
-        if (bgen_phased(vg) != phased[i])
-            return 1;
-        bgen_close_variant_genotype(index, vg);
-    }
 
     int ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
@@ -138,33 +114,29 @@ int main()
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_open_variant_genotype(index, i);
+        struct bgen_vg *vg = bgen_open_genotype(bgen, vm[i].vaddr);
+        cass_cond(bgen_phased(vg) == phased[i]);
 
         probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-        double *p = probabilities;
-        bgen_read_variant_genotype(index, vg, probabilities);
+        bgen_read_genotype(bgen, vg, probabilities);
 
+        double *p = probabilities;
         for (j = 0; j < (size_t)nsamples; ++j) {
 
-            if (ploidys[jj] != bgen_ploidy(vg, j))
-                return 1;
-
-            if (bgen_missing(vg, j) != 0)
-                return 1;
+            cass_cond(ploidys[jj] == bgen_ploidy(vg, j));
+            cass_cond(bgen_missing(vg, j) == 0);
 
             for (ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
-                if (*rp != *p && !(isnan(*rp) && isnan(*p)))
-                    return 1;
+                cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                 ++rp;
                 ++p;
             }
             ++jj;
         }
-        bgen_close_variant_genotype(index, vg);
+        bgen_close_genotype(vg);
         free(probabilities);
     }
 
-    bgen_free_index(index);
-
-    return 0;
+    cass_cond(bgen_close_metafile(mf) == 0);
+    bgen_close(bgen);
 }

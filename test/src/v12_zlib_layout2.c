@@ -14,28 +14,6 @@ const char* get_example_index_filepath(size_t i);
 int get_example_precision(size_t i);
 int get_nexamples();
 
-#ifndef isnan
-int isnan(double x)
-{
-#if defined _MSC_VER
-    union
-    {
-        __int64 u;
-        double f;
-    } ieee754;
-#else
-    union
-    {
-        uint64_t u;
-        double f;
-    } ieee754;
-#endif
-    ieee754.f = x;
-    return ((unsigned)(ieee754.u >> 32) & 0x7fffffff) + ((unsigned)ieee754.u != 0) >
-           0x7ff00000;
-}
-#endif
-
 int ipow(int base, int exp)
 {
     int result = 1;
