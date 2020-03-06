@@ -33,9 +33,9 @@
 /** Minor bgen version. */
 #define BGEN_VERSION_MINOR 0
 /** Minor bgen version. */
-#define BGEN_VERSION_PATCH 3
+#define BGEN_VERSION_PATCH 4
 /** Bgen version. */
-#define BGEN_VERSION "3.0.3"
+#define BGEN_VERSION "3.0.4"
 
 #ifdef __cplusplus
 extern "C"
@@ -43,7 +43,6 @@ extern "C"
 #endif
 
 #include "bgen/api.h"
-#include "bgen/depr.h"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"

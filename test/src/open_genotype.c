@@ -86,41 +86,41 @@ int test_geno()
     struct bgen_mf *mf =
         bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
 
-    assert_equal_int(bgen_metafile_npartitions(mf), 3);
-    assert_equal_int(bgen_metafile_nvariants(mf), 10);
+    cass_equal_int(bgen_metafile_npartitions(mf), 3);
+    cass_equal_int(bgen_metafile_nvariants(mf), 10);
 
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
     struct bgen_vg *vg = bgen_open_genotype(bgen, vm[0].vaddr);
 
-    assert_equal_int(bgen_nalleles(vg), 2);
-    assert_equal_int(bgen_missing(vg, 0), 0);
-    assert_equal_int(bgen_missing(vg, 1), 0);
-    assert_equal_int(bgen_missing(vg, 2), 0);
-    assert_equal_int(bgen_ploidy(vg, 0), 1);
-    assert_equal_int(bgen_ploidy(vg, 1), 2);
-    assert_equal_int(bgen_ploidy(vg, 2), 2);
-    assert_equal_int(bgen_min_ploidy(vg), 1);
-    assert_equal_int(bgen_max_ploidy(vg), 2);
-    assert_equal_int(bgen_ncombs(vg), 3);
-    assert_equal_int(bgen_phased(vg), 0);
+    cass_equal_int(bgen_nalleles(vg), 2);
+    cass_equal_int(bgen_missing(vg, 0), 0);
+    cass_equal_int(bgen_missing(vg, 1), 0);
+    cass_equal_int(bgen_missing(vg, 2), 0);
+    cass_equal_int(bgen_ploidy(vg, 0), 1);
+    cass_equal_int(bgen_ploidy(vg, 1), 2);
+    cass_equal_int(bgen_ploidy(vg, 2), 2);
+    cass_equal_int(bgen_min_ploidy(vg), 1);
+    cass_equal_int(bgen_max_ploidy(vg), 2);
+    cass_equal_int(bgen_ncombs(vg), 3);
+    cass_equal_int(bgen_phased(vg), 0);
 
     bgen_close_genotype(vg);
 
     vg = bgen_open_genotype(bgen, vm[1].vaddr);
 
-    assert_equal_int(bgen_nalleles(vg), 2);
-    assert_equal_int(bgen_missing(vg, 0), 0);
-    assert_equal_int(bgen_missing(vg, 1), 0);
-    assert_equal_int(bgen_missing(vg, 2), 0);
-    assert_equal_int(bgen_ploidy(vg, 0), 1);
-    assert_equal_int(bgen_ploidy(vg, 1), 1);
-    assert_equal_int(bgen_ploidy(vg, 2), 1);
-    assert_equal_int(bgen_min_ploidy(vg), 1);
-    assert_equal_int(bgen_max_ploidy(vg), 1);
-    assert_equal_int(bgen_ncombs(vg), 2);
-    assert_equal_int(bgen_phased(vg), 1);
+    cass_equal_int(bgen_nalleles(vg), 2);
+    cass_equal_int(bgen_missing(vg, 0), 0);
+    cass_equal_int(bgen_missing(vg, 1), 0);
+    cass_equal_int(bgen_missing(vg, 2), 0);
+    cass_equal_int(bgen_ploidy(vg, 0), 1);
+    cass_equal_int(bgen_ploidy(vg, 1), 1);
+    cass_equal_int(bgen_ploidy(vg, 2), 1);
+    cass_equal_int(bgen_min_ploidy(vg), 1);
+    cass_equal_int(bgen_max_ploidy(vg), 1);
+    cass_equal_int(bgen_ncombs(vg), 2);
+    cass_equal_int(bgen_phased(vg), 1);
 
     bgen_close_genotype(vg);
 

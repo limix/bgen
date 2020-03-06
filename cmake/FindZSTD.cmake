@@ -1,5 +1,5 @@
 # FindZSTD
-# ---------
+# --------
 #
 # Find ZSTANDARD include dirs and libraries
 #
@@ -7,6 +7,24 @@
 #
 #   ZSTD_INCLUDEDIR       - Preferred include directory e.g. <prefix>/include
 #   ZSTD_LIBRARYDIR       - Preferred library directory e.g. <prefix>/lib
+#
+# IMPORTED Targets
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines :prop_tgt:`IMPORTED` target ``ZSTD::zstd``, if
+# ZSTD has been found.
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines the following variables:
+#
+# ::
+#
+#   ZSTD_INCLUDE_DIR - Where to find the header files.
+#   ZSTD_LIBRARY     - Library when using zstd.
+#   ZSTD_FOUND       - True if zstd library is found.
+
 
 set(zstd_incl_dirs "/usr/include" "/usr/local/include")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
@@ -46,3 +64,12 @@ mark_as_advanced(ZSTD_INCLUDE_DIR ZSTD_LIBRARY ZSTD_FOUND)
 
 set(ZSTD_LIBRARIES ${ZSTD_LIBRARY})
 set(ZSTD_INCLUDE_DIRS ${ZSTD_INCLUDE_DIR})
+
+if(ZSTD_FOUND)
+    if(NOT TARGET ZSTD::zstd)
+        add_library(ZSTD::zstd UNKNOWN IMPORTED)
+        set_target_properties(ZSTD::zstd PROPERTIES
+            IMPORTED_LOCATION "${ZSTD_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${ZSTD_INCLUDE_DIR}")
+    endif()
+endif()
