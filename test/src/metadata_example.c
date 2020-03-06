@@ -1,20 +1,17 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "cass.h"
 #include <stdio.h>
 #include <string.h>
 
+void test_corrupted_metadata_file(void);
+
 int main()
 {
-    struct bgen_file *bgen;
-    struct bgen_vi *index = NULL;
-    struct bgen_var *v;
+    test_corrupted_metadata_file();
+    return cass_status();
+}
 
-    assert_not_null(bgen = bgen_open("data/example.14bits.bgen"));
-
-    v = bgen_load_variants_metadata(bgen, "data/wrong.metadata", &index, 0);
-    assert_null(v);
-
-    bgen_close(bgen);
-
-    return 0;
+void test_corrupted_metadata_file(void)
+{
+    cass_cond(bgen_open_metafile("data/wrong.metadata") == NULL);
 }
