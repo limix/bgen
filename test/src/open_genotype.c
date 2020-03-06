@@ -34,8 +34,6 @@ void test_file(void)
 
     free(sample_ids);
 
-    /* struct bgen_vi *index; */
-    /* struct bgen_var *variants = bgen_read_variants_metadata(bgen, &index, 0); */
     struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
 
@@ -43,7 +41,6 @@ void test_file(void)
     cass_cond(strncmp("M10", vm[9].rsid.str, vm[9].rsid.len) == 0);
 
     struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
-    /* printf("\nnalleles: %d\n", bgen_nalleles(vg)); */
     cass_cond(bgen_nalleles(vg) == 2);
     bgen_close_genotype(vg);
 

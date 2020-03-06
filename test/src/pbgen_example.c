@@ -1,13 +1,16 @@
-#include "bgen.h"
-#include <stdio.h>
-#include <string.h>
+#include "bgen/bgen.h"
+#include "cass.h"
 
-int main() {
-    struct bgen_file *bgen;
+void test_pbgen_example(void);
 
-    if ((bgen = bgen_open("data/pbgen_example.pgen")) == NULL) {
-        return 0;
-    }
+int main(void)
+{
+    test_pbgen_example();
+    return cass_status();
+}
 
-    return 1;
+void test_pbgen_example(void)
+{
+    struct bgen_file* bgen = bgen_open("data/pbgen_example.pgen");
+    cass_cond(bgen == NULL);
 }

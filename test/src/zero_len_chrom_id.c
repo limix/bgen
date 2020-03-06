@@ -1,39 +1,45 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
+#include "cass.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int main()
+void test_zeo_len_chrom_id(void);
+
+int main(void)
 {
-    struct bgen_vi *index;
+    test_zeo_len_chrom_id();
+    return cass_status();
+}
+
+void test_zeo_len_chrom_id(void)
+{
     struct bgen_file *bgen;
-    struct bgen_var *variants;
     struct bgen_str *samples;
 
     bgen = bgen_open("data/zero_len_chrom_id.bgen");
 
-    if (bgen == NULL)
-        return 1;
+    cass_cond(bgen != NULL);
 
-    if (bgen_nsamples(bgen) != 182)
-        return 1;
-
-    if (bgen_nvariants(bgen) != 50)
-        return 1;
+    cass_cond(bgen_nsamples(bgen) == 182);
+    cass_cond(bgen_nvariants(bgen) == 50);
 
     samples = bgen_read_samples(bgen, 0);
+    cass_cond(samples != NULL);
+    free(samples);
 
-    if (samples == NULL)
-        return 1;
+    struct bgen_mf *mf = bgen_create_metafile(bgen, "zero_len_chrom_id.metadata", 2, 0);
+    cass_cond(mf != NULL);
 
-    variants = bgen_read_variants_metadata(bgen, &index, 0);
-    if (variants == NULL)
-        return 1;
+    int nvariants = 0;
+    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
+    cass_cond(vm != NULL);
+    cass_cond(nvariants == 25);
+    cass_cond(vm[0].chrom.len == 0);
+    bgen_free_partition(vm, nvariants);
 
-    bgen_free_index(index);
+    bgen_close_metafile(mf);
     bgen_close(bgen);
-
-    return 0;
 }
