@@ -1,15 +1,16 @@
 #include "example_files.h"
 
-#include "bgen.h"
+#include "bgen/bgen.h"
+#include "cass.h"
 #include <float.h>
 #include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stddef.h>
 
-const char *get_example_filepath(size_t i);
-const char *get_example_index_filepath(size_t i);
+const char* get_example_filepath(size_t i);
+const char* get_example_index_filepath(size_t i);
 int get_example_precision(size_t i);
 int get_nexamples();
 
@@ -50,192 +51,143 @@ int ipow(int base, int exp)
     return result;
 }
 
-int test_read_metadata(struct bgen_file *bgen, struct bgen_str *s, struct bgen_var *v)
+void test_read_metadata(struct bgen_file* bgen, struct bgen_str* samples, struct bgen_mf* mf)
 {
-    if (bgen_nsamples(bgen) != 500)
-        return 1;
+    cass_cond(bgen_nsamples(bgen) == 500);
+    cass_cond(bgen_nvariants(bgen) == 199);
+    cass_cond(strncmp("sample_001", samples[0].str, samples[0].len) == 0);
+    cass_cond(strncmp("sample_500", samples[499].str, samples[0].len) == 0);
 
-    if (bgen_nvariants(bgen) != 199)
-        return 1;
+    int nvariants = 0;
+    struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
+    cass_cond(nvariants == 67);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), vm[0].id));
+    bgen_free_partition(vm, nvariants);
 
-    if (strncmp("sample_001", s[0].str, s[0].len) != 0)
-        return 1;
+    vm = bgen_read_partition(mf, 1, &nvariants);
+    cass_cond(nvariants == 67);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), vm[5].id));
+    bgen_free_partition(vm, nvariants);
 
-    if (strncmp("sample_500", s[499].str, s[0].len) != 0)
-        return 1;
-
-    if (strncmp("SNPID_2", v[0].id.str, v[0].id.len) != 0)
-        return 1;
-
-    if (strncmp("SNPID_200", v[198].id.str, v[198].id.len) != 0)
-        return 1;
-
-    return 0;
+    vm = bgen_read_partition(mf, 2, &nvariants);
+    cass_cond(nvariants == 65);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), vm[60].id));
+    bgen_free_partition(vm, nvariants);
 }
 
-int test_reading(const char *fp0, const char *fp1, struct bgen_vi **index)
+void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsamples,
+                             int prec)
 {
-    struct bgen_file *bgen;
-    struct bgen_var *v;
-    struct bgen_str *s;
-
-    if ((bgen = bgen_open(fp0)) == NULL)
-        return 1;
-
-    s = bgen_read_samples(bgen, 0);
-    if (fp1)
-        v = bgen_load_variants_metadata(bgen, fp1, index, 0);
-    else
-        v = bgen_read_variants_metadata(bgen, index, 0);
-
-    if (v == NULL)
-        return 1;
-
-    if (test_read_metadata(bgen, s, v))
-        return 1;
-
-    bgen_free_samples(bgen, s);
-    bgen_free_variants_metadata(bgen, v);
-
-    bgen_close(bgen);
-
-    return 0;
-}
-
-int test_read_probabilities(struct bgen_vi *index, int nsamples, int prec)
-{
-    FILE *f;
     double prob[3];
-    double eps = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
+    double abs_tol = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
+    double rel_tol = 1e-09;
     int e;
     size_t i, j;
 
-    if ((f = fopen("data/example.matrix", "r")) == NULL)
-        return 1;
+    FILE* f = fopen("data/example.matrix", "r");
+    cass_cond(f != NULL);
 
-    for (i = 0; i < 199; ++i) {
-        struct bgen_vg *vg = bgen_open_variant_genotype(index, i);
+    int nvariants = 0;
+    int ii = 0;
+    i = 0;
+    for (int part = 0; part < bgen_metafile_npartitions(mf); ++part) {
+        struct bgen_vm* vm = bgen_read_partition(mf, part, &nvariants);
+        for (ii = 0; ii < nvariants; ++ii, ++i) {
+            struct bgen_vg* vg = bgen_open_genotype(bgen, vm[ii].vaddr);
 
-        if (bgen_max_ploidy(vg) != 2) {
-            fprintf(stderr, "Wrong ploidy.\n");
-            return 1;
-        }
+            cass_cond(bgen_max_ploidy(vg) == 2);
 
-        int ncombs = bgen_ncombs(vg);
+            int ncombs = bgen_ncombs(vg);
+            cass_cond(ncombs == 3);
 
-        double *probabilities = calloc(nsamples * ncombs, sizeof(double));
+            double* probabilities = calloc(nsamples * ncombs, sizeof(double));
 
-        bgen_read_variant_genotype(index, vg, probabilities);
+            cass_cond(bgen_read_genotype(bgen, vg, probabilities) == 0);
 
-        for (j = 0; j < 500; ++j) {
+            for (j = 0; j < 500; ++j) {
 
-            e = fscanf(f, "%lf", prob + 0);
-            if (e != 1)
-                return 1;
+                e = fscanf(f, "%lf", prob + 0);
+                cass_cond(e == 1);
 
-            e = fscanf(f, "%lf", prob + 1);
-            if (e != 1)
-                return 1;
+                e = fscanf(f, "%lf", prob + 1);
+                cass_cond(e == 1);
 
-            e = fscanf(f, "%lf", prob + 2);
-            if (e != 1)
-                return 1;
+                e = fscanf(f, "%lf", prob + 2);
+                cass_cond(e == 1);
 
-            if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) {
-                prob[0] = NAN;
-                prob[1] = NAN;
-                prob[2] = NAN;
-
-                if (!isnan(probabilities[j * 3 + 0]))
-                    return 1;
-
-                if (!isnan(probabilities[j * 3 + 1]))
-                    return 1;
-
-                if (!isnan(probabilities[j * 3 + 2]))
-                    return 1;
-            } else {
-                if (fabs(prob[0] - probabilities[j * 3 + 0]) > eps)
-                    return 1;
-
-                if (fabs(prob[1] - probabilities[j * 3 + 1]) > eps)
-                    return 1;
-
-                if (fabs(prob[2] - probabilities[j * 3 + 2]) > eps)
-                    return 1;
+                if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) {
+                    prob[0] = NAN;
+                    prob[1] = NAN;
+                    prob[2] = NAN;
+                    cass_cond(isnan(probabilities[j * 3 + 0]));
+                    cass_cond(isnan(probabilities[j * 3 + 1]));
+                    cass_cond(isnan(probabilities[j * 3 + 2]));
+                } else {
+                    cass_close2(probabilities[j * 3 + 0], prob[0], rel_tol, abs_tol);
+                    cass_close2(probabilities[j * 3 + 1], prob[1], rel_tol, abs_tol);
+                    cass_close2(probabilities[j * 3 + 2], prob[2], rel_tol, abs_tol);
+                }
             }
+            free(probabilities);
+            bgen_close_genotype(vg);
         }
-        bgen_close_variant_genotype(index, vg);
-        free(probabilities);
+        bgen_free_partition(vm, nvariants);
     }
 
     fclose(f);
-
-    return 0;
 }
 
-int test_read(const char *bgen_fp, const char *index_fp, int precision)
+void test_read(struct bgen_file* bgen, struct bgen_mf* mf, int precision)
 {
-    struct bgen_vi *index;
+    struct bgen_str* samples = bgen_read_samples(bgen, 0);
+    test_read_metadata(bgen, samples, mf);
+    free(samples);
 
-    if (test_reading(bgen_fp, index_fp, &index))
-        return 1;
-
-    if (test_read_probabilities(index, 500, precision))
-        return 1;
-
-    bgen_free_index(index);
-
-    return 0;
+    test_read_probabilities(bgen, mf, 500, precision);
 }
 
 int main()
 {
-
     size_t i;
 
     for (i = 0; i < (size_t)get_nexamples(); ++i) {
-        const char *ex = get_example_filepath(i);
-        const char *ix = get_example_index_filepath(i);
+        const char* ex = get_example_filepath(i);
+        const char* ix = get_example_index_filepath(i);
         int prec = get_example_precision(i);
 
-        bgen_create_variants_metadata_file(ex, ix, 0);
+        /* bgen_create_variants_metadata_file(ex, ix, 0); */
+        struct bgen_file* bgen = bgen_open(ex);
+        struct bgen_mf* mf = bgen_open_metafile(ix);
 
-        if (test_read(ex, NULL, prec))
-            return 1;
-        if (test_read(ex, ix, prec))
-            return 1;
+        test_read(bgen, mf, prec);
+
+        /* if (test_read(ex, ix, prec)) */
+        /*     return 1; */
+
+        cass_cond(bgen_close_metafile(mf) == 0);
+        bgen_close(bgen);
     }
 
-    return 0;
+    return cass_status();
 }
 
-const char *examples[] = {"data/example.1bits.bgen",
-                          "data/example.14bits.bgen",
+const char* examples[] = {"data/example.1bits.bgen", "data/example.14bits.bgen",
                           "data/example.32bits.bgen"};
 
-const char *indices[] = {"data/example.1bits.bgen.index",
-                         "data/example.14bits.bgen.index",
-                         "data/example.32bits.bgen.index"};
+/* const char *indices[] = {"data/example.1bits.bgen.index", */
+/*                          "data/example.14bits.bgen.index", */
+/*                          "data/example.32bits.bgen.index"}; */
+
+const char* indices[] = {"data/example.1bits.bgen.metadata",
+                         "data/example.14bits.bgen.metadata",
+                         "data/example.32bits.bgen.metadata"};
 
 const int precision[] = {1, 14, 32};
 
-const char *get_example_filepath(size_t i)
-{
-    return examples[i];
-}
+const char* get_example_filepath(size_t i) { return examples[i]; }
 
-const char *get_example_index_filepath(size_t i)
-{
-    return indices[i];
-}
+const char* get_example_index_filepath(size_t i) { return indices[i]; }
 
-int get_example_precision(size_t i)
-{
-    return precision[i];
-}
+int get_example_precision(size_t i) { return precision[i]; }
 
-int get_nexamples()
-{
-    return 3;
-}
+int get_nexamples() { return 3; }

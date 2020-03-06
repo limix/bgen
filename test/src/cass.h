@@ -40,11 +40,11 @@ inline static int cass_status(void)
 
 #define cass_close(actual, desired) cass_close2(actual, desired, 1e-09, 0.0)
 
-#define cass_close2(actual, desired, rel_to, abs_tol)                         \
+#define cass_close2(actual, desired, rel_tol, abs_tol)                         \
     {                                                                         \
         double _a = actual;                                                   \
         double _d = desired;                                                  \
-        if (cass_close_impl(_a, _d, 1e-09, 0.0)) {                            \
+        if (cass_close_impl(_a, _d, rel_tol, abs_tol)) {                            \
             cass_print_context(__FILE__, __LINE__);                           \
             fprintf(stderr, " Items are not close:\n");                       \
             fprintf(stderr, "  ACTUAL : %.10f\n", (double)_a);                \
@@ -108,12 +108,17 @@ inline static int cass_close_impl(double actual, double desired,
                                   double rel_tol, double abs_tol)
 {
     /* This implementation is basically a copy of the `math.isclose`
-     * implementation of the Python library.
+     * implementation of the Python library plus returning 0 in case
+     * both values are NaN.
      */
     if (actual == desired) {
         /* short circuit exact equality -- needed to catch two infinities of
          * the same sign. And perhaps speeds things up a bit sometimes.
          */
+        return 0;
+    }
+
+    if (isnan(actual) && isnan(desired)) {
         return 0;
     }
 

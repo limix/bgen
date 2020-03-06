@@ -12,7 +12,7 @@ endfunction()
 
 
 
-# bgen_add_test(v12_zlib_layout2)
+bgen_add_test(v12_zlib_layout2)
 # bgen_add_test(v12_zlib_layout2 ${PROJECT_NAME} "v12_zlib_layout2.c;example_files.c")
 bgen_add_test(zero_len_chrom_id)
 bgen_add_test(pbgen_example)
