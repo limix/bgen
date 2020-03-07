@@ -1,96 +1,81 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "cass.h"
 #include <stdlib.h>
 
-inline static int imin(int a, int b) { return a < b ? a : b; }
-
 int main()
 {
-
     struct bgen_string str = {0, NULL};
-    assert_equal_int(str.len, 0);
-    struct bgen_var var = {{0, NULL}, {0, NULL}, {0, NULL}, 15, 13, NULL};
-
-    assert_equal_int(var.position, 15);
-    assert_equal_int(var.nalleles, 13);
+    cass_equal_int(str.len, 0);
 
     struct bgen_file *bgen = bgen_open("nexist");
-    assert_null(bgen);
+    cass_cond(bgen == NULL);
     bgen_close(bgen);
 
     bgen = bgen_open("data/example.v11.bgen");
 
-    assert_equal_int(bgen_nsamples(bgen), 500);
-    assert_equal_int(bgen_nvariants(bgen), 199);
-    assert_equal_int(bgen_sample_ids_presence(bgen), 0);
+    cass_equal_int(bgen_nsamples(bgen), 500);
+    cass_equal_int(bgen_nvariants(bgen), 199);
+    cass_equal_int(bgen_contain_samples(bgen), 0);
 
-    struct bgen_string *samples = (struct bgen_string *)bgen_read_samples(bgen, 0);
-    assert_null(samples);
-    bgen_free_samples(bgen, (struct bgen_str *)samples);
+    struct bgen_str *samples = bgen_read_samples(bgen, 0);
+    cass_cond(samples == NULL);
 
     bgen_close(bgen);
 
     bgen = bgen_open("data/example.14bits.bgen");
+    cass_cond(bgen != NULL);
 
-    assert_equal_int(bgen_nsamples(bgen), 500);
-    assert_equal_int(bgen_nvariants(bgen), 199);
-    assert_equal_int(bgen_sample_ids_presence(bgen), 1);
+    cass_equal_int(bgen_nsamples(bgen), 500);
+    cass_equal_int(bgen_nvariants(bgen), 199);
+    cass_equal_int(bgen_contain_samples(bgen), 1);
 
-    samples = (struct bgen_string *)bgen_read_samples(bgen, 0);
-    assert_not_null(samples);
-    bgen_free_samples(bgen, (struct bgen_str *)samples);
+    samples = bgen_read_samples(bgen, 0);
+    cass_cond(samples != NULL);
+    bgen_free_samples(bgen, samples);
 
     bgen_close(bgen);
 
     bgen = bgen_open("data/example.14bits.bgen");
     struct bgen_vi *vi;
-    struct bgen_var *variants = bgen_read_variants_metadata(bgen, &vi, 0);
+    struct bgen_mf* mf = bgen_create_metafile(bgen, "example.14bits.bgen.metadata", 1, 0);
+    int nvariants = 0;
+    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
 
-    assert_equal_int(variants[0].position, 2000);
-    assert_equal_int(variants[0].nalleles, 2);
-    assert_strncmp(variants[0].rsid.str, "RSID_2", imin(variants[0].rsid.len, 6));
-    assert_strncmp(variants[0].id.str, "SNPID_2", imin(variants[0].id.len, 7));
-    assert_strncmp(variants[0].chrom.str, "01", imin(variants[0].chrom.len, 2));
-    assert_strncmp(variants[0].allele_ids[0].str, "A",
-                   imin(variants[0].allele_ids[0].len, 1));
-    bgen_free_variants_metadata(bgen, variants);
-    assert_equal_int(bgen_max_nalleles(vi), 2);
-    bgen_free_index(vi);
+    cass_equal_int(vm[0].position, 2000);
+    cass_equal_int(vm[0].nalleles, 2);
+    cass_cond(bgen_str_equal(BGEN_STR("RSID_2"), vm[0].rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), vm[0].id));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
+    cass_cond(bgen_str_equal(BGEN_STR("A"), vm[0].allele_ids[0]));
+
+    bgen_free_partition(vm, nvariants);
+    bgen_close_metafile(mf);
     bgen_close(bgen);
 
     bgen = bgen_open("data/example.14bits.bgen");
-    variants = bgen_read_variants_metadata(bgen, &vi, 0);
-    struct bgen_vg *vg = bgen_open_variant_genotype(vi, 3);
+    mf = bgen_open_metafile("example.14bits.bgen.metadata");
+    vm = bgen_read_partition(mf, 0, &nvariants);
+    struct bgen_vg *vg = bgen_open_genotype(bgen, vm[3].vaddr);
 
-    assert_equal_int(bgen_nalleles(vg), 2);
-    assert_equal_int(bgen_missing(vg, 3), 0);
-    assert_equal_int(bgen_ploidy(vg, 3), 2);
-    assert_equal_int(bgen_min_ploidy(vg), 2);
-    assert_equal_int(bgen_max_ploidy(vg), 2);
-    assert_equal_int(bgen_ncombs(vg), 3);
-    assert_equal_int(bgen_phased(vg), 0);
+    cass_equal_int(bgen_nalleles(vg), 2);
+    cass_equal_int(bgen_missing(vg, 3), 0);
+    cass_equal_int(bgen_ploidy(vg, 3), 2);
+    cass_equal_int(bgen_min_ploidy(vg), 2);
+    cass_equal_int(bgen_max_ploidy(vg), 2);
+    cass_equal_int(bgen_ncombs(vg), 3);
+    cass_equal_int(bgen_phased(vg), 0);
 
     double *probs = malloc(500 * 3 * sizeof(double));
-    bgen_read_variant_genotype(vi, vg, probs);
-    assert_almost_equal(probs[0], 0.00488311054141488121);
-    assert_almost_equal(probs[1], 0.02838308002197399704);
-    assert_almost_equal(probs[2], 0.96673380943661113562);
-    assert_almost_equal(probs[3], 0.99047793444424092613);
+    bgen_read_genotype(bgen, vg, probs);
+    cass_close(probs[0], 0.00488311054141488121);
+    cass_close(probs[1], 0.02838308002197399704);
+    cass_close(probs[2], 0.96673380943661113562);
+    cass_close(probs[3], 0.99047793444424092613);
 
-    bgen_free_variants_metadata(bgen, variants);
-    bgen_close_variant_genotype(vi, vg);
-    bgen_free_index(vi);
+    bgen_free_partition(vm, nvariants);
+    bgen_close_genotype(vg);
+    bgen_close_metafile(mf);
     bgen_close(bgen);
 
-    bgen = bgen_open("data/example.14bits.bgen");
-    variants = bgen_read_variants_metadata(bgen, &vi, 0);
-
-    bgen_store_variants_metadata(bgen, variants, vi, "assert_interface_2.metadata1");
-    bgen_free_variants_metadata(bgen, variants);
-    bgen_free_index(vi);
-    bgen_close(bgen);
-
-    free(probs);
-
-    return 0;
+    return cass_status();
 }
