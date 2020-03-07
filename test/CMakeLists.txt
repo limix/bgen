@@ -21,7 +21,7 @@ bgen_add_test(complex)
 bgen_add_test(index)
 bgen_add_test(open_genotype)
 bgen_add_test(assert_interface_2)
-# bgen_add_test(assert_interface_3)
+bgen_add_test(assert_interface_3)
 # bgen_add_test(assert_interface_3_complex)
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
