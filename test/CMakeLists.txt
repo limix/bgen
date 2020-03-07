@@ -10,8 +10,6 @@ function(bgen_add_test name)
     set_tests_properties(${name} PROPERTIES ENVIRONMENT "PATH=${PATH}" )
 endfunction()
 
-
-
 bgen_add_test(v12_zlib_layout2)
 bgen_add_test(zero_len_chrom_id)
 bgen_add_test(pbgen_example)
@@ -22,7 +20,7 @@ bgen_add_test(index)
 bgen_add_test(open_genotype)
 bgen_add_test(assert_interface_2)
 bgen_add_test(assert_interface_3)
-# bgen_add_test(assert_interface_3_complex)
+bgen_add_test(assert_interface_3_complex)
 
 list(APPEND DATA_FILES example.matrix example.1bits.bgen)
 list(APPEND DATA_FILES example.14bits.bgen example.32bits.bgen)

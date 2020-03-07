@@ -1,74 +1,67 @@
-#include "bgen.h"
+#include "bgen/bgen.h"
 #include "cass.h"
 #include <math.h>
 #include <stdlib.h>
 
-#define TEST_CASE(x)                                                                   \
-    if (x)                                                                             \
-        return 1;
-
-int test_bgen_file_complex()
+void test_bgen_file_complex()
 {
     struct bgen_file *bgen = bgen_open("data/complex.23bits.bgen");
 
-    assert_not_null(bgen);
-    assert_equal_int(bgen_nsamples(bgen), 4);
-    assert_equal_int(bgen_nvariants(bgen), 10);
-    assert_equal_int(bgen_contain_samples(bgen), 1);
+    cass_cond(bgen != NULL)
+    cass_equal_int(bgen_nsamples(bgen), 4);
+    cass_equal_int(bgen_nvariants(bgen), 10);
+    cass_equal_int(bgen_contain_samples(bgen), 1);
 
     struct bgen_str *samples = bgen_read_samples(bgen, 0);
-    assert_not_null(samples);
-    assert_strncmp(samples[0].str, "sample_0", samples[0].len);
+    cass_cond(samples != NULL)
+    cass_cond(bgen_str_equal(BGEN_STR("sample_0"), samples[0]));
     bgen_free_samples(bgen, samples);
 
     bgen_close(bgen);
-
-    return 0;
 }
 
-int test_create_metadata_complex()
+void test_create_metadata_complex()
 {
     struct bgen_file *bgen = bgen_open("data/complex.23bits.bgen");
 
     struct bgen_mf *mf =
         bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.1", 4, 0);
-    assert_not_null(mf);
+    cass_cond(mf != NULL)
 
-    assert_equal_int(bgen_metafile_npartitions(mf), 4);
-    assert_equal_int(bgen_metafile_nvariants(mf), 10);
+    cass_equal_int(bgen_metafile_npartitions(mf), 4);
+    cass_equal_int(bgen_metafile_nvariants(mf), 10);
 
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
     struct bgen_vg *vg = bgen_open_genotype(bgen, vm->vaddr);
-    assert_not_null(vg);
+    cass_cond(vg != NULL)
 
-    assert_equal_int(bgen_nalleles(vg), 2);
+    cass_equal_int(bgen_nalleles(vg), 2);
     int ploidy[] = {1, 2, 2, 2};
     int miss[] = {0, 0, 0, 0};
     for (size_t i = 0; i < (size_t)bgen_nsamples(bgen); ++i) {
-        assert_equal_int(bgen_missing(vg, i), miss[i]);
-        assert_equal_int(bgen_ploidy(vg, i), ploidy[i]);
+        cass_equal_int(bgen_missing(vg, i), miss[i]);
+        cass_equal_int(bgen_ploidy(vg, i), ploidy[i]);
     }
-    assert_equal_int(bgen_min_ploidy(vg), 1);
-    assert_equal_int(bgen_max_ploidy(vg), 2);
-    assert_equal_int(bgen_ncombs(vg), 3);
-    assert_equal_int(bgen_phased(vg), 0);
+    cass_equal_int(bgen_min_ploidy(vg), 1);
+    cass_equal_int(bgen_max_ploidy(vg), 2);
+    cass_equal_int(bgen_ncombs(vg), 3);
+    cass_equal_int(bgen_phased(vg), 0);
 
     bgen_close_genotype(vg);
     bgen_free_partition(vm, nvars);
 
-    assert_equal_int(bgen_close_metafile(mf), 0);
+    cass_equal_int(bgen_close_metafile(mf), 0);
     bgen_close(bgen);
-    return 0;
 }
 
-int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
+void _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
 {
-    assert_not_null(mf);
+    cass_cond(mf != NULL)
 
-    assert_equal_int(bgen_metafile_npartitions(mf), 4);
-    assert_equal_int(bgen_metafile_nvariants(mf), 10);
+    cass_equal_int(bgen_metafile_npartitions(mf), 4);
+    cass_equal_int(bgen_metafile_nvariants(mf), 10);
 
     double probs[] = {
         1.0000, 0.0000, NAN,    1.0000, 0.0000, 0.0000, 1.0000, 0.0000, 0.0000, 0.0000,
@@ -124,26 +117,26 @@ int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
 
         for (int ii = 0; ii < nvars; ++ii) {
             struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].vaddr);
-            assert_not_null(vg);
+            cass_cond(vg != NULL)
 
-            assert_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));
+            cass_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));
             for (size_t j = 0; j < (size_t)bgen_nsamples(bgen); ++j) {
-                assert_equal_int(bgen_missing(vg, j), 0);
-                assert_equal_int(bgen_ploidy(vg, j), *(ploidy_ptr++));
+                cass_equal_int(bgen_missing(vg, j), 0);
+                cass_equal_int(bgen_ploidy(vg, j), *(ploidy_ptr++));
             }
-            assert_equal_int(bgen_min_ploidy(vg), *(min_ploidy_ptr++));
-            assert_equal_int(bgen_max_ploidy(vg), *(max_ploidy_ptr++));
-            assert_equal_int(bgen_ncombs(vg), *(ncombs_ptr++));
-            assert_equal_int(bgen_phased(vg), *(phased_ptr++));
+            cass_equal_int(bgen_min_ploidy(vg), *(min_ploidy_ptr++));
+            cass_equal_int(bgen_max_ploidy(vg), *(max_ploidy_ptr++));
+            cass_equal_int(bgen_ncombs(vg), *(ncombs_ptr++));
+            cass_equal_int(bgen_phased(vg), *(phased_ptr++));
 
             double *ptr =
                 malloc(bgen_nsamples(bgen) * bgen_ncombs(vg) * sizeof(double));
 
-            assert_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
+            cass_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
             double *p = ptr;
             for (int j = 0; j < bgen_nsamples(bgen); ++j) {
                 for (int c = 0; c < bgen_ncombs(vg); ++c) {
-                    assert_almost_equal(*p, *(probs_ptr++));
+                    cass_close(*p, *(probs_ptr++));
                     ++p;
                 }
             }
@@ -153,39 +146,34 @@ int _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
         }
         bgen_free_partition(vm, nvars);
     }
-
-    return 0;
 }
 
-int test_genotype_complex()
+void test_genotype_complex()
 {
     {
         struct bgen_file *bgen = bgen_open("data/complex.23bits.bgen");
         struct bgen_mf *mf =
             bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 4, 0);
 
-        if (_test_genotype_complex(bgen, mf))
-            return 1;
-        assert_equal_int(bgen_close_metafile(mf), 0);
+        _test_genotype_complex(bgen, mf);
+        cass_equal_int(bgen_close_metafile(mf), 0);
         bgen_close(bgen);
     }
 
     {
         struct bgen_file *bgen = bgen_open("data/complex.23bits.bgen");
         struct bgen_mf *mf = bgen_open_metafile("complex.23bits.bgen.metadata.2");
-        if (_test_genotype_complex(bgen, mf))
-            return 1;
-        assert_equal_int(bgen_close_metafile(mf), 0);
+
+        _test_genotype_complex(bgen, mf);
+        cass_equal_int(bgen_close_metafile(mf), 0);
         bgen_close(bgen);
     }
-    return 0;
 }
 
 int main()
 {
-    TEST_CASE(test_bgen_file_complex());
-    TEST_CASE(test_create_metadata_complex());
-    TEST_CASE(test_genotype_complex());
-
-    return 0;
+    test_bgen_file_complex();
+    test_create_metadata_complex();
+    test_genotype_complex();
+    return cass_status();
 }
