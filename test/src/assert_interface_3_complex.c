@@ -10,7 +10,7 @@ void test_bgen_file_complex()
     cass_cond(bgen != NULL)
     cass_equal_int(bgen_file_nsamples(bgen), 4);
     cass_equal_int(bgen_file_nvariants(bgen), 10);
-    cass_equal_int(bgen_contain_samples(bgen), 1);
+    cass_equal_int(bgen_file_contain_samples(bgen), 1);
 
     struct bgen_str *samples = bgen_read_samples(bgen, 0);
     cass_cond(samples != NULL)

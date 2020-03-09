@@ -1,10 +1,13 @@
 #include "bgen/bgen.h"
+#include "free.h"
 #include "mem.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void alloc_str(struct bgen_str *v, int len)
+void alloc_str(struct bgen_str* v, size_t len);
+
+void alloc_str(struct bgen_str* v, size_t len)
 {
     v->len = len;
     if (len > 0)
@@ -13,13 +16,30 @@ void alloc_str(struct bgen_str *v, int len)
         v->str = NULL;
 }
 
-void free_str(struct bgen_str *v)
+/* void bgen_str_alloc(struct bgen_str* bgen_str, const size_t length) */
+/* { */
+/*     bgen_str->str = malloc(sizeof(char) * length); */
+/* } */
+
+char const* bgen_str_data(struct bgen_str const* bgen_str) { return bgen_str->str; }
+
+void bgen_str_free(struct bgen_str const* v) { free_c(v->str); }
+
+size_t bgen_str_length(struct bgen_str const* bgen_str) { return bgen_str->len; }
+
+bool bgen_str_equal(struct bgen_str a, struct bgen_str b)
 {
-    v->str = free_nul(v->str);
-    v->len = 0;
+    if (a.len == b.len)
+        return strncmp(a.str, b.str, a.len) == 0;
+    return 0;
 }
 
-int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
+struct bgen_str BGEN_STR(char const* str)
+{
+    return (struct bgen_str){strlen(str), str};
+}
+
+int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
 {
     uint64_t len = 0;
 
@@ -28,12 +48,15 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
         return 1;
     }
 
-    alloc_str(s, len);
+    /* bgen_str_alloc(bgen_str, len); */
+    alloc_str(bgen_str, len);
 
     if (len == 0)
         return 0;
 
-    if (fread(s->str, 1, s->len, fp) < (size_t)s->len) {
+    char* data = bgen_str_data(bgen_str);
+    size_t length = bgen_str_length(bgen_str);
+    if (fread(data, 1, length, fp) < length) {
         if (ferror(fp))
             perror("Error while freading a string str");
         else
@@ -44,7 +67,8 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
     return 0;
 }
 
-int fwrite_str(FILE *fp, struct bgen_str const *s, size_t len_size)
+
+int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
 {
 
     uint64_t len = s->len;

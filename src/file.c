@@ -22,26 +22,6 @@ struct bgen_file
 
 static int read_bgen_header(struct bgen_file* bgen);
 
-FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }
-
-char const* bgen_file_filepath(struct bgen_file const* bgen_file)
-{
-    return bgen_file->filepath;
-}
-
-int bgen_file_layout(struct bgen_file const* bgen_file) { return bgen_file->layout; }
-
-int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file->compression; }
-
-int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
-{
-    if (LONG_SEEK(bgen_file->file, bgen_file->variants_start, SEEK_SET)) {
-        perror_fmt(bgen_file->file, "Could not jump to the variants start");
-        return 1;
-    }
-    return 0;
-}
-
 struct bgen_file* bgen_file_open(char const* filepath)
 {
     struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
@@ -89,7 +69,7 @@ uint32_t bgen_file_nsamples(struct bgen_file const* bgen) { return bgen->nsample
 
 uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvariants; }
 
-bool bgen_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
+bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
 struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
 {
@@ -99,14 +79,14 @@ struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
     LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
 
     if (!bgen->contain_sample) {
-        warn("This bgen file does not contain sample ids");
+        bgen_warning("this bgen file does not contain sample ids");
         return NULL;
     }
 
-    sample_ids = dalloc((size_t)bgen->nsamples * sizeof(struct bgen_str));
+    sample_ids = malloc((size_t)bgen->nsamples * sizeof(struct bgen_str));
 
     if (LONG_SEEK(bgen->file, 8, SEEK_CUR)) {
-        perror("Could not fseek eight bytes forward");
+        bgen_perror(bgen->file, "could not fseek eight bytes forward");
         goto err;
     }
 
@@ -139,18 +119,33 @@ err:
     return free_nul(sample_ids);
 }
 
-void bgen_free_samples(struct bgen_file const* bgen, struct bgen_str* samples)
+void bgen_free_samples(struct bgen_file const* bgen_file, struct bgen_str const* samples)
 {
-    if (!bgen->contain_sample)
-        return;
+    for (uint32_t i = 0; i < bgen_file->nsamples; ++i)
+        bgen_str_free(samples + i);
 
-    if (!samples)
-        return;
+    free_c(samples);
+}
 
-    for (size_t i = 0; i < (size_t)bgen->nsamples; ++i)
-        free_str(samples + i);
 
-    free(samples);
+FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }
+
+char const* bgen_file_filepath(struct bgen_file const* bgen_file)
+{
+    return bgen_file->filepath;
+}
+
+int bgen_file_layout(struct bgen_file const* bgen_file) { return bgen_file->layout; }
+
+int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file->compression; }
+
+int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
+{
+    if (LONG_SEEK(bgen_file->file, bgen_file->variants_start, SEEK_SET)) {
+        perror_fmt(bgen_file->file, "Could not jump to the variants start");
+        return 1;
+    }
+    return 0;
 }
 
 /*
@@ -190,7 +185,7 @@ static int read_bgen_header(struct bgen_file* bgen)
     }
 
     if (magic_number != 1852139362)
-        warn("This might not be a BGEN file: magic number mismatch");
+        bgen_warning("magic number mismatch");
 
     if (LONG_SEEK(bgen->file, header_length - 20, SEEK_CUR)) {
         error("Fseek error while reading a BGEN file");

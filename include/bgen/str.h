@@ -18,16 +18,11 @@ struct bgen_str
     char const* str; /**< Array of characters. */
 };
 
-BGEN_EXPORT static inline bool bgen_str_equal(struct bgen_str a, struct bgen_str b)
-{
-    if (a.len == b.len)
-        return strncmp(a.str, b.str, a.len) == 0;
-    return 0;
-}
-
-BGEN_EXPORT static inline struct bgen_str BGEN_STR(char const* str)
-{
-    return (struct bgen_str){strlen(str), str};
-}
+/* BGEN_EXPORT void bgen_str_alloc(struct bgen_str* bgen_str, size_t length); */
+BGEN_EXPORT char const* bgen_str_data(struct bgen_str const* bgen_str);
+BGEN_EXPORT void bgen_str_free(struct bgen_str const* bgen_str);
+BGEN_EXPORT size_t bgen_str_length(struct bgen_str const* bgen_str);
+BGEN_EXPORT bool bgen_str_equal(struct bgen_str a, struct bgen_str b);
+BGEN_EXPORT struct bgen_str BGEN_STR(char const* str);
 
 #endif

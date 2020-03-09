@@ -73,12 +73,12 @@ struct bgen_vm *alloc_metadata(void)
 
 void free_metadata(struct bgen_vm *vm)
 {
-    free_str(&vm->id);
-    free_str(&vm->rsid);
-    free_str(&vm->chrom);
+    bgen_str_free(&vm->id);
+    bgen_str_free(&vm->rsid);
+    bgen_str_free(&vm->chrom);
     if (vm->allele_ids) {
         for (size_t i = 0; i < (size_t)vm->nalleles; ++i)
-            free_str(vm->allele_ids + i);
+            bgen_str_free(vm->allele_ids + i);
     }
     vm->allele_ids = free_nul(vm->allele_ids);
 }
