@@ -56,7 +56,7 @@ void test_complex(void)
 
         for (int j = 0; j < vm[i].nalleles; ++j) {
 
-            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), vm[i].allele_ids[j]));
+            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), *vm[i].allele_ids[j]));
             ++jj;
         }
     }

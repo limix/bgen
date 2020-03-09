@@ -163,7 +163,10 @@ uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset)
     fwrite_int(fp, v->nalleles, 2);
 
     for (size_t j = 0; j < (size_t)v->nalleles; ++j)
-        fwrite_str(fp, v->allele_ids + j, 4);
+    {
+        if (bgen_str_fwrite(v->allele_ids[j], fp, 4))
+            return 0;
+    }
 
     return LONG_TELL(fp) - start;
 }
@@ -423,10 +426,12 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
 
         fread_int(file, &vars[i].position, 4);
         fread_int(file, &vars[i].nalleles, 2);
-        vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
+        vars[i].allele_ids = malloc(sizeof(struct bgen_str*) * vars[i].nalleles);
 
         for (int j = 0; j < vars[i].nalleles; ++j)
-            fread_str(file, vars[i].allele_ids + j, 4);
+        {
+            vars[i].allele_ids[j] = bgen_str_fread_create(file, 4);
+        }
     }
 
     return vars;

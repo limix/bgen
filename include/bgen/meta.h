@@ -51,13 +51,13 @@ struct bgen_mf;
  */
 struct bgen_vm
 {
-    long                   vaddr;      /**< Vasdsdrianteealso:: offset-address. */
-    struct bgen_str const* id;         /**< Variant identification. */
-    struct bgen_str const* rsid;       /**< RSID. */
-    struct bgen_str const* chrom;      /**< Chromossome name. */
-    int                    position;   /**< Base-pair position. */
-    int                    nalleles;   /**< Number of alleles. */
-    struct bgen_str*       allele_ids; /**< Allele ids. */
+    long                    vaddr;      /**< Vasdsdrianteealso:: offset-address. */
+    struct bgen_str const*  id;         /**< Variant identification. */
+    struct bgen_str const*  rsid;       /**< RSID. */
+    struct bgen_str const*  chrom;      /**< Chromossome name. */
+    int                     position;   /**< Base-pair position. */
+    int                     nalleles;   /**< Number of alleles. */
+    struct bgen_str const** allele_ids; /**< Allele ids. */
 };
 
 /** Create a bgen metafile.

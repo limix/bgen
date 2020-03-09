@@ -45,8 +45,8 @@ void test_haplotype(void)
     cass_cond(vm[0].nalleles == 2);
 
     for (i = 0; i < (size_t)nvariants; ++i) {
-        cass_cond(strncmp("A", vm[i].allele_ids[0].data, vm[i].allele_ids[0].length) == 0);
-        cass_cond(strncmp("G", vm[i].allele_ids[1].data, vm[i].allele_ids[1].length) == 0);
+        cass_cond(bgen_str_equal(BGEN_STR("A"), *vm[i].allele_ids[0]));
+        cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[i].allele_ids[1]));
     }
 
     struct bgen_vg* vg = bgen_open_genotype(bgen, vm[1].vaddr);

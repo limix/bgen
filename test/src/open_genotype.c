@@ -58,8 +58,7 @@ void test_file(void)
         cass_cond(vm[i].position == position[i]);
         for (int j = 0; j < vm[i].nalleles; ++j) {
 
-            cass_cond(strncmp(allele_ids[jj], vm[i].allele_ids[j].data,
-                              vm[i].allele_ids[j].length) == 0);
+            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), *vm[i].allele_ids[j]));
             ++jj;
         }
     }

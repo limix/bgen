@@ -1,7 +1,7 @@
-#include "io.h"
-#include "free.h"
 #include "variant.h"
 #include "file.h"
+#include "free.h"
+#include "io.h"
 #include "mem.h"
 #include "str.h"
 #include <assert.h>
@@ -15,7 +15,7 @@
  * ----
  * It assumes that the bgen file is open.
  */
-int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
+int next_variant(struct bgen_file* bgen, struct bgen_vm* vm)
 {
     if (bgen_file_layout(bgen) == 1) {
         if (LONG_SEEK(bgen_file_stream(bgen), 4, SEEK_CUR))
@@ -39,12 +39,16 @@ int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
     else if (fread_int(bgen_file_stream(bgen), &vm->nalleles, 2))
         goto err;
 
-    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str));
+    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str*));
+    for (int i = 0; i < vm->nalleles; ++i)
+        vm->allele_ids[i] = NULL;
+
     if (!vm->allele_ids)
         goto err;
 
     for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
-        if (fread_str(bgen_file_stream(bgen), vm->allele_ids + i, 4))
+
+        if ((vm->allele_ids[i] = bgen_str_fread_create(bgen_file_stream(bgen), 4)) == NULL)
             goto err;
     }
 
@@ -54,7 +58,7 @@ err:
     return 1;
 }
 
-void init_metadata(struct bgen_vm *vm)
+void init_metadata(struct bgen_vm* vm)
 {
     vm->vaddr = -1;
     vm->allele_ids = NULL;
@@ -65,26 +69,31 @@ void init_metadata(struct bgen_vm *vm)
     vm->nalleles = -1;
 }
 
-struct bgen_vm *alloc_metadata(void)
+struct bgen_vm* alloc_metadata(void)
 {
-    struct bgen_vm *v = malloc(sizeof(struct bgen_vm));
+    struct bgen_vm* v = malloc(sizeof(struct bgen_vm));
     if (v)
         init_metadata(v);
     return v;
 }
 
-void free_metadata(struct bgen_vm *vm)
+void free_metadata(struct bgen_vm* vm)
 {
     if (vm->id)
         bgen_str_free(vm->id);
+
     if (vm->rsid)
         bgen_str_free(vm->rsid);
+
     if (vm->chrom)
         bgen_str_free(vm->chrom);
+
     if (vm->allele_ids) {
-        for (size_t i = 0; i < (size_t)vm->nalleles; ++i)
-            bgen_str_free(vm->allele_ids + i);
+        for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
+            if (vm->allele_ids[i])
+                bgen_str_free(vm->allele_ids[i]);
+        }
+        free_c(vm->allele_ids);
     }
-    free_c(vm->allele_ids);
     vm->allele_ids = NULL;
 }
