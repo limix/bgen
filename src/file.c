@@ -7,6 +7,7 @@
 #include "samples.h"
 #include "str.h"
 #include <assert.h>
+#include <inttypes.h>
 
 struct bgen_file
 {
@@ -72,55 +73,7 @@ uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvaria
 
 bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
-struct bgen_str* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
-{
-    struct bgen_str* sample_ids = NULL;
-    struct athr* at = NULL;
-
-    LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
-
-    if (!bgen->contain_sample) {
-        bgen_warning("this bgen file does not contain sample ids");
-        return NULL;
-    }
-
-    sample_ids = malloc((size_t)bgen->nsamples * sizeof(struct bgen_str));
-
-    if (LONG_SEEK(bgen->file, 8, SEEK_CUR)) {
-        bgen_perror(bgen->file, "could not fseek eight bytes forward");
-        goto err;
-    }
-
-    if (verbose) {
-        at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
-        if (!at) {
-            error("Could not create a progress bar");
-            goto err;
-        }
-    }
-    for (size_t i = 0; i < (size_t)bgen->nsamples; ++i) {
-        if (verbose)
-            athr_consume(at, 1);
-
-        if (fread_str(bgen->file, sample_ids + i, 2)) {
-            error("Could not read the %zu-th sample id", i);
-            goto err;
-        }
-    }
-
-    if (verbose)
-        athr_finish(at);
-
-    bgen->variants_start = LONG_TELL(bgen->file);
-    return sample_ids;
-
-err:
-    if (at)
-        athr_finish(at);
-    return free_nul(sample_ids);
-}
-
-struct bgen_samples* bgen_file_read_samples2(struct bgen_file* bgen, int verbose)
+struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
 
@@ -151,7 +104,7 @@ struct bgen_samples* bgen_file_read_samples2(struct bgen_file* bgen, int verbose
 
         struct bgen_str const* sample_id = bgen_str_fread_create(bgen->file, 2);
         if (sample_id == NULL) {
-            bgen_error("could not read the %lu-th sample id", i);
+            bgen_error("could not read the %" PRIu32 "lu-th sample id", i);
             goto err;
         }
         bgen_samples_set(samples, i, sample_id);
@@ -168,14 +121,6 @@ err:
         athr_finish(at);
     bgen_samples_free(samples);
     return NULL;
-}
-
-void bgen_free_samples(struct bgen_file const* bgen_file, struct bgen_str const* samples)
-{
-    for (uint32_t i = 0; i < bgen_file->nsamples; ++i)
-        bgen_str_free(samples + i);
-
-    free_c(samples);
 }
 
 FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }

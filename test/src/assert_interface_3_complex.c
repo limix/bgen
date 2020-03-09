@@ -11,7 +11,7 @@ void test_bgen_file_complex()
     cass_equal_int(bgen_file_nvariants(bgen), 10);
     cass_equal_int(bgen_file_contain_samples(bgen), 1);
 
-    struct bgen_samples* samples = bgen_file_read_samples2(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL)
         cass_cond(bgen_str_equal(BGEN_STR("sample_0"), *bgen_samples_get(samples, 0)));
     bgen_samples_free(samples);

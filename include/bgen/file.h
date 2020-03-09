@@ -59,15 +59,6 @@ BGEN_EXPORT bool bgen_file_contain_samples(struct bgen_file const* bgen);
  * @param verbose `1` to show progress; `0` otherwise.
  * @return Array of sample ids.
  */
-BGEN_EXPORT struct bgen_str* bgen_file_read_samples(struct bgen_file* bgen, int verbose);
-/** Free array of sample identifications.
- *
- * @param bgen_file Bgen file handler.
- * @param samples Array of sample ids.
- */
-BGEN_EXPORT void bgen_free_samples(struct bgen_file const* bgen_file,
-                                   struct bgen_str const* samples);
-
-BGEN_EXPORT struct bgen_samples* bgen_file_read_samples2(struct bgen_file* bgen, int verbose);
+BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose);
 
 #endif

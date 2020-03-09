@@ -117,7 +117,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
 
 void test_read(struct bgen_file* bgen, struct bgen_mf* mf, int precision)
 {
-    struct bgen_samples* samples = bgen_file_read_samples2(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     test_read_metadata(bgen, samples, mf);
     bgen_samples_free(samples);
 
