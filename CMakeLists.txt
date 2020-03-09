@@ -23,6 +23,7 @@ add_library(bgen
     src/layout/one.c
     src/layout/two.c
     src/metafile.c
+    src/report.c
     src/str.c
     src/variant.c
     src/zip/zlib.c
@@ -60,6 +61,15 @@ target_compile_options(bgen PRIVATE
 )
 target_compile_features(bgen PRIVATE c_restrict)
 
+include(CheckCSourceCompiles)
+check_c_source_compiles(
+    "
+        static void f(char const* err, ...) __attribute__((format(printf, 1, 2)));
+        int main(void) {return 0;}
+    "
+    HAVE_ATTR_FORMAT
+)
+target_compile_definitions(bgen PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
 install(TARGETS bgen EXPORT bgen-targets
     RUNTIME DESTINATION bin

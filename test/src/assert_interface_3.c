@@ -4,14 +4,14 @@
 
 void test_open_wrong_bgen_filepath()
 {
-    struct bgen_file *bgen = bgen_open("wrong.metadata");
+    struct bgen_file *bgen = bgen_file_open("wrong.metadata");
     cass_cond(bgen == NULL);
     bgen_close(bgen);
 }
 
 void test_bgen_file_haplotypes()
 {
-    struct bgen_file *bgen = bgen_open("data/haplotypes.bgen");
+    struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
     cass_cond(bgen != NULL);
     cass_equal_int(bgen_nsamples(bgen), 4);
@@ -28,7 +28,7 @@ void test_bgen_file_haplotypes()
 
 void test_create_meteadata_haplotypes()
 {
-    struct bgen_file *bgen = bgen_open("data/haplotypes.bgen");
+    struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
     struct bgen_mf *mf = bgen_create_metafile(bgen, "haplotypes.bgen.metadata.1", 4, 0);
     cass_cond(mf != NULL);
@@ -61,7 +61,7 @@ void test_create_meteadata_haplotypes()
 
 void test_genotype_haplotypes_by_creating_metadata()
 {
-    struct bgen_file *bgen = bgen_open("data/haplotypes.bgen");
+    struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
     struct bgen_mf *mf = bgen_create_metafile(bgen, "haplotypes.bgen.metadata.2", 4, 0);
     cass_cond(mf != NULL);
@@ -139,7 +139,7 @@ void test_genotype_haplotypes_by_creating_metadata()
 
 void test_genotype_haplotypes_by_loading_metadata()
 {
-    struct bgen_file *bgen = bgen_open("data/haplotypes.bgen");
+    struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
     struct bgen_mf *mf = bgen_open_metafile("haplotypes.bgen.metadata.2");
     cass_cond(mf != NULL);

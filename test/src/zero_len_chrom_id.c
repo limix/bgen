@@ -19,7 +19,7 @@ void test_zeo_len_chrom_id(void)
     struct bgen_file *bgen;
     struct bgen_str *samples;
 
-    bgen = bgen_open("data/zero_len_chrom_id.bgen");
+    bgen = bgen_file_open("data/zero_len_chrom_id.bgen");
 
     cass_cond(bgen != NULL);
 

@@ -65,7 +65,7 @@ int main()
     const char mf_filepath[] = "complex_index03.metadata";
     const char bgen_filepath[] = "data/complex.23bits.bgen";
 
-    struct bgen_file *bgen = bgen_open(bgen_filepath);
+    struct bgen_file *bgen = bgen_file_open(bgen_filepath);
     cass_cond(bgen != NULL);
     struct bgen_mf *mf = bgen_create_metafile(bgen, mf_filepath, 2, 0);
     cass_cond(mf != NULL);

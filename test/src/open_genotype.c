@@ -23,7 +23,7 @@ void test_file(void)
     struct bgen_file *bgen;
     int nsamples, nvariants;
 
-    cass_cond((bgen = bgen_open(filename)) != NULL);
+    cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_nvariants(bgen)) == 10);
 
@@ -75,7 +75,7 @@ void test_geno(void)
     const char filename[] = "data/complex.23bits.bgen";
     struct bgen_file *bgen;
 
-    cass_cond((bgen = bgen_open(filename)) != NULL);
+    cass_cond((bgen = bgen_file_open(filename)) != NULL);
 
     struct bgen_mf *mf =
         bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);

@@ -22,7 +22,7 @@ void test_complex(void)
     int nsamples, nvariants;
     double *probabilities;
 
-    cass_cond((bgen = bgen_open(filename)) != NULL);
+    cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_nvariants(bgen)) == 10);
 

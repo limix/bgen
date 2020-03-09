@@ -20,7 +20,7 @@ struct bgen_file;
  * @param filepath File path to the bgen file.
  * @return Bgen file handler.
  */
-BGEN_EXPORT struct bgen_file* bgen_open(char const* filepath);
+BGEN_EXPORT struct bgen_file* bgen_file_open(char const* filepath);
 /** Close a bgen file handler.
  *
  * @param bgen Bgen file handler.

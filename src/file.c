@@ -111,7 +111,7 @@ int read_bgen_header(struct bgen_file* bgen)
     return 0;
 }
 
-struct bgen_file* bgen_open(const char* filepath)
+struct bgen_file* bgen_file_open(const char* filepath)
 {
     struct bgen_file* bgen = dalloc(sizeof(struct bgen_file));
     if (!bgen)
