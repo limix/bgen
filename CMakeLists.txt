@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 3.5.1 FATAL_ERROR)
-project(bgen VERSION 3.0.4 LANGUAGES C)
+cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+project(bgen VERSION 4.0.0 LANGUAGES C)
 set(PROJECT_DESCRIPTION "It fully supports the BGEN format specifications 1.2 and 1.3.")
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Hide things by default
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -26,11 +30,17 @@ add_library(bgen
 )
 add_library(BGEN::bgen ALIAS bgen)
 
+# Write out mytools_export.h to the current binary directory
+# Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
+# search path.
+include(GenerateExportHeader)
+generate_export_header(bgen)
 
 target_include_directories(bgen
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        ${CMAKE_CURRENT_BINARY_DIR}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
@@ -44,8 +54,9 @@ target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
 target_compile_options(bgen PRIVATE
     $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
-    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic -Wstrict-prototypes
-        -Wshadow -Wconversion -Wmissing-prototypes -Wno-unused-parameter>
+    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
+    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
+    -Wno-unused-parameter>
 )
 target_compile_features(bgen PRIVATE c_restrict)
 
@@ -59,35 +70,3 @@ install(TARGETS bgen EXPORT bgen-targets
 
 enable_testing()
 add_subdirectory(test)
-
-# include(cmake/limix.cmake)
-# limix_initialise()
-# project(${PROJECT_NAME} VERSION ${PROJECT_VERSION} LANGUAGES C)
-# limix_config()
-
-# set(CMAKE_C_STANDARD 11)
-# add_definitions(-DTPL_NOLIB)
-
-# find_package(ZLIB REQUIRED)
-# include_directories("${ZLIB_INCLUDE_DIRS}")
-
-# find_package(ZSTD REQUIRED)
-# include_directories("${ZSTD_INCLUDE_DIRS}")
-
-# find_package(ATHR REQUIRED)
-# include_directories("${ATHR_INCLUDE_DIRS}")
-
-# if (NOT c_restrict IN_LIST CMAKE_C_COMPILE_FEATURES)
-#     add_compile_definitions(restrict= )
-# endif()
-
-# if(NOT MSVC)
-#     add_compile_options(-Wall -Wextra -Wno-pedantic -Werror -Wno-missing-field-initializers -Wno-deprecated-declarations)
-# endif(NOT MSVC)
-
-# limix_process_default_dirs()
-
-# limix_add_library(${PROJECT_NAME} ${PROJECT_VERSION} "${SOURCES}" "${HEADERS}"
-# "${PRIVATE_HEADERS}" "${ZLIB_LIBRARIES};${ZSTD_LIBRARIES};${ATHR_LIBRARIES}")
-
-# add_subdirectory(test)

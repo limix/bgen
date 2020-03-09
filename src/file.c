@@ -1,5 +1,3 @@
-#define BGEN_API_EXPORTS
-
 #include "file.h"
 #include "athr.h"
 #include "bgen/bgen.h"
@@ -7,17 +5,16 @@
 #include "str.h"
 #include <assert.h>
 
-int close_bgen_file(struct bgen_file *bgen)
+int close_bgen_file(struct bgen_file* bgen)
 {
     char unknown[] = "`[unknown]`";
-    const char *filepath = bgen->filepath ? bgen->filepath : unknown;
+    const char* filepath = bgen->filepath ? bgen->filepath : unknown;
 
     if (fclose_nul(bgen->file)) {
         if (ferror(bgen->file))
             perror_fmt(bgen->file, "Could not close bgen file %s", filepath);
         else
-            error("Could not close bgen file %s. Maybe it has already been closed",
-                  filepath);
+            error("Could not close bgen file %s. Maybe it has already been closed", filepath);
         bgen->file = NULL;
         return 1;
     }
@@ -35,7 +32,7 @@ int close_bgen_file(struct bgen_file *bgen)
  *   unused space: header length minus 20 bytes
  *   bgen flags: 4 bytes
  */
-int read_bgen_header(struct bgen_file *bgen)
+int read_bgen_header(struct bgen_file* bgen)
 {
     uint32_t header_length;
     uint32_t magic_number;
@@ -76,15 +73,14 @@ int read_bgen_header(struct bgen_file *bgen)
 
     bgen->compression = flags & 3;
     bgen->layout = (flags & (15 << 2)) >> 2;
-    bgen->contain_sample =
-        (flags & ((uint32_t)1 << 31)) >> 31;
+    bgen->contain_sample = (flags & ((uint32_t)1 << 31)) >> 31;
 
     return 0;
 }
 
-BGEN_API struct bgen_file *bgen_open(const char *filepath)
+struct bgen_file* bgen_open(const char* filepath)
 {
-    struct bgen_file *bgen = dalloc(sizeof(struct bgen_file));
+    struct bgen_file* bgen = dalloc(sizeof(struct bgen_file));
     if (!bgen)
         goto err;
 
@@ -124,7 +120,7 @@ err:
     return free_nul(bgen);
 }
 
-BGEN_API void bgen_close(struct bgen_file *bgen)
+void bgen_close(struct bgen_file* bgen)
 {
     if (bgen) {
         close_bgen_file(bgen);
@@ -133,19 +129,16 @@ BGEN_API void bgen_close(struct bgen_file *bgen)
     free_nul(bgen);
 }
 
-BGEN_API int bgen_nsamples(const struct bgen_file *bgen) { return bgen->nsamples; }
+int bgen_nsamples(const struct bgen_file* bgen) { return bgen->nsamples; }
 
-BGEN_API int bgen_nvariants(const struct bgen_file *bgen) { return bgen->nvariants; }
+int bgen_nvariants(const struct bgen_file* bgen) { return bgen->nvariants; }
 
-BGEN_API int bgen_contain_samples(const struct bgen_file *bgen)
+int bgen_contain_samples(const struct bgen_file* bgen) { return bgen->contain_sample; }
+
+struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
 {
-    return bgen->contain_sample;
-}
-
-BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose)
-{
-    struct bgen_str *sample_ids = NULL;
-    struct athr *at = NULL;
+    struct bgen_str* sample_ids = NULL;
+    struct athr* at = NULL;
 
     LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
 
@@ -190,7 +183,7 @@ err:
     return free_nul(sample_ids);
 }
 
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen, struct bgen_str *samples)
+void bgen_free_samples(const struct bgen_file* bgen, struct bgen_str* samples)
 {
     if (bgen->contain_sample == 0)
         return;

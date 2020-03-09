@@ -1,5 +1,3 @@
-#define BGEN_API_EXPORTS
-
 #include "geno.h"
 #include "bgen/bgen.h"
 #include "depr/variants_index.h"
@@ -9,16 +7,16 @@
 #include "mem.h"
 #include <assert.h>
 
-struct bgen_vg *create_vg()
+struct bgen_vg* create_vg()
 {
-    struct bgen_vg *vg = dalloc(sizeof(struct bgen_vg));
+    struct bgen_vg* vg = dalloc(sizeof(struct bgen_vg));
     vg->plo_miss = NULL;
     vg->chunk = NULL;
     vg->current_chunk = NULL;
     return vg;
 }
 
-int free_vg(struct bgen_vg *vg)
+int free_vg(struct bgen_vg* vg)
 {
     if (vg) {
         vg->plo_miss = free_nul(vg->plo_miss);
@@ -27,9 +25,9 @@ int free_vg(struct bgen_vg *vg)
     return free_nul(vg) != NULL;
 }
 
-BGEN_API struct bgen_vg *bgen_open_genotype(struct bgen_file *bgen, long vaddr)
+struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
 {
-    struct bgen_vg *vg = create_vg();
+    struct bgen_vg* vg = create_vg();
     if (!vg) {
         error("Could not open genotype");
         goto err;
@@ -63,10 +61,9 @@ err:
     return free_nul(vg);
 }
 
-BGEN_API void bgen_close_genotype(struct bgen_vg *vg) { free_vg(vg); }
+void bgen_close_genotype(struct bgen_vg* vg) { free_vg(vg); }
 
-BGEN_API int bgen_read_genotype(const struct bgen_file *bgen, struct bgen_vg *vg,
-                                double *probs)
+int bgen_read_genotype(const struct bgen_file* bgen, struct bgen_vg* vg, double* probs)
 {
     if (bgen->layout == 1) {
         bgen_read_probs_one(vg, probs);
@@ -79,22 +76,16 @@ BGEN_API int bgen_read_genotype(const struct bgen_file *bgen, struct bgen_vg *vg
     return 0;
 }
 
-BGEN_API int bgen_nalleles(const struct bgen_vg *vg) { return vg->nalleles; }
+int bgen_nalleles(const struct bgen_vg* vg) { return vg->nalleles; }
 
-BGEN_API int bgen_missing(const struct bgen_vg *vg, int index)
-{
-    return vg->plo_miss[index] >> 7;
-}
+int bgen_missing(const struct bgen_vg* vg, int index) { return vg->plo_miss[index] >> 7; }
 
-BGEN_API int bgen_ploidy(const struct bgen_vg *vg, int index)
-{
-    return vg->plo_miss[index] & 127;
-}
+int bgen_ploidy(const struct bgen_vg* vg, int index) { return vg->plo_miss[index] & 127; }
 
-BGEN_API int bgen_min_ploidy(const struct bgen_vg *vg) { return vg->min_ploidy; }
+int bgen_min_ploidy(const struct bgen_vg* vg) { return vg->min_ploidy; }
 
-BGEN_API int bgen_max_ploidy(const struct bgen_vg *vg) { return vg->max_ploidy; }
+int bgen_max_ploidy(const struct bgen_vg* vg) { return vg->max_ploidy; }
 
-BGEN_API int bgen_ncombs(const struct bgen_vg *vg) { return vg->ncombs; }
+int bgen_ncombs(const struct bgen_vg* vg) { return vg->ncombs; }
 
-BGEN_API int bgen_phased(const struct bgen_vg *vg) { return vg->phased; }
+int bgen_phased(const struct bgen_vg* vg) { return vg->phased; }

@@ -1,5 +1,3 @@
-#define BGEN_API_EXPORTS
-
 #include "bgen/bgen.h"
 #include "file.h"
 #include "io.h"
@@ -13,12 +11,12 @@
 /* context for reading the next variant */
 struct next_variant_ctx
 {
-    struct bgen_file *bgen;
+    struct bgen_file* bgen;
     uint32_t nvariants;
 };
 
 /* callback type for fetching the next variant */
-typedef int(next_variant_t)(struct bgen_vm *, uint64_t *, struct next_variant_ctx *);
+typedef int(next_variant_t)(struct bgen_vm*, uint64_t*, struct next_variant_ctx*);
 
 /* variant metadata index */
 struct bgen_idx
@@ -28,20 +26,20 @@ struct bgen_idx
     uint64_t metasize;
     uint32_t npartitions;
     /* array of partition offsets */
-    uint64_t *poffset;
+    uint64_t* poffset;
 };
 
 /* node for creating metadata file */
 struct bgen_mf
 {
-    char *filepath;
-    FILE *file;
+    char* filepath;
+    FILE* file;
     struct bgen_idx idx;
 };
 
-struct bgen_mf *alloc_mf(void)
+struct bgen_mf* alloc_mf(void)
 {
-    struct bgen_mf *mf = dalloc(sizeof(struct bgen_mf));
+    struct bgen_mf* mf = dalloc(sizeof(struct bgen_mf));
     if (!mf)
         return NULL;
 
@@ -71,7 +69,7 @@ inline static uint32_t ceildiv(uint32_t x, uint32_t y) { return (x + (y - 1)) / 
  *   Number of variants left to read plus one. `0` indicates the end of the list. `-1`
  *   indicates that an error has occurred.
  */
-int _next_variant(struct bgen_vm *vm, uint64_t *geno_offset, struct next_variant_ctx *c)
+int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant_ctx* c)
 {
     if (c->nvariants == 0)
         return 0;
@@ -101,12 +99,12 @@ int is_little_endian(void)
 {
     int num = 1;
 
-    return *(char *)&num == 1;
+    return *(char*)&num == 1;
 }
 
-struct bgen_mf *create_metafile(const char *filepath, uint32_t nvars, uint32_t nparts)
+struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t nparts)
 {
-    struct bgen_mf *mf = alloc_mf();
+    struct bgen_mf* mf = alloc_mf();
     if (!mf)
         goto err;
 
@@ -141,7 +139,7 @@ err:
 }
 
 /* Write variant genotype to file and return the block size. */
-uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
+uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset)
 {
     OFF_T start = LONG_TELL(fp);
 
@@ -158,15 +156,14 @@ uint64_t write_variant(FILE *fp, const struct bgen_vm *v, uint64_t offset)
     return LONG_TELL(fp) - start;
 }
 
-int write_metadata_block(struct bgen_mf *mf, next_variant_t *next, void *args,
-                         int verbose)
+int write_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* args, int verbose)
 {
     struct bgen_vm vm;
 
     mf->idx.poffset[0] = 0;
     int part_size = ceildiv(mf->idx.nvariants, mf->idx.npartitions);
 
-    struct athr *at = NULL;
+    struct athr* at = NULL;
     if (verbose) {
         if (!(at = create_athr(mf->idx.nvariants, "Writing variants")))
             goto err;
@@ -206,7 +203,7 @@ err:
     return 1;
 }
 
-int write_offsets_block(struct bgen_mf *mf)
+int write_offsets_block(struct bgen_mf* mf)
 {
     if (fwrite_ui32(mf->file, mf->idx.npartitions, sizeof(mf->idx.npartitions))) {
         error("Could not write the number of partitions %d", mf->idx.npartitions);
@@ -241,7 +238,7 @@ err:
  *  - The block containing the variants metadata.
  *  - The block containing the offsets to the partitions of variants metadata.
  */
-int write_metafile(struct bgen_mf *mf, next_variant_t *next, void *args, int verbose)
+int write_metafile(struct bgen_mf* mf, next_variant_t* next, void* args, int verbose)
 {
     struct bgen_vm vm;
     init_metadata(&vm);
@@ -262,10 +259,10 @@ err:
     return 1;
 }
 
-BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen, const char *fp,
-                                              int nparts, int verbose)
+struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* fp, int nparts,
+                                     int verbose)
 {
-    struct bgen_mf *mf = create_metafile(fp, bgen_nvariants(bgen), nparts);
+    struct bgen_mf* mf = create_metafile(fp, bgen_nvariants(bgen), nparts);
     if (!mf)
         goto err;
 
@@ -291,9 +288,9 @@ err:
     return NULL;
 }
 
-BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath)
+struct bgen_mf* bgen_open_metafile(const char* filepath)
 {
-    struct bgen_mf *mf = alloc_mf();
+    struct bgen_mf* mf = alloc_mf();
     if (!mf) {
         error("Could not allocate resources for metafile");
         goto err;
@@ -352,7 +349,7 @@ err:
     return NULL;
 }
 
-BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
+int bgen_close_metafile(struct bgen_mf* mf)
 {
     if (mf) {
         if (fclose_nul(mf->file)) {
@@ -367,17 +364,11 @@ BGEN_API int bgen_close_metafile(struct bgen_mf *mf)
     return 0;
 }
 
-BGEN_API int bgen_metafile_npartitions(const struct bgen_mf *mf)
-{
-    return mf->idx.npartitions;
-}
+int bgen_metafile_npartitions(const struct bgen_mf* mf) { return mf->idx.npartitions; }
 
-BGEN_API int bgen_metafile_nvariants(const struct bgen_mf *mf)
-{
-    return mf->idx.nvariants;
-}
+int bgen_metafile_nvariants(const struct bgen_mf* mf) { return mf->idx.nvariants; }
 
-int bgen_partition_nvars(const struct bgen_mf *mf, int part)
+int bgen_partition_nvars(const struct bgen_mf* mf, int part)
 {
     if (part < 0) {
         error("Invalid partition number: %d", part);
@@ -387,11 +378,10 @@ int bgen_partition_nvars(const struct bgen_mf *mf, int part)
     return imin(size, mf->idx.nvariants - size * part);
 }
 
-BGEN_API struct bgen_vm *bgen_read_partition(const struct bgen_mf *mf, int part,
-                                             int *nvars)
+struct bgen_vm* bgen_read_partition(const struct bgen_mf* mf, int part, int* nvars)
 {
-    struct bgen_vm *vars = NULL;
-    FILE *file = mf->file;
+    struct bgen_vm* vars = NULL;
+    FILE* file = mf->file;
 
     if ((uint32_t)part >= mf->idx.npartitions) {
         error("The provided partition number %d is out-of-range", part);
@@ -435,7 +425,7 @@ err:
     return NULL;
 }
 
-BGEN_API void bgen_free_partition(struct bgen_vm *vars, int nvars)
+void bgen_free_partition(struct bgen_vm* vars, int nvars)
 {
     for (size_t i = 0; i < (size_t)nvars; ++i)
         free_metadata(vars + i);

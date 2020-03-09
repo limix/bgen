@@ -29,9 +29,9 @@
 #ifndef BGEN_META_H
 #define BGEN_META_H
 
-#include "bgen/api.h"
 #include "bgen/file.h"
 #include "bgen/str.h"
+#include "bgen_export.h"
 
 /** Metafile index name. */
 #define BGEN_IDX_NAME "bgen index "
@@ -57,7 +57,7 @@ struct bgen_vm
     struct bgen_str chrom;       /**< Chromossome name. */
     int position;                /**< Base-pair position. */
     int nalleles;                /**< Number of alleles. */
-    struct bgen_str *allele_ids; /**< Allele ids. */
+    struct bgen_str* allele_ids; /**< Allele ids. */
 };
 
 /** Create a bgen metafile.
@@ -72,27 +72,26 @@ struct bgen_vm
  * @param verbose `1` for showing progress; `0` otherwise.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_API struct bgen_mf *bgen_create_metafile(struct bgen_file *bgen,
-                                              const char *filepath, int npartitions,
-                                              int verbose);
+BGEN_EXPORT struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* filepath,
+                                              int npartitions, int verbose);
 /** Open a bgen metafile.
  *
  * @param filepath File path to the metafile.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_API struct bgen_mf *bgen_open_metafile(const char *filepath);
+BGEN_EXPORT struct bgen_mf* bgen_open_metafile(const char* filepath);
 /** Get the number of partitions.
  *
  * @param mf Metafile handler.
  * @return Number of partitions.
  */
-BGEN_API int bgen_metafile_npartitions(const struct bgen_mf *mf);
+BGEN_EXPORT int bgen_metafile_npartitions(const struct bgen_mf* mf);
 /** Get the number of variants.
  *
  * @param mf Metafile handler.
  * @return Number of variants.
  */
-BGEN_API int bgen_metafile_nvariants(const struct bgen_mf *mf);
+BGEN_EXPORT int bgen_metafile_nvariants(const struct bgen_mf* mf);
 /** Read a partition of variants.
  *
  * @param mf Metafile handler.
@@ -100,19 +99,19 @@ BGEN_API int bgen_metafile_nvariants(const struct bgen_mf *mf);
  * @param nvariants Number of variants of the partition.
  * @return Array of variant metadata.
  */
-BGEN_API struct bgen_vm *bgen_read_partition(const struct bgen_mf *mf, int index,
-                                             int *nvariants);
+BGEN_EXPORT struct bgen_vm* bgen_read_partition(const struct bgen_mf* mf, int index,
+                                             int* nvariants);
 /** Free a partition.
  *
  * @param vm Array of variant metatada.
  * @param nvariants Number of variants of the partition.
  */
-BGEN_API void bgen_free_partition(struct bgen_vm *vm, int nvariants);
+BGEN_EXPORT void bgen_free_partition(struct bgen_vm* vm, int nvariants);
 /** Close a metafile handler.
  *
  * @param mf Metafile handler.
  * @return `0` on success; `1` otherwise.
  */
-BGEN_API int bgen_close_metafile(struct bgen_mf *mf);
+BGEN_EXPORT int bgen_close_metafile(struct bgen_mf* mf);
 
 #endif

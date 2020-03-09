@@ -2,7 +2,6 @@
 #ifndef _BGEN_IO_H
 #define _BGEN_IO_H
 
-#include "platform.h"
 #include <stdint.h>
 #include <stdio.h>
 

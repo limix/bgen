@@ -4,8 +4,8 @@
 #ifndef BGEN_FILE_H
 #define BGEN_FILE_H
 
-#include "bgen/api.h"
 #include "bgen/str.h"
+#include "bgen_export.h"
 
 /** Bgen file handler.
  * @struct bgen_file
@@ -20,24 +20,24 @@ struct bgen_file;
  * @param filepath File path to the bgen file.
  * @return Bgen file handler.
  */
-BGEN_API struct bgen_file *bgen_open(const char *filepath);
+BGEN_EXPORT struct bgen_file* bgen_open(const char* filepath);
 /** Close a bgen file handler.
  *
  * @param bgen Bgen file handler.
  */
-BGEN_API void bgen_close(struct bgen_file *bgen);
+BGEN_EXPORT void bgen_close(struct bgen_file* bgen);
 /** Get the number of samples.
  *
  * @param bgen Bgen file handler.
  * @return Number of samples.
  */
-BGEN_API int bgen_nsamples(const struct bgen_file *bgen);
+BGEN_EXPORT int bgen_nsamples(const struct bgen_file* bgen);
 /** Get the number of variants.
  *
  * @param bgen Bgen file handler.
  * @return Number of variants.
  */
-BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
+BGEN_EXPORT int bgen_nvariants(const struct bgen_file* bgen);
 /** Check if the file contain sample identifications.
  *
  * \rst
@@ -48,7 +48,7 @@ BGEN_API int bgen_nvariants(const struct bgen_file *bgen);
  * @param bgen Bgen file handler.
  * @return `1` if bgen file contains the sample ids; `0` otherwise.
  */
-BGEN_API int bgen_contain_samples(const struct bgen_file *bgen);
+BGEN_EXPORT int bgen_contain_samples(const struct bgen_file* bgen);
 /** Return array of sample identifications.
  *
  * The size of this array is given be the @ref bgen_nsamples function.
@@ -57,13 +57,12 @@ BGEN_API int bgen_contain_samples(const struct bgen_file *bgen);
  * @param verbose `1` to show progress; `0` otherwise.
  * @return Array of sample ids.
  */
-BGEN_API struct bgen_str *bgen_read_samples(struct bgen_file *bgen, int verbose);
+BGEN_EXPORT struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose);
 /** Free array of sample identifications.
  *
  * @param bgen Bgen file handler.
  * @param sample_ids Array of sample ids.
  */
-BGEN_API void bgen_free_samples(const struct bgen_file *bgen,
-                                struct bgen_str *sample_ids);
+BGEN_EXPORT void bgen_free_samples(const struct bgen_file* bgen, struct bgen_str* sample_ids);
 
 #endif
