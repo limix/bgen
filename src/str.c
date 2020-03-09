@@ -1,7 +1,8 @@
-#include "bgen/bgen.h"
 #include "str.h"
+#include "bgen/bgen.h"
 #include "free.h"
 #include "mem.h"
+#include "report.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,30 +20,17 @@ void alloc_str(struct bgen_str* v, size_t len)
         v->data = NULL;
 }
 
-/* void bgen_str_alloc(struct bgen_str* bgen_str, const size_t length) */
-/* { */
-/*     bgen_str->str = malloc(sizeof(char) * length); */
-/* } */
-
-char const* bgen_str_data(struct bgen_str const* bgen_str) { return bgen_str->data; }
+struct bgen_str const* bgen_str_create(char const* data, size_t length)
+{
+    struct bgen_str* str = malloc(sizeof(struct bgen_str));
+    str->data = data;
+    str->length = length;
+    return str;
+}
 
 void bgen_str_free(struct bgen_str const* v) { free_c(v->data); }
 
-size_t bgen_str_length(struct bgen_str const* bgen_str) { return bgen_str->length; }
-
-bool bgen_str_equal(struct bgen_str a, struct bgen_str b)
-{
-    if (a.length == b.length)
-        return strncmp(a.data, b.data, a.length) == 0;
-    return 0;
-}
-
-struct bgen_str BGEN_STR(char const* str)
-{
-    return (struct bgen_str){strlen(str), str};
-}
-
-int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
+int fread_str(FILE* fp, struct bgen_str* bgen_str, size_t len_size)
 {
     uint64_t len = 0;
 
@@ -70,7 +58,7 @@ int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
     return 0;
 }
 
-struct bgen_str const* bgen_str_fread_create(FILE *stream, size_t length_size)
+struct bgen_str const* bgen_str_fread_create(FILE* stream, size_t length_size)
 {
     uint64_t length = 0;
 
@@ -78,11 +66,11 @@ struct bgen_str const* bgen_str_fread_create(FILE *stream, size_t length_size)
         bgen_perror("Error while freading a string length");
         return NULL;
     }
-    
+
     if (length == 0)
         return bgen_str_create_empty();
 
-    char *data = malloc(sizeof(char) * length);
+    char* data = malloc(sizeof(char) * length);
 
     if (fread(data, 1, length, stream) < length) {
         if (ferror(stream))
@@ -141,17 +129,9 @@ int bgen_str_fwrite(struct bgen_str const* s, FILE* fp, size_t len_size)
     return 0;
 }
 
-struct bgen_str const* bgen_str_create(char const* data, size_t length)
-{
-    struct bgen_str *str = malloc(sizeof(struct bgen_str));
-    str->data = data;
-    str->length = length;
-    return str;
-}
-
 static struct bgen_str const* bgen_str_create_empty(void)
 {
-    struct bgen_str *str = malloc(sizeof(struct bgen_str));
+    struct bgen_str* str = malloc(sizeof(struct bgen_str));
     str->length = 0;
     return str;
 }
