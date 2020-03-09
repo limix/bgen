@@ -34,7 +34,7 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
 {
     struct bgen_vg* vg = create_vg();
     if (!vg) {
-        bgen_error("Could not open genotype");
+        bgen_error("could not open genotype");
         goto err;
     }
     vg->vaddr = (OFF_T)vaddr;
@@ -52,17 +52,15 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
     } else if (bgen_file_layout(bgen) == 2) {
         read_probs_header_two(&vi, vg, bgen_file_stream(bgen));
     } else {
-        bgen_error("Unrecognized layout type %d", bgen_file_layout(bgen));
+        bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;
     }
 
     free_c(vi.filepath);
-    free_c(vi.start);
     return vg;
 
 err:
     free_c(vi.filepath);
-    free_c(vi.start);
     free_c(vg);
     return NULL;
 }

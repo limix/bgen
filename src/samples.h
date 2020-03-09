@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 struct bgen_samples* bgen_samples_create(uint32_t nsamples);
-void bgen_samples_set(struct bgen_samples const* samples, uint32_t index,
-                      struct bgen_str const* sample_id);
+void                 bgen_samples_set(struct bgen_samples const* samples, uint32_t index,
+                                      struct bgen_str const* sample_id);
 
 #endif

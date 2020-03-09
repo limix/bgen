@@ -9,7 +9,5 @@ int init_index(struct bgen_file const* bgen, struct bgen_vi* vi)
     vi->nsamples = (uint32_t)bgen_file_nsamples(bgen);
     vi->nvariants = (uint32_t)bgen_file_nvariants(bgen);
     vi->max_nalleles = 0;
-    /* `start` is not used anymore. */
-    vi->start = NULL;
     return 0;
 }
