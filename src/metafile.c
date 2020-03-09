@@ -152,9 +152,13 @@ uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset)
     fwrite_ui64(fp, offset, 8);
     if (bgen_str_fwrite(v->id, fp, 2))
         return 0;
+
     if (bgen_str_fwrite(v->rsid, fp, 2))
         return 0;
-    fwrite_str(fp, &(v->chrom), 2);
+
+    if (bgen_str_fwrite(v->chrom, fp, 2))
+        return 0;
+
     fwrite_int(fp, v->position, 4);
     fwrite_int(fp, v->nalleles, 2);
 
@@ -415,7 +419,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
 
         vars[i].id = bgen_str_fread_create(file, 2);
         vars[i].rsid = bgen_str_fread_create(file, 2);
-        fread_str(file, &vars[i].chrom, 2);
+        vars[i].chrom = bgen_str_fread_create(file, 2);
 
         fread_int(file, &vars[i].position, 4);
         fread_int(file, &vars[i].nalleles, 2);

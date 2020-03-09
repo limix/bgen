@@ -22,14 +22,14 @@ void use_metafile(struct bgen_mf *mf)
 
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[0].chrom));
     cass_equal_int(vm[0].nalleles, 2);
     cass_cond(bgen_str_equal(BGEN_STR("A"), vm[1].allele_ids[0]));
     cass_cond(bgen_str_equal(BGEN_STR("G"), vm[1].allele_ids[1]));
 
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[4].id));
     cass_cond(bgen_str_equal(BGEN_STR("M5"), *vm[4].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), vm[4].chrom));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[4].chrom));
     cass_equal_int(vm[4].nalleles, 2);
     cass_cond(bgen_str_equal(BGEN_STR("A"), vm[4].allele_ids[0]));
     cass_cond(bgen_str_equal(BGEN_STR("G"), vm[4].allele_ids[1]));
@@ -41,7 +41,7 @@ void use_metafile(struct bgen_mf *mf)
 
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
     cass_cond(bgen_str_equal(BGEN_STR("M6"), *vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[0].chrom));
     cass_equal_int(vm[0].nalleles, 4);
     cass_cond(bgen_str_equal(BGEN_STR("A"), vm[1].allele_ids[0]));
     cass_cond(bgen_str_equal(BGEN_STR("G"), vm[1].allele_ids[1]));

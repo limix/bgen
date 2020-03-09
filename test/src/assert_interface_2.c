@@ -44,7 +44,7 @@ int main()
     cass_equal_int(vm[0].nalleles, 2);
     cass_cond(bgen_str_equal(BGEN_STR("RSID_2"), *vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *vm[0].id));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[0].chrom));
     cass_cond(bgen_str_equal(BGEN_STR("A"), vm[0].allele_ids[0]));
 
     bgen_free_partition(vm, nvariants);

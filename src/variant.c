@@ -28,7 +28,7 @@ int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
     if ((vm->rsid = bgen_str_fread_create(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
-    if (fread_str(bgen_file_stream(bgen), &vm->chrom, 2))
+    if ((vm->chrom = bgen_str_fread_create(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
     if (fread_int(bgen_file_stream(bgen), &vm->position, 4))
@@ -60,7 +60,7 @@ void init_metadata(struct bgen_vm *vm)
     vm->allele_ids = NULL;
     vm->id = NULL;
     vm->rsid = NULL;
-    vm->chrom.data = NULL;
+    vm->chrom = NULL;
     vm->position = -1;
     vm->nalleles = -1;
 }
@@ -79,7 +79,8 @@ void free_metadata(struct bgen_vm *vm)
         bgen_str_free(vm->id);
     if (vm->rsid)
         bgen_str_free(vm->rsid);
-    bgen_str_free(&vm->chrom);
+    if (vm->chrom)
+        bgen_str_free(vm->chrom);
     if (vm->allele_ids) {
         for (size_t i = 0; i < (size_t)vm->nalleles; ++i)
             bgen_str_free(vm->allele_ids + i);
