@@ -39,17 +39,17 @@ void test_read_metadata(struct bgen_file* bgen, struct bgen_samples *samples, st
     int nvariants = 0;
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
     cass_cond(nvariants == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), vm[0].id));
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *vm[0].id));
     bgen_free_partition(vm, nvariants);
 
     vm = bgen_read_partition(mf, 1, &nvariants);
     cass_cond(nvariants == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), vm[5].id));
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), *vm[5].id));
     bgen_free_partition(vm, nvariants);
 
     vm = bgen_read_partition(mf, 2, &nvariants);
     cass_cond(nvariants == 65);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), vm[60].id));
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), *vm[60].id));
     bgen_free_partition(vm, nvariants);
 }
 

@@ -15,10 +15,10 @@ int main(void)
 
 void test_haplotype(void)
 {
-    size_t i, j, ii, jj;
-    const char filename[] = "data/haplotypes.bgen";
+    size_t            i, j, ii, jj;
+    const char        filename[] = "data/haplotypes.bgen";
     struct bgen_file* bgen;
-    int nsamples, nvariants;
+    int               nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
@@ -41,7 +41,7 @@ void test_haplotype(void)
     cass_cond(vm != NULL);
     cass_cond(nvariants == 4);
 
-    cass_cond(strncmp("RS1", vm[0].rsid.data, vm[0].rsid.length) == 0);
+    cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm[0].rsid));
     cass_cond(vm[0].nalleles == 2);
 
     for (i = 0; i < (size_t)nvariants; ++i) {

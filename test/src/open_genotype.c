@@ -37,8 +37,8 @@ void test_file(void)
     struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
 
-    cass_cond(strncmp("V1", vm[0].rsid.data, vm[0].rsid.length) == 0);
-    cass_cond(strncmp("M10", vm[9].rsid.data, vm[9].rsid.length) == 0);
+    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
 
     struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
     cass_cond(bgen_nalleles(vg) == 2);

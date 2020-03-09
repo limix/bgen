@@ -38,8 +38,8 @@ void test_complex(void)
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
     cass_cond(nvariants == 10);
 
-    cass_cond(bgen_str_equal(BGEN_STR("V1"), vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("M10"), vm[9].rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
 
     int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     int correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
@@ -60,8 +60,6 @@ void test_complex(void)
             ++jj;
         }
     }
-
-    bgen_free_partition(vm, nvariants);
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
@@ -136,6 +134,7 @@ void test_complex(void)
         free(probabilities);
     }
 
+    bgen_free_partition(vm, nvariants);
     cass_cond(bgen_close_metafile(mf) == 0);
     bgen_file_close(bgen);
 }
