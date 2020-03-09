@@ -1,4 +1,4 @@
-#include "layout_one.h"
+#include "layout1.h"
 #include "bgen/bgen.h"
 #include "file.h"
 #include "geno.h"
@@ -13,9 +13,7 @@
 static void  read_unphased(struct bgen_vg* vg, double* probabilities);
 static char* _uncompress(struct bgen_vi* index, FILE* file);
 
-void bgen_read_probs_one(struct bgen_vg* vg, double* p) { read_unphased(vg, p); }
-
-int bgen_read_probs_header_one(struct bgen_vi* index, struct bgen_vg* vg, FILE* file)
+int bgen_layout1_read_header(struct bgen_vi* index, struct bgen_vg* vg, FILE* file)
 {
     char* c;
     char* chunk;
@@ -44,6 +42,8 @@ int bgen_read_probs_header_one(struct bgen_vi* index, struct bgen_vg* vg, FILE* 
 
     return 0;
 }
+
+void bgen_layout1_read_genotype(struct bgen_vg* vg, double* p) { read_unphased(vg, p); }
 
 static void read_unphased(struct bgen_vg* vg, double* probabilities)
 {

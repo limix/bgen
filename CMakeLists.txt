@@ -19,8 +19,8 @@ add_library(bgen
     src/file.c
     src/geno.c
     src/io.c
-    src/layout_one.c
-    src/layout_two.c
+    src/layout1.c
+    src/layout2.c
     src/metafile.c
     src/report.c
     src/samples.c

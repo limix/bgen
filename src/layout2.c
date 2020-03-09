@@ -1,4 +1,4 @@
-#include "layout_two.h"
+#include "layout2.h"
 #include "bgen/bgen.h"
 #include "file.h"
 #include "geno.h"
@@ -36,7 +36,7 @@ inline static void set_array_nan(double* p, size_t n)
         p[i] = NAN;
 }
 
-int read_probs_header_two(struct bgen_vi* idx, struct bgen_vg* vg, FILE* file)
+int bgen_layout2_read_header(struct bgen_vi* idx, struct bgen_vg* vg, FILE* file)
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -98,7 +98,7 @@ int read_probs_header_two(struct bgen_vi* idx, struct bgen_vg* vg, FILE* file)
     return EXIT_SUCCESS;
 }
 
-void read_probs_two(struct bgen_vg* vg, double* p)
+void bgen_layout2_read_genotype(struct bgen_vg* vg, double* p)
 {
     if (vg->phased)
         read_phased_genotype(vg, p);

@@ -3,8 +3,8 @@
 #include "file.h"
 #include "free.h"
 #include "index.h"
-#include "layout_one.h"
-#include "layout_two.h"
+#include "layout1.h"
+#include "layout2.h"
 #include "mem.h"
 #include "report.h"
 #include <assert.h>
@@ -28,9 +28,9 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
     struct bgen_vi vi = BGEN_VI(bgen);
 
     if (bgen_file_layout(bgen) == 1) {
-        bgen_read_probs_header_one(&vi, vg, bgen_file_stream(bgen));
+        bgen_layout1_read_header(&vi, vg, bgen_file_stream(bgen));
     } else if (bgen_file_layout(bgen) == 2) {
-        read_probs_header_two(&vi, vg, bgen_file_stream(bgen));
+        bgen_layout2_read_header(&vi, vg, bgen_file_stream(bgen));
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;
@@ -53,9 +53,9 @@ void bgen_close_genotype(struct bgen_vg const* vg)
 int bgen_read_genotype(struct bgen_file const* bgen, struct bgen_vg* vg, double* probs)
 {
     if (bgen_file_layout(bgen) == 1) {
-        bgen_read_probs_one(vg, probs);
+        bgen_layout1_read_genotype(vg, probs);
     } else if (bgen_file_layout(bgen) == 2) {
-        read_probs_two(vg, probs);
+        bgen_layout2_read_genotype(vg, probs);
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         return 1;
