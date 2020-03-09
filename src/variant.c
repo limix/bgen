@@ -22,13 +22,13 @@ int next_variant(struct bgen_file* bgen, struct bgen_vm* vm)
             goto err;
     }
 
-    if ((vm->id = bgen_str_fread_create(bgen_file_stream(bgen), 2)) == NULL)
+    if ((vm->id = bgen_str_fread(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
-    if ((vm->rsid = bgen_str_fread_create(bgen_file_stream(bgen), 2)) == NULL)
+    if ((vm->rsid = bgen_str_fread(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
-    if ((vm->chrom = bgen_str_fread_create(bgen_file_stream(bgen), 2)) == NULL)
+    if ((vm->chrom = bgen_str_fread(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
     if (fread_int(bgen_file_stream(bgen), &vm->position, 4))
@@ -48,7 +48,7 @@ int next_variant(struct bgen_file* bgen, struct bgen_vm* vm)
 
     for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
 
-        if ((vm->allele_ids[i] = bgen_str_fread_create(bgen_file_stream(bgen), 4)) == NULL)
+        if ((vm->allele_ids[i] = bgen_str_fread(bgen_file_stream(bgen), 4)) == NULL)
             goto err;
     }
 

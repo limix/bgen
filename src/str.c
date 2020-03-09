@@ -1,72 +1,26 @@
 #include "str.h"
-#include "bgen/bgen.h"
 #include "free.h"
-#include "mem.h"
 #include "report.h"
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-static struct bgen_str const* bgen_str_create_empty(void);
-
-void alloc_str(struct bgen_str* v, size_t len);
-
-void alloc_str(struct bgen_str* v, size_t len)
-{
-    v->length = len;
-    if (len > 0)
-        v->data = malloc(len);
-    else
-        v->data = NULL;
-}
-
-int fread_str(FILE* fp, struct bgen_str* bgen_str, size_t len_size)
-{
-    uint64_t len = 0;
-
-    if (fread(&len, 1, len_size, fp) < len_size) {
-        bgen_perror("Error while freading a string length");
-        return 1;
-    }
-
-    /* bgen_str_alloc(bgen_str, len); */
-    alloc_str(bgen_str, len);
-
-    if (len == 0)
-        return 0;
-
-    char* data = bgen_str_data(bgen_str);
-    size_t length = bgen_str_length(bgen_str);
-    if (fread(data, 1, length, fp) < length) {
-        if (ferror(fp))
-            bgen_perror("Error while freading a string str");
-        else
-            bgen_error("Unexpected end of file while reading a string");
-        return 1;
-    }
-
-    return 0;
-}
-
-struct bgen_str const* bgen_str_fread_create(FILE* stream, size_t length_size)
+struct bgen_str const* bgen_str_fread(FILE* stream, size_t length_size)
 {
     uint64_t length = 0;
 
     if (fread(&length, 1, length_size, stream) < length_size) {
-        bgen_perror("Error while freading a string length");
+        bgen_perror("error while freading a string length");
         return NULL;
     }
 
     if (length == 0)
-        return bgen_str_create_empty();
+        return bgen_str_create(NULL, 0);
 
     char* data = malloc(sizeof(char) * length);
 
     if (fread(data, 1, length, stream) < length) {
         if (ferror(stream))
-            bgen_perror("Error while freading a string str");
+            bgen_perror("error while freading a string str");
         else
-            bgen_error("Unexpected end of file while reading a string");
+            bgen_error("unexpected end of file while reading a string");
         free_c(data);
         return NULL;
     }
@@ -74,54 +28,24 @@ struct bgen_str const* bgen_str_fread_create(FILE* stream, size_t length_size)
     return bgen_str_create(data, length);
 }
 
-int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
+int bgen_str_fwrite(struct bgen_str const* str, FILE* stream, size_t length_size)
 {
-
-    uint64_t len = s->length;
-    if (fwrite(&len, len_size, 1, fp) != 1) {
-        bgen_perror("Error while fwriting a string length");
+    uint64_t len = str->length;
+    if (fwrite(&len, length_size, 1, stream) != 1) {
+        bgen_perror("error while fwriting a string length");
         return 1;
     }
 
     if (len == 0)
         return 0;
 
-    if (fwrite(s->data, 1, len, fp) != len) {
+    if (fwrite(str->data, 1, len, stream) != len) {
 
-        if (ferror(fp))
-            bgen_perror("Error while fwriting a string str");
+        if (ferror(stream))
+            bgen_perror("error while fwriting a string str");
         else
-            bgen_error("Unexpected end of file while writing a string");
+            bgen_error("unexpected end of file while writing a string");
         return 1;
     }
     return 0;
-}
-
-int bgen_str_fwrite(struct bgen_str const* s, FILE* fp, size_t len_size)
-{
-    uint64_t len = s->length;
-    if (fwrite(&len, len_size, 1, fp) != 1) {
-        bgen_perror("Error while fwriting a string length");
-        return 1;
-    }
-
-    if (len == 0)
-        return 0;
-
-    if (fwrite(s->data, 1, len, fp) != len) {
-
-        if (ferror(fp))
-            bgen_perror("Error while fwriting a string str");
-        else
-            bgen_error("Unexpected end of file while writing a string");
-        return 1;
-    }
-    return 0;
-}
-
-static struct bgen_str const* bgen_str_create_empty(void)
-{
-    struct bgen_str* str = malloc(sizeof(struct bgen_str));
-    str->length = 0;
-    return str;
 }

@@ -420,9 +420,9 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
     for (int i = 0; i < *nvars; ++i) {
         fread_long(file, &vars[i].vaddr, 8);
 
-        vars[i].id = bgen_str_fread_create(file, 2);
-        vars[i].rsid = bgen_str_fread_create(file, 2);
-        vars[i].chrom = bgen_str_fread_create(file, 2);
+        vars[i].id = bgen_str_fread(file, 2);
+        vars[i].rsid = bgen_str_fread(file, 2);
+        vars[i].chrom = bgen_str_fread(file, 2);
 
         fread_int(file, &vars[i].position, 4);
         fread_int(file, &vars[i].nalleles, 2);
@@ -430,7 +430,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
 
         for (int j = 0; j < vars[i].nalleles; ++j)
         {
-            vars[i].allele_ids[j] = bgen_str_fread_create(file, 4);
+            vars[i].allele_ids[j] = bgen_str_fread(file, 4);
         }
     }
 
