@@ -63,7 +63,7 @@ err:
 
 void bgen_close_genotype(struct bgen_vg* vg) { free_vg(vg); }
 
-int bgen_read_genotype(const struct bgen_file* bgen, struct bgen_vg* vg, double* probs)
+int bgen_read_genotype(struct bgen_file const* bgen, struct bgen_vg* vg, double* probs)
 {
     if (bgen->layout == 1) {
         bgen_read_probs_one(vg, probs);
@@ -76,16 +76,16 @@ int bgen_read_genotype(const struct bgen_file* bgen, struct bgen_vg* vg, double*
     return 0;
 }
 
-int bgen_nalleles(const struct bgen_vg* vg) { return vg->nalleles; }
+int bgen_nalleles(struct bgen_vg const* vg) { return vg->nalleles; }
 
-int bgen_missing(const struct bgen_vg* vg, int index) { return vg->plo_miss[index] >> 7; }
+int bgen_missing(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] >> 7; }
 
-int bgen_ploidy(const struct bgen_vg* vg, int index) { return vg->plo_miss[index] & 127; }
+int bgen_ploidy(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] & 127; }
 
-int bgen_min_ploidy(const struct bgen_vg* vg) { return vg->min_ploidy; }
+int bgen_min_ploidy(struct bgen_vg const* vg) { return vg->min_ploidy; }
 
-int bgen_max_ploidy(const struct bgen_vg* vg) { return vg->max_ploidy; }
+int bgen_max_ploidy(struct bgen_vg const* vg) { return vg->max_ploidy; }
 
-int bgen_ncombs(const struct bgen_vg* vg) { return vg->ncombs; }
+int bgen_ncombs(struct bgen_vg const* vg) { return vg->ncombs; }
 
-int bgen_phased(const struct bgen_vg* vg) { return vg->phased; }
+int bgen_phased(struct bgen_vg const* vg) { return vg->phased; }

@@ -20,7 +20,7 @@ struct bgen_file;
  * @param filepath File path to the bgen file.
  * @return Bgen file handler.
  */
-BGEN_EXPORT struct bgen_file* bgen_open(const char* filepath);
+BGEN_EXPORT struct bgen_file* bgen_open(char const* filepath);
 /** Close a bgen file handler.
  *
  * @param bgen Bgen file handler.
@@ -31,13 +31,13 @@ BGEN_EXPORT void bgen_close(struct bgen_file* bgen);
  * @param bgen Bgen file handler.
  * @return Number of samples.
  */
-BGEN_EXPORT int bgen_nsamples(const struct bgen_file* bgen);
+BGEN_EXPORT int bgen_nsamples(struct bgen_file const* bgen);
 /** Get the number of variants.
  *
  * @param bgen Bgen file handler.
  * @return Number of variants.
  */
-BGEN_EXPORT int bgen_nvariants(const struct bgen_file* bgen);
+BGEN_EXPORT int bgen_nvariants(struct bgen_file const* bgen);
 /** Check if the file contain sample identifications.
  *
  * \rst
@@ -48,7 +48,7 @@ BGEN_EXPORT int bgen_nvariants(const struct bgen_file* bgen);
  * @param bgen Bgen file handler.
  * @return `1` if bgen file contains the sample ids; `0` otherwise.
  */
-BGEN_EXPORT int bgen_contain_samples(const struct bgen_file* bgen);
+BGEN_EXPORT int bgen_contain_samples(struct bgen_file const* bgen);
 /** Return array of sample identifications.
  *
  * The size of this array is given be the @ref bgen_nsamples function.
@@ -63,6 +63,6 @@ BGEN_EXPORT struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbo
  * @param bgen Bgen file handler.
  * @param sample_ids Array of sample ids.
  */
-BGEN_EXPORT void bgen_free_samples(const struct bgen_file* bgen, struct bgen_str* sample_ids);
+BGEN_EXPORT void bgen_free_samples(struct bgen_file const* bgen, struct bgen_str* sample_ids);
 
 #endif

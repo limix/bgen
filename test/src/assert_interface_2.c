@@ -4,7 +4,7 @@
 
 int main()
 {
-    struct bgen_string str = {0, NULL};
+    struct bgen_str str = {0, NULL};
     cass_equal_int(str.len, 0);
 
     struct bgen_file *bgen = bgen_open("nexist");

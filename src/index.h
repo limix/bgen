@@ -15,6 +15,6 @@ struct bgen_vi
     uint64_t *start;
 };
 
-int init_index(const struct bgen_file *, struct bgen_vi *);
+int init_index(struct bgen_file const *, struct bgen_vi *);
 
 #endif /* _BGEN_INDEX_H */

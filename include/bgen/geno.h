@@ -44,39 +44,40 @@ BGEN_EXPORT void bgen_close_genotype(struct bgen_vg* vg);
  * @param p Array of probabilities.
  * @return `0` if it succeeded; `1` otherwise.
  */
-BGEN_EXPORT int bgen_read_genotype(const struct bgen_file* bgen, struct bgen_vg* vg, double* p);
+BGEN_EXPORT int bgen_read_genotype(struct bgen_file const* bgen, struct bgen_vg* vg,
+                                   double* p);
 /** Get the number of alleles.
  *
  * @param vg Variant genotype handler.
  * @return Number of alleles.
  */
-BGEN_EXPORT int bgen_nalleles(const struct bgen_vg* vg);
+BGEN_EXPORT int bgen_nalleles(struct bgen_vg const* vg);
 /** Return `1` if variant is missing for the sample; `0` otherwise.
  *
  * @param vg Variant genotype handler.
  * @param index Sample index.
  * @return `1` for missing genotype; `0` otherwise.
  */
-BGEN_EXPORT int bgen_missing(const struct bgen_vg* vg, int index);
+BGEN_EXPORT int bgen_missing(struct bgen_vg const* vg, int index);
 /** Get the ploidy.
  *
  * @param vg Variant genotype handler.
  * @param index Sample index.
  * @return Ploidy.
  */
-BGEN_EXPORT int bgen_ploidy(const struct bgen_vg* vg, int index);
+BGEN_EXPORT int bgen_ploidy(struct bgen_vg const* vg, int index);
 /** Get the minimum ploidy of the variant.
  *
  * @param vg Variant genotype handler.
  * @return Ploidy minimum.
  */
-BGEN_EXPORT int bgen_min_ploidy(const struct bgen_vg* vg);
+BGEN_EXPORT int bgen_min_ploidy(struct bgen_vg const* vg);
 /** Get the maximum ploidy of the variant.
  *
  * @param vg Variant genotype handler.
  * @return Ploidy maximum.
  */
-BGEN_EXPORT int bgen_max_ploidy(const struct bgen_vg* vg);
+BGEN_EXPORT int bgen_max_ploidy(struct bgen_vg const* vg);
 /** Get the number of genotype combinations.
  *
  * Precisely, if the bgen file is of **Layout 1**, the number of combinations is always
@@ -90,12 +91,12 @@ BGEN_EXPORT int bgen_max_ploidy(const struct bgen_vg* vg);
  * @param vg Variant genotype handler.
  * @return Number of combinations.
  */
-BGEN_EXPORT int bgen_ncombs(const struct bgen_vg* vg);
+BGEN_EXPORT int bgen_ncombs(struct bgen_vg const* vg);
 /** Return `1` for phased or `0` for unphased genotype.
  *
  * @param vg Variant genotype handler.
  * @return `1` for phased genotype; `0` otherwise.
  */
-BGEN_EXPORT int bgen_phased(const struct bgen_vg* vg);
+BGEN_EXPORT int bgen_phased(struct bgen_vg const* vg);
 
 #endif

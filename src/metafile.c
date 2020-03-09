@@ -364,11 +364,11 @@ int bgen_close_metafile(struct bgen_mf* mf)
     return 0;
 }
 
-int bgen_metafile_npartitions(const struct bgen_mf* mf) { return mf->idx.npartitions; }
+int bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->idx.npartitions; }
 
-int bgen_metafile_nvariants(const struct bgen_mf* mf) { return mf->idx.nvariants; }
+int bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->idx.nvariants; }
 
-int bgen_partition_nvars(const struct bgen_mf* mf, int part)
+int bgen_partition_nvars(struct bgen_mf const* mf, int part)
 {
     if (part < 0) {
         error("Invalid partition number: %d", part);
@@ -378,7 +378,7 @@ int bgen_partition_nvars(const struct bgen_mf* mf, int part)
     return imin(size, mf->idx.nvariants - size * part);
 }
 
-struct bgen_vm* bgen_read_partition(const struct bgen_mf* mf, int part, int* nvars)
+struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nvars)
 {
     struct bgen_vm* vars = NULL;
     FILE* file = mf->file;

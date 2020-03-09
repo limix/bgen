@@ -44,7 +44,7 @@ int fread_str(FILE *fp, struct bgen_str *s, size_t len_size)
     return 0;
 }
 
-int fwrite_str(FILE *fp, const struct bgen_str *s, size_t len_size)
+int fwrite_str(FILE *fp, struct bgen_str const *s, size_t len_size)
 {
 
     uint64_t len = s->len;

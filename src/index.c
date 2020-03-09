@@ -1,7 +1,7 @@
 #include "index.h"
 #include "mem.h"
 
-int init_index(const struct bgen_file *bgen, struct bgen_vi *vi)
+int init_index(struct bgen_file const *bgen, struct bgen_vi *vi)
 {
     vi->filepath = strdup(bgen->filepath);
     vi->compression = (uint32_t)bgen->compression;

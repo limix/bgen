@@ -1,6 +1,6 @@
 #include "layout/two.h"
 #include "bgen/bgen.h"
-#include "depr/variants_index.h"
+#include "index.h"
 #include "file.h"
 #include "geno.h"
 #include "math.h"

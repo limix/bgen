@@ -129,11 +129,11 @@ void bgen_close(struct bgen_file* bgen)
     free_nul(bgen);
 }
 
-int bgen_nsamples(const struct bgen_file* bgen) { return bgen->nsamples; }
+int bgen_nsamples(struct bgen_file const* bgen) { return bgen->nsamples; }
 
-int bgen_nvariants(const struct bgen_file* bgen) { return bgen->nvariants; }
+int bgen_nvariants(struct bgen_file const* bgen) { return bgen->nvariants; }
 
-int bgen_contain_samples(const struct bgen_file* bgen) { return bgen->contain_sample; }
+int bgen_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
 struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
 {
@@ -183,7 +183,7 @@ err:
     return free_nul(sample_ids);
 }
 
-void bgen_free_samples(const struct bgen_file* bgen, struct bgen_str* samples)
+void bgen_free_samples(struct bgen_file const* bgen, struct bgen_str* samples)
 {
     if (bgen->contain_sample == 0)
         return;
