@@ -1,5 +1,5 @@
-#ifndef _BGEN_INDEX_H
-#define _BGEN_INDEX_H
+#ifndef BGEN_INDEX_H
+#define BGEN_INDEX_H
 
 #include "file.h"
 #include <stdint.h>

@@ -44,8 +44,7 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
         goto err;
     }
 
-    struct bgen_vi vi;
-    init_index(bgen, &vi);
+    struct bgen_vi vi = BGEN_VI(bgen);
 
     if (bgen_file_layout(bgen) == 1) {
         bgen_read_probs_header_one(&vi, vg, bgen_file_stream(bgen));
@@ -56,11 +55,9 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
         goto err;
     }
 
-    free_c(vi.filepath);
     return vg;
 
 err:
-    free_c(vi.filepath);
     free_c(vg);
     return NULL;
 }
