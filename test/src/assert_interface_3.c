@@ -17,7 +17,7 @@ void test_bgen_file_haplotypes()
     cass_equal_int(bgen_file_nvariants(bgen), 4);
     cass_equal_int(bgen_file_contain_samples(bgen), 1);
 
-    struct bgen_str *samples = bgen_read_samples(bgen, 0);
+    struct bgen_str *samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL);
     cass_cond(bgen_str_equal(BGEN_STR("sample_0"), samples[0]));
     bgen_free_samples(bgen, samples);

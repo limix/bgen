@@ -5,7 +5,7 @@
 int main()
 {
     struct bgen_str str = {0, NULL};
-    cass_equal_int(str.len, 0);
+    cass_equal_int(str.length, 0);
 
     struct bgen_file *bgen = bgen_file_open("nexist");
     cass_cond(bgen == NULL);
@@ -16,7 +16,7 @@ int main()
     cass_equal_int(bgen_file_nvariants(bgen), 199);
     cass_equal_int(bgen_file_contain_samples(bgen), 0);
 
-    struct bgen_str *samples = bgen_read_samples(bgen, 0);
+    struct bgen_str *samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples == NULL);
 
     bgen_file_close(bgen);
@@ -28,7 +28,7 @@ int main()
     cass_equal_int(bgen_file_nvariants(bgen), 199);
     cass_equal_int(bgen_file_contain_samples(bgen), 1);
 
-    samples = bgen_read_samples(bgen, 0);
+    samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL);
     bgen_free_samples(bgen, samples);
 

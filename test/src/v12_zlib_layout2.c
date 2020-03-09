@@ -29,12 +29,12 @@ int ipow(int base, int exp)
     return result;
 }
 
-void test_read_metadata(struct bgen_file* bgen, struct bgen_str* samples, struct bgen_mf* mf)
+void test_read_metadata(struct bgen_file* bgen, struct bgen_samples *samples, struct bgen_mf* mf)
 {
     cass_cond(bgen_file_nsamples(bgen) == 500);
     cass_cond(bgen_file_nvariants(bgen) == 199);
-    cass_cond(strncmp("sample_001", samples[0].str, samples[0].len) == 0);
-    cass_cond(strncmp("sample_500", samples[499].str, samples[0].len) == 0);
+    cass_cond(bgen_str_equal(BGEN_STR("sample_001"), *bgen_samples_get(samples, 0)));
+    cass_cond(bgen_str_equal(BGEN_STR("sample_500"), *bgen_samples_get(samples, 499)));
 
     int nvariants = 0;
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
@@ -117,9 +117,9 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
 
 void test_read(struct bgen_file* bgen, struct bgen_mf* mf, int precision)
 {
-    struct bgen_str* samples = bgen_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples2(bgen, 0);
     test_read_metadata(bgen, samples, mf);
-    free(samples);
+    bgen_samples_free(samples);
 
     test_read_probabilities(bgen, mf, 500, precision);
 }
@@ -133,14 +133,10 @@ int main()
         const char* ix = get_example_index_filepath(i);
         int prec = get_example_precision(i);
 
-        /* bgen_create_variants_metadata_file(ex, ix, 0); */
         struct bgen_file* bgen = bgen_file_open(ex);
         struct bgen_mf* mf = bgen_open_metafile(ix);
 
         test_read(bgen, mf, prec);
-
-        /* if (test_read(ex, ix, prec)) */
-        /*     return 1; */
 
         cass_cond(bgen_close_metafile(mf) == 0);
         bgen_file_close(bgen);
@@ -151,10 +147,6 @@ int main()
 
 const char* examples[] = {"data/example.1bits.bgen", "data/example.14bits.bgen",
                           "data/example.32bits.bgen"};
-
-/* const char *indices[] = {"data/example.1bits.bgen.index", */
-/*                          "data/example.14bits.bgen.index", */
-/*                          "data/example.32bits.bgen.index"}; */
 
 const char* indices[] = {"data/example.1bits.bgen.metadata",
                          "data/example.14bits.bgen.metadata",

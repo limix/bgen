@@ -47,6 +47,7 @@ extern "C"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"
+#include "bgen/samples.h"
 #include "bgen/str.h"
 
 #ifdef __cplusplus

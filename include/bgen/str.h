@@ -14,8 +14,8 @@
  */
 struct bgen_str
 {
-    size_t len;      /**< String length. */
-    char const* str; /**< Array of characters. */
+    size_t length;    /**< String length. */
+    char const* data; /**< Array of characters. */
 };
 
 /* BGEN_EXPORT void bgen_str_alloc(struct bgen_str* bgen_str, size_t length); */

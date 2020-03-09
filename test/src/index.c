@@ -20,15 +20,15 @@ void use_metafile(struct bgen_mf *mf)
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
     cass_cond(vm != NULL);
 
-    cass_equal_int(vm[0].id.len, 0);
-    cass_equal_int(vm[0].rsid.len, 2);
+    cass_equal_int(vm[0].id.length, 0);
+    cass_equal_int(vm[0].rsid.length, 2);
     cass_cond(bgen_str_equal(BGEN_STR("V1"), vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
     cass_equal_int(vm[0].nalleles, 2);
     cass_cond(bgen_str_equal(BGEN_STR("A"), vm[1].allele_ids[0]));
     cass_cond(bgen_str_equal(BGEN_STR("G"), vm[1].allele_ids[1]));
 
-    cass_equal_int(vm[4].id.len, 0);
+    cass_equal_int(vm[4].id.length, 0);
     cass_cond(bgen_str_equal(BGEN_STR("M5"), vm[4].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("01"), vm[4].chrom));
     cass_equal_int(vm[4].nalleles, 2);
@@ -40,8 +40,8 @@ void use_metafile(struct bgen_mf *mf)
     vm = bgen_read_partition(mf, 1, &nvariants);
     cass_cond(vm != NULL);
 
-    cass_equal_int(vm[0].id.len, 0);
-    cass_equal_int(vm[0].rsid.len, 2);
+    cass_equal_int(vm[0].id.length, 0);
+    cass_equal_int(vm[0].rsid.length, 2);
     cass_cond(bgen_str_equal(BGEN_STR("M6"), vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("01"), vm[0].chrom));
     cass_equal_int(vm[0].nalleles, 4);

@@ -27,18 +27,18 @@ void test_file(void)
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_file_nvariants(bgen)) == 10);
 
-    struct bgen_str *sample_ids = bgen_read_samples(bgen, 0);
+    struct bgen_str *sample_ids = bgen_file_read_samples(bgen, 0);
 
-    cass_cond(strncmp("sample_0", sample_ids[0].str, sample_ids[0].len) == 0);
-    cass_cond(strncmp("sample_3", sample_ids[3].str, sample_ids[3].len) == 0);
+    cass_cond(strncmp("sample_0", sample_ids[0].data, sample_ids[0].length) == 0);
+    cass_cond(strncmp("sample_3", sample_ids[3].data, sample_ids[3].length) == 0);
 
     free(sample_ids);
 
     struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
 
-    cass_cond(strncmp("V1", vm[0].rsid.str, vm[0].rsid.len) == 0);
-    cass_cond(strncmp("M10", vm[9].rsid.str, vm[9].rsid.len) == 0);
+    cass_cond(strncmp("V1", vm[0].rsid.data, vm[0].rsid.length) == 0);
+    cass_cond(strncmp("M10", vm[9].rsid.data, vm[9].rsid.length) == 0);
 
     struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
     cass_cond(bgen_nalleles(vg) == 2);
@@ -60,8 +60,8 @@ void test_file(void)
         cass_cond(vm[i].position == position[i]);
         for (int j = 0; j < vm[i].nalleles; ++j) {
 
-            cass_cond(strncmp(allele_ids[jj], vm[i].allele_ids[j].str,
-                        vm[i].allele_ids[j].len) == 0);
+            cass_cond(strncmp(allele_ids[jj], vm[i].allele_ids[j].data,
+                        vm[i].allele_ids[j].length) == 0);
             ++jj;
         }
     }

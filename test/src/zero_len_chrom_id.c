@@ -26,7 +26,7 @@ void test_zeo_len_chrom_id(void)
     cass_cond(bgen_file_nsamples(bgen) == 182);
     cass_cond(bgen_file_nvariants(bgen) == 50);
 
-    samples = bgen_read_samples(bgen, 0);
+    samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL);
     free(samples);
 
@@ -37,7 +37,7 @@ void test_zeo_len_chrom_id(void)
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
     cass_cond(vm != NULL);
     cass_cond(nvariants == 25);
-    cass_cond(vm[0].chrom.len == 0);
+    cass_cond(vm[0].chrom.length == 0);
     bgen_free_partition(vm, nvariants);
 
     bgen_close_metafile(mf);

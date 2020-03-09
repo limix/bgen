@@ -1,4 +1,5 @@
 #include "bgen/bgen.h"
+#include "str.h"
 #include "free.h"
 #include "mem.h"
 #include <stdint.h>
@@ -11,11 +12,11 @@ void alloc_str(struct bgen_str* v, size_t len);
 
 void alloc_str(struct bgen_str* v, size_t len)
 {
-    v->len = len;
+    v->length = len;
     if (len > 0)
-        v->str = dalloc(len);
+        v->data = dalloc(len);
     else
-        v->str = NULL;
+        v->data = NULL;
 }
 
 /* void bgen_str_alloc(struct bgen_str* bgen_str, const size_t length) */
@@ -23,16 +24,16 @@ void alloc_str(struct bgen_str* v, size_t len)
 /*     bgen_str->str = malloc(sizeof(char) * length); */
 /* } */
 
-char const* bgen_str_data(struct bgen_str const* bgen_str) { return bgen_str->str; }
+char const* bgen_str_data(struct bgen_str const* bgen_str) { return bgen_str->data; }
 
-void bgen_str_free(struct bgen_str const* v) { free_c(v->str); }
+void bgen_str_free(struct bgen_str const* v) { free_c(v->data); }
 
-size_t bgen_str_length(struct bgen_str const* bgen_str) { return bgen_str->len; }
+size_t bgen_str_length(struct bgen_str const* bgen_str) { return bgen_str->length; }
 
 bool bgen_str_equal(struct bgen_str a, struct bgen_str b)
 {
-    if (a.len == b.len)
-        return strncmp(a.str, b.str, a.len) == 0;
+    if (a.length == b.length)
+        return strncmp(a.data, b.data, a.length) == 0;
     return 0;
 }
 
@@ -69,25 +70,22 @@ int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
     return 0;
 }
 
-struct bgen_str const* bgen_str_fread(FILE *fp, size_t len_size)
+struct bgen_str const* bgen_str_fread_create(FILE *stream, size_t length_size)
 {
-    uint64_t len = 0;
+    uint64_t length = 0;
 
-    if (fread(&len, 1, len_size, fp) < len_size) {
+    if (fread(&length, 1, length_size, stream) < length_size) {
         perror("Error while freading a string length");
         return NULL;
     }
     
-    if (len == 0)
+    if (length == 0)
         return bgen_str_create_empty();
 
-    /* bgen_str_alloc(bgen_str, len); */
-    /* alloc_str(bgen_str, len); */
-    char *data = malloc(sizeof(char) * len);
+    char *data = malloc(sizeof(char) * length);
 
-
-    if (fread(data, 1, len, fp) < len) {
-        if (ferror(fp))
+    if (fread(data, 1, length, stream) < length) {
+        if (ferror(stream))
             perror("Error while freading a string str");
         else
             error("Unexpected end of file while reading a string");
@@ -95,13 +93,13 @@ struct bgen_str const* bgen_str_fread(FILE *fp, size_t len_size)
         return NULL;
     }
 
-    return bgen_str_create(data, len);
+    return bgen_str_create(data, length);
 }
 
 int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
 {
 
-    uint64_t len = s->len;
+    uint64_t len = s->length;
     if (fwrite(&len, len_size, 1, fp) != 1) {
         perror("Error while fwriting a string length");
         return 1;
@@ -110,7 +108,29 @@ int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
     if (len == 0)
         return 0;
 
-    if (fwrite(s->str, 1, len, fp) != len) {
+    if (fwrite(s->data, 1, len, fp) != len) {
+
+        if (ferror(fp))
+            perror("Error while fwriting a string str");
+        else
+            error("Unexpected end of file while writing a string");
+        return 1;
+    }
+    return 0;
+}
+
+int bgen_str_fwrite(struct bgen_str const* s, FILE* fp, size_t len_size)
+{
+    uint64_t len = s->length;
+    if (fwrite(&len, len_size, 1, fp) != 1) {
+        perror("Error while fwriting a string length");
+        return 1;
+    }
+
+    if (len == 0)
+        return 0;
+
+    if (fwrite(s->data, 1, len, fp) != len) {
 
         if (ferror(fp))
             perror("Error while fwriting a string str");
@@ -124,14 +144,14 @@ int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
 struct bgen_str const* bgen_str_create(char const* data, size_t length)
 {
     struct bgen_str *str = malloc(sizeof(struct bgen_str));
-    str->str = data;
-    str->len = length;
+    str->data = data;
+    str->length = length;
     return str;
 }
 
 static struct bgen_str const* bgen_str_create_empty(void)
 {
     struct bgen_str *str = malloc(sizeof(struct bgen_str));
-    str->len = 0;
+    str->length = 0;
     return str;
 }

@@ -56,9 +56,9 @@ void init_metadata(struct bgen_vm *vm)
 {
     vm->vaddr = -1;
     vm->allele_ids = NULL;
-    vm->id.str = NULL;
-    vm->rsid.str = NULL;
-    vm->chrom.str = NULL;
+    vm->id.data = NULL;
+    vm->rsid.data = NULL;
+    vm->chrom.data = NULL;
     vm->position = -1;
     vm->nalleles = -1;
 }

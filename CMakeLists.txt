@@ -24,6 +24,7 @@ add_library(bgen
     src/layout/two.c
     src/metafile.c
     src/report.c
+    src/samples.c
     src/str.c
     src/variant.c
     src/zip/zlib.c
