@@ -1,3 +1,4 @@
+#include "io.h"
 #include "free.h"
 #include "variant.h"
 #include "file.h"

@@ -2,10 +2,10 @@
 #include "athr.h"
 #include "bgen/bgen.h"
 #include "free.h"
+#include "io.h"
 #include "report.h"
 #include "samples.h"
 #include "str.h"
-#include <assert.h>
 #include <inttypes.h>
 
 struct bgen_file

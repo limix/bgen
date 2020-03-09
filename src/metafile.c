@@ -1,6 +1,6 @@
 #include "bgen/bgen.h"
-#include "free.h"
 #include "file.h"
+#include "free.h"
 #include "io.h"
 #include "mem.h"
 #include "min.h"
@@ -122,11 +122,15 @@ struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t n
 
     mf->filepath = strdup(filepath);
 
-    if (fwrite1(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), mf->file))
+    if (fwrite(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), 1, mf->file) != 1) {
+        bgen_perror("could not write to file");
         goto err;
+    }
 
-    if (fwrite1(&nvars, sizeof(uint32_t), mf->file))
+    if (fwrite(&nvars, sizeof(uint32_t), 1, mf->file) != 1) {
+        bgen_perror("could not write to file");
         goto err;
+    }
 
     if (LONG_SEEK(mf->file, sizeof(uint64_t), SEEK_CUR))
         goto err;
@@ -305,7 +309,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     }
 
     char header[13];
-    if (fread1(header, 13 * sizeof(char), mf->file)) {
+    if (fread(header, 13 * sizeof(char), 1, mf->file) != 1) {
         bgen_perror("Could not fetch the metafile header");
         goto err;
     }
@@ -315,12 +319,12 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    if (fread1(&(mf->idx.nvariants), sizeof(uint32_t), mf->file)) {
+    if (fread(&(mf->idx.nvariants), sizeof(uint32_t), 1, mf->file) != 1) {
         bgen_perror("Could not read the number of variants from metafile");
         goto err;
     }
 
-    if (fread1(&(mf->idx.metasize), sizeof(uint64_t), mf->file)) {
+    if (fread(&(mf->idx.metasize), sizeof(uint64_t), 1, mf->file) != 1) {
         bgen_perror("Could not read the metasize from metafile");
         goto err;
     }
@@ -330,7 +334,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->file)) {
+    if (fread(&(mf->idx.npartitions), sizeof(uint32_t), 1, mf->file) != 1) {
         bgen_perror("Could not read the number of partitions");
         goto err;
     }
@@ -338,7 +342,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     mf->idx.poffset = malloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
-        if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->file)) {
+        if (fread(mf->idx.poffset + i, sizeof(uint64_t), 1, mf->file) != 1) {
             bgen_perror("Could not read partition offsets");
             goto err;
         }
@@ -353,8 +357,8 @@ err:
 int bgen_close_metafile(struct bgen_mf* mf)
 {
     if (mf) {
-        if (fclose_nul(mf->file)) {
-            bgen_perror("Could not close the %s file", mf->filepath);
+        if (fclose(mf->file)) {
+            bgen_perror("could not close the %s file", mf->filepath);
             return 1;
         }
         mf->file = NULL;

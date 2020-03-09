@@ -29,25 +29,6 @@ static_assert(0, "Code does not work on the DJGPP compiler.");
 typedef long OFF_T;
 #endif
 
-static inline int fclose_nul(FILE* fp)
-{
-    if (fp)
-        return fclose(fp);
-    return 0;
-}
-
-/* Write a single block of data with a given size. */
-static inline int fwrite1(const void* restrict buffer, size_t size, FILE* restrict stream)
-{
-    return fwrite(buffer, size, 1, stream) != 1;
-}
-
-/* Read a single block of data with a given size. */
-static inline int fread1(void* restrict buffer, size_t size, FILE* restrict stream)
-{
-    return fread(buffer, size, 1, stream) != 1;
-}
-
 /* Define fread_int, fread_ui64 and like. */
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE*, TYPE*, size_t);
 #define DECLARE_TYPE_FREAD_SIZE(TYPE, SUF) int fread_##SUF(FILE*, TYPE*);
