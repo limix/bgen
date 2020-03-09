@@ -1,5 +1,5 @@
-#ifndef _BGEN_FILE_H
-#define _BGEN_FILE_H
+#ifndef BGEN_FILE_H_PRIVATE
+#define BGEN_FILE_H_PRIVATE
 
 #include "bgen/bgen.h"
 #include "io.h"

@@ -4,6 +4,7 @@
 #include "mem.h"
 #include "min.h"
 #include "pbar.h"
+#include "report.h"
 #include "str.h"
 #include "variant.h"
 #include <assert.h>
@@ -86,7 +87,7 @@ int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant
     }
 
     if (LONG_SEEK(bgen_file_stream(c->bgen), length, SEEK_CUR)) {
-        perror_fmt(bgen_file_stream(c->bgen), "Could not jump to the next variant");
+        bgen_perror("Could not jump to the next variant");
         goto err;
     }
 
@@ -114,7 +115,7 @@ struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t n
     }
 
     if (!(mf->file = fopen(filepath, "w+b"))) {
-        perror_fmt(mf->file, "Could not create file %s", filepath);
+        bgen_perror("Could not create file %s", filepath);
         goto err;
     }
 
@@ -218,7 +219,7 @@ int write_offsets_block(struct bgen_mf* mf)
     }
 
     if (LONG_SEEK(mf->file, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET)) {
-        perror_fmt(mf->file, "Could not fseek");
+        bgen_perror("Could not fseek");
         goto err;
     }
 
@@ -276,7 +277,7 @@ struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* fp, int
     }
 
     if (fflush(mf->file)) {
-        perror_fmt(mf->file, "Could not fflush");
+        bgen_perror("Could not fflush");
         goto err;
     }
 
@@ -297,13 +298,13 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     mf->filepath = strdup(filepath);
 
     if (!(mf->file = fopen(mf->filepath, "rb"))) {
-        perror_fmt(mf->file, "Could not open %s", mf->filepath);
+        bgen_perror("Could not open %s", mf->filepath);
         goto err;
     }
 
     char header[13];
     if (fread1(header, 13 * sizeof(char), mf->file)) {
-        perror_fmt(mf->file, "Could not fetch the metafile header");
+        bgen_perror("Could not fetch the metafile header");
         goto err;
     }
 
@@ -313,12 +314,12 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     }
 
     if (fread1(&(mf->idx.nvariants), sizeof(uint32_t), mf->file)) {
-        perror_fmt(mf->file, "Could not read the number of variants from metafile");
+        bgen_perror("Could not read the number of variants from metafile");
         goto err;
     }
 
     if (fread1(&(mf->idx.metasize), sizeof(uint64_t), mf->file)) {
-        perror_fmt(mf->file, "Could not read the metasize from metafile");
+        bgen_perror("Could not read the metasize from metafile");
         goto err;
     }
 
@@ -328,7 +329,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     }
 
     if (fread1(&(mf->idx.npartitions), sizeof(uint32_t), mf->file)) {
-        perror_fmt(mf->file, "Could not read the number of partitions");
+        bgen_perror("Could not read the number of partitions");
         goto err;
     }
 
@@ -336,7 +337,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
         if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->file)) {
-            perror_fmt(mf->file, "Could not read partition offsets");
+            bgen_perror("Could not read partition offsets");
             goto err;
         }
     }
@@ -351,7 +352,7 @@ int bgen_close_metafile(struct bgen_mf* mf)
 {
     if (mf) {
         if (fclose_nul(mf->file)) {
-            perror_fmt(mf->file, "Could not close the %s file", mf->filepath);
+            bgen_perror("Could not close the %s file", mf->filepath);
             return 1;
         }
         mf->file = NULL;
@@ -392,12 +393,12 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
         init_metadata(vars + i);
 
     if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
-        perror_fmt(file, "Could not fseek bgen index file");
+        bgen_perror("Could not fseek bgen index file");
         goto err;
     }
 
     if (LONG_SEEK(file, mf->idx.poffset[part], SEEK_CUR)) {
-        perror_fmt(file, "Could not fseek bgen index file");
+        bgen_perror("Could not fseek bgen index file");
         goto err;
     }
 

@@ -2,7 +2,6 @@
 #include "athr.h"
 #include "bgen/bgen.h"
 #include "free.h"
-#include "mem.h"
 #include "report.h"
 #include "samples.h"
 #include "str.h"
@@ -12,7 +11,7 @@
 struct bgen_file
 {
     char* filepath;
-    FILE* file;
+    FILE* stream;
     uint32_t nvariants;
     uint32_t nsamples;
     int compression;
@@ -29,29 +28,25 @@ struct bgen_file* bgen_file_open(char const* filepath)
     struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
     bgen->filepath = strdup(filepath);
 
-    bgen->samples_start = -1;
-    bgen->variants_start = -1;
-    bgen->file = NULL;
-
-    if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
-        perror_fmt(bgen->file, "Could not open bgen file %s", bgen->filepath);
+    if (!(bgen->stream = fopen(bgen->filepath, "rb"))) {
+        bgen_perror("could not open bgen file %s", bgen->filepath);
         goto err;
     }
 
-    if (fread_off(bgen->file, &bgen->variants_start, 4)) {
-        error("Could not read the `variants_start` field");
+    if (fread_off(bgen->stream, &bgen->variants_start, 4)) {
+        bgen_error("could not read the `variants_start` field");
         goto err;
     }
 
     bgen->variants_start += 4;
 
     if (read_bgen_header(bgen)) {
-        error("Could not read bgen header");
+        bgen_error("could not read bgen header");
         goto err;
     }
 
     /* if they actually exist */
-    bgen->samples_start = LONG_TELL(bgen->file);
+    bgen->samples_start = LONG_TELL(bgen->stream);
 
     return bgen;
 err:
@@ -61,8 +56,8 @@ err:
 
 void bgen_file_close(struct bgen_file* bgen)
 {
-    if (bgen->file != NULL && fclose(bgen->file))
-        bgen_perror(bgen->file, "could not close %s file", bgen->filepath);
+    if (bgen->stream != NULL && fclose(bgen->stream))
+        bgen_perror("could not close %s file", bgen->filepath);
     free_c(bgen->filepath);
     free_c(bgen);
 }
@@ -77,7 +72,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
 
-    LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
+    LONG_SEEK(bgen->stream, bgen->samples_start, SEEK_SET);
 
     if (!bgen->contain_sample) {
         bgen_warning("file does not contain sample ids");
@@ -86,23 +81,24 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 
     struct bgen_samples* samples = bgen_samples_create(bgen->nsamples);
 
-    if (LONG_SEEK(bgen->file, 8, SEEK_CUR)) {
-        bgen_perror(bgen->file, "could not fseek eight bytes forward");
+    if (LONG_SEEK(bgen->stream, 8, SEEK_CUR)) {
+        bgen_perror("could not fseek eight bytes forward");
         goto err;
     }
 
     if (verbose) {
         at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
         if (!at) {
-            error("could not create a progress bar");
+            bgen_error("could not create a progress bar");
             goto err;
         }
     }
+
     for (uint32_t i = 0; i < bgen->nsamples; ++i) {
         if (verbose)
             athr_consume(at, 1);
 
-        struct bgen_str const* sample_id = bgen_str_fread_create(bgen->file, 2);
+        struct bgen_str const* sample_id = bgen_str_fread_create(bgen->stream, 2);
         if (sample_id == NULL) {
             bgen_error("could not read the %" PRIu32 "lu-th sample id", i);
             goto err;
@@ -113,7 +109,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
     if (verbose)
         athr_finish(at);
 
-    bgen->variants_start = LONG_TELL(bgen->file);
+    bgen->variants_start = LONG_TELL(bgen->stream);
     return samples;
 
 err:
@@ -123,7 +119,7 @@ err:
     return NULL;
 }
 
-FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }
+FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->stream; }
 
 char const* bgen_file_filepath(struct bgen_file const* bgen_file)
 {
@@ -136,8 +132,8 @@ int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file-
 
 int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 {
-    if (LONG_SEEK(bgen_file->file, bgen_file->variants_start, SEEK_SET)) {
-        perror_fmt(bgen_file->file, "Could not jump to the variants start");
+    if (LONG_SEEK(bgen_file->stream, bgen_file->variants_start, SEEK_SET)) {
+        bgen_perror("Could not jump to the variants start");
         return 1;
     }
     return 0;
@@ -159,36 +155,36 @@ static int read_bgen_header(struct bgen_file* bgen)
     uint32_t magic_number;
     uint32_t flags;
 
-    if (fread_ui32(bgen->file, &header_length, 4)) {
-        error("Could not read the header length");
+    if (fread_ui32(bgen->stream, &header_length, 4)) {
+        bgen_error("could not read the header length");
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &bgen->nvariants, 4)) {
-        error("Could not read the number of variants");
+    if (fread_ui32(bgen->stream, &bgen->nvariants, 4)) {
+        bgen_error("could not read the number of variants");
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &bgen->nsamples, 4)) {
-        error("Could not read the number of samples");
+    if (fread_ui32(bgen->stream, &bgen->nsamples, 4)) {
+        bgen_error("could not read the number of samples");
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &magic_number, 4)) {
-        error("Could not read the magic number");
+    if (fread_ui32(bgen->stream, &magic_number, 4)) {
+        bgen_error("could not read the magic number");
         return 1;
     }
 
     if (magic_number != 1852139362)
         bgen_warning("magic number mismatch");
 
-    if (LONG_SEEK(bgen->file, header_length - 20, SEEK_CUR)) {
-        error("Fseek error while reading a BGEN file");
+    if (LONG_SEEK(bgen->stream, header_length - 20, SEEK_CUR)) {
+        bgen_error("fseek error while reading a BGEN file");
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &flags, 4)) {
-        error("Could not read the bgen flags");
+    if (fread_ui32(bgen->stream, &flags, 4)) {
+        bgen_error("could not read the bgen flags");
         return 1;
     }
 

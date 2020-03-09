@@ -1,6 +1,6 @@
 /* Define low-level io read and write functions. */
-#ifndef _BGEN_IO_H
-#define _BGEN_IO_H
+#ifndef BGEN_IO_H
+#define BGEN_IO_H
 
 #include <stdint.h>
 #include <stdio.h>
@@ -49,21 +49,6 @@ static inline int fread1(void *restrict buffer, size_t size, FILE *restrict stre
     return fread(buffer, size, 1, stream) != 1;
 }
 
-#define perror_fmt(fp, ...)                                                            \
-    do {                                                                               \
-        fputs("Error: ", stderr);                                                      \
-        fprintf(stderr, __VA_ARGS__);                                                  \
-        fprintf(stderr, ": ");                                                         \
-        if (!fp)                                                                       \
-            fprintf(stderr, "NULL pointer\n");                                         \
-        else if (feof(fp))                                                             \
-            fprintf(stderr, "unexpected end of file\n");                               \
-        else if (ferror(fp))                                                           \
-            perror("");                                                                \
-        else                                                                           \
-            fprintf(stderr, "unknown\n");                                              \
-    } while (0)
-
 #define echo(...)                                                                      \
     do {                                                                               \
         printf(__VA_ARGS__);                                                           \
@@ -110,4 +95,4 @@ DECLARE_TYPE_FWRITE(uint16_t, ui16)
 #undef DECLARE_TYPE_FREAD
 #undef DECLARE_TYPE_FWRITE
 
-#endif /* _BGEN_IO_H */
+#endif

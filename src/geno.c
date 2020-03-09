@@ -5,6 +5,7 @@
 #include "layout/one.h"
 #include "layout/two.h"
 #include "mem.h"
+#include "report.h"
 #include <assert.h>
 
 struct bgen_vg* create_vg()
@@ -35,8 +36,7 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
     vg->vaddr = (OFF_T)vaddr;
 
     if (LONG_SEEK(bgen_file_stream(bgen), vaddr, SEEK_SET)) {
-        perror_fmt(bgen_file_stream(bgen), "Could not seek a variant in %s",
-                   bgen_file_filepath(bgen));
+        bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
         goto err;
     }
 
