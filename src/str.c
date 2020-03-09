@@ -20,16 +20,6 @@ void alloc_str(struct bgen_str* v, size_t len)
         v->data = NULL;
 }
 
-struct bgen_str const* bgen_str_create(char const* data, size_t length)
-{
-    struct bgen_str* str = malloc(sizeof(struct bgen_str));
-    str->data = data;
-    str->length = length;
-    return str;
-}
-
-void bgen_str_free(struct bgen_str const* v) { free_c(v->data); }
-
 int fread_str(FILE* fp, struct bgen_str* bgen_str, size_t len_size)
 {
     uint64_t len = 0;
