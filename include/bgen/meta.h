@@ -51,12 +51,12 @@ struct bgen_mf;
  */
 struct bgen_vm
 {
-    long                    vaddr;      /**< Vasdsdrianteealso:: offset-address. */
+    long                    vaddr;      /**< Variante address. */
     struct bgen_str const*  id;         /**< Variant identification. */
     struct bgen_str const*  rsid;       /**< RSID. */
     struct bgen_str const*  chrom;      /**< Chromossome name. */
-    int                     position;   /**< Base-pair position. */
-    int                     nalleles;   /**< Number of alleles. */
+    unsigned                position;   /**< Base-pair position. */
+    unsigned                nalleles;   /**< Number of alleles. */
     struct bgen_str const** allele_ids; /**< Allele ids. */
 };
 
@@ -72,8 +72,8 @@ struct bgen_vm
  * @param verbose `1` for showing progress; `0` otherwise.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, char const* filepath,
-                                                 int npartitions, int verbose);
+BGEN_EXPORT struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepath,
+                                                 unsigned npartitions, int verbose);
 /** Open a bgen metafile.
  *
  * @param filepath File path to the metafile.
@@ -85,13 +85,13 @@ BGEN_EXPORT struct bgen_mf* bgen_open_metafile(char const* filepath);
  * @param mf Metafile handler.
  * @return Number of partitions.
  */
-BGEN_EXPORT int bgen_metafile_npartitions(struct bgen_mf const* mf);
+BGEN_EXPORT unsigned bgen_metafile_npartitions(struct bgen_mf const* mf);
 /** Get the number of variants.
  *
  * @param mf Metafile handler.
  * @return Number of variants.
  */
-BGEN_EXPORT int bgen_metafile_nvariants(struct bgen_mf const* mf);
+BGEN_EXPORT unsigned bgen_metafile_nvariants(struct bgen_mf const* mf);
 /** Read a partition of variants.
  *
  * @param mf Metafile handler.

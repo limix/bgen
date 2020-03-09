@@ -29,7 +29,7 @@ void test_zeo_len_chrom_id(void)
     cass_cond(samples != NULL);
     bgen_samples_free(samples);
 
-    struct bgen_mf *mf = bgen_create_metafile(bgen, "zero_len_chrom_id.metadata", 2, 0);
+    struct bgen_mf *mf = bgen_metafile_create(bgen, "zero_len_chrom_id.metadata", 2, 0);
     cass_cond(mf != NULL);
 
     int nvariants = 0;

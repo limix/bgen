@@ -33,7 +33,7 @@ void test_complex(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata", 1, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
 
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
     cass_cond(nvariants == 10);

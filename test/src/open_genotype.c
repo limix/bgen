@@ -34,7 +34,7 @@ void test_file(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
 
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
@@ -74,7 +74,7 @@ void test_geno(void)
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
 
-    struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
 
     cass_cond(bgen_metafile_npartitions(mf) == 3);
     cass_cond(bgen_metafile_nvariants(mf) == 10);

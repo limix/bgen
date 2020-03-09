@@ -5,24 +5,19 @@
 #include "index.h"
 #include "layout1.h"
 #include "layout2.h"
-#include "mem.h"
 #include "report.h"
-#include <assert.h>
 
 static struct bgen_vg* create_vg(void);
 
-struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
+struct bgen_vg* bgen_open_genotype(struct bgen_file const* bgen, long const vaddr)
 {
     struct bgen_vg* vg = create_vg();
-    if (!vg) {
-        bgen_error("could not open genotype");
-        goto err;
-    }
     vg->vaddr = (OFF_T)vaddr;
 
     if (LONG_SEEK(bgen_file_stream(bgen), vaddr, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
-        goto err;
+        free_c(vg);
+        return NULL;
     }
 
     struct bgen_vi vi = BGEN_VI(bgen);
@@ -33,14 +28,11 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
         bgen_layout2_read_header(&vi, vg, bgen_file_stream(bgen));
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
-        goto err;
+        free_c(vg);
+        return NULL;
     }
 
     return vg;
-
-err:
-    free_c(vg);
-    return NULL;
 }
 
 void bgen_close_genotype(struct bgen_vg const* vg)
@@ -63,19 +55,19 @@ int bgen_read_genotype(struct bgen_file const* bgen, struct bgen_vg* vg, double*
     return 0;
 }
 
-int bgen_nalleles(struct bgen_vg const* vg) { return vg->nalleles; }
+unsigned bgen_nalleles(struct bgen_vg const* vg) { return vg->nalleles; }
 
-int bgen_missing(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] >> 7; }
+bool bgen_missing(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] >> 7; }
 
-int bgen_ploidy(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] & 127; }
+unsigned bgen_ploidy(struct bgen_vg const* vg, int index) { return vg->plo_miss[index] & 127; }
 
-int bgen_min_ploidy(struct bgen_vg const* vg) { return vg->min_ploidy; }
+unsigned bgen_min_ploidy(struct bgen_vg const* vg) { return vg->min_ploidy; }
 
-int bgen_max_ploidy(struct bgen_vg const* vg) { return vg->max_ploidy; }
+unsigned bgen_max_ploidy(struct bgen_vg const* vg) { return vg->max_ploidy; }
 
-int bgen_ncombs(struct bgen_vg const* vg) { return vg->ncombs; }
+unsigned bgen_ncombs(struct bgen_vg const* vg) { return vg->ncombs; }
 
-int bgen_phased(struct bgen_vg const* vg) { return vg->phased; }
+bool bgen_phased(struct bgen_vg const* vg) { return vg->phased; }
 
 static struct bgen_vg* create_vg(void)
 {

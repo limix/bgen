@@ -65,7 +65,7 @@ int main()
 
     struct bgen_file *bgen = bgen_file_open(bgen_filepath);
     cass_cond(bgen != NULL);
-    struct bgen_mf *mf = bgen_create_metafile(bgen, mf_filepath, 2, 0);
+    struct bgen_mf *mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
     cass_cond(mf != NULL);
     cass_equal_int(bgen_close_metafile(mf), 0);
 

@@ -14,10 +14,10 @@
 
 #define BIT(var, bit) ((var & (1 << bit)) != 0)
 
-static int   choose(int n, int k);
-static void  read_phased_genotype(struct bgen_vg* vg, double* p);
-static void  read_unphased_genotype(struct bgen_vg* vg, double* p);
-static char* _uncompress(struct bgen_vi* idx, FILE* file);
+static unsigned choose(unsigned n, unsigned k);
+static void     read_phased_genotype(struct bgen_vg* vg, double* p);
+static void     read_unphased_genotype(struct bgen_vg* vg, double* p);
+static char*    _uncompress(struct bgen_vi* idx, FILE* file);
 
 inline static int read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
 
@@ -274,15 +274,12 @@ err:
 }
 
 /* Number of ways to choose `k` elements from a total of `n`. */
-static int choose(int n, int k)
+static unsigned choose(unsigned n, unsigned k)
 {
-    int ans;
-    int j;
-
-    ans = 1;
+    unsigned ans = 1;
 
     k = k > n - k ? n - k : k;
-    j = 1;
+    unsigned j = 1;
 
     for (; j <= k; j++, n--) {
         if (n % j == 0) {

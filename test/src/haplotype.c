@@ -31,7 +31,7 @@ void test_haplotype(void)
     bgen_samples_free(samples);
 
     struct bgen_vi* index;
-    struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
 
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);

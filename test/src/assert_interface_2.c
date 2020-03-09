@@ -36,7 +36,7 @@ int main()
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     struct bgen_vi *vi;
-    struct bgen_mf* mf = bgen_create_metafile(bgen, "example.14bits.bgen.metadata", 1, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
     int nvariants = 0;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
 
