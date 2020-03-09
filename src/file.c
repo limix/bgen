@@ -9,8 +9,8 @@ struct bgen_file
 {
     char* filepath;
     FILE* file;
-    int nvariants;
-    int nsamples;
+    uint32_t nvariants;
+    uint32_t nsamples;
     int compression;
     int layout;
     int contain_sample;
@@ -71,22 +71,22 @@ int read_bgen_header(struct bgen_file* bgen)
     uint32_t magic_number;
     uint32_t flags;
 
-    if (fread_ui32(bgen->file, &header_length, 4)) {
+    if (fread_ui32(bgen->file, &header_length)) {
         error("Could not read the header length");
         return 1;
     }
 
-    if (fread_int(bgen->file, &bgen->nvariants, 4)) {
+    if (fread_ui32(bgen->file, &bgen->nvariants)) {
         error("Could not read the number of variants");
         return 1;
     }
 
-    if (fread_int(bgen->file, &bgen->nsamples, 4)) {
+    if (fread_ui32(bgen->file, &bgen->nsamples)) {
         error("Could not read the number of samples");
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &magic_number, 4)) {
+    if (fread_ui32(bgen->file, &magic_number)) {
         error("Could not read the magic number");
         return 1;
     }
@@ -99,7 +99,7 @@ int read_bgen_header(struct bgen_file* bgen)
         return 1;
     }
 
-    if (fread_ui32(bgen->file, &flags, 4)) {
+    if (fread_ui32(bgen->file, &flags)) {
         error("Could not read the bgen flags");
         return 1;
     }

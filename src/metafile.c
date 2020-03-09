@@ -80,7 +80,7 @@ int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant
     *geno_offset = LONG_TELL(bgen_file_stream(c->bgen));
 
     uint32_t length;
-    if (fread_ui32(bgen_file_stream(c->bgen), &length, 4)) {
+    if (fread_ui32(bgen_file_stream(c->bgen), &length)) {
         error("Could not read the genotype block length");
         goto err;
     }
