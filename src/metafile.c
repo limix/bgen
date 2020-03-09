@@ -77,16 +77,16 @@ int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant
     if (next_variant(c->bgen, vm))
         goto err;
 
-    *geno_offset = LONG_TELL(c->bgen->file);
+    *geno_offset = LONG_TELL(bgen_file_stream(c->bgen));
 
     uint32_t length;
-    if (fread_ui32(c->bgen->file, &length, 4)) {
+    if (fread_ui32(bgen_file_stream(c->bgen), &length, 4)) {
         error("Could not read the genotype block length");
         goto err;
     }
 
-    if (LONG_SEEK(c->bgen->file, length, SEEK_CUR)) {
-        perror_fmt(c->bgen->file, "Could not jump to the next variant");
+    if (LONG_SEEK(bgen_file_stream(c->bgen), length, SEEK_CUR)) {
+        perror_fmt(bgen_file_stream(c->bgen), "Could not jump to the next variant");
         goto err;
     }
 
@@ -266,10 +266,8 @@ struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* fp, int
     if (!mf)
         goto err;
 
-    if (LONG_SEEK(bgen->file, bgen->variants_start, SEEK_SET)) {
-        perror_fmt(bgen->file, "Could not jump to the variants start");
+    if (bgen_file_seek_variants_start(bgen))
         goto err;
-    }
 
     struct next_variant_ctx ctx = {bgen, bgen_nvariants(bgen)};
     if (write_metafile(mf, &_next_variant, &ctx, verbose)) {

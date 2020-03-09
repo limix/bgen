@@ -15,26 +15,26 @@
  */
 int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
 {
-    if (bgen->layout == 1) {
-        if (LONG_SEEK(bgen->file, 4, SEEK_CUR))
+    if (bgen_file_layout(bgen) == 1) {
+        if (LONG_SEEK(bgen_file_stream(bgen), 4, SEEK_CUR))
             goto err;
     }
 
-    if (fread_str(bgen->file, &vm->id, 2))
+    if (fread_str(bgen_file_stream(bgen), &vm->id, 2))
         goto err;
 
-    if (fread_str(bgen->file, &vm->rsid, 2))
+    if (fread_str(bgen_file_stream(bgen), &vm->rsid, 2))
         goto err;
 
-    if (fread_str(bgen->file, &vm->chrom, 2))
+    if (fread_str(bgen_file_stream(bgen), &vm->chrom, 2))
         goto err;
 
-    if (fread_int(bgen->file, &vm->position, 4))
+    if (fread_int(bgen_file_stream(bgen), &vm->position, 4))
         goto err;
 
-    if (bgen->layout == 1)
+    if (bgen_file_layout(bgen) == 1)
         vm->nalleles = 2;
-    else if (fread_int(bgen->file, &vm->nalleles, 2))
+    else if (fread_int(bgen_file_stream(bgen), &vm->nalleles, 2))
         goto err;
 
     vm->allele_ids = dalloc(vm->nalleles * sizeof(struct bgen_str));
@@ -42,7 +42,7 @@ int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
         goto err;
 
     for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
-        if (fread_str(bgen->file, vm->allele_ids + i, 4))
+        if (fread_str(bgen_file_stream(bgen), vm->allele_ids + i, 4))
             goto err;
     }
 

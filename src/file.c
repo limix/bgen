@@ -5,6 +5,39 @@
 #include "str.h"
 #include <assert.h>
 
+struct bgen_file
+{
+    char* filepath;
+    FILE* file;
+    int nvariants;
+    int nsamples;
+    int compression;
+    int layout;
+    int contain_sample;
+    OFF_T samples_start;
+    OFF_T variants_start;
+};
+
+FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }
+
+char const* bgen_file_filepath(struct bgen_file const* bgen_file)
+{
+    return bgen_file->filepath;
+}
+
+int bgen_file_layout(struct bgen_file const* bgen_file) { return bgen_file->layout; }
+
+int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file->compression; }
+
+int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
+{
+    if (LONG_SEEK(bgen_file->file, bgen_file->variants_start, SEEK_SET)) {
+        perror_fmt(bgen_file->file, "Could not jump to the variants start");
+        return 1;
+    }
+    return 0;
+}
+
 int close_bgen_file(struct bgen_file* bgen)
 {
     char unknown[] = "`[unknown]`";
