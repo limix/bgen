@@ -93,8 +93,7 @@ DECLARE_TYPE_FREAD(long, long)
 DECLARE_TYPE_FREAD(unsigned, unsigned)
 DECLARE_TYPE_FREAD(OFF_T, off)
 DECLARE_TYPE_FREAD(uint64_t, ui64)
-/* DECLARE_TYPE_FREAD(uint32_t, ui32) */
-DECLARE_TYPE_FREAD_SIZE(uint32_t, ui32)
+DECLARE_TYPE_FREAD(uint32_t, ui32)
 DECLARE_TYPE_FREAD(uint16_t, ui16)
 
 /* Define fwrite_int, fwrite_ui64 and like. */

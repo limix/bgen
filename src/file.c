@@ -1,7 +1,9 @@
 #include "file.h"
 #include "athr.h"
 #include "bgen/bgen.h"
+#include "free.h"
 #include "mem.h"
+#include "report.h"
 #include "str.h"
 #include <assert.h>
 
@@ -13,10 +15,12 @@ struct bgen_file
     uint32_t nsamples;
     int compression;
     int layout;
-    int contain_sample;
+    bool contain_sample;
     OFF_T samples_start;
     OFF_T variants_start;
 };
+
+static int read_bgen_header(struct bgen_file* bgen);
 
 FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->file; }
 
@@ -38,90 +42,14 @@ int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
     return 0;
 }
 
-int close_bgen_file(struct bgen_file* bgen)
+struct bgen_file* bgen_file_open(char const* filepath)
 {
-    char unknown[] = "`[unknown]`";
-    const char* filepath = bgen->filepath ? bgen->filepath : unknown;
-
-    if (fclose_nul(bgen->file)) {
-        if (ferror(bgen->file))
-            perror_fmt(bgen->file, "Could not close bgen file %s", filepath);
-        else
-            error("Could not close bgen file %s. Maybe it has already been closed", filepath);
-        bgen->file = NULL;
-        return 1;
-    }
-    bgen->file = NULL;
-    return 0;
-}
-
-/*
- * Read the header block defined as follows:
- *
- *   header length: 4 bytes
- *   number of variants: 4 bytes
- *   number of samples: 4 bytes
- *   magic number: 4 bytes
- *   unused space: header length minus 20 bytes
- *   bgen flags: 4 bytes
- */
-int read_bgen_header(struct bgen_file* bgen)
-{
-    uint32_t header_length;
-    uint32_t magic_number;
-    uint32_t flags;
-
-    if (fread_ui32(bgen->file, &header_length)) {
-        error("Could not read the header length");
-        return 1;
-    }
-
-    if (fread_ui32(bgen->file, &bgen->nvariants)) {
-        error("Could not read the number of variants");
-        return 1;
-    }
-
-    if (fread_ui32(bgen->file, &bgen->nsamples)) {
-        error("Could not read the number of samples");
-        return 1;
-    }
-
-    if (fread_ui32(bgen->file, &magic_number)) {
-        error("Could not read the magic number");
-        return 1;
-    }
-
-    if (magic_number != 1852139362)
-        warn("This might not be a BGEN file: magic number mismatch");
-
-    if (LONG_SEEK(bgen->file, header_length - 20, SEEK_CUR)) {
-        error("Fseek error while reading a BGEN file");
-        return 1;
-    }
-
-    if (fread_ui32(bgen->file, &flags)) {
-        error("Could not read the bgen flags");
-        return 1;
-    }
-
-    bgen->compression = flags & 3;
-    bgen->layout = (flags & (15 << 2)) >> 2;
-    bgen->contain_sample = (flags & ((uint32_t)1 << 31)) >> 31;
-
-    return 0;
-}
-
-struct bgen_file* bgen_file_open(const char* filepath)
-{
-    struct bgen_file* bgen = dalloc(sizeof(struct bgen_file));
-    if (!bgen)
-        goto err;
+    struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
+    bgen->filepath = strdup(filepath);
 
     bgen->samples_start = -1;
     bgen->variants_start = -1;
     bgen->file = NULL;
-
-    bgen->filepath = strdup(filepath);
 
     if (!(bgen->file = fopen(bgen->filepath, "rb"))) {
         perror_fmt(bgen->file, "Could not open bgen file %s", bgen->filepath);
@@ -144,29 +72,24 @@ struct bgen_file* bgen_file_open(const char* filepath)
     bgen->samples_start = LONG_TELL(bgen->file);
 
     return bgen;
-
 err:
-    if (bgen) {
-        close_bgen_file(bgen);
-        bgen->filepath = free_nul(bgen->filepath);
-    }
-    return free_nul(bgen);
+    bgen_file_close(bgen);
+    return NULL;
 }
 
-void bgen_close(struct bgen_file* bgen)
+void bgen_file_close(struct bgen_file* bgen)
 {
-    if (bgen) {
-        close_bgen_file(bgen);
-        bgen->filepath = free_nul(bgen->filepath);
-    }
-    free_nul(bgen);
+    if (bgen->file != NULL && fclose(bgen->file))
+        bgen_perror(bgen->file, "could not close %s file", bgen->filepath);
+    free_c(bgen->filepath);
+    free_c(bgen);
 }
 
-int bgen_nsamples(struct bgen_file const* bgen) { return bgen->nsamples; }
+uint32_t bgen_file_nsamples(struct bgen_file const* bgen) { return bgen->nsamples; }
 
-int bgen_nvariants(struct bgen_file const* bgen) { return bgen->nvariants; }
+uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvariants; }
 
-int bgen_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
+bool bgen_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
 struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
 {
@@ -175,7 +98,7 @@ struct bgen_str* bgen_read_samples(struct bgen_file* bgen, int verbose)
 
     LONG_SEEK(bgen->file, bgen->samples_start, SEEK_SET);
 
-    if (bgen->contain_sample == 0) {
+    if (!bgen->contain_sample) {
         warn("This bgen file does not contain sample ids");
         return NULL;
     }
@@ -218,7 +141,7 @@ err:
 
 void bgen_free_samples(struct bgen_file const* bgen, struct bgen_str* samples)
 {
-    if (bgen->contain_sample == 0)
+    if (!bgen->contain_sample)
         return;
 
     if (!samples)
@@ -228,4 +151,60 @@ void bgen_free_samples(struct bgen_file const* bgen, struct bgen_str* samples)
         free_str(samples + i);
 
     free(samples);
+}
+
+/*
+ * Read the header block defined as follows:
+ *
+ *   header length: 4 bytes
+ *   number of variants: 4 bytes
+ *   number of samples: 4 bytes
+ *   magic number: 4 bytes
+ *   unused space: header length minus 20 bytes
+ *   bgen flags: 4 bytes
+ */
+static int read_bgen_header(struct bgen_file* bgen)
+{
+    uint32_t header_length;
+    uint32_t magic_number;
+    uint32_t flags;
+
+    if (fread_ui32(bgen->file, &header_length, 4)) {
+        error("Could not read the header length");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &bgen->nvariants, 4)) {
+        error("Could not read the number of variants");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &bgen->nsamples, 4)) {
+        error("Could not read the number of samples");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &magic_number, 4)) {
+        error("Could not read the magic number");
+        return 1;
+    }
+
+    if (magic_number != 1852139362)
+        warn("This might not be a BGEN file: magic number mismatch");
+
+    if (LONG_SEEK(bgen->file, header_length - 20, SEEK_CUR)) {
+        error("Fseek error while reading a BGEN file");
+        return 1;
+    }
+
+    if (fread_ui32(bgen->file, &flags, 4)) {
+        error("Could not read the bgen flags");
+        return 1;
+    }
+
+    bgen->compression = flags & 3;
+    bgen->layout = (flags & (15 << 2)) >> 2;
+    bgen->contain_sample = ((flags & ((uint32_t)1 << 31)) >> 31) == 1;
+
+    return 0;
 }

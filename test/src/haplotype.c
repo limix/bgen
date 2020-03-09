@@ -21,8 +21,8 @@ void test_haplotype(void)
     int nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
-    cass_cond((nsamples = bgen_nsamples(bgen)) == 4);
-    cass_cond((nvariants = bgen_nvariants(bgen)) == 4);
+    cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
+    cass_cond((nvariants = bgen_file_nvariants(bgen)) == 4);
 
     struct bgen_str* sample_ids = bgen_read_samples(bgen, 0);
 
@@ -86,5 +86,5 @@ void test_haplotype(void)
 
     bgen_free_partition(vm, nvariants);
     cass_cond(bgen_close_metafile(mf) == 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }

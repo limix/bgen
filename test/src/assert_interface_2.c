@@ -9,31 +9,30 @@ int main()
 
     struct bgen_file *bgen = bgen_file_open("nexist");
     cass_cond(bgen == NULL);
-    bgen_close(bgen);
 
     bgen = bgen_file_open("data/example.v11.bgen");
 
-    cass_equal_int(bgen_nsamples(bgen), 500);
-    cass_equal_int(bgen_nvariants(bgen), 199);
+    cass_equal_int(bgen_file_nsamples(bgen), 500);
+    cass_equal_int(bgen_file_nvariants(bgen), 199);
     cass_equal_int(bgen_contain_samples(bgen), 0);
 
     struct bgen_str *samples = bgen_read_samples(bgen, 0);
     cass_cond(samples == NULL);
 
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     cass_cond(bgen != NULL);
 
-    cass_equal_int(bgen_nsamples(bgen), 500);
-    cass_equal_int(bgen_nvariants(bgen), 199);
+    cass_equal_int(bgen_file_nsamples(bgen), 500);
+    cass_equal_int(bgen_file_nvariants(bgen), 199);
     cass_equal_int(bgen_contain_samples(bgen), 1);
 
     samples = bgen_read_samples(bgen, 0);
     cass_cond(samples != NULL);
     bgen_free_samples(bgen, samples);
 
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     struct bgen_vi *vi;
@@ -50,7 +49,7 @@ int main()
 
     bgen_free_partition(vm, nvariants);
     bgen_close_metafile(mf);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     mf = bgen_open_metafile("example.14bits.bgen.metadata");
@@ -75,7 +74,7 @@ int main()
     bgen_free_partition(vm, nvariants);
     bgen_close_genotype(vg);
     bgen_close_metafile(mf);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 
     return cass_status();
 }

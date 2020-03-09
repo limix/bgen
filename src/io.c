@@ -18,30 +18,12 @@
         return 0;                                                                      \
     }
 
-#define DEFINE_TYPE_FREAD_SIZE(TYPE, SUF, SIZE)                                                   \
-    int fread_##SUF(FILE *fp, TYPE *value)                                \
-    {                                                                                  \
-        *value = 0;                                                                    \
-                                                                                       \
-        if (fread(value, SIZE, 1, fp) != 1) {                                          \
-                                                                                       \
-            if (feof(fp))                                                              \
-                fprintf(stderr, "Error reading file: unexpected end of file.\n");      \
-            else if (ferror(fp))                                                       \
-                perror("Error reading file");                                          \
-                                                                                       \
-            return 1;                                                                  \
-        }                                                                              \
-                                                                                       \
-        return 0;                                                                      \
-    }
-
 DEFINE_TYPE_FREAD(int, int)
 DEFINE_TYPE_FREAD(long, long)
 DEFINE_TYPE_FREAD(unsigned, unsigned)
 DEFINE_TYPE_FREAD(OFF_T, off)
 DEFINE_TYPE_FREAD(uint64_t, ui64)
-DEFINE_TYPE_FREAD_SIZE(uint32_t, ui32, 4)
+DEFINE_TYPE_FREAD(uint32_t, ui32)
 DEFINE_TYPE_FREAD(uint16_t, ui16)
 
 #define DEFINE_TYPE_FWRITE(TYPE, SUF)                                                  \

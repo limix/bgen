@@ -80,7 +80,7 @@ int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant
     *geno_offset = LONG_TELL(bgen_file_stream(c->bgen));
 
     uint32_t length;
-    if (fread_ui32(bgen_file_stream(c->bgen), &length)) {
+    if (fread_ui32(bgen_file_stream(c->bgen), &length, 4)) {
         error("Could not read the genotype block length");
         goto err;
     }
@@ -262,14 +262,14 @@ err:
 struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* fp, int nparts,
                                      int verbose)
 {
-    struct bgen_mf* mf = create_metafile(fp, bgen_nvariants(bgen), nparts);
+    struct bgen_mf* mf = create_metafile(fp, bgen_file_nvariants(bgen), nparts);
     if (!mf)
         goto err;
 
     if (bgen_file_seek_variants_start(bgen))
         goto err;
 
-    struct next_variant_ctx ctx = {bgen, bgen_nvariants(bgen)};
+    struct next_variant_ctx ctx = {bgen, bgen_file_nvariants(bgen)};
     if (write_metafile(mf, &_next_variant, &ctx, verbose)) {
         error("Could not write metafile");
         goto err;

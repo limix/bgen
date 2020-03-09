@@ -24,8 +24,8 @@ void test_file(void)
     int nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
-    cass_cond((nsamples = bgen_nsamples(bgen)) == 4);
-    cass_cond((nvariants = bgen_nvariants(bgen)) == 10);
+    cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
+    cass_cond((nvariants = bgen_file_nvariants(bgen)) == 10);
 
     struct bgen_str *sample_ids = bgen_read_samples(bgen, 0);
 
@@ -67,7 +67,7 @@ void test_file(void)
     }
     bgen_free_partition(vm, nvariants);
     cass_cond(bgen_close_metafile(mf) == 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void test_geno(void)
@@ -181,7 +181,7 @@ void test_geno(void)
 
     double *rp = real_probs;
 
-    int nsamples = bgen_nsamples(bgen);
+    int nsamples = bgen_file_nsamples(bgen);
     size_t jj = 0;
     for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
@@ -211,5 +211,5 @@ void test_geno(void)
     }
 
     cass_cond(bgen_close_metafile(mf) == 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }

@@ -31,8 +31,8 @@ int ipow(int base, int exp)
 
 void test_read_metadata(struct bgen_file* bgen, struct bgen_str* samples, struct bgen_mf* mf)
 {
-    cass_cond(bgen_nsamples(bgen) == 500);
-    cass_cond(bgen_nvariants(bgen) == 199);
+    cass_cond(bgen_file_nsamples(bgen) == 500);
+    cass_cond(bgen_file_nvariants(bgen) == 199);
     cass_cond(strncmp("sample_001", samples[0].str, samples[0].len) == 0);
     cass_cond(strncmp("sample_500", samples[499].str, samples[0].len) == 0);
 
@@ -143,7 +143,7 @@ int main()
         /*     return 1; */
 
         cass_cond(bgen_close_metafile(mf) == 0);
-        bgen_close(bgen);
+        bgen_file_close(bgen);
     }
 
     return cass_status();

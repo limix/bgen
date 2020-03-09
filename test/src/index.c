@@ -79,6 +79,6 @@ int main()
     use_metafile_wrongly(mf);
     cass_equal_int(bgen_close_metafile(mf), 0);
 
-    bgen_close(bgen);
+    bgen_file_close(bgen);
     return cass_status();
 }

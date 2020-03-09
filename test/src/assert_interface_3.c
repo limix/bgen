@@ -6,7 +6,6 @@ void test_open_wrong_bgen_filepath()
 {
     struct bgen_file *bgen = bgen_file_open("wrong.metadata");
     cass_cond(bgen == NULL);
-    bgen_close(bgen);
 }
 
 void test_bgen_file_haplotypes()
@@ -14,8 +13,8 @@ void test_bgen_file_haplotypes()
     struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
     cass_cond(bgen != NULL);
-    cass_equal_int(bgen_nsamples(bgen), 4);
-    cass_equal_int(bgen_nvariants(bgen), 4);
+    cass_equal_int(bgen_file_nsamples(bgen), 4);
+    cass_equal_int(bgen_file_nvariants(bgen), 4);
     cass_equal_int(bgen_contain_samples(bgen), 1);
 
     struct bgen_str *samples = bgen_read_samples(bgen, 0);
@@ -23,7 +22,7 @@ void test_bgen_file_haplotypes()
     cass_cond(bgen_str_equal(BGEN_STR("sample_0"), samples[0]));
     bgen_free_samples(bgen, samples);
 
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void test_create_meteadata_haplotypes()
@@ -56,7 +55,7 @@ void test_create_meteadata_haplotypes()
     bgen_free_partition(vm, nvars);
 
     cass_equal_int(bgen_close_metafile(mf), 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void test_genotype_haplotypes_by_creating_metadata()
@@ -134,7 +133,7 @@ void test_genotype_haplotypes_by_creating_metadata()
     }
 
     cass_equal_int(bgen_close_metafile(mf), 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void test_genotype_haplotypes_by_loading_metadata()
@@ -213,7 +212,7 @@ void test_genotype_haplotypes_by_loading_metadata()
     }
 
     cass_equal_int(bgen_close_metafile(mf), 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 int main()

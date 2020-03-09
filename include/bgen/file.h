@@ -6,6 +6,8 @@
 
 #include "bgen/str.h"
 #include "bgen_export.h"
+#include <stdint.h>
+#include <stdbool.h>
 
 /** Bgen file handler.
  * @struct bgen_file
@@ -25,19 +27,19 @@ BGEN_EXPORT struct bgen_file* bgen_file_open(char const* filepath);
  *
  * @param bgen Bgen file handler.
  */
-BGEN_EXPORT void bgen_close(struct bgen_file* bgen);
+BGEN_EXPORT void bgen_file_close(struct bgen_file* bgen);
 /** Get the number of samples.
  *
  * @param bgen Bgen file handler.
  * @return Number of samples.
  */
-BGEN_EXPORT int bgen_nsamples(struct bgen_file const* bgen);
+BGEN_EXPORT uint32_t bgen_file_nsamples(struct bgen_file const* bgen);
 /** Get the number of variants.
  *
  * @param bgen Bgen file handler.
  * @return Number of variants.
  */
-BGEN_EXPORT int bgen_nvariants(struct bgen_file const* bgen);
+BGEN_EXPORT uint32_t bgen_file_nvariants(struct bgen_file const* bgen);
 /** Check if the file contain sample identifications.
  *
  * \rst
@@ -48,7 +50,7 @@ BGEN_EXPORT int bgen_nvariants(struct bgen_file const* bgen);
  * @param bgen Bgen file handler.
  * @return `1` if bgen file contains the sample ids; `0` otherwise.
  */
-BGEN_EXPORT int bgen_contain_samples(struct bgen_file const* bgen);
+BGEN_EXPORT bool bgen_contain_samples(struct bgen_file const* bgen);
 /** Return array of sample identifications.
  *
  * The size of this array is given be the @ref bgen_nsamples function.

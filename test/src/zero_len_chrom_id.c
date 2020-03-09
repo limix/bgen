@@ -23,8 +23,8 @@ void test_zeo_len_chrom_id(void)
 
     cass_cond(bgen != NULL);
 
-    cass_cond(bgen_nsamples(bgen) == 182);
-    cass_cond(bgen_nvariants(bgen) == 50);
+    cass_cond(bgen_file_nsamples(bgen) == 182);
+    cass_cond(bgen_file_nvariants(bgen) == 50);
 
     samples = bgen_read_samples(bgen, 0);
     cass_cond(samples != NULL);
@@ -41,5 +41,5 @@ void test_zeo_len_chrom_id(void)
     bgen_free_partition(vm, nvariants);
 
     bgen_close_metafile(mf);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }

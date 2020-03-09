@@ -8,8 +8,8 @@ void test_bgen_file_complex()
     struct bgen_file *bgen = bgen_file_open("data/complex.23bits.bgen");
 
     cass_cond(bgen != NULL)
-    cass_equal_int(bgen_nsamples(bgen), 4);
-    cass_equal_int(bgen_nvariants(bgen), 10);
+    cass_equal_int(bgen_file_nsamples(bgen), 4);
+    cass_equal_int(bgen_file_nvariants(bgen), 10);
     cass_equal_int(bgen_contain_samples(bgen), 1);
 
     struct bgen_str *samples = bgen_read_samples(bgen, 0);
@@ -17,7 +17,7 @@ void test_bgen_file_complex()
     cass_cond(bgen_str_equal(BGEN_STR("sample_0"), samples[0]));
     bgen_free_samples(bgen, samples);
 
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void test_create_metadata_complex()
@@ -40,7 +40,7 @@ void test_create_metadata_complex()
     cass_equal_int(bgen_nalleles(vg), 2);
     int ploidy[] = {1, 2, 2, 2};
     int miss[] = {0, 0, 0, 0};
-    for (size_t i = 0; i < (size_t)bgen_nsamples(bgen); ++i) {
+    for (size_t i = 0; i < (size_t)bgen_file_nsamples(bgen); ++i) {
         cass_equal_int(bgen_missing(vg, i), miss[i]);
         cass_equal_int(bgen_ploidy(vg, i), ploidy[i]);
     }
@@ -53,7 +53,7 @@ void test_create_metadata_complex()
     bgen_free_partition(vm, nvars);
 
     cass_equal_int(bgen_close_metafile(mf), 0);
-    bgen_close(bgen);
+    bgen_file_close(bgen);
 }
 
 void _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
@@ -120,7 +120,7 @@ void _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
             cass_cond(vg != NULL)
 
             cass_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));
-            for (size_t j = 0; j < (size_t)bgen_nsamples(bgen); ++j) {
+            for (size_t j = 0; j < (size_t)bgen_file_nsamples(bgen); ++j) {
                 cass_equal_int(bgen_missing(vg, j), 0);
                 cass_equal_int(bgen_ploidy(vg, j), *(ploidy_ptr++));
             }
@@ -130,11 +130,11 @@ void _test_genotype_complex(struct bgen_file *bgen, struct bgen_mf *mf)
             cass_equal_int(bgen_phased(vg), *(phased_ptr++));
 
             double *ptr =
-                malloc(bgen_nsamples(bgen) * bgen_ncombs(vg) * sizeof(double));
+                malloc(bgen_file_nsamples(bgen) * bgen_ncombs(vg) * sizeof(double));
 
             cass_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
             double *p = ptr;
-            for (int j = 0; j < bgen_nsamples(bgen); ++j) {
+            for (int j = 0; j < bgen_file_nsamples(bgen); ++j) {
                 for (int c = 0; c < bgen_ncombs(vg); ++c) {
                     cass_close(*p, *(probs_ptr++));
                     ++p;
@@ -157,7 +157,7 @@ void test_genotype_complex()
 
         _test_genotype_complex(bgen, mf);
         cass_equal_int(bgen_close_metafile(mf), 0);
-        bgen_close(bgen);
+        bgen_file_close(bgen);
     }
 
     {
@@ -166,7 +166,7 @@ void test_genotype_complex()
 
         _test_genotype_complex(bgen, mf);
         cass_equal_int(bgen_close_metafile(mf), 0);
-        bgen_close(bgen);
+        bgen_file_close(bgen);
     }
 }
 
