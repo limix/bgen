@@ -31,8 +31,6 @@ typedef long OFF_T;
 
 /* Define fread_int, fread_ui64 and like. */
 #define DECLARE_TYPE_FREAD(TYPE, SUF) int fread_##SUF(FILE*, TYPE*, size_t);
-#define DECLARE_TYPE_FREAD_SIZE(TYPE, SUF) int fread_##SUF(FILE*, TYPE*);
-
 DECLARE_TYPE_FREAD(int, int)
 DECLARE_TYPE_FREAD(long, long)
 DECLARE_TYPE_FREAD(unsigned, unsigned)
@@ -40,10 +38,10 @@ DECLARE_TYPE_FREAD(OFF_T, off)
 DECLARE_TYPE_FREAD(uint64_t, ui64)
 DECLARE_TYPE_FREAD(uint32_t, ui32)
 DECLARE_TYPE_FREAD(uint16_t, ui16)
+#undef DECLARE_TYPE_FREAD
 
 /* Define fwrite_int, fwrite_ui64 and like. */
 #define DECLARE_TYPE_FWRITE(TYPE, SUF) int fwrite_##SUF(FILE*, TYPE, size_t);
-
 DECLARE_TYPE_FWRITE(int, int)
 DECLARE_TYPE_FWRITE(long, long)
 DECLARE_TYPE_FWRITE(unsigned, unsigned)
@@ -51,8 +49,6 @@ DECLARE_TYPE_FWRITE(OFF_T, off)
 DECLARE_TYPE_FWRITE(uint64_t, ui64)
 DECLARE_TYPE_FWRITE(uint32_t, ui32)
 DECLARE_TYPE_FWRITE(uint16_t, ui16)
-
-#undef DECLARE_TYPE_FREAD
 #undef DECLARE_TYPE_FWRITE
 
 #endif

@@ -1,6 +1,6 @@
 #include "file.h"
 #include "athr.h"
-#include "bgen/bgen.h"
+#include "bgen/file.h"
 #include "free.h"
 #include "io.h"
 #include "report.h"
@@ -133,7 +133,7 @@ int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file-
 int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 {
     if (LONG_SEEK(bgen_file->stream, bgen_file->variants_start, SEEK_SET)) {
-        bgen_perror("Could not jump to the variants start");
+        bgen_perror("could not jump to the variants start");
         return 1;
     }
     return 0;

@@ -10,8 +10,8 @@
                                                                                               \
             if (feof(fp))                                                                     \
                 bgen_error("error reading file (unexpected end of file)");                    \
-            else if (ferror(fp))                                                              \
-                bgen_error("error reading file");                                             \
+            else                                                                              \
+                bgen_perror("error reading file");                                            \
                                                                                               \
             return 1;                                                                         \
         }                                                                                     \
@@ -34,8 +34,8 @@ DEFINE_TYPE_FREAD(uint16_t, ui16)
                                                                                               \
             if (feof(fp))                                                                     \
                 bgen_error("error reading file (unexpected end of file)");                    \
-            else if (ferror(fp))                                                              \
-                bgen_error("error writing file");                                             \
+            else                                                                              \
+                bgen_perror("error writing file");                                            \
                                                                                               \
             return 1;                                                                         \
         }                                                                                     \
