@@ -47,7 +47,7 @@ int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
     uint64_t len = 0;
 
     if (fread(&len, 1, len_size, fp) < len_size) {
-        perror("Error while freading a string length");
+        bgen_perror("Error while freading a string length");
         return 1;
     }
 
@@ -61,9 +61,9 @@ int fread_str(FILE *fp, struct bgen_str *bgen_str, size_t len_size)
     size_t length = bgen_str_length(bgen_str);
     if (fread(data, 1, length, fp) < length) {
         if (ferror(fp))
-            perror("Error while freading a string str");
+            bgen_perror("Error while freading a string str");
         else
-            error("Unexpected end of file while reading a string");
+            bgen_error("Unexpected end of file while reading a string");
         return 1;
     }
 
@@ -75,7 +75,7 @@ struct bgen_str const* bgen_str_fread_create(FILE *stream, size_t length_size)
     uint64_t length = 0;
 
     if (fread(&length, 1, length_size, stream) < length_size) {
-        perror("Error while freading a string length");
+        bgen_perror("Error while freading a string length");
         return NULL;
     }
     
@@ -86,9 +86,9 @@ struct bgen_str const* bgen_str_fread_create(FILE *stream, size_t length_size)
 
     if (fread(data, 1, length, stream) < length) {
         if (ferror(stream))
-            perror("Error while freading a string str");
+            bgen_perror("Error while freading a string str");
         else
-            error("Unexpected end of file while reading a string");
+            bgen_error("Unexpected end of file while reading a string");
         free_c(data);
         return NULL;
     }
@@ -101,7 +101,7 @@ int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
 
     uint64_t len = s->length;
     if (fwrite(&len, len_size, 1, fp) != 1) {
-        perror("Error while fwriting a string length");
+        bgen_perror("Error while fwriting a string length");
         return 1;
     }
 
@@ -111,9 +111,9 @@ int fwrite_str(FILE* fp, struct bgen_str const* s, size_t len_size)
     if (fwrite(s->data, 1, len, fp) != len) {
 
         if (ferror(fp))
-            perror("Error while fwriting a string str");
+            bgen_perror("Error while fwriting a string str");
         else
-            error("Unexpected end of file while writing a string");
+            bgen_error("Unexpected end of file while writing a string");
         return 1;
     }
     return 0;
@@ -123,7 +123,7 @@ int bgen_str_fwrite(struct bgen_str const* s, FILE* fp, size_t len_size)
 {
     uint64_t len = s->length;
     if (fwrite(&len, len_size, 1, fp) != 1) {
-        perror("Error while fwriting a string length");
+        bgen_perror("Error while fwriting a string length");
         return 1;
     }
 
@@ -133,9 +133,9 @@ int bgen_str_fwrite(struct bgen_str const* s, FILE* fp, size_t len_size)
     if (fwrite(s->data, 1, len, fp) != len) {
 
         if (ferror(fp))
-            perror("Error while fwriting a string str");
+            bgen_perror("Error while fwriting a string str");
         else
-            error("Unexpected end of file while writing a string");
+            bgen_error("Unexpected end of file while writing a string");
         return 1;
     }
     return 0;

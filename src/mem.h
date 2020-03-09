@@ -2,6 +2,7 @@
 #define _BGEN_MEM_H
 
 #include "io.h"
+#include "report.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -9,7 +10,7 @@ static inline void *_dalloc(size_t size, const char *_file_, int _line_)
 {
     void *p = malloc(size);
     if (p == NULL) {
-        error("Error: could not allocate memory at %s, line %d.", _file_, _line_);
+        bgen_error("could not allocate memory at %s, line %d.", _file_, _line_);
         return NULL;
     }
     return p;

@@ -82,7 +82,7 @@ int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant
 
     uint32_t length;
     if (fread_ui32(bgen_file_stream(c->bgen), &length, 4)) {
-        error("Could not read the genotype block length");
+        bgen_error("Could not read the genotype block length");
         goto err;
     }
 
@@ -110,7 +110,7 @@ struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t n
         goto err;
 
     if (!is_little_endian()) {
-        error("This program does not support big-endian platforms yet.");
+        bgen_error("This program does not support big-endian platforms yet.");
         goto err;
     }
 
@@ -195,7 +195,7 @@ int write_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* args, i
         athr_finish(at);
 
     if (e) {
-        error("Could not write every variant");
+        bgen_error("Could not write every variant");
         goto err;
     }
 
@@ -207,13 +207,13 @@ err:
 int write_offsets_block(struct bgen_mf* mf)
 {
     if (fwrite_ui32(mf->file, mf->idx.npartitions, sizeof(mf->idx.npartitions))) {
-        error("Could not write the number of partitions %d", mf->idx.npartitions);
+        bgen_error("Could not write the number of partitions %d", mf->idx.npartitions);
         goto err;
     }
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
         if (fwrite_ui64(mf->file, mf->idx.poffset[i], sizeof(uint64_t))) {
-            error("Could not write a partition offset");
+            bgen_error("Could not write a partition offset");
             goto err;
         }
     }
@@ -224,7 +224,7 @@ int write_offsets_block(struct bgen_mf* mf)
     }
 
     if (fwrite_ui64(mf->file, mf->idx.poffset[mf->idx.npartitions], sizeof(uint64_t))) {
-        error("Could not write the size of the metadata block");
+        bgen_error("Could not write the size of the metadata block");
         goto err;
     }
 
@@ -272,7 +272,7 @@ struct bgen_mf* bgen_create_metafile(struct bgen_file* bgen, const char* fp, int
 
     struct next_variant_ctx ctx = {bgen, bgen_file_nvariants(bgen)};
     if (write_metafile(mf, &_next_variant, &ctx, verbose)) {
-        error("Could not write metafile");
+        bgen_error("Could not write metafile");
         goto err;
     }
 
@@ -291,7 +291,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
 {
     struct bgen_mf* mf = alloc_mf();
     if (!mf) {
-        error("Could not allocate resources for metafile");
+        bgen_error("Could not allocate resources for metafile");
         goto err;
     }
 
@@ -309,7 +309,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     }
 
     if (strncmp(header, "bgen index 03", 13)) {
-        error("Unrecognized bgen index version: %.13s", header);
+        bgen_error("Unrecognized bgen index version: %.13s", header);
         goto err;
     }
 
@@ -324,7 +324,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     }
 
     if (LONG_SEEK(mf->file, mf->idx.metasize, SEEK_CUR)) {
-        error("Could to fseek to the number of partitions");
+        bgen_error("Could to fseek to the number of partitions");
         goto err;
     }
 
@@ -370,7 +370,7 @@ int bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->idx.nvariants
 int bgen_partition_nvars(struct bgen_mf const* mf, int part)
 {
     if (part < 0) {
-        error("Invalid partition number: %d", part);
+        bgen_error("Invalid partition number: %d", part);
         return -1;
     }
     int size = ceildiv(mf->idx.nvariants, mf->idx.npartitions);
@@ -383,7 +383,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
     FILE* file = mf->file;
 
     if ((uint32_t)part >= mf->idx.npartitions) {
-        error("The provided partition number %d is out-of-range", part);
+        bgen_error("The provided partition number %d is out-of-range", part);
         goto err;
     }
 
