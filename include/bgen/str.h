@@ -19,6 +19,7 @@ struct bgen_str
 };
 
 /* BGEN_EXPORT void bgen_str_alloc(struct bgen_str* bgen_str, size_t length); */
+BGEN_EXPORT struct bgen_str const* bgen_str_create(char const* data, size_t length);
 BGEN_EXPORT char const* bgen_str_data(struct bgen_str const* bgen_str);
 BGEN_EXPORT void bgen_str_free(struct bgen_str const* bgen_str);
 BGEN_EXPORT size_t bgen_str_length(struct bgen_str const* bgen_str);
