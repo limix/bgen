@@ -1,4 +1,5 @@
 #include "bgen/bgen.h"
+#include "free.h"
 #include "file.h"
 #include "io.h"
 #include "mem.h"
@@ -40,7 +41,7 @@ struct bgen_mf
 
 struct bgen_mf* alloc_mf(void)
 {
-    struct bgen_mf* mf = dalloc(sizeof(struct bgen_mf));
+    struct bgen_mf* mf = malloc(sizeof(struct bgen_mf));
     if (!mf)
         return NULL;
 
@@ -244,7 +245,7 @@ int write_metafile(struct bgen_mf* mf, next_variant_t* next, void* args, int ver
     struct bgen_vm vm;
     init_metadata(&vm);
 
-    mf->idx.poffset = dalloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
+    mf->idx.poffset = malloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
     if (mf->idx.poffset == NULL)
         goto err;
 
@@ -256,7 +257,8 @@ int write_metafile(struct bgen_mf* mf, next_variant_t* next, void* args, int ver
 
     return 0;
 err:
-    mf->idx.poffset = free_nul(mf->idx.poffset);
+    free_c(mf->idx.poffset);
+    mf->idx.poffset = NULL;
     return 1;
 }
 
@@ -333,7 +335,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    mf->idx.poffset = dalloc(mf->idx.npartitions * sizeof(uint64_t));
+    mf->idx.poffset = malloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
         if (fread1(mf->idx.poffset + i, sizeof(uint64_t), mf->file)) {
@@ -356,9 +358,9 @@ int bgen_close_metafile(struct bgen_mf* mf)
             return 1;
         }
         mf->file = NULL;
-        free_nul(mf->filepath);
-        free_nul(mf->idx.poffset);
-        free_nul(mf);
+        free_c(mf->filepath);
+        free_c(mf->idx.poffset);
+        free_c(mf);
     }
     return 0;
 }
@@ -388,7 +390,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
     }
 
     *nvars = bgen_partition_nvars(mf, part);
-    vars = dalloc((*nvars) * sizeof(struct bgen_vm));
+    vars = malloc((*nvars) * sizeof(struct bgen_vm));
     for (int i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
 
@@ -411,7 +413,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
 
         fread_int(file, &vars[i].position, 4);
         fread_int(file, &vars[i].nalleles, 2);
-        vars[i].allele_ids = dalloc(sizeof(struct bgen_str) * vars[i].nalleles);
+        vars[i].allele_ids = malloc(sizeof(struct bgen_str) * vars[i].nalleles);
 
         for (int j = 0; j < vars[i].nalleles; ++j)
             fread_str(file, vars[i].allele_ids + j, 4);

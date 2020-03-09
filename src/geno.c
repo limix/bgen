@@ -5,12 +5,13 @@
 #include "layout/one.h"
 #include "layout/two.h"
 #include "mem.h"
+#include "free.h"
 #include "report.h"
 #include <assert.h>
 
-struct bgen_vg* create_vg()
+struct bgen_vg* create_vg(void)
 {
-    struct bgen_vg* vg = dalloc(sizeof(struct bgen_vg));
+    struct bgen_vg* vg = malloc(sizeof(struct bgen_vg));
     vg->plo_miss = NULL;
     vg->chunk = NULL;
     vg->current_chunk = NULL;
@@ -20,10 +21,13 @@ struct bgen_vg* create_vg()
 int free_vg(struct bgen_vg* vg)
 {
     if (vg) {
-        vg->plo_miss = free_nul(vg->plo_miss);
-        vg->current_chunk = vg->chunk = free_nul(vg->chunk);
+        free_c(vg->plo_miss);
+        vg->plo_miss = NULL;
+        free_c(vg->chunk);
+        vg->current_chunk = vg->chunk = NULL;
     }
-    return free_nul(vg) != NULL;
+    free_c(vg);
+    return 0;
 }
 
 struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
@@ -52,14 +56,15 @@ struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vaddr)
         goto err;
     }
 
-    free_nul(vi.filepath);
-    free_nul(vi.start);
+    free_c(vi.filepath);
+    free_c(vi.start);
     return vg;
 
 err:
-    free_nul(vi.filepath);
-    free_nul(vi.start);
-    return free_nul(vg);
+    free_c(vi.filepath);
+    free_c(vi.start);
+    free_c(vg);
+    return NULL;
 }
 
 void bgen_close_genotype(struct bgen_vg* vg) { free_vg(vg); }

@@ -1,3 +1,4 @@
+#include "free.h"
 #include "variant.h"
 #include "file.h"
 #include "mem.h"
@@ -37,7 +38,7 @@ int next_variant(struct bgen_file *bgen, struct bgen_vm *vm)
     else if (fread_int(bgen_file_stream(bgen), &vm->nalleles, 2))
         goto err;
 
-    vm->allele_ids = dalloc(vm->nalleles * sizeof(struct bgen_str));
+    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str));
     if (!vm->allele_ids)
         goto err;
 
@@ -65,7 +66,7 @@ void init_metadata(struct bgen_vm *vm)
 
 struct bgen_vm *alloc_metadata(void)
 {
-    struct bgen_vm *v = dalloc(sizeof(struct bgen_vm));
+    struct bgen_vm *v = malloc(sizeof(struct bgen_vm));
     if (v)
         init_metadata(v);
     return v;
@@ -80,5 +81,6 @@ void free_metadata(struct bgen_vm *vm)
         for (size_t i = 0; i < (size_t)vm->nalleles; ++i)
             bgen_str_free(vm->allele_ids + i);
     }
-    vm->allele_ids = free_nul(vm->allele_ids);
+    free_c(vm->allele_ids);
+    vm->allele_ids = NULL;
 }

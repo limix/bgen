@@ -14,7 +14,7 @@ void alloc_str(struct bgen_str* v, size_t len)
 {
     v->length = len;
     if (len > 0)
-        v->data = dalloc(len);
+        v->data = malloc(len);
     else
         v->data = NULL;
 }
