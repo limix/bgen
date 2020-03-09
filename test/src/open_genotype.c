@@ -20,19 +20,19 @@ void test_file(void)
 {
     size_t i, jj;
     const char filename[] = "data/complex.23bits.bgen";
-    struct bgen_file *bgen;
+    struct bgen_file* bgen;
     int nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_file_nvariants(bgen)) == 10);
 
-    struct bgen_str *sample_ids = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples2(bgen, 0);
 
-    cass_cond(strncmp("sample_0", sample_ids[0].data, sample_ids[0].length) == 0);
-    cass_cond(strncmp("sample_3", sample_ids[3].data, sample_ids[3].length) == 0);
+    cass_cond(bgen_str_equal(BGEN_STR("sample_0"), *bgen_samples_get(samples, 0)));
+    cass_cond(bgen_str_equal(BGEN_STR("sample_3"), *bgen_samples_get(samples, 3)));
 
-    free(sample_ids);
+    bgen_samples_free(samples);
 
     struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
@@ -44,15 +44,13 @@ void test_file(void)
     cass_cond(bgen_nalleles(vg) == 2);
     bgen_close_genotype(vg);
 
-
     int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     int correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
-    char *allele_ids[] = {"A",       "G", "A",  "G",   "A",    "G",     "A",
-                          "G",       "T", "A",  "G",   "A",    "G",     "GT",
-                          "GTT",     "A", "G",  "GT",  "GTT",  "GTTT",  "GTTTT",
-                          "A",       "G", "GT", "GTT", "GTTT", "GTTTT", "GTTTTT",
-                          "A",       "G", "GT", "GTT", "GTTT", "GTTTT", "GTTTTT",
-                          "GTTTTTT", "A", "G"};
+    char* allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
+                          "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
+                          "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
+                          "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
+                          "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
@@ -61,7 +59,7 @@ void test_file(void)
         for (int j = 0; j < vm[i].nalleles; ++j) {
 
             cass_cond(strncmp(allele_ids[jj], vm[i].allele_ids[j].data,
-                        vm[i].allele_ids[j].length) == 0);
+                              vm[i].allele_ids[j].length) == 0);
             ++jj;
         }
     }
@@ -73,20 +71,19 @@ void test_file(void)
 void test_geno(void)
 {
     const char filename[] = "data/complex.23bits.bgen";
-    struct bgen_file *bgen;
+    struct bgen_file* bgen;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
 
-    struct bgen_mf *mf =
-        bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
+    struct bgen_mf* mf = bgen_create_metafile(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
 
     cass_cond(bgen_metafile_npartitions(mf) == 3);
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
     int nvars;
-    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
+    struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm[0].vaddr);
+    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
 
     cass_cond(bgen_nalleles(vg) == 2);
     cass_cond(bgen_missing(vg, 0) == 0);
@@ -127,7 +124,7 @@ void test_geno(void)
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_open_genotype(bgen, vm[l].vaddr);
-            cass_cond (bgen_phased(vg) == phased[i]);
+            cass_cond(bgen_phased(vg) == phased[i]);
             bgen_close_genotype(vg);
             ++i;
         }
@@ -179,7 +176,7 @@ void test_geno(void)
         0.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000,
         0.000000, 0.000000, 1.000000, 0.000000};
 
-    double *rp = real_probs;
+    double* rp = real_probs;
 
     int nsamples = bgen_file_nsamples(bgen);
     size_t jj = 0;
@@ -188,8 +185,8 @@ void test_geno(void)
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_open_genotype(bgen, vm[l].vaddr);
 
-            double *probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-            double *p = probabilities;
+            double* probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
+            double* p = probabilities;
             bgen_read_genotype(bgen, vg, probabilities);
 
             for (j = 0; j < (size_t)nsamples; ++j) {
@@ -198,7 +195,7 @@ void test_geno(void)
                 cass_cond(bgen_missing(vg, j) == 0);
 
                 for (size_t ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
-                    cass_cond (!(*rp != *p && !(isnan(*rp) && isnan(*p))));
+                    cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                     ++rp;
                     ++p;
                 }

@@ -17,7 +17,6 @@ int main(void)
 void test_zeo_len_chrom_id(void)
 {
     struct bgen_file *bgen;
-    struct bgen_str *samples;
 
     bgen = bgen_file_open("data/zero_len_chrom_id.bgen");
 
@@ -26,9 +25,9 @@ void test_zeo_len_chrom_id(void)
     cass_cond(bgen_file_nsamples(bgen) == 182);
     cass_cond(bgen_file_nvariants(bgen) == 50);
 
-    samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples *samples = bgen_file_read_samples2(bgen, 0);
     cass_cond(samples != NULL);
-    free(samples);
+    bgen_samples_free(samples);
 
     struct bgen_mf *mf = bgen_create_metafile(bgen, "zero_len_chrom_id.metadata", 2, 0);
     cass_cond(mf != NULL);
