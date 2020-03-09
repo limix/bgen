@@ -1,4 +1,4 @@
-#include "layout/one.h"
+#include "layout_one.h"
 #include "bgen/bgen.h"
 #include "file.h"
 #include "geno.h"
@@ -10,7 +10,42 @@
 #include <math.h>
 #include <stdlib.h>
 
-void bgen_read_unphased_one(struct bgen_vg* vg, double* probabilities)
+static void  read_unphased(struct bgen_vg* vg, double* probabilities);
+static char* _uncompress(struct bgen_vi* index, FILE* file);
+
+void bgen_read_probs_one(struct bgen_vg* vg, double* p) { read_unphased(vg, p); }
+
+int bgen_read_probs_header_one(struct bgen_vi* index, struct bgen_vg* vg, FILE* file)
+{
+    char* c;
+    char* chunk;
+
+    if (index->compression > 0) {
+        chunk = _uncompress(index, file);
+        c = chunk;
+    } else {
+        chunk = malloc(6 * index->nsamples);
+
+        if (fread(chunk, 1, 6 * index->nsamples, file) < 6 * index->nsamples) {
+            free(chunk);
+            return 1;
+        }
+
+        c = chunk;
+    }
+
+    vg->nsamples = index->nsamples;
+    vg->nalleles = 2;
+    vg->ncombs = 3;
+    vg->min_ploidy = 2;
+    vg->max_ploidy = 2;
+    vg->chunk = chunk;
+    vg->current_chunk = c;
+
+    return 0;
+}
+
+static void read_unphased(struct bgen_vg* vg, double* probabilities)
 {
     uint16_t ui_prob;
 
@@ -36,12 +71,10 @@ void bgen_read_unphased_one(struct bgen_vg* vg, double* probabilities)
     }
 }
 
-void bgen_read_probs_one(struct bgen_vg* vg, double* p) { bgen_read_unphased_one(vg, p); }
-
-char* bgen_uncompress_layout1(struct bgen_vi* index, FILE* file)
+static char* _uncompress(struct bgen_vi* index, FILE* file)
 {
     size_t clength, ulength;
-    char *cchunk, *uchunk;
+    char * cchunk, *uchunk;
 
     clength = 0;
     ulength = 0;
@@ -70,34 +103,4 @@ char* bgen_uncompress_layout1(struct bgen_vi* index, FILE* file)
     free(cchunk);
 
     return uchunk;
-}
-
-int bgen_read_probs_header_one(struct bgen_vi* index, struct bgen_vg* vg, FILE* file)
-{
-    char* c;
-    char* chunk;
-
-    if (index->compression > 0) {
-        chunk = bgen_uncompress_layout1(index, file);
-        c = chunk;
-    } else {
-        chunk = malloc(6 * index->nsamples);
-
-        if (fread(chunk, 1, 6 * index->nsamples, file) < 6 * index->nsamples) {
-            free(chunk);
-            return 1;
-        }
-
-        c = chunk;
-    }
-
-    vg->nsamples = index->nsamples;
-    vg->nalleles = 2;
-    vg->ncombs = 3;
-    vg->min_ploidy = 2;
-    vg->max_ploidy = 2;
-    vg->chunk = chunk;
-    vg->current_chunk = c;
-
-    return 0;
 }

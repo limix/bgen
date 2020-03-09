@@ -8,10 +8,6 @@
 #include "bgen_export.h"
 #include <stddef.h>
 
-/** Variant index.
- * @struct bgen_vi
- */
-struct bgen_vi;
 /** Variant genotype.
  * @struct bgen_vg
  */
@@ -28,7 +24,7 @@ BGEN_EXPORT struct bgen_vg* bgen_open_genotype(struct bgen_file* bgen, long vadd
  *
  * @param vg Variant genotype handler.
  */
-BGEN_EXPORT void bgen_close_genotype(struct bgen_vg* vg);
+BGEN_EXPORT void bgen_close_genotype(struct bgen_vg const* vg);
 /** Read the probabilities of each possible genotype.
  *
  * The length of this array is equal to the product of the values obtained by calling
