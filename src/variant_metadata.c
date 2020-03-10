@@ -4,6 +4,7 @@
 #include "io.h"
 #include "str.h"
 #include "variant_metadata.h"
+#include "report.h"
 
 static struct bgen_vm* variant_metadata_create(void);
 static void            variant_metadata_destroy(struct bgen_vm const* vm);
@@ -23,6 +24,10 @@ struct bgen_vm* bgen_variant_metadata_begin(struct bgen_file* bgen, int* error)
 struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
 {
     struct bgen_vm* vm = variant_metadata_create();
+    *error = 0;
+
+    if (feof(bgen_file_stream(bgen)))
+        return NULL;
 
     if (bgen_file_layout(bgen) == 1) {
         if (LONG_SEEK(bgen_file_stream(bgen), 4, SEEK_CUR))
@@ -53,10 +58,19 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
     if (!vm->allele_ids)
         goto err;
 
-    for (size_t i = 0; i < (size_t)vm->nalleles; ++i) {
+    for (uint16_t i = 0; i < vm->nalleles; ++i) {
 
         if ((vm->allele_ids[i] = bgen_str_fread(bgen_file_stream(bgen), 4)) == NULL)
             goto err;
+    }
+
+    uint32_t length = 0;
+    if (fread_ui32(bgen_file_stream(bgen), &length, 4))
+        goto err;
+
+    if (LONG_SEEK(bgen_file_stream(bgen), length, SEEK_CUR)) {
+        bgen_perror("could not jump to the next variant");
+        goto err;
     }
 
     return vm;
@@ -97,4 +111,6 @@ static void variant_metadata_destroy(struct bgen_vm const* vm)
         }
         free_c(vm->allele_ids);
     }
+
+    free_c(vm);
 }
