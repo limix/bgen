@@ -43,11 +43,11 @@ struct bgen_mf
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
 static int             bgen_partition_nvars(struct bgen_mf const* mf, int part);
 static int             _next_variant(struct bgen_vm* vm, uint64_t* geno_offset,
-                                     struct next_variant_ctx* c);
+                                     struct bgen_file *bgen, uint32_t *nvariants);
 static uint64_t        write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset);
 static int             write_metafile_header(FILE* stream);
 static int             write_metafile_nvariants(FILE* stream, uint32_t nvariants);
-static int write_metafile_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* args,
+static int write_metafile_metadata_block(struct bgen_mf* mf,struct bgen_file *bgen,
                                          int verbose);
 static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions, uint64_t* poffset);
 
@@ -75,11 +75,11 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
     if (bgen_file_seek_variants_start(bgen))
         goto err;
 
-    struct next_variant_ctx ctx = {bgen, bgen_file_nvariants(bgen)};
+    /* struct next_variant_ctx ctx = {bgen, bgen_file_nvariants(bgen)}; */
 
     mf->idx.poffset = malloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
 
-    if (write_metafile_metadata_block(mf, &_next_variant, &ctx, verbose))
+    if (write_metafile_metadata_block(mf, bgen, verbose))
         goto err;
 
     if (write_metafile_offsets_block(mf->stream, mf->idx.npartitions, mf->idx.poffset))
@@ -266,28 +266,29 @@ static int bgen_partition_nvars(struct bgen_mf const* mf, int part)
  *   Number of variants left to read plus one. `0` indicates the end of the list. `-1`
  *   indicates that an error has occurred.
  */
-static int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct next_variant_ctx* c)
+static int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct bgen_file *bgen,
+            uint32_t *nvariants)
 {
-    if (c->nvariants == 0)
+    if (*nvariants == 0)
         return 0;
 
-    if (next_variant(c->bgen, vm))
+    if (next_variant(bgen, vm))
         goto err;
 
-    *geno_offset = LONG_TELL(bgen_file_stream(c->bgen));
+    *geno_offset = LONG_TELL(bgen_file_stream(bgen));
 
     uint32_t length;
-    if (fread_ui32(bgen_file_stream(c->bgen), &length, 4)) {
+    if (fread_ui32(bgen_file_stream(bgen), &length, 4)) {
         bgen_error("Could not read the genotype block length");
         goto err;
     }
 
-    if (LONG_SEEK(bgen_file_stream(c->bgen), length, SEEK_CUR)) {
+    if (LONG_SEEK(bgen_file_stream(bgen), length, SEEK_CUR)) {
         bgen_perror("Could not jump to the next variant");
         goto err;
     }
 
-    return (c->nvariants)--;
+    return (*nvariants)--;
 err:
     return -1;
 }
@@ -318,7 +319,7 @@ static uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset
     return LONG_TELL(fp) - start;
 }
 
-static int write_metafile_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* args,
+static int write_metafile_metadata_block(struct bgen_mf* mf, struct bgen_file *bgen, 
                                          int verbose)
 {
     struct bgen_vm vm;
@@ -333,8 +334,9 @@ static int write_metafile_metadata_block(struct bgen_mf* mf, next_variant_t* nex
     }
 
     int      e;
-    uint64_t offset;
-    for (size_t i = 0, j = 0; (e = next(&vm, &offset, args)) > 0;) {
+    uint64_t offset; 
+    uint32_t nvariants = bgen_file_nvariants(bgen);
+    for (size_t i = 0, j = 0; (e = _next_variant(&vm, &offset, bgen, &nvariants)) > 0;) {
         uint64_t size;
 
         if ((size = write_variant(mf->stream, &vm, offset)) == 0)
