@@ -1,44 +1,9 @@
-/** Create and query a metafile.
- * @file bgen/meta.h
- *
- * A bgen metafile is defined as follows:
- *
- * [ header block of 13 characters ], : "bgen index 03"
- * [ uint32_t : number of variants ],
- * [ uint64_t : metadata block size ],
- * [                                       \
- *   uint64_t        : variant offset      |
- *   uint16_t, str,  : variant id          |
- *   uint16_t, str,  : variant rsid        |
- *   uint16_t, str,  : variant chrom       |
- *   uint32_t,       : genetic position    | Metadata block
- *   uint16_t,       : number of alleles   |
- *   [                                     |
- *     uint32_t, str : allele id           |
- *   ], ...                                |
- * ], ...                                  /
- * [ uint32_t : number of partitions ],
- * [                                       \
- *   [                                     |
- *     uint64_t : partition offset         | Offsets block
- *   ], ...                                |
- * ]                                       /
- *
- * Version 03.
- */
 #ifndef BGEN_META_H
 #define BGEN_META_H
 
 #include "bgen/file.h"
 #include "bgen/str.h"
 #include "bgen_export.h"
-
-/** Metafile header: name field. */
-#define BGEN_METAFILE_HDR_NAME "bgen index "
-/** Metafile header: version field. */
-#define BGEN_METAFILE_HDR_VERSION "03"
-/** Metafile header: total length. */
-#define BGEN_METAFILE_HDR_LENGTH 13
 
 struct bgen_file;
 /** Metafile handler.
