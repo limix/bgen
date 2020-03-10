@@ -49,6 +49,7 @@ extern "C"
 #include "bgen/meta.h"
 #include "bgen/samples.h"
 #include "bgen/str.h"
+#include "bgen/variant_metadata.h"
 
 #ifdef __cplusplus
 }

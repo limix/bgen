@@ -7,6 +7,7 @@
 #include "report.h"
 #include "str.h"
 #include "variant.h"
+#include "metafile.h"
 #include <inttypes.h>
 
 /* Fetch the variant metada and record the genotype offset.
