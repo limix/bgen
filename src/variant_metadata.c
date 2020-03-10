@@ -2,12 +2,11 @@
 #include "file.h"
 #include "free.h"
 #include "io.h"
+#include "report.h"
 #include "str.h"
 #include "variant_metadata.h"
-#include "report.h"
 
 static struct bgen_vm* variant_metadata_create(void);
-static void            variant_metadata_destroy(struct bgen_vm const* vm);
 
 struct bgen_vm* bgen_variant_metadata_begin(struct bgen_file* bgen, int* error)
 {
@@ -19,8 +18,6 @@ struct bgen_vm* bgen_variant_metadata_begin(struct bgen_file* bgen, int* error)
     return bgen_variant_metadata_next(bgen, error);
 }
 
-/* Fetch the next variant metadata from a bgen file.
- */
 struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
 {
     struct bgen_vm* vm = variant_metadata_create();
@@ -64,7 +61,12 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
             goto err;
     }
 
-    vm->genotype_offset = LONG_TELL(bgen_file_stream(bgen));
+    OFF_T offset = LONG_TELL(bgen_file_stream(bgen));
+    if (offset < 0) {
+        bgen_perror("could not ftell");
+        goto err;
+    }
+    vm->genotype_offset = (uint64_t)offset;
 
     uint32_t length = 0;
     if (fread_ui32(bgen_file_stream(bgen), &length, 4))
@@ -77,25 +79,14 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
 
     return vm;
 err:
-    variant_metadata_destroy(vm);
+    bgen_variant_metadata_destroy(vm);
     *error = 1;
     return NULL;
 }
 
-static struct bgen_vm* variant_metadata_create(void)
-{
-    struct bgen_vm* vm = malloc(sizeof(struct bgen_vm));
-    vm->genotype_offset = 0;
-    vm->id = NULL;
-    vm->rsid = NULL;
-    vm->chrom = NULL;
-    vm->position = 0;
-    vm->nalleles = 0;
-    vm->allele_ids = NULL;
-    return vm;
-}
+struct bgen_vm* bgen_variant_metadata_end(struct bgen_file* bgen_file) { return NULL; }
 
-static void variant_metadata_destroy(struct bgen_vm const* vm)
+void bgen_variant_metadata_destroy(struct bgen_vm const* vm)
 {
     if (vm->id)
         bgen_str_free(vm->id);
@@ -115,4 +106,17 @@ static void variant_metadata_destroy(struct bgen_vm const* vm)
     }
 
     free_c(vm);
+}
+
+static struct bgen_vm* variant_metadata_create(void)
+{
+    struct bgen_vm* vm = malloc(sizeof(struct bgen_vm));
+    vm->id = NULL;
+    vm->rsid = NULL;
+    vm->chrom = NULL;
+    vm->position = 0;
+    vm->nalleles = 0;
+    vm->allele_ids = NULL;
+    vm->genotype_offset = 0;
+    return vm;
 }
