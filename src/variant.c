@@ -2,9 +2,7 @@
 #include "file.h"
 #include "free.h"
 #include "io.h"
-#include "mem.h"
 #include "str.h"
-#include <assert.h>
 
 /* Fetch the next variant metadata from a bgen file.
  *

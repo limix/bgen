@@ -99,14 +99,14 @@ BGEN_EXPORT unsigned bgen_metafile_nvariants(struct bgen_mf const* mf);
  * @param nvariants Number of variants of the partition.
  * @return Array of variant metadata.
  */
-BGEN_EXPORT struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int index,
-                                                int* nvariants);
+BGEN_EXPORT struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t index,
+                                                uint32_t* nvariants);
 /** Free a partition.
  *
  * @param vm Array of variant metatada.
  * @param nvariants Number of variants of the partition.
  */
-BGEN_EXPORT void bgen_free_partition(struct bgen_vm* vm, int nvariants);
+BGEN_EXPORT void bgen_free_partition(struct bgen_vm* vm, uint32_t nvariants);
 /** Close a metafile handler.
  *
  * @param mf Metafile handler.
