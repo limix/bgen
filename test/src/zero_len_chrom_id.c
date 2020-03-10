@@ -39,6 +39,6 @@ void test_zeo_len_chrom_id(void)
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].chrom));
     bgen_free_partition(vm, nvariants);
 
-    bgen_close_metafile(mf);
+    bgen_mf_close(mf);
     bgen_file_close(bgen);
 }

@@ -54,7 +54,7 @@ void test_create_meteadata_haplotypes()
     bgen_close_genotype(vg);
     bgen_free_partition(vm, nvars);
 
-    cass_equal_int(bgen_close_metafile(mf), 0);
+    cass_equal_int(bgen_mf_close(mf), 0);
     bgen_file_close(bgen);
 }
 
@@ -132,7 +132,7 @@ void test_genotype_haplotypes_by_creating_metadata()
         bgen_free_partition(vm, nvars);
     }
 
-    cass_equal_int(bgen_close_metafile(mf), 0);
+    cass_equal_int(bgen_mf_close(mf), 0);
     bgen_file_close(bgen);
 }
 
@@ -211,7 +211,7 @@ void test_genotype_haplotypes_by_loading_metadata()
         bgen_free_partition(vm, nvars);
     }
 
-    cass_equal_int(bgen_close_metafile(mf), 0);
+    cass_equal_int(bgen_mf_close(mf), 0);
     bgen_file_close(bgen);
 }
 

@@ -63,7 +63,7 @@ void test_file(void)
         }
     }
     bgen_free_partition(vm, nvariants);
-    cass_cond(bgen_close_metafile(mf) == 0);
+    cass_cond(bgen_mf_close(mf) == 0);
     bgen_file_close(bgen);
 }
 
@@ -206,6 +206,6 @@ void test_geno(void)
         bgen_free_partition(vm, nvars);
     }
 
-    cass_cond(bgen_close_metafile(mf) == 0);
+    cass_cond(bgen_mf_close(mf) == 0);
     bgen_file_close(bgen);
 }

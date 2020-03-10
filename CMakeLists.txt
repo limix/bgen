@@ -71,6 +71,12 @@ check_c_source_compiles(
 )
 target_compile_definitions(bgen PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
+include(TestBigEndian)
+test_big_endian(IS_BIG_ENDIAN)
+if(IS_BIG_ENDIAN)
+    message(FATAL_ERROR "Sorry, big-endian platforms are not supported yet.")
+endif()
+
 install(TARGETS bgen EXPORT bgen-targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib

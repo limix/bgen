@@ -50,7 +50,7 @@ void test_create_metadata_complex()
     bgen_close_genotype(vg);
     bgen_free_partition(vm, nvars);
 
-    cass_equal_int(bgen_close_metafile(mf), 0);
+    cass_equal_int(bgen_mf_close(mf), 0);
     bgen_file_close(bgen);
 }
 
@@ -150,7 +150,7 @@ void test_genotype_complex()
             bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 4, 0);
 
         _test_genotype_complex(bgen, mf);
-        cass_equal_int(bgen_close_metafile(mf), 0);
+        cass_equal_int(bgen_mf_close(mf), 0);
         bgen_file_close(bgen);
     }
 
@@ -159,7 +159,7 @@ void test_genotype_complex()
         struct bgen_mf* mf = bgen_open_metafile("complex.23bits.bgen.metadata.2");
 
         _test_genotype_complex(bgen, mf);
-        cass_equal_int(bgen_close_metafile(mf), 0);
+        cass_equal_int(bgen_mf_close(mf), 0);
         bgen_file_close(bgen);
     }
 }

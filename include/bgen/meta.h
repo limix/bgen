@@ -33,12 +33,12 @@
 #include "bgen/str.h"
 #include "bgen_export.h"
 
-/** Metafile index name. */
-#define BGEN_IDX_NAME "bgen index "
-/** Metafile index version. */
-#define BGEN_IDX_VER "03"
-/** Metafile index name length. */
-#define BGEN_HDR_LEN 13
+/** Metafile header: name field. */
+#define BGEN_METAFILE_HDR_NAME "bgen index "
+/** Metafile header: version field. */
+#define BGEN_METAFILE_HDR_VERSION "03"
+/** Metafile header: total length. */
+#define BGEN_METAFILE_HDR_LENGTH 13
 
 struct bgen_file;
 /** Metafile handler.
@@ -112,6 +112,6 @@ BGEN_EXPORT void bgen_free_partition(struct bgen_vm* vm, int nvariants);
  * @param mf Metafile handler.
  * @return `0` on success; `1` otherwise.
  */
-BGEN_EXPORT int bgen_close_metafile(struct bgen_mf* mf);
+BGEN_EXPORT int bgen_mf_close(struct bgen_mf* mf);
 
 #endif

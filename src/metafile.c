@@ -36,27 +36,29 @@ struct bgen_idx
 struct bgen_mf
 {
     char*           filepath;
-    FILE*           file;
+    FILE*           stream;
     struct bgen_idx idx;
 };
 
 inline static uint32_t ceildiv(uint32_t x, uint32_t y) { return (x + (y - 1)) / y; }
 
-static struct bgen_mf* alloc_mf(void);
+static struct bgen_mf* bgen_mf_alloc(void);
 static int             bgen_partition_nvars(struct bgen_mf const* mf, int part);
 static int             _next_variant(struct bgen_vm* vm, uint64_t* geno_offset,
                                      struct next_variant_ctx* c);
-static struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t nparts);
+static struct bgen_mf* create_metafile(const char* filepath, uint32_t nvariants,
+                                       uint32_t npartitions);
 static uint64_t        write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset);
+static int write_metafile_header(struct bgen_mf* mf);
 static int write_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* args,
                                 int verbose);
 static int write_offsets_block(struct bgen_mf* mf);
 static int write_metafile(struct bgen_mf* mf, next_variant_t* next, void* args, int verbose);
 
-struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, const char* fp,
+struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepath,
                                      unsigned npartitions, int verbose)
 {
-    struct bgen_mf* mf = create_metafile(fp, bgen_file_nvariants(bgen), npartitions);
+    struct bgen_mf* mf = create_metafile(filepath, bgen_file_nvariants(bgen), npartitions);
     if (!mf)
         goto err;
 
@@ -69,20 +71,20 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, const char* fp,
         goto err;
     }
 
-    if (fflush(mf->file)) {
+    if (fflush(mf->stream)) {
         bgen_perror("Could not fflush");
         goto err;
     }
 
     return mf;
 err:
-    bgen_close_metafile(mf);
+    bgen_mf_close(mf);
     return NULL;
 }
 
 struct bgen_mf* bgen_open_metafile(const char* filepath)
 {
-    struct bgen_mf* mf = alloc_mf();
+    struct bgen_mf* mf = bgen_mf_alloc();
     if (!mf) {
         bgen_error("Could not allocate resources for metafile");
         goto err;
@@ -90,13 +92,13 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
 
     mf->filepath = strdup(filepath);
 
-    if (!(mf->file = fopen(mf->filepath, "rb"))) {
+    if (!(mf->stream = fopen(mf->filepath, "rb"))) {
         bgen_perror("Could not open %s", mf->filepath);
         goto err;
     }
 
     char header[13];
-    if (fread(header, 13 * sizeof(char), 1, mf->file) != 1) {
+    if (fread(header, 13 * sizeof(char), 1, mf->stream) != 1) {
         bgen_perror("Could not fetch the metafile header");
         goto err;
     }
@@ -106,12 +108,12 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    if (fread(&(mf->idx.nvariants), sizeof(uint32_t), 1, mf->file) != 1) {
+    if (fread(&(mf->idx.nvariants), sizeof(uint32_t), 1, mf->stream) != 1) {
         bgen_perror("Could not read the number of variants from metafile");
         goto err;
     }
 
-    if (fread(&(mf->idx.metasize), sizeof(uint64_t), 1, mf->file) != 1) {
+    if (fread(&(mf->idx.metasize), sizeof(uint64_t), 1, mf->stream) != 1) {
         bgen_perror("Could not read the metasize from metafile");
         goto err;
     }
@@ -121,12 +123,12 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    if (LONG_SEEK(mf->file, (OFF_T)mf->idx.metasize, SEEK_CUR)) {
+    if (LONG_SEEK(mf->stream, (OFF_T)mf->idx.metasize, SEEK_CUR)) {
         bgen_error("Could to fseek to the number of partitions");
         goto err;
     }
 
-    if (fread(&(mf->idx.npartitions), sizeof(uint32_t), 1, mf->file) != 1) {
+    if (fread(&(mf->idx.npartitions), sizeof(uint32_t), 1, mf->stream) != 1) {
         bgen_perror("Could not read the number of partitions");
         goto err;
     }
@@ -134,7 +136,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
     mf->idx.poffset = malloc(mf->idx.npartitions * sizeof(uint64_t));
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
-        if (fread(mf->idx.poffset + i, sizeof(uint64_t), 1, mf->file) != 1) {
+        if (fread(mf->idx.poffset + i, sizeof(uint64_t), 1, mf->stream) != 1) {
             bgen_perror("Could not read partition offsets");
             goto err;
         }
@@ -142,7 +144,7 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
 
     return mf;
 err:
-    bgen_close_metafile(mf);
+    bgen_mf_close(mf);
     return NULL;
 }
 
@@ -153,7 +155,7 @@ unsigned bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->idx.nvar
 struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nvars)
 {
     struct bgen_vm* vars = NULL;
-    FILE*           file = mf->file;
+    FILE*           file = mf->stream;
 
     if ((uint32_t)part >= mf->idx.npartitions) {
         bgen_error("The provided partition number %d is out-of-range", part);
@@ -205,14 +207,14 @@ void bgen_free_partition(struct bgen_vm* vars, int nvars)
     free(vars);
 }
 
-int bgen_close_metafile(struct bgen_mf* mf)
+int bgen_mf_close(struct bgen_mf* mf)
 {
     if (mf) {
-        if (fclose(mf->file)) {
+        if (fclose(mf->stream)) {
             bgen_perror("could not close the %s file", mf->filepath);
             return 1;
         }
-        mf->file = NULL;
+        mf->stream = NULL;
         free_c(mf->filepath);
         free_c(mf->idx.poffset);
         free_c(mf);
@@ -220,11 +222,11 @@ int bgen_close_metafile(struct bgen_mf* mf)
     return 0;
 }
 
-static struct bgen_mf* alloc_mf(void)
+static struct bgen_mf* bgen_mf_alloc(void)
 {
     struct bgen_mf* mf = malloc(sizeof(struct bgen_mf));
     mf->filepath = NULL;
-    mf->file = NULL;
+    mf->stream = NULL;
     mf->idx.poffset = NULL;
     return mf;
 }
@@ -282,43 +284,41 @@ err:
     return -1;
 }
 
-struct bgen_mf* create_metafile(const char* filepath, uint32_t nvars, uint32_t nparts)
+struct bgen_mf* create_metafile(const char* filepath, uint32_t nvariants, uint32_t npartitions)
 {
-    struct bgen_mf* mf = alloc_mf();
+    struct bgen_mf* mf = bgen_mf_alloc();
     if (!mf)
         goto err;
 
     if (!is_little_endian()) {
-        bgen_error("This program does not support big-endian platforms yet.");
+        bgen_error("this program does not support big-endian platforms yet.");
         goto err;
     }
 
-    if (!(mf->file = fopen(filepath, "w+b"))) {
-        bgen_perror("Could not create file %s", filepath);
+    if (!(mf->stream = fopen(filepath, "w+b"))) {
+        bgen_perror("could not create file %s", filepath);
         goto err;
     }
 
     mf->filepath = strdup(filepath);
 
-    if (fwrite(BGEN_IDX_NAME BGEN_IDX_VER, BGEN_HDR_LEN * sizeof(char), 1, mf->file) != 1) {
-        bgen_perror("could not write to file");
+    if (write_metafile_header(mf))
+        goto err;
+
+    if (fwrite(&nvariants, sizeof(nvariants), 1, mf->stream) != 1) {
+        bgen_perror("could not write the number of variants to file");
         goto err;
     }
 
-    if (fwrite(&nvars, sizeof(uint32_t), 1, mf->file) != 1) {
-        bgen_perror("could not write to file");
-        goto err;
-    }
-
-    if (LONG_SEEK(mf->file, sizeof(uint64_t), SEEK_CUR))
+    if (LONG_SEEK(mf->stream, sizeof(uint64_t), SEEK_CUR))
         goto err;
 
-    mf->idx.npartitions = nparts;
-    mf->idx.nvariants = nvars;
+    mf->idx.npartitions = npartitions;
+    mf->idx.nvariants = nvariants;
 
     return mf;
 err:
-    bgen_close_metafile(mf);
+    bgen_mf_close(mf);
     return NULL;
 }
 
@@ -367,7 +367,7 @@ static int write_metadata_block(struct bgen_mf* mf, next_variant_t* next, void* 
     for (size_t i = 0, j = 0; (e = next(&vm, &offset, args)) > 0;) {
         uint64_t size;
 
-        if ((size = write_variant(mf->file, &vm, offset)) == 0)
+        if ((size = write_variant(mf->stream, &vm, offset)) == 0)
             goto err;
 
         if (at)
@@ -398,24 +398,24 @@ err:
 
 static int write_offsets_block(struct bgen_mf* mf)
 {
-    if (fwrite_ui32(mf->file, mf->idx.npartitions, sizeof(mf->idx.npartitions))) {
+    if (fwrite_ui32(mf->stream, mf->idx.npartitions, sizeof(mf->idx.npartitions))) {
         bgen_error("Could not write the number of partitions %d", mf->idx.npartitions);
         goto err;
     }
 
     for (size_t i = 0; i < mf->idx.npartitions; ++i) {
-        if (fwrite_ui64(mf->file, mf->idx.poffset[i], sizeof(uint64_t))) {
+        if (fwrite_ui64(mf->stream, mf->idx.poffset[i], sizeof(uint64_t))) {
             bgen_error("Could not write a partition offset");
             goto err;
         }
     }
 
-    if (LONG_SEEK(mf->file, BGEN_HDR_LEN + sizeof(uint32_t), SEEK_SET)) {
+    if (LONG_SEEK(mf->stream, BGEN_METAFILE_HDR_LENGTH + sizeof(uint32_t), SEEK_SET)) {
         bgen_perror("Could not fseek");
         goto err;
     }
 
-    if (fwrite_ui64(mf->file, mf->idx.poffset[mf->idx.npartitions], sizeof(uint64_t))) {
+    if (fwrite_ui64(mf->stream, mf->idx.poffset[mf->idx.npartitions], sizeof(uint64_t))) {
         bgen_error("Could not write the size of the metadata block");
         goto err;
     }
@@ -451,4 +451,16 @@ err:
     free_c(mf->idx.poffset);
     mf->idx.poffset = NULL;
     return 1;
+}
+
+static int write_metafile_header(struct bgen_mf* mf)
+{
+    char const header[BGEN_METAFILE_HDR_LENGTH] = {
+        BGEN_METAFILE_HDR_NAME BGEN_METAFILE_HDR_VERSION};
+
+    if (fwrite(header, BGEN_METAFILE_HDR_LENGTH, 1, mf->stream) != 1) {
+        bgen_perror("could not write header to file");
+        return 1;
+    }
+    return 0;
 }

@@ -138,7 +138,7 @@ int main()
 
         test_read(bgen, mf, prec);
 
-        cass_cond(bgen_close_metafile(mf) == 0);
+        cass_cond(bgen_mf_close(mf) == 0);
         bgen_file_close(bgen);
     }
 
