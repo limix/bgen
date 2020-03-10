@@ -1,10 +1,8 @@
 #ifndef BGEN_METAFILE_WRITE_H
 #define BGEN_METAFILE_WRITE_H
 
-#include "bgen/meta.h"
 #include "bmath.h"
 #include "io.h"
-#include "metafile.h"
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
@@ -51,29 +49,29 @@ static int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct bgen_
 }
 
 /* Write variant genotype to file and return the block size. */
-static uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset)
+static uint64_t write_variant(FILE* stream, const struct bgen_vm* v, uint64_t offset)
 {
-    OFF_T start = LONG_TELL(fp);
+    OFF_T start = LONG_TELL(stream);
 
-    fwrite_ui64(fp, offset, 8);
-    if (bgen_str_fwrite(v->id, fp, 2))
+    fwrite_ui64(stream, offset, 8);
+    if (bgen_str_fwrite(v->id, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(v->rsid, fp, 2))
+    if (bgen_str_fwrite(v->rsid, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(v->chrom, fp, 2))
+    if (bgen_str_fwrite(v->chrom, stream, 2))
         return 0;
 
-    fwrite_ui32(fp, v->position, 4);
-    fwrite_ui16(fp, v->nalleles, 2);
+    fwrite_ui32(stream, v->position, 4);
+    fwrite_ui16(stream, v->nalleles, 2);
 
     for (size_t j = 0; j < (size_t)v->nalleles; ++j) {
-        if (bgen_str_fwrite(v->allele_ids[j], fp, 4))
+        if (bgen_str_fwrite(v->allele_ids[j], stream, 4))
             return 0;
     }
 
-    OFF_T stop = LONG_TELL(fp);
+    OFF_T stop = LONG_TELL(stream);
     if (start > stop)
         bgen_die("start cannot be greater than stop");
     return (uint64_t)(stop - start);
@@ -99,22 +97,22 @@ static int write_metafile_nvariants(FILE* stream, uint32_t nvariants)
     }
     return 0;
 }
-static int write_metafile_metadata_block(FILE* stream, struct bgen_idx* idx,
-                                         struct bgen_file* bgen, int verbose)
+static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32_t npartitions,
+                                         uint32_t nvariants, struct bgen_file* bgen,
+                                         int verbose)
 {
     struct bgen_vm vm;
 
-    idx->poffset[0] = 0;
-    uint32_t part_size = ceildiv_uint32(idx->nvariants, idx->npartitions);
+    poffset[0] = 0;
+    uint32_t part_size = ceildiv_uint32(nvariants, npartitions);
 
     struct athr* at = NULL;
     if (verbose) {
-        if (!(at = create_athr(idx->nvariants, "Writing variants")))
+        if (!(at = create_athr(nvariants, "Writing variants")))
             goto err;
     }
 
     uint64_t offset;
-    uint32_t nvariants = bgen_file_nvariants(bgen);
     size_t   i = 0, j = 0;
     int      end = 0;
     while (!(end = _next_variant(&vm, &offset, bgen, &nvariants))) {
@@ -129,10 +127,10 @@ static int write_metafile_metadata_block(FILE* stream, struct bgen_idx* idx,
         /* true for the first variant of every partition */
         if (i % part_size == 0) {
             ++j;
-            idx->poffset[j] = idx->poffset[j - 1];
+            poffset[j] = poffset[j - 1];
         }
 
-        idx->poffset[j] += size;
+        poffset[j] += size;
         ++i;
         free_metadata(&vm);
     }

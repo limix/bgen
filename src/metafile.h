@@ -4,23 +4,14 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-/* variant metadata index */
-struct bgen_idx
-{
-    uint32_t nvariants;
-    /* size of the variants metadata block */
-    uint64_t metasize;
-    uint32_t npartitions;
-    /* array of partition offsets */
-    uint64_t* poffset;
-};
-
-/* node for creating metadata file */
 struct bgen_mf
 {
-    char*           filepath;
-    FILE*           stream;
-    struct bgen_idx idx;
+    char*    filepath;
+    FILE*    stream;
+    uint32_t nvariants;
+    uint64_t metasize; /**< Size of the metadata block */
+    uint32_t npartitions;
+    uint64_t* poffset; /**< Array of partition offsets */
 };
 
 #endif
