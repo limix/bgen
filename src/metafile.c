@@ -4,7 +4,6 @@
 #include "free.h"
 #include "io.h"
 #include "mem.h"
-#include "min.h"
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
@@ -41,7 +40,7 @@ struct bgen_mf
 };
 
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
-static int             bgen_partition_nvars(struct bgen_mf const* mf, int part);
+static uint32_t             bgen_partition_nvars(struct bgen_mf const* mf, uint32_t partition);
 static int             _next_variant(struct bgen_vm* vm, uint64_t* geno_offset,
                                      struct bgen_file *bgen, uint32_t *nvariants);
 static uint64_t        write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset);
@@ -180,7 +179,10 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
         goto err;
     }
 
-    if (LONG_SEEK(file, mf->idx.poffset[part], SEEK_CUR)) {
+    if (mf->idx.poffset[part] > OFF_T_MAX)
+        bgen_die("offset overflow");
+
+    if (LONG_SEEK(file, (OFF_T) mf->idx.poffset[part], SEEK_CUR)) {
         bgen_perror("Could not fseek bgen index file");
         goto err;
     }
@@ -192,8 +194,8 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, int part, int* nva
         vars[i].rsid = bgen_str_fread(file, 2);
         vars[i].chrom = bgen_str_fread(file, 2);
 
-        fread_int(file, &vars[i].position, 4);
-        fread_int(file, &vars[i].nalleles, 2);
+        fread_ui32(file, &vars[i].position, 4);
+        fread_ui16(file, &vars[i].nalleles, 2);
         vars[i].allele_ids = malloc(sizeof(struct bgen_str*) * vars[i].nalleles);
 
         for (int j = 0; j < vars[i].nalleles; ++j) {
@@ -239,14 +241,10 @@ static struct bgen_mf* bgen_mf_alloc(char const* filepath)
     return mf;
 }
 
-static int bgen_partition_nvars(struct bgen_mf const* mf, int part)
+static uint32_t bgen_partition_nvars(struct bgen_mf const* mf, uint32_t partition)
 {
-    if (part < 0) {
-        bgen_error("Invalid partition number: %d", part);
-        return -1;
-    }
-    int size = ceildiv_uint32(mf->idx.nvariants, mf->idx.npartitions);
-    return imin(size, mf->idx.nvariants - size * part);
+    uint32_t size = ceildiv_uint32(mf->idx.nvariants, mf->idx.npartitions);
+    return min_uint32(size, mf->idx.nvariants - size * partition);
 }
 
 /* Fetch the variant metada and record the genotype offset.
