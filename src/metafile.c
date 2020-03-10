@@ -1,26 +1,16 @@
+#include "metafile.h"
 #include "bgen/bgen.h"
-#include "metafile_write.h"
 #include "bmath.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"
 #include "mem.h"
+#include "metafile_write.h"
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
 #include "variant.h"
 #include <assert.h>
-#include "metafile.h"
-
-/* context for reading the next variant */
-struct next_variant_ctx
-{
-    struct bgen_file* bgen;
-    uint32_t          nvariants;
-};
-
-/* callback type for fetching the next variant */
-typedef int(next_variant_t)(struct bgen_vm*, uint64_t*, struct next_variant_ctx*);
 
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
 static uint32_t        partition_nvariants(struct bgen_mf const* mf, uint32_t partition);
@@ -30,6 +20,7 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
 {
     struct bgen_mf* mf = bgen_mf_alloc(filepath);
     mf->idx.npartitions = npartitions;
+    mf->idx.nvariants = bgen_file_nvariants(bgen);
 
     if (!(mf->stream = fopen(filepath, "w+b"))) {
         bgen_perror("could not create file %s", filepath);
@@ -39,7 +30,6 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
     if (write_metafile_header(mf->stream))
         goto err;
 
-    mf->idx.nvariants = bgen_file_nvariants(bgen);
     if (write_metafile_nvariants(mf->stream, mf->idx.nvariants))
         goto err;
 
@@ -51,7 +41,7 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
 
     mf->idx.poffset = malloc(sizeof(uint64_t) * (mf->idx.npartitions + 1));
 
-    if (write_metafile_metadata_block(mf, bgen, verbose))
+    if (write_metafile_metadata_block(mf->stream, &mf->idx, bgen, verbose))
         goto err;
 
     if (write_metafile_offsets_block(mf->stream, mf->idx.npartitions, mf->idx.poffset))
@@ -128,9 +118,9 @@ err:
     return NULL;
 }
 
-unsigned bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->idx.npartitions; }
+uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->idx.npartitions; }
 
-unsigned bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->idx.nvariants; }
+uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->idx.nvariants; }
 
 struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t partition,
                                     uint32_t* nvariants)
@@ -220,4 +210,3 @@ static uint32_t partition_nvariants(struct bgen_mf const* mf, uint32_t partition
     uint32_t size = ceildiv_uint32(mf->idx.nvariants, mf->idx.npartitions);
     return min_uint32(size, mf->idx.nvariants - size * partition);
 }
-

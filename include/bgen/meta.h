@@ -85,13 +85,13 @@ BGEN_EXPORT struct bgen_mf* bgen_open_metafile(char const* filepath);
  * @param mf Metafile handler.
  * @return Number of partitions.
  */
-BGEN_EXPORT unsigned bgen_metafile_npartitions(struct bgen_mf const* mf);
+BGEN_EXPORT uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf);
 /** Get the number of variants.
  *
  * @param mf Metafile handler.
  * @return Number of variants.
  */
-BGEN_EXPORT unsigned bgen_metafile_nvariants(struct bgen_mf const* mf);
+BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf);
 /** Read a partition of variants.
  *
  * @param mf Metafile handler.
