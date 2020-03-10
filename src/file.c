@@ -6,6 +6,9 @@
 #include "report.h"
 #include "samples.h"
 #include "str.h"
+#include "geno.h"
+#include "layout1.h"
+#include "layout2.h"
 #include <inttypes.h>
 
 struct bgen_file
@@ -117,6 +120,32 @@ err:
         athr_finish(at);
     bgen_samples_free(samples);
     return NULL;
+}
+
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, long const vaddr)
+{
+    struct bgen_genotype* vg = create_vg();
+    vg->vaddr = (OFF_T)vaddr;
+
+    if (LONG_SEEK(bgen_file_stream(bgen), vaddr, SEEK_SET)) {
+        bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
+        free_c(vg);
+        return NULL;
+    }
+
+    struct bgen_vi vi = BGEN_VI(bgen);
+
+    if (bgen_file_layout(bgen) == 1) {
+        bgen_layout1_read_header(&vi, vg, bgen_file_stream(bgen));
+    } else if (bgen_file_layout(bgen) == 2) {
+        bgen_layout2_read_header(&vi, vg, bgen_file_stream(bgen));
+    } else {
+        bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
+        free_c(vg);
+        return NULL;
+    }
+
+    return vg;
 }
 
 FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->stream; }

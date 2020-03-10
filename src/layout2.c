@@ -15,8 +15,8 @@
 #define BIT(var, bit) ((var & (1 << bit)) != 0)
 
 static unsigned choose(unsigned n, unsigned k);
-static void     read_phased_genotype(struct bgen_vg* vg, double* p);
-static void     read_unphased_genotype(struct bgen_vg* vg, double* p);
+static void     read_phased_genotype(struct bgen_genotype* vg, double* p);
+static void     read_unphased_genotype(struct bgen_genotype* vg, double* p);
 static char*    _uncompress(struct bgen_vi* idx, FILE* file);
 
 inline static int read_ploidy(char ploidy_miss) { return ploidy_miss & 127; }
@@ -36,7 +36,7 @@ inline static void set_array_nan(double* p, size_t n)
         p[i] = NAN;
 }
 
-int bgen_layout2_read_header(struct bgen_vi* idx, struct bgen_vg* vg, FILE* file)
+int bgen_layout2_read_header(struct bgen_vi* idx, struct bgen_genotype* vg, FILE* file)
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -98,7 +98,7 @@ int bgen_layout2_read_header(struct bgen_vi* idx, struct bgen_vg* vg, FILE* file
     return EXIT_SUCCESS;
 }
 
-void bgen_layout2_read_genotype(struct bgen_vg* vg, double* p)
+void bgen_layout2_read_genotype(struct bgen_genotype* vg, double* p)
 {
     if (vg->phased)
         read_phased_genotype(vg, p);
@@ -106,7 +106,7 @@ void bgen_layout2_read_genotype(struct bgen_vg* vg, double* p)
         read_unphased_genotype(vg, p);
 }
 
-static void read_phased_genotype(struct bgen_vg* vg, double* p)
+static void read_phased_genotype(struct bgen_genotype* vg, double* p)
 {
     int      nalleles, nbits, max_ploidy;
     uint64_t uip_sum, ui_prob;
@@ -164,7 +164,7 @@ static void read_phased_genotype(struct bgen_vg* vg, double* p)
     }
 }
 
-static void read_unphased_genotype(struct bgen_vg* vg, double* p)
+static void read_unphased_genotype(struct bgen_genotype* vg, double* p)
 {
     int      nalleles, nbits, max_ploidy, max_ncombs;
     uint64_t uip_sum, ui_prob;

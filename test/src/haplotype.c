@@ -49,7 +49,7 @@ void test_haplotype(void)
         cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[i].allele_ids[1]));
     }
 
-    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[1].genotype_offset);
+    struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[1].genotype_offset);
 
     cass_cond(bgen_ncombs(vg) == 4);
     cass_cond(bgen_ploidy(vg, 0) == 2);
@@ -58,7 +58,7 @@ void test_haplotype(void)
     cass_cond(bgen_nalleles(vg) == 2);
     cass_cond(bgen_phased(vg) == 1);
 
-    bgen_close_genotype(vg);
+    bgen_genotype_close(vg);
 
     double real_probs[] = {1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
                            1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
@@ -68,7 +68,7 @@ void test_haplotype(void)
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_open_genotype(bgen, vm[i].genotype_offset);
+        vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
 
         double* probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
 
@@ -80,7 +80,7 @@ void test_haplotype(void)
                 jj++;
             }
         }
-        bgen_close_genotype(vg);
+        bgen_genotype_close(vg);
         free(probabilities);
     }
 

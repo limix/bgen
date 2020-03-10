@@ -3,8 +3,9 @@
 
 #include "io.h"
 #include <stdint.h>
+#include <stdlib.h>
 
-struct bgen_vg
+struct bgen_genotype
 {
     uint32_t nsamples;
     uint16_t nalleles;
@@ -18,5 +19,14 @@ struct bgen_vg
     char*    current_chunk;
     OFF_T    vaddr;
 };
+
+static inline struct bgen_genotype* create_vg(void)
+{
+    struct bgen_genotype* vg = malloc(sizeof(struct bgen_genotype));
+    vg->plo_miss = NULL;
+    vg->chunk = NULL;
+    vg->current_chunk = NULL;
+    return vg;
+}
 
 #endif

@@ -54,7 +54,7 @@ int main()
     bgen = bgen_file_open("data/example.14bits.bgen");
     mf = bgen_open_metafile("example.14bits.bgen.metadata");
     vm = bgen_read_partition(mf, 0, &nvariants);
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm[3].genotype_offset);
+    struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[3].genotype_offset);
 
     cass_equal_int(bgen_nalleles(vg), 2);
     cass_equal_int(bgen_missing(vg, 3), 0);
@@ -72,7 +72,7 @@ int main()
     cass_close(probs[3], 0.99047793444424092613);
 
     bgen_free_partition(vm, nvariants);
-    bgen_close_genotype(vg);
+    bgen_genotype_close(vg);
     bgen_mf_close(mf);
     bgen_file_close(bgen);
 

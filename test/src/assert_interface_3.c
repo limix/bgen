@@ -38,7 +38,7 @@ void test_create_meteadata_haplotypes()
     int nvars;
     struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg *vg = bgen_open_genotype(bgen, vm->genotype_offset);
+    struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL);
 
     cass_equal_int(bgen_nalleles(vg), 2);
@@ -51,7 +51,7 @@ void test_create_meteadata_haplotypes()
     cass_equal_int(bgen_ncombs(vg), 4);
     cass_equal_int(bgen_phased(vg), 1);
 
-    bgen_close_genotype(vg);
+    bgen_genotype_close(vg);
     bgen_free_partition(vm, nvars);
 
     cass_equal_int(bgen_mf_close(mf), 0);
@@ -103,7 +103,7 @@ void test_genotype_haplotypes_by_creating_metadata()
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].genotype_offset);
+            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_nalleles(vg), nalleles[i]);
@@ -127,7 +127,7 @@ void test_genotype_haplotypes_by_creating_metadata()
             }
             free(ptr);
 
-            bgen_close_genotype(vg);
+            bgen_genotype_close(vg);
         }
         bgen_free_partition(vm, nvars);
     }
@@ -182,7 +182,7 @@ void test_genotype_haplotypes_by_loading_metadata()
         struct bgen_vm *vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg *vg = bgen_open_genotype(bgen, vm[ii].genotype_offset);
+            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_nalleles(vg), nalleles[i]);
@@ -206,7 +206,7 @@ void test_genotype_haplotypes_by_loading_metadata()
             }
             free(ptr);
 
-            bgen_close_genotype(vg);
+            bgen_genotype_close(vg);
         }
         bgen_free_partition(vm, nvars);
     }

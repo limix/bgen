@@ -5,7 +5,7 @@
 #include "index.h"
 #include <stdio.h>
 
-int  bgen_layout1_read_header(struct bgen_vi*, struct bgen_vg*, FILE*);
-void bgen_layout1_read_genotype(struct bgen_vg*, double*);
+int  bgen_layout1_read_header(struct bgen_vi*, struct bgen_genotype*, FILE*);
+void bgen_layout1_read_genotype(struct bgen_genotype*, double*);
 
 #endif

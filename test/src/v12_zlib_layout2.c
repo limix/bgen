@@ -71,7 +71,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
     for (int part = 0; part < bgen_metafile_npartitions(mf); ++part) {
         struct bgen_vm* vm = bgen_read_partition(mf, part, &nvariants);
         for (ii = 0; ii < nvariants; ++ii, ++i) {
-            struct bgen_vg* vg = bgen_open_genotype(bgen, vm[ii].genotype_offset);
+            struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
 
             cass_cond(bgen_max_ploidy(vg) == 2);
 
@@ -107,7 +107,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
                 }
             }
             free(probabilities);
-            bgen_close_genotype(vg);
+            bgen_genotype_close(vg);
         }
         bgen_free_partition(vm, nvariants);
     }

@@ -10,10 +10,10 @@
 #include <math.h>
 #include <stdlib.h>
 
-static void  read_unphased(struct bgen_vg* vg, double* probabilities);
+static void  read_unphased(struct bgen_genotype* vg, double* probabilities);
 static char* _uncompress(struct bgen_vi* index, FILE* file);
 
-int bgen_layout1_read_header(struct bgen_vi* index, struct bgen_vg* vg, FILE* file)
+int bgen_layout1_read_header(struct bgen_vi* index, struct bgen_genotype* vg, FILE* file)
 {
     char* c;
     char* chunk;
@@ -43,9 +43,9 @@ int bgen_layout1_read_header(struct bgen_vi* index, struct bgen_vg* vg, FILE* fi
     return 0;
 }
 
-void bgen_layout1_read_genotype(struct bgen_vg* vg, double* p) { read_unphased(vg, p); }
+void bgen_layout1_read_genotype(struct bgen_genotype* vg, double* p) { read_unphased(vg, p); }
 
-static void read_unphased(struct bgen_vg* vg, double* probabilities)
+static void read_unphased(struct bgen_genotype* vg, double* probabilities)
 {
     uint16_t ui_prob;
 

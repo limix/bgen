@@ -111,7 +111,7 @@ void test_complex(void)
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
-        struct bgen_vg* vg = bgen_open_genotype(bgen, vm[i].genotype_offset);
+        struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
         cass_cond(bgen_phased(vg) == phased[i]);
 
         probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
@@ -130,7 +130,7 @@ void test_complex(void)
             }
             ++jj;
         }
-        bgen_close_genotype(vg);
+        bgen_genotype_close(vg);
         free(probabilities);
     }
 

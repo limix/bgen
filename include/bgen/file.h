@@ -60,5 +60,12 @@ BGEN_EXPORT bool bgen_file_contain_samples(struct bgen_file const* bgen);
  * @return Array of sample ids.
  */
 BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose);
+/** Open a variant for genotype queries.
+ *
+ * @param bgen Bgen file handler.
+ * @param vaddr Variant address in the bgen file.
+ * @return Variant genotype handler. Return `NULL` on failure.
+ */
+BGEN_EXPORT struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, long vaddr);
 
 #endif
