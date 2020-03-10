@@ -41,15 +41,15 @@ void test_create_meteadata_haplotypes()
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL);
 
-    cass_equal_int(bgen_nalleles(vg), 2);
+    cass_equal_int(bgen_genotype_nalleles(vg), 2);
     for (int i = 0; i < 4; ++i) {
-        cass_equal_int(bgen_missing(vg, i), 0);
-        cass_equal_int(bgen_ploidy(vg, i), 2);
+        cass_equal_int(bgen_genotype_missing(vg, i), 0);
+        cass_equal_int(bgen_genotype_ploidy(vg, i), 2);
     }
-    cass_equal_int(bgen_min_ploidy(vg), 2);
-    cass_equal_int(bgen_max_ploidy(vg), 2);
-    cass_equal_int(bgen_ncombs(vg), 4);
-    cass_equal_int(bgen_phased(vg), 1);
+    cass_equal_int(bgen_genotype_min_ploidy(vg), 2);
+    cass_equal_int(bgen_genotype_max_ploidy(vg), 2);
+    cass_equal_int(bgen_genotype_ncombs(vg), 4);
+    cass_equal_int(bgen_genotype_phased(vg), 1);
 
     bgen_genotype_close(vg);
     bgen_free_partition(vm, nvars);
@@ -106,18 +106,18 @@ void test_genotype_haplotypes_by_creating_metadata()
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL);
 
-            cass_equal_int(bgen_nalleles(vg), nalleles[i]);
+            cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
             for (size_t j = 0; j < (size_t)nsamples; ++j) {
-                cass_equal_int(bgen_missing(vg, j), 0);
-                cass_equal_int(bgen_ploidy(vg, j), 2);
+                cass_equal_int(bgen_genotype_missing(vg, j), 0);
+                cass_equal_int(bgen_genotype_ploidy(vg, j), 2);
             }
-            cass_equal_int(bgen_min_ploidy(vg), min_ploidy[i]);
-            cass_equal_int(bgen_max_ploidy(vg), max_ploidy[i]);
-            cass_equal_int(bgen_ncombs(vg), ncombs[i]);
-            cass_equal_int(bgen_phased(vg), phased[i]);
+            cass_equal_int(bgen_genotype_min_ploidy(vg), min_ploidy[i]);
+            cass_equal_int(bgen_genotype_max_ploidy(vg), max_ploidy[i]);
+            cass_equal_int(bgen_genotype_ncombs(vg), ncombs[i]);
+            cass_equal_int(bgen_genotype_phased(vg), phased[i]);
 
             double *ptr = malloc(nsamples * ncombs[i] * sizeof(double));
-            cass_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
+            cass_equal_int(bgen_genotype_read(vg, ptr), 0);
             double *p = ptr;
             for (int j = 0; j < nsamples; ++j) {
                 for (int c = 0; c < ncombs[i]; ++c) {
@@ -185,18 +185,18 @@ void test_genotype_haplotypes_by_loading_metadata()
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL);
 
-            cass_equal_int(bgen_nalleles(vg), nalleles[i]);
+            cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
             for (int j = 0; j < nsamples; ++j) {
-                cass_equal_int(bgen_missing(vg, j), 0);
-                cass_equal_int(bgen_ploidy(vg, j), 2);
+                cass_equal_int(bgen_genotype_missing(vg, j), 0);
+                cass_equal_int(bgen_genotype_ploidy(vg, j), 2);
             }
-            cass_equal_int(bgen_min_ploidy(vg), min_ploidy[i]);
-            cass_equal_int(bgen_max_ploidy(vg), max_ploidy[i]);
-            cass_equal_int(bgen_ncombs(vg), ncombs[i]);
-            cass_equal_int(bgen_phased(vg), phased[i]);
+            cass_equal_int(bgen_genotype_min_ploidy(vg), min_ploidy[i]);
+            cass_equal_int(bgen_genotype_max_ploidy(vg), max_ploidy[i]);
+            cass_equal_int(bgen_genotype_ncombs(vg), ncombs[i]);
+            cass_equal_int(bgen_genotype_phased(vg), phased[i]);
 
             double *ptr = malloc(nsamples * ncombs[i] * sizeof(double));
-            cass_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
+            cass_equal_int(bgen_genotype_read(vg, ptr), 0);
             double *p = ptr;
             for (int j = 0; j < nsamples; ++j) {
                 for (int c = 0; c < ncombs[i]; ++c) {

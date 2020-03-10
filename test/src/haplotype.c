@@ -18,7 +18,7 @@ void test_haplotype(void)
     size_t            i, j, ii, jj;
     const char        filename[] = "data/haplotypes.bgen";
     struct bgen_file* bgen;
-    int               nsamples, nvariants;
+    uint32_t               nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
@@ -51,12 +51,12 @@ void test_haplotype(void)
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[1].genotype_offset);
 
-    cass_cond(bgen_ncombs(vg) == 4);
-    cass_cond(bgen_ploidy(vg, 0) == 2);
-    cass_cond(bgen_min_ploidy(vg) == 2);
-    cass_cond(bgen_max_ploidy(vg) == 2);
-    cass_cond(bgen_nalleles(vg) == 2);
-    cass_cond(bgen_phased(vg) == 1);
+    cass_cond(bgen_genotype_ncombs(vg) == 4);
+    cass_cond(bgen_genotype_ploidy(vg, 0) == 2);
+    cass_cond(bgen_genotype_min_ploidy(vg) == 2);
+    cass_cond(bgen_genotype_max_ploidy(vg) == 2);
+    cass_cond(bgen_genotype_nalleles(vg) == 2);
+    cass_cond(bgen_genotype_phased(vg) == 1);
 
     bgen_genotype_close(vg);
 
@@ -70,13 +70,13 @@ void test_haplotype(void)
     for (i = 0; i < (size_t)nvariants; ++i) {
         vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
 
-        double* probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
+        double* probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
 
-        cass_cond(bgen_read_genotype(bgen, vg, probabilities) == 0);
+        cass_cond(bgen_genotype_read(vg, probabilities) == 0);
 
         for (ii = 0; ii < (size_t)nsamples; ++ii) {
-            for (j = 0; j < (size_t)bgen_ncombs(vg); ++j) {
-                cass_cond(probabilities[ii * bgen_ncombs(vg) + j] == real_probs[jj]);
+            for (j = 0; j < (size_t)bgen_genotype_ncombs(vg); ++j) {
+                cass_cond(probabilities[ii * bgen_genotype_ncombs(vg) + j] == real_probs[jj]);
                 jj++;
             }
         }

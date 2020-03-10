@@ -122,12 +122,13 @@ err:
     return NULL;
 }
 
-struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, long const vaddr)
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, uint64_t const offset)
 {
     struct bgen_genotype* vg = create_vg();
-    vg->vaddr = (OFF_T)vaddr;
+    vg->layout = bgen->layout;
+    vg->offset = offset;
 
-    if (LONG_SEEK(bgen_file_stream(bgen), vaddr, SEEK_SET)) {
+    if (LONG_SEEK(bgen_file_stream(bgen), offset, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
         free_c(vg);
         return NULL;

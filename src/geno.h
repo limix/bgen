@@ -7,6 +7,7 @@
 
 struct bgen_genotype
 {
+    unsigned layout;
     uint32_t nsamples;
     uint16_t nalleles;
     uint8_t  phased;
@@ -17,7 +18,7 @@ struct bgen_genotype
     uint8_t  max_ploidy;
     char*    chunk;
     char*    current_chunk;
-    OFF_T    vaddr;
+    uint64_t offset;
 };
 
 static inline struct bgen_genotype* create_vg(void)

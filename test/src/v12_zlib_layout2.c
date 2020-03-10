@@ -73,14 +73,14 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
         for (ii = 0; ii < nvariants; ++ii, ++i) {
             struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
 
-            cass_cond(bgen_max_ploidy(vg) == 2);
+            cass_cond(bgen_genotype_max_ploidy(vg) == 2);
 
-            int ncombs = bgen_ncombs(vg);
+            int ncombs = bgen_genotype_ncombs(vg);
             cass_cond(ncombs == 3);
 
             double* probabilities = calloc(nsamples * ncombs, sizeof(double));
 
-            cass_cond(bgen_read_genotype(bgen, vg, probabilities) == 0);
+            cass_cond(bgen_genotype_read(vg, probabilities) == 0);
 
             for (j = 0; j < 500; ++j) {
 

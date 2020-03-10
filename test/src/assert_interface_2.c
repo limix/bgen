@@ -56,16 +56,16 @@ int main()
     vm = bgen_read_partition(mf, 0, &nvariants);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[3].genotype_offset);
 
-    cass_equal_int(bgen_nalleles(vg), 2);
-    cass_equal_int(bgen_missing(vg, 3), 0);
-    cass_equal_int(bgen_ploidy(vg, 3), 2);
-    cass_equal_int(bgen_min_ploidy(vg), 2);
-    cass_equal_int(bgen_max_ploidy(vg), 2);
-    cass_equal_int(bgen_ncombs(vg), 3);
-    cass_equal_int(bgen_phased(vg), 0);
+    cass_equal_int(bgen_genotype_nalleles(vg), 2);
+    cass_equal_int(bgen_genotype_missing(vg, 3), 0);
+    cass_equal_int(bgen_genotype_ploidy(vg, 3), 2);
+    cass_equal_int(bgen_genotype_min_ploidy(vg), 2);
+    cass_equal_int(bgen_genotype_max_ploidy(vg), 2);
+    cass_equal_int(bgen_genotype_ncombs(vg), 3);
+    cass_equal_int(bgen_genotype_phased(vg), 0);
 
     double *probs = malloc(500 * 3 * sizeof(double));
-    bgen_read_genotype(bgen, vg, probs);
+    bgen_genotype_read(vg, probs);
     cass_close(probs[0], 0.00488311054141488121);
     cass_close(probs[1], 0.02838308002197399704);
     cass_close(probs[2], 0.96673380943661113562);

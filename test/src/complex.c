@@ -112,18 +112,18 @@ void test_complex(void)
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
         struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
-        cass_cond(bgen_phased(vg) == phased[i]);
+        cass_cond(bgen_genotype_phased(vg) == phased[i]);
 
-        probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
-        bgen_read_genotype(bgen, vg, probabilities);
+        probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
+        bgen_genotype_read(vg, probabilities);
 
         double* p = probabilities;
         for (j = 0; j < (size_t)nsamples; ++j) {
 
-            cass_cond(ploidys[jj] == bgen_ploidy(vg, j));
-            cass_cond(bgen_missing(vg, j) == 0);
+            cass_cond(ploidys[jj] == bgen_genotype_ploidy(vg, j));
+            cass_cond(bgen_genotype_missing(vg, j) == 0);
 
-            for (ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
+            for (ii = 0; ii < (size_t)bgen_genotype_ncombs(vg); ++ii) {
                 cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                 ++rp;
                 ++p;

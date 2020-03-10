@@ -35,17 +35,17 @@ void test_create_metadata_complex()
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL)
 
-        cass_equal_int(bgen_nalleles(vg), 2);
+        cass_equal_int(bgen_genotype_nalleles(vg), 2);
     int ploidy[] = {1, 2, 2, 2};
     int miss[] = {0, 0, 0, 0};
     for (size_t i = 0; i < (size_t)bgen_file_nsamples(bgen); ++i) {
-        cass_equal_int(bgen_missing(vg, i), miss[i]);
-        cass_equal_int(bgen_ploidy(vg, i), ploidy[i]);
+        cass_equal_int(bgen_genotype_missing(vg, i), miss[i]);
+        cass_equal_int(bgen_genotype_ploidy(vg, i), ploidy[i]);
     }
-    cass_equal_int(bgen_min_ploidy(vg), 1);
-    cass_equal_int(bgen_max_ploidy(vg), 2);
-    cass_equal_int(bgen_ncombs(vg), 3);
-    cass_equal_int(bgen_phased(vg), 0);
+    cass_equal_int(bgen_genotype_min_ploidy(vg), 1);
+    cass_equal_int(bgen_genotype_max_ploidy(vg), 2);
+    cass_equal_int(bgen_genotype_ncombs(vg), 3);
+    cass_equal_int(bgen_genotype_phased(vg), 0);
 
     bgen_genotype_close(vg);
     bgen_free_partition(vm, nvars);
@@ -114,22 +114,22 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_mf* mf)
             struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL)
 
-                cass_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));
+                cass_equal_int(bgen_genotype_nalleles(vg), *(nalleles_ptr++));
             for (size_t j = 0; j < (size_t)bgen_file_nsamples(bgen); ++j) {
-                cass_equal_int(bgen_missing(vg, j), 0);
-                cass_equal_int(bgen_ploidy(vg, j), *(ploidy_ptr++));
+                cass_equal_int(bgen_genotype_missing(vg, j), 0);
+                cass_equal_int(bgen_genotype_ploidy(vg, j), *(ploidy_ptr++));
             }
-            cass_equal_int(bgen_min_ploidy(vg), *(min_ploidy_ptr++));
-            cass_equal_int(bgen_max_ploidy(vg), *(max_ploidy_ptr++));
-            cass_equal_int(bgen_ncombs(vg), *(ncombs_ptr++));
-            cass_equal_int(bgen_phased(vg), *(phased_ptr++));
+            cass_equal_int(bgen_genotype_min_ploidy(vg), *(min_ploidy_ptr++));
+            cass_equal_int(bgen_genotype_max_ploidy(vg), *(max_ploidy_ptr++));
+            cass_equal_int(bgen_genotype_ncombs(vg), *(ncombs_ptr++));
+            cass_equal_int(bgen_genotype_phased(vg), *(phased_ptr++));
 
-            double* ptr = malloc(bgen_file_nsamples(bgen) * bgen_ncombs(vg) * sizeof(double));
+            double* ptr = malloc(bgen_file_nsamples(bgen) * bgen_genotype_ncombs(vg) * sizeof(double));
 
-            cass_equal_int(bgen_read_genotype(bgen, vg, ptr), 0);
+            cass_equal_int(bgen_genotype_read(vg, ptr), 0);
             double* p = ptr;
             for (int j = 0; j < bgen_file_nsamples(bgen); ++j) {
-                for (int c = 0; c < bgen_ncombs(vg); ++c) {
+                for (int c = 0; c < bgen_genotype_ncombs(vg); ++c) {
                     cass_close(*p, *(probs_ptr++));
                     ++p;
                 }

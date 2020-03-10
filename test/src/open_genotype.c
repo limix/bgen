@@ -41,7 +41,7 @@ void test_file(void)
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[0].genotype_offset);
-    cass_cond(bgen_nalleles(vg) == 2);
+    cass_cond(bgen_genotype_nalleles(vg) == 2);
     bgen_genotype_close(vg);
 
     int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
@@ -84,33 +84,33 @@ void test_geno(void)
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[0].genotype_offset);
 
-    cass_cond(bgen_nalleles(vg) == 2);
-    cass_cond(bgen_missing(vg, 0) == 0);
-    cass_cond(bgen_missing(vg, 1) == 0);
-    cass_cond(bgen_missing(vg, 2) == 0);
-    cass_cond(bgen_ploidy(vg, 0) == 1);
-    cass_cond(bgen_ploidy(vg, 1) == 2);
-    cass_cond(bgen_ploidy(vg, 2) == 2);
-    cass_cond(bgen_min_ploidy(vg) == 1);
-    cass_cond(bgen_max_ploidy(vg) == 2);
-    cass_cond(bgen_ncombs(vg) == 3);
-    cass_cond(bgen_phased(vg) == 0);
+    cass_cond(bgen_genotype_nalleles(vg) == 2);
+    cass_cond(bgen_genotype_missing(vg, 0) == 0);
+    cass_cond(bgen_genotype_missing(vg, 1) == 0);
+    cass_cond(bgen_genotype_missing(vg, 2) == 0);
+    cass_cond(bgen_genotype_ploidy(vg, 0) == 1);
+    cass_cond(bgen_genotype_ploidy(vg, 1) == 2);
+    cass_cond(bgen_genotype_ploidy(vg, 2) == 2);
+    cass_cond(bgen_genotype_min_ploidy(vg) == 1);
+    cass_cond(bgen_genotype_max_ploidy(vg) == 2);
+    cass_cond(bgen_genotype_ncombs(vg) == 3);
+    cass_cond(bgen_genotype_phased(vg) == 0);
 
     bgen_genotype_close(vg);
 
     vg = bgen_file_open_genotype(bgen, vm[1].genotype_offset);
 
-    cass_cond(bgen_nalleles(vg) == 2);
-    cass_cond(bgen_missing(vg, 0) == 0);
-    cass_cond(bgen_missing(vg, 1) == 0);
-    cass_cond(bgen_missing(vg, 2) == 0);
-    cass_cond(bgen_ploidy(vg, 0) == 1);
-    cass_cond(bgen_ploidy(vg, 1) == 1);
-    cass_cond(bgen_ploidy(vg, 2) == 1);
-    cass_cond(bgen_min_ploidy(vg) == 1);
-    cass_cond(bgen_max_ploidy(vg) == 1);
-    cass_cond(bgen_ncombs(vg) == 2);
-    cass_cond(bgen_phased(vg) == 1);
+    cass_cond(bgen_genotype_nalleles(vg) == 2);
+    cass_cond(bgen_genotype_missing(vg, 0) == 0);
+    cass_cond(bgen_genotype_missing(vg, 1) == 0);
+    cass_cond(bgen_genotype_missing(vg, 2) == 0);
+    cass_cond(bgen_genotype_ploidy(vg, 0) == 1);
+    cass_cond(bgen_genotype_ploidy(vg, 1) == 1);
+    cass_cond(bgen_genotype_ploidy(vg, 2) == 1);
+    cass_cond(bgen_genotype_min_ploidy(vg) == 1);
+    cass_cond(bgen_genotype_max_ploidy(vg) == 1);
+    cass_cond(bgen_genotype_ncombs(vg) == 2);
+    cass_cond(bgen_genotype_phased(vg) == 1);
 
     bgen_genotype_close(vg);
 
@@ -123,7 +123,7 @@ void test_geno(void)
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_file_open_genotype(bgen, vm[l].genotype_offset);
-            cass_cond(bgen_phased(vg) == phased[i]);
+            cass_cond(bgen_genotype_phased(vg) == phased[i]);
             bgen_genotype_close(vg);
             ++i;
         }
@@ -184,16 +184,16 @@ void test_geno(void)
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_file_open_genotype(bgen, vm[l].genotype_offset);
 
-            double* probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
+            double* probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
             double* p = probabilities;
-            bgen_read_genotype(bgen, vg, probabilities);
+            bgen_genotype_read(vg, probabilities);
 
             for (j = 0; j < (size_t)nsamples; ++j) {
 
-                cass_cond(ploidys[jj] == bgen_ploidy(vg, j));
-                cass_cond(bgen_missing(vg, j) == 0);
+                cass_cond(ploidys[jj] == bgen_genotype_ploidy(vg, j));
+                cass_cond(bgen_genotype_missing(vg, j) == 0);
 
-                for (size_t ii = 0; ii < (size_t)bgen_ncombs(vg); ++ii) {
+                for (size_t ii = 0; ii < (size_t)bgen_genotype_ncombs(vg); ++ii) {
                     cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                     ++rp;
                     ++p;

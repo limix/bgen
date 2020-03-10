@@ -15,9 +15,9 @@ struct bgen_genotype;
 
 /** Close a variant genotype handler.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  */
-BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* vg);
+BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* genotype);
 /** Read the probabilities of each possible genotype.
  *
  * The length of this array is equal to the product of the values obtained by calling
@@ -29,44 +29,44 @@ BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* vg);
  * \endrst
  *
  * @param bgen Bgen file handler.
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @param p Array of probabilities.
  * @return `0` if it succeeded; `1` otherwise.
  */
-BGEN_EXPORT int bgen_read_genotype(struct bgen_file const* bgen, struct bgen_genotype* vg,
-                                   double* p);
+BGEN_EXPORT int bgen_genotype_read(struct bgen_genotype* genotype,
+                                   double* probabilities);
 /** Get the number of alleles.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @return Number of alleles.
  */
-BGEN_EXPORT unsigned bgen_nalleles(struct bgen_genotype const* vg);
+BGEN_EXPORT uint16_t  bgen_genotype_nalleles(struct bgen_genotype const* genotype);
 /** Return `1` if variant is missing for the sample; `0` otherwise.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @param index Sample index.
  * @return `1` for missing genotype; `0` otherwise.
  */
-BGEN_EXPORT bool bgen_missing(struct bgen_genotype const* vg, int index);
+BGEN_EXPORT bool bgen_genotype_missing(struct bgen_genotype const* genotype, int index);
 /** Get the ploidy.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @param index Sample index.
  * @return Ploidy.
  */
-BGEN_EXPORT unsigned bgen_ploidy(struct bgen_genotype const* vg, int index);
+BGEN_EXPORT uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, int index);
 /** Get the minimum ploidy of the variant.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @return Ploidy minimum.
  */
-BGEN_EXPORT unsigned bgen_min_ploidy(struct bgen_genotype const* vg);
+BGEN_EXPORT uint8_t bgen_genotype_min_ploidy(struct bgen_genotype const* genotype);
 /** Get the maximum ploidy of the variant.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @return Ploidy maximum.
  */
-BGEN_EXPORT unsigned bgen_max_ploidy(struct bgen_genotype const* vg);
+BGEN_EXPORT uint8_t bgen_genotype_max_ploidy(struct bgen_genotype const* genotype);
 /** Get the number of genotype combinations.
  *
  * Precisely, if the bgen file is of **Layout 1**, the number of combinations is always
@@ -77,15 +77,15 @@ BGEN_EXPORT unsigned bgen_max_ploidy(struct bgen_genotype const* vg);
  * number of combinations `n-1` alleles can be selected from `n+m-1`, such that the
  * order of a selection does not matter.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @return Number of combinations.
  */
-BGEN_EXPORT unsigned bgen_ncombs(struct bgen_genotype const* vg);
+BGEN_EXPORT unsigned bgen_genotype_ncombs(struct bgen_genotype const* genotype);
 /** Return `1` for phased or `0` for unphased genotype.
  *
- * @param vg Variant genotype handler.
+ * @param genotype Variant genotype handler.
  * @return `1` for phased genotype; `0` otherwise.
  */
-BGEN_EXPORT bool bgen_phased(struct bgen_genotype const* vg);
+BGEN_EXPORT bool bgen_genotype_phased(struct bgen_genotype const* genotype);
 
 #endif
