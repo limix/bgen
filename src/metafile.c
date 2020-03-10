@@ -258,38 +258,33 @@ static uint32_t partition_nvariants(struct bgen_mf const* mf, uint32_t partition
  *   Genotype address in the bgen file.
  * c
  *   Context for the callback.
- *
- * Returns
- * -------
- * int
- *   Number of variants left to read plus one. `0` indicates the end of the list. `-1`
- *   indicates that an error has occurred.
  */
 static int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct bgen_file* bgen,
                          uint32_t* nvariants)
 {
     if (*nvariants == 0)
-        return 0;
+        return 1;
 
     if (next_variant(bgen, vm))
-        goto err;
+        return -1;
 
     *geno_offset = LONG_TELL(bgen_file_stream(bgen));
 
     uint32_t length;
     if (fread_ui32(bgen_file_stream(bgen), &length, 4)) {
-        bgen_error("Could not read the genotype block length");
-        goto err;
+        bgen_error("could not read the genotype block length");
+        return -1;
     }
 
     if (LONG_SEEK(bgen_file_stream(bgen), length, SEEK_CUR)) {
-        bgen_perror("Could not jump to the next variant");
-        goto err;
+        bgen_perror("could not jump to the next variant");
+        return -1;
     }
 
-    return (*nvariants)--;
-err:
-    return -1;
+    if ((*nvariants)-- == 0)
+        return 1;
+
+    return 0;
 }
 
 /* Write variant genotype to file and return the block size. */
@@ -335,10 +330,11 @@ static int write_metafile_metadata_block(struct bgen_mf* mf, struct bgen_file* b
             goto err;
     }
 
-    int      e;
     uint64_t offset;
     uint32_t nvariants = bgen_file_nvariants(bgen);
-    for (size_t i = 0, j = 0; (e = _next_variant(&vm, &offset, bgen, &nvariants)) > 0;) {
+    size_t i = 0, j = 0;
+    int      end = 0;
+    while (!(end = _next_variant(&vm, &offset, bgen, &nvariants))) {
         uint64_t size;
 
         if ((size = write_variant(mf->stream, &vm, offset)) == 0)
@@ -360,8 +356,8 @@ static int write_metafile_metadata_block(struct bgen_mf* mf, struct bgen_file* b
     if (verbose)
         athr_finish(at);
 
-    if (e) {
-        bgen_error("Could not write every variant");
+    if (end == -1) {
+        bgen_error("could not write every variant");
         goto err;
     }
 
