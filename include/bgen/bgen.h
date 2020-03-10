@@ -37,8 +37,6 @@
 /** Bgen version. */
 #define BGEN_VERSION "4.0.0"
 
-/* static_assert(sizeof(int) >= 4, "Code relies on int being at least 4 bytes") */
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -47,6 +45,7 @@ extern "C"
 #include "bgen/file.h"
 #include "bgen/geno.h"
 #include "bgen/meta.h"
+#include "bgen/partition.h"
 #include "bgen/samples.h"
 #include "bgen/str.h"
 #include "bgen/variant_metadata.h"

@@ -11,45 +11,6 @@
 #include "variant_metadata.h"
 #include <inttypes.h>
 
-/* Fetch the variant metada and record the genotype offset.
- *
- * Parameters
- * ----------
- * vm
- *   Variant metadata.
- * geno_offset
- *   Genotype address in the bgen file.
- * c
- *   Context for the callback.
- */
-static int _next_variant(struct bgen_vm* vm, uint64_t* geno_offset, struct bgen_file* bgen,
-                         uint32_t* nvariants)
-{
-    if (*nvariants == 0)
-        return 1;
-
-    if (next_variant(bgen, vm))
-        return -1;
-
-    *geno_offset = LONG_TELL(bgen_file_stream(bgen));
-
-    uint32_t length;
-    if (fread_ui32(bgen_file_stream(bgen), &length, 4)) {
-        bgen_error("could not read the genotype block length");
-        return -1;
-    }
-
-    if (LONG_SEEK(bgen_file_stream(bgen), length, SEEK_CUR)) {
-        bgen_perror("could not jump to the next variant");
-        return -1;
-    }
-
-    if ((*nvariants)-- == 0)
-        return 1;
-
-    return 0;
-}
-
 /* Write variant genotype to file and return the block size. */
 static uint64_t write_variant(FILE* stream, const struct bgen_vm* vm)
 {
@@ -111,31 +72,6 @@ static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32
         if (!(at = create_athr(nvariants, "Writing variants")))
             goto err;
     }
-
-#if 0
-    uint64_t offset;
-    size_t   i = 0, j = 0;
-    int      end = 0;
-    while (!(end = _next_variant(&vm, &offset, bgen, &nvariants))) {
-        uint64_t size;
-
-        if ((size = write_variant(stream, &vm, offset)) == 0)
-            goto err;
-
-        if (at)
-            athr_consume(at, 1);
-
-        /* true for the first variant of every partition */
-        if (i % part_size == 0) {
-            ++j;
-            poffset[j] = poffset[j - 1];
-        }
-
-        poffset[j] += size;
-        ++i;
-        free_metadata(&vm);
-    }
-#endif
 
     size_t i = 0, j = 0;
     int    end = 0;
