@@ -24,7 +24,7 @@ static inline uint32_t min_uint32(uint32_t a, uint32_t b) { return a < b ? a : b
 static inline uint32_t max_uint32(uint32_t a, uint32_t b) { return a > b ? a : b; }
 
 /* Number of ways to choose `k` elements from a total of `n`. */
-static unsigned choose(unsigned n, unsigned k)
+static inline unsigned choose(unsigned n, unsigned k)
 {
     unsigned ans = 1;
 

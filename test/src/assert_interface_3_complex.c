@@ -29,7 +29,7 @@ void test_create_metadata_complex()
         cass_equal_int(bgen_metafile_npartitions(mf), 4);
     cass_equal_int(bgen_metafile_nvariants(mf), 10);
 
-    int nvars;
+    uint32_t nvars = 0;
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvars);
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);

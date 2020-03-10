@@ -1,6 +1,6 @@
 #include "layout2.h"
 #include "bmath.h"
-#include "geno.h"
+#include "genotype.h"
 #include "mem.h"
 #include "zip/zlib.h"
 #include "zip/zstd.h"

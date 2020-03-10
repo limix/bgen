@@ -1,7 +1,7 @@
 #include "layout1.h"
 #include "bgen/bgen.h"
 #include "file.h"
-#include "geno.h"
+#include "genotype.h"
 #include "index.h"
 #include "mem.h"
 #include "zip/zlib.h"

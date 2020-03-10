@@ -43,7 +43,7 @@ extern "C"
 #endif
 
 #include "bgen/file.h"
-#include "bgen/geno.h"
+#include "bgen/genotype.h"
 #include "bgen/meta.h"
 #include "bgen/partition.h"
 #include "bgen/samples.h"

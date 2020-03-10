@@ -17,7 +17,7 @@ find_package(ZSTD REQUIRED)
 
 add_library(bgen
     src/file.c
-    src/geno.c
+    src/genotype.c
     src/io.c
     src/layout1.c
     src/layout2.c

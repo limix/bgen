@@ -58,7 +58,7 @@ err:
 
 void init_metadata(struct bgen_vm* vm)
 {
-    vm->genotype_offset = -1;
+    vm->genotype_offset = 0;
     vm->allele_ids = NULL;
     vm->id = NULL;
     vm->rsid = NULL;

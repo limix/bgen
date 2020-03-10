@@ -1,4 +1,4 @@
-#include "geno.h"
+#include "genotype.h"
 #include "bgen/bgen.h"
 #include "file.h"
 #include "free.h"

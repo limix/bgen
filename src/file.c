@@ -2,26 +2,27 @@
 #include "athr.h"
 #include "bgen/file.h"
 #include "free.h"
+#include "genotype.h"
 #include "io.h"
+#include "layout1.h"
+#include "layout2.h"
 #include "report.h"
 #include "samples.h"
 #include "str.h"
-#include "geno.h"
-#include "layout1.h"
-#include "layout2.h"
 #include <inttypes.h>
+#include <stdbool.h>
 
 struct bgen_file
 {
-    char* filepath;
-    FILE* stream;
+    char*    filepath;
+    FILE*    stream;
     uint32_t nvariants;
     uint32_t nsamples;
-    int compression;
-    int layout;
-    bool contain_sample;
-    OFF_T samples_start;
-    OFF_T variants_start;
+    unsigned compression;
+    unsigned layout;
+    bool     contain_sample;
+    OFF_T    samples_start;
+    OFF_T    variants_start;
 };
 
 static int read_bgen_header(struct bgen_file* bgen);
@@ -122,13 +123,17 @@ err:
     return NULL;
 }
 
-struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, uint64_t const offset)
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
+                                              uint64_t const          offset)
 {
     struct bgen_genotype* vg = create_vg();
     vg->layout = bgen->layout;
     vg->offset = offset;
 
-    if (LONG_SEEK(bgen_file_stream(bgen), offset, SEEK_SET)) {
+    if (offset > OFF_T_MAX)
+        bgen_die("offset overflow");
+
+    if (LONG_SEEK(bgen_file_stream(bgen), (OFF_T)offset, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
         free_c(vg);
         return NULL;
@@ -156,9 +161,12 @@ char const* bgen_file_filepath(struct bgen_file const* bgen_file)
     return bgen_file->filepath;
 }
 
-int bgen_file_layout(struct bgen_file const* bgen_file) { return bgen_file->layout; }
+unsigned bgen_file_layout(struct bgen_file const* bgen_file) { return bgen_file->layout; }
 
-int bgen_file_compression(struct bgen_file const* bgen_file) { return bgen_file->compression; }
+unsigned bgen_file_compression(struct bgen_file const* bgen_file)
+{
+    return bgen_file->compression;
+}
 
 int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 {
