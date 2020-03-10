@@ -1,5 +1,5 @@
-#ifndef BGEN_MATH_H
-#define BGEN_MATH_H
+#ifndef BGEN_BMATH_H
+#define BGEN_BMATH_H
 
 #include <limits.h>
 #include <inttypes.h>

@@ -31,12 +31,12 @@ int next_variant(struct bgen_file* bgen, struct bgen_vm* vm)
     if ((vm->chrom = bgen_str_fread(bgen_file_stream(bgen), 2)) == NULL)
         goto err;
 
-    if (fread_int(bgen_file_stream(bgen), &vm->position, 4))
+    if (fread_ui32(bgen_file_stream(bgen), &vm->position, 4))
         goto err;
 
     if (bgen_file_layout(bgen) == 1)
         vm->nalleles = 2;
-    else if (fread_int(bgen_file_stream(bgen), &vm->nalleles, 2))
+    else if (fread_ui16(bgen_file_stream(bgen), &vm->nalleles, 2))
         goto err;
 
     vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str*));
@@ -65,8 +65,8 @@ void init_metadata(struct bgen_vm* vm)
     vm->id = NULL;
     vm->rsid = NULL;
     vm->chrom = NULL;
-    vm->position = -1;
-    vm->nalleles = -1;
+    vm->position = 0;
+    vm->nalleles = 0;
 }
 
 struct bgen_vm* alloc_metadata(void)

@@ -1,5 +1,5 @@
 #include "bgen/bgen.h"
-#include "math.h"
+#include "bmath.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"
@@ -308,15 +308,18 @@ static uint64_t write_variant(FILE* fp, const struct bgen_vm* v, uint64_t offset
     if (bgen_str_fwrite(v->chrom, fp, 2))
         return 0;
 
-    fwrite_int(fp, v->position, 4);
-    fwrite_int(fp, v->nalleles, 2);
+    fwrite_ui32(fp, v->position, 4);
+    fwrite_ui16(fp, v->nalleles, 2);
 
     for (size_t j = 0; j < (size_t)v->nalleles; ++j) {
         if (bgen_str_fwrite(v->allele_ids[j], fp, 4))
             return 0;
     }
 
-    return LONG_TELL(fp) - start;
+    OFF_T stop = LONG_TELL(fp);
+    if (start > stop)
+        bgen_die("start cannot be greater than stop");
+    return (uint64_t)(stop - start);
 }
 
 static int write_metafile_metadata_block(struct bgen_mf* mf, struct bgen_file *bgen, 
@@ -325,7 +328,7 @@ static int write_metafile_metadata_block(struct bgen_mf* mf, struct bgen_file *b
     struct bgen_vm vm;
 
     mf->idx.poffset[0] = 0;
-    int part_size = ceildiv_uint32(mf->idx.nvariants, mf->idx.npartitions);
+    uint32_t part_size = ceildiv_uint32(mf->idx.nvariants, mf->idx.npartitions);
 
     struct athr* at = NULL;
     if (verbose) {

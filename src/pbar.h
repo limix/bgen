@@ -6,7 +6,7 @@
 #include "report.h"
 #include <stddef.h>
 
-static inline struct athr *create_athr(int n, const char *subject)
+static inline struct athr *create_athr(long n, const char *subject)
 {
     struct athr *at = NULL;
     at = athr_create(n, subject, ATHR_BAR | ATHR_ETA);
