@@ -35,7 +35,7 @@ void test_file(void)
     bgen_samples_free(samples);
 
     struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
-    struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvariants);
+    struct bgen_vm* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
 
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
@@ -80,7 +80,7 @@ void test_geno(void)
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
     int nvars;
-    struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvars);
+    struct bgen_vm* vm = bgen_metafile_read_partition(mf, 0, &nvars);
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[0].genotype_offset);
 
@@ -120,7 +120,7 @@ void test_geno(void)
 
     size_t i = 0;
     for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
-        vm = bgen_read_partition(mf, j, &nvars);
+        vm = bgen_metafile_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_file_open_genotype(bgen, vm[l].genotype_offset);
             cass_cond(bgen_genotype_phased(vg) == phased[i]);
@@ -180,7 +180,7 @@ void test_geno(void)
     int nsamples = bgen_file_nsamples(bgen);
     size_t jj = 0;
     for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
-        vm = bgen_read_partition(mf, j, &nvars);
+        vm = bgen_metafile_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
             vg = bgen_file_open_genotype(bgen, vm[l].genotype_offset);
 

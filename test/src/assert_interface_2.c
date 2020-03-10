@@ -38,7 +38,7 @@ int main()
     struct bgen_vi *vi;
     struct bgen_mf* mf = bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
     int nvariants = 0;
-    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
+    struct bgen_vm *vm = bgen_metafile_read_partition(mf, 0, &nvariants);
 
     cass_equal_int(vm[0].position, 2000);
     cass_equal_int(vm[0].nalleles, 2);
@@ -53,7 +53,7 @@ int main()
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     mf = bgen_open_metafile("example.14bits.bgen.metadata");
-    vm = bgen_read_partition(mf, 0, &nvariants);
+    vm = bgen_metafile_read_partition(mf, 0, &nvariants);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[3].genotype_offset);
 
     cass_equal_int(bgen_genotype_nalleles(vg), 2);

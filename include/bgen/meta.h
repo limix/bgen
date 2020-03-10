@@ -51,8 +51,8 @@ BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf);
  * @param nvariants Number of variants of the partition.
  * @return Array of variant metadata.
  */
-BGEN_EXPORT struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t index,
-                                                uint32_t* nvariants);
+BGEN_EXPORT struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf,
+                                                         uint32_t index, uint32_t* nvariants);
 /** Free a partition.
  *
  * @param vm Array of variant metatada.

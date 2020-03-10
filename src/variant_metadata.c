@@ -6,7 +6,27 @@
 #include "str.h"
 #include "variant_metadata.h"
 
-static struct bgen_vm* variant_metadata_create(void);
+struct bgen_vm* bgen_variant_metadata_create(void)
+{
+    struct bgen_vm* vm = malloc(sizeof(struct bgen_vm));
+    vm->id = NULL;
+    vm->rsid = NULL;
+    vm->chrom = NULL;
+    vm->position = 0;
+    vm->nalleles = 0;
+    vm->allele_ids = NULL;
+    vm->genotype_offset = 0;
+    return vm;
+}
+
+void bgen_variant_metadata_create_alleles(struct bgen_vm* vm, uint16_t nalleles)
+{
+    vm->allele_ids = malloc(sizeof(struct bgen_str*) * nalleles);
+
+    for (uint16_t j = 0; j < nalleles; ++j) {
+        vm->allele_ids[j] = NULL;
+    }
+}
 
 struct bgen_vm* bgen_variant_metadata_begin(struct bgen_file* bgen, int* error)
 {
@@ -20,7 +40,7 @@ struct bgen_vm* bgen_variant_metadata_begin(struct bgen_file* bgen, int* error)
 
 struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
 {
-    struct bgen_vm* vm = variant_metadata_create();
+    struct bgen_vm* vm = bgen_variant_metadata_create();
     *error = 0;
 
     if (feof(bgen_file_stream(bgen)))
@@ -106,17 +126,4 @@ void bgen_variant_metadata_destroy(struct bgen_vm const* vm)
     }
 
     free_c(vm);
-}
-
-static struct bgen_vm* variant_metadata_create(void)
-{
-    struct bgen_vm* vm = malloc(sizeof(struct bgen_vm));
-    vm->id = NULL;
-    vm->rsid = NULL;
-    vm->chrom = NULL;
-    vm->position = 0;
-    vm->nalleles = 0;
-    vm->allele_ids = NULL;
-    vm->genotype_offset = 0;
-    return vm;
 }

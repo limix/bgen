@@ -17,7 +17,7 @@ void use_metafile(struct bgen_mf *mf)
     int nvars = bgen_metafile_nvariants(mf);
     cass_equal_int(nvars, 10);
 
-    struct bgen_vm *vm = bgen_read_partition(mf, 0, &nvariants);
+    struct bgen_vm *vm = bgen_metafile_read_partition(mf, 0, &nvariants);
     cass_cond(vm != NULL);
 
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
@@ -36,7 +36,7 @@ void use_metafile(struct bgen_mf *mf)
 
     bgen_free_partition(vm, nvariants);
 
-    vm = bgen_read_partition(mf, 1, &nvariants);
+    vm = bgen_metafile_read_partition(mf, 1, &nvariants);
     cass_cond(vm != NULL);
 
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
@@ -53,7 +53,7 @@ void use_metafile_wrongly(struct bgen_mf *mf)
 {
     int nvariants;
     bgen_metafile_npartitions(mf);
-    struct bgen_vm *vm = bgen_read_partition(mf, 3, &nvariants);
+    struct bgen_vm *vm = bgen_metafile_read_partition(mf, 3, &nvariants);
     cass_cond(vm == NULL);
 }
 

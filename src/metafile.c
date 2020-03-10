@@ -10,6 +10,7 @@
 #include "report.h"
 #include "str.h"
 #include "variant.h"
+#include "partition.h"
 #include <assert.h>
 
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
@@ -123,36 +124,74 @@ uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->nparti
 
 uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->nvariants; }
 
-struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t partition,
-                                    uint32_t* nvariants)
+struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t index,
+                                    uint32_t* nvars)
 {
     struct bgen_vm* vars = NULL;
     FILE*           file = mf->stream;
 
-    if (partition >= mf->npartitions) {
-        bgen_error("The provided partition number %d is out-of-range", partition);
+    if (index >= mf->npartitions) {
+        bgen_error("the provided partition number %d is out-of-range", index);
         goto err;
     }
+    
+#if 0
+    uint32_t nvariants = partition_nvariants(mf, index);
+    struct bgen_partition *partition = bgen_partition_create(nvariants);
+#endif
 
-    *nvariants = partition_nvariants(mf, partition);
-    vars = malloc((*nvariants) * sizeof(struct bgen_vm));
-    for (uint32_t i = 0; i < *nvariants; ++i)
+    *nvars = partition_nvariants(mf, index);
+    vars = malloc((*nvars) * sizeof(struct bgen_vm));
+    for (uint32_t i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
 
     if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
-        bgen_perror("Could not fseek bgen index file");
+        bgen_perror("could not fseek metafile");
         goto err;
     }
 
-    if (mf->partition_offset[partition] > OFF_T_MAX)
+    if (mf->partition_offset[index] > OFF_T_MAX)
         bgen_die("offset overflow");
 
-    if (LONG_SEEK(file, (OFF_T)mf->partition_offset[partition], SEEK_CUR)) {
-        bgen_perror("Could not fseek bgen index file");
+    if (LONG_SEEK(file, (OFF_T)mf->partition_offset[index], SEEK_CUR)) {
+        bgen_perror("could not fseek metafile");
         goto err;
     }
 
-    for (uint32_t i = 0; i < *nvariants; ++i) {
+#if 0
+    for (uint32_t i = 0; i < *nvars; ++i) {
+        struct bgen_vm *vm = bgen_variant_metadata_create();
+
+        if (fread_ui64(file, &vm->genotype_offset, 8))
+            goto err;
+
+        if ((vm->id = bgen_str_fread(file, 2)) == NULL)
+            goto err;
+
+        if ((vm->rsid = bgen_str_fread(file, 2)) == NULL)
+            goto err;
+
+        if ((vm->chrom = bgen_str_fread(file, 2)) == NULL)
+            goto err;
+
+        if (fread_ui32(file, &vm->position, 4))
+            goto err;
+
+        if (fread_ui16(file, &vm->nalleles, 2))
+            goto err;
+
+        bgen_variant_metadata_create_alleles(vm, vm->nalleles);
+
+        for (uint16_t j = 0; j < vm->nalleles; ++j) {
+            vm->allele_ids[j] = bgen_str_fread(file, 4);
+        }
+
+        bgen_variant_metadata_destroy(vm);
+    }
+#endif
+
+#if 1
+    for (uint32_t i = 0; i < *nvars; ++i) {
         fread_ui64(file, &vars[i].genotype_offset, 8);
 
         vars[i].id = bgen_str_fread(file, 2);
@@ -167,11 +206,12 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t partition
             vars[i].allele_ids[j] = bgen_str_fread(file, 4);
         }
     }
+#endif
 
     return vars;
 err:
     if (vars)
-        bgen_free_partition(vars, *nvariants);
+        bgen_free_partition(vars, *nvars);
     return NULL;
 }
 
