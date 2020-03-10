@@ -153,7 +153,7 @@ struct bgen_vm* bgen_read_partition(struct bgen_mf const* mf, uint32_t partition
     }
 
     for (uint32_t i = 0; i < *nvariants; ++i) {
-        fread_long(file, &vars[i].vaddr, 8);
+        fread_long(file, &vars[i].genotype_offset, 8);
 
         vars[i].id = bgen_str_fread(file, 2);
         vars[i].rsid = bgen_str_fread(file, 2);

@@ -6,23 +6,23 @@
  * [ char[13] : header (e.g. "bgen index 03") ],
  * [ uint32_t : number of variants ],
  * [ uint64_t : metadata block size ],
- * [                                       \
- *   uint64_t        : variant offset      |
- *   uint16_t, str,  : variant id          |
- *   uint16_t, str,  : variant rsid        |
- *   uint16_t, str,  : variant chrom       |
- *   uint32_t,       : genetic position    | Metadata block
- *   uint16_t,       : number of alleles   |
- *   [                                     |
- *     uint32_t, str : allele id           |
- *   ], ...                                |
- * ], ...                                  /
+ * [                                               \
+ *   uint64_t        : genotype offset (bgen file) |
+ *   uint16_t, str,  : variant id                  |
+ *   uint16_t, str,  : variant rsid                |
+ *   uint16_t, str,  : variant chrom               |
+ *   uint32_t,       : genetic position            | Metadata block
+ *   uint16_t,       : number of alleles           |
+ *   [                                             |
+ *     uint32_t, str : allele id                   |
+ *   ], ...                                        |
+ * ], ...                                          /
  * [ uint32_t : number of partitions ],
- * [                                       \
- *   [                                     |
- *     uint64_t : partition offset         | Offsets block
- *   ], ...                                |
- * ]                                       /
+ * [                                               \
+ *   [                                             |
+ *     uint64_t : partition offset (this file)     | Offsets block
+ *   ], ...                                        |
+ * ]                                               /
  *
  * Version 03.
  */

@@ -32,7 +32,7 @@ void test_create_metadata_complex()
     int nvars;
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg* vg = bgen_open_genotype(bgen, vm->vaddr);
+    struct bgen_vg* vg = bgen_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL)
 
         cass_equal_int(bgen_nalleles(vg), 2);
@@ -111,7 +111,7 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_mf* mf)
         struct bgen_vm* vm = bgen_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_vg* vg = bgen_open_genotype(bgen, vm[ii].vaddr);
+            struct bgen_vg* vg = bgen_open_genotype(bgen, vm[ii].genotype_offset);
             cass_cond(vg != NULL)
 
                 cass_equal_int(bgen_nalleles(vg), *(nalleles_ptr++));

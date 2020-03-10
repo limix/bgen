@@ -40,7 +40,7 @@ void test_file(void)
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
 
-    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
+    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].genotype_offset);
     cass_cond(bgen_nalleles(vg) == 2);
     bgen_close_genotype(vg);
 
@@ -82,7 +82,7 @@ void test_geno(void)
     int nvars;
     struct bgen_vm* vm = bgen_read_partition(mf, 0, &nvars);
 
-    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].vaddr);
+    struct bgen_vg* vg = bgen_open_genotype(bgen, vm[0].genotype_offset);
 
     cass_cond(bgen_nalleles(vg) == 2);
     cass_cond(bgen_missing(vg, 0) == 0);
@@ -98,7 +98,7 @@ void test_geno(void)
 
     bgen_close_genotype(vg);
 
-    vg = bgen_open_genotype(bgen, vm[1].vaddr);
+    vg = bgen_open_genotype(bgen, vm[1].genotype_offset);
 
     cass_cond(bgen_nalleles(vg) == 2);
     cass_cond(bgen_missing(vg, 0) == 0);
@@ -122,7 +122,7 @@ void test_geno(void)
     for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
-            vg = bgen_open_genotype(bgen, vm[l].vaddr);
+            vg = bgen_open_genotype(bgen, vm[l].genotype_offset);
             cass_cond(bgen_phased(vg) == phased[i]);
             bgen_close_genotype(vg);
             ++i;
@@ -182,7 +182,7 @@ void test_geno(void)
     for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
         vm = bgen_read_partition(mf, j, &nvars);
         for (size_t l = 0; l < (size_t)nvars; ++l) {
-            vg = bgen_open_genotype(bgen, vm[l].vaddr);
+            vg = bgen_open_genotype(bgen, vm[l].genotype_offset);
 
             double* probabilities = malloc(nsamples * bgen_ncombs(vg) * sizeof(double));
             double* p = probabilities;

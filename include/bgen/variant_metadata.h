@@ -8,13 +8,13 @@
  */
 struct bgen_vm
 {
-    long                    vaddr;      /**< Variant address. */
-    struct bgen_str const*  id;         /**< Variant identification. */
-    struct bgen_str const*  rsid;       /**< RSID. */
-    struct bgen_str const*  chrom;      /**< Chromossome name. */
-    uint32_t                position;   /**< Base-pair position. */
-    uint16_t                nalleles;   /**< Number of alleles. */
-    struct bgen_str const** allele_ids; /**< Allele ids. */
+    struct bgen_str const*  id;              /**< Variant identification. */
+    struct bgen_str const*  rsid;            /**< RSID. */
+    struct bgen_str const*  chrom;           /**< Chromossome name. */
+    uint32_t                position;        /**< Base-pair position. */
+    uint16_t                nalleles;        /**< Number of alleles. */
+    struct bgen_str const** allele_ids;      /**< Allele ids. */
+    uint64_t                genotype_offset; /**< Genotype offset (bgen file). */
 };
 
 #endif

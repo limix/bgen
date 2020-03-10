@@ -64,6 +64,8 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
             goto err;
     }
 
+    vm->genotype_offset = LONG_TELL(bgen_file_stream(bgen));
+
     uint32_t length = 0;
     if (fread_ui32(bgen_file_stream(bgen), &length, 4))
         goto err;
@@ -83,7 +85,7 @@ err:
 static struct bgen_vm* variant_metadata_create(void)
 {
     struct bgen_vm* vm = malloc(sizeof(struct bgen_vm));
-    vm->vaddr = -1;
+    vm->genotype_offset = 0;
     vm->id = NULL;
     vm->rsid = NULL;
     vm->chrom = NULL;
