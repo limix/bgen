@@ -1,35 +1,36 @@
 #ifndef BGEN_METAFILE_WRITE_H
 #define BGEN_METAFILE_WRITE_H
 
+#include "athr.h"
+#include "bgen/variant.h"
 #include "bmath.h"
 #include "io.h"
 #include "metafile.h"
-#include "pbar.h"
 #include "report.h"
 #include "str.h"
 #include "variant.h"
 #include <inttypes.h>
 
 /* Write variant genotype to file and return the block size. */
-static uint64_t write_variant(FILE* stream, const struct bgen_variant* vm)
+static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
 {
     int64_t start = bgen_ftell(stream);
 
-    fwrite_ui64(stream, vm->genotype_offset, 8);
-    if (bgen_str_fwrite(vm->id, stream, 2))
+    fwrite_ui64(stream, variant->genotype_offset, 8);
+    if (bgen_str_fwrite(variant->id, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(vm->rsid, stream, 2))
+    if (bgen_str_fwrite(variant->rsid, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(vm->chrom, stream, 2))
+    if (bgen_str_fwrite(variant->chrom, stream, 2))
         return 0;
 
-    fwrite_ui32(stream, vm->position, 4);
-    fwrite_ui16(stream, vm->nalleles, 2);
+    fwrite_ui32(stream, variant->position, 4);
+    fwrite_ui16(stream, variant->nalleles, 2);
 
-    for (size_t j = 0; j < (size_t)vm->nalleles; ++j) {
-        if (bgen_str_fwrite(vm->allele_ids[j], stream, 4))
+    for (size_t j = 0; j < (size_t)variant->nalleles; ++j) {
+        if (bgen_str_fwrite(variant->allele_ids[j], stream, 4))
             return 0;
     }
 
@@ -69,16 +70,18 @@ static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32
 
     struct athr* at = NULL;
     if (verbose) {
-        if (!(at = create_athr(nvariants, "Writing variants")))
+        at = athr_create(nvariants, "Writing variants", ATHR_BAR | ATHR_ETA);
+        if (at == NULL) {
+            bgen_error("could not create a progress bar");
             goto err;
+        }
     }
 
     size_t i = 0, j = 0;
     int    end = 0;
     int    error = 0;
     for (struct bgen_variant* vm = bgen_variant_begin(bgen, &error);
-         vm != bgen_variant_end(bgen);
-         vm = bgen_variant_next(bgen, &error)) {
+         vm != bgen_variant_end(bgen); vm = bgen_variant_next(bgen, &error)) {
 
         if (error)
             goto err;
