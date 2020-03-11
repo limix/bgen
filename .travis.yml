@@ -23,7 +23,7 @@ jobs:
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
         - ls
         - ./install.bat
-        - set PATH=%programfiles%\zlib\bin;%PATH%
+        - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
     - name: Build on windows
       os: windows
@@ -33,7 +33,7 @@ jobs:
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
         - ls
         - ./install.bat
-        - set PATH=%programfiles%\zlib\bin;%PATH%
+        - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
 addons:
   apt:
