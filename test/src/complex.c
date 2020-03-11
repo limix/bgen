@@ -139,6 +139,6 @@ void test_complex(void)
     }
 
     bgen_partition_destroy(partition);
-    cass_cond(bgen_mf_close(mf) == 0);
+    cass_cond(bgen_metafile_close(mf) == 0);
     bgen_file_close(bgen);
 }

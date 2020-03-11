@@ -1,5 +1,5 @@
-#ifndef BGEN_META_H
-#define BGEN_META_H
+#ifndef BGEN_METAFILE_H
+#define BGEN_METAFILE_H
 
 #include "bgen/file.h"
 #include "bgen/str.h"
@@ -68,6 +68,6 @@ BGEN_EXPORT void bgen_free_partition(struct bgen_variant* vm, uint32_t nvariants
  * @param mf Metafile handler.
  * @return `0` on success; `1` otherwise.
  */
-BGEN_EXPORT int bgen_mf_close(struct bgen_mf* mf);
+BGEN_EXPORT int bgen_metafile_close(struct bgen_mf* mf);
 
 #endif

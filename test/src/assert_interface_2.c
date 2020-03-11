@@ -48,7 +48,7 @@ int main()
     cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
 
     bgen_partition_destroy(partition);
-    bgen_mf_close(mf);
+    bgen_metafile_close(mf);
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
@@ -74,7 +74,7 @@ int main()
 
     bgen_partition_destroy(partition);
     bgen_genotype_close(vg);
-    bgen_mf_close(mf);
+    bgen_metafile_close(mf);
     bgen_file_close(bgen);
 
     return cass_status();

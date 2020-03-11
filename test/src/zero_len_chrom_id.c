@@ -40,6 +40,6 @@ void test_zeo_len_chrom_id(void)
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm->chrom));
     bgen_partition_destroy(partition);
 
-    bgen_mf_close(mf);
+    bgen_metafile_close(mf);
     bgen_file_close(bgen);
 }

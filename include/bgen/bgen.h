@@ -44,7 +44,7 @@ extern "C"
 
 #include "bgen/file.h"
 #include "bgen/genotype.h"
-#include "bgen/meta.h"
+#include "bgen/metafile.h"
 #include "bgen/partition.h"
 #include "bgen/samples.h"
 #include "bgen/str.h"

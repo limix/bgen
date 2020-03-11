@@ -55,7 +55,7 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
 
     return mf;
 err:
-    bgen_mf_close(mf);
+    bgen_metafile_close(mf);
     return NULL;
 }
 
@@ -115,7 +115,7 @@ struct bgen_mf* bgen_metafile_open(const char* filepath)
 
     return mf;
 err:
-    bgen_mf_close(mf);
+    bgen_metafile_close(mf);
     return NULL;
 }
 
@@ -188,7 +188,7 @@ err:
     return NULL;
 }
 
-int bgen_mf_close(struct bgen_mf* mf)
+int bgen_metafile_close(struct bgen_mf* mf)
 {
     if (mf) {
         if (fclose(mf->stream)) {

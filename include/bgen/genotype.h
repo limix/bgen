@@ -4,7 +4,7 @@
 #ifndef BGEN_GENOTYPE_H
 #define BGEN_GENOTYPE_H
 
-#include "bgen/meta.h"
+#include "bgen/metafile.h"
 #include "bgen_export.h"
 #include <stddef.h>
 
