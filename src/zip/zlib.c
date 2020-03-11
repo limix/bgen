@@ -1,31 +1,39 @@
 #include "zip/zlib.h"
-#include "bgen/bgen.h"
-#include <assert.h>
+#include "report.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <zlib.h>
 
-int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size)
+int bgen_unzlib(const char* src, size_t src_size, char** dst, size_t* dst_size)
 {
-    int e;
+    int      e;
     z_stream strm;
 
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;
     strm.opaque = Z_NULL;
     strm.avail_in = 0;
-    strm.next_in = (unsigned char *)src;
+    strm.next_in = (unsigned char*)src;
     e = inflateInit(&strm);
 
     if (e != Z_OK) {
         fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
-        return EXIT_FAILURE;
+        return 1;
     }
 
-    strm.avail_in = (uInt)src_size;
+    if (src_size > UINT_MAX) {
+        bgen_error("zlib src_size overflow");
+        return 1;
+    }
+    strm.avail_in = (unsigned)src_size;
 
-    strm.avail_out = (uInt)*dst_size;
-    strm.next_out = (unsigned char *)*dst;
+    if (src_size > UINT_MAX) {
+        bgen_error("zlib *dst_size overflow");
+        return 1;
+    }
+    strm.avail_out = (unsigned)*dst_size;
+    strm.next_out = (unsigned char*)*dst;
 
     e = inflate(&strm, Z_NO_FLUSH);
     if (e == Z_NEED_DICT) {
@@ -37,20 +45,25 @@ int bgen_unzlib(const char *src, size_t src_size, char **dst, size_t *dst_size)
         goto err;
 
     inflateEnd(&strm);
-    return EXIT_SUCCESS;
+    return 0;
 err:
     inflateEnd(&strm);
     fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(e));
-    return EXIT_FAILURE;
+    return 1;
 }
 
-int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *dst_size)
+int bgen_unzlib_chunked(const char* src, size_t src_size, char** dst, size_t* dst_size)
 {
-    int ret;
+    int      ret;
     z_stream strm;
 
-    uInt unused = *dst_size;
-    char *cdst = *dst;
+    if (*dst_size > UINT_MAX) {
+        bgen_error("zlib *dst_size overflow");
+        return 1;
+    }
+
+    unsigned unused = (unsigned)*dst_size;
+    char*    cdst = *dst;
 
     strm.zalloc = Z_NULL;
     strm.zfree = Z_NULL;
@@ -61,15 +74,15 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
 
     if (ret != Z_OK) {
         fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(ret));
-        return EXIT_FAILURE;
+        return 1;
     }
 
     strm.avail_in = (uInt)src_size;
-    strm.next_in = (unsigned char *)src;
+    strm.next_in = (unsigned char*)src;
 
     while (1) {
         strm.avail_out = unused;
-        strm.next_out = (unsigned char *)cdst;
+        strm.next_out = (unsigned char*)cdst;
 
         ret = inflate(&strm, Z_NO_FLUSH);
 
@@ -88,27 +101,27 @@ int bgen_unzlib_chunked(const char *src, size_t src_size, char **dst, size_t *ds
 
         if (ret == Z_STREAM_END) {
             *dst_size -= unused;
-            *dst = (char *)realloc(*dst, *dst_size);
+            *dst = (char*)realloc(*dst, *dst_size);
             break;
         }
 
         if (strm.avail_out == 0) {
             if (unused > 0) {
                 fprintf(stderr, "zlib failed to uncompress: unknown error.\n");
-                return EXIT_FAILURE;
+                return 1;
             }
 
-            unused = (uInt)*dst_size;
+            unused = (unsigned)*dst_size;
             *dst_size += unused;
-            *dst = (char *)realloc(*dst, *dst_size);
+            *dst = (char*)realloc(*dst, *dst_size);
             cdst = *dst + unused;
         }
     }
 
     inflateEnd(&strm);
-    return EXIT_SUCCESS;
+    return 0;
 err:
     inflateEnd(&strm);
     fprintf(stderr, "zlib failed to uncompress: %s.\n", zError(ret));
-    return EXIT_FAILURE;
+    return 1;
 }
