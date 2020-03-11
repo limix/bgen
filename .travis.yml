@@ -22,7 +22,7 @@ jobs:
         - choco install zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
         - ls
-        - install.bat
+        - ./install.bat
         - set PATH=%programfiles%\zlib\bin;%PATH%
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
     - name: Build on windows
@@ -32,7 +32,7 @@ jobs:
         - choco install ninja zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
         - ls
-        - install.bat
+        - ./install.bat
         - set PATH=%programfiles%\zlib\bin;%PATH%
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
 addons:
