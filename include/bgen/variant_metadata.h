@@ -6,7 +6,7 @@
 /** Variant metadata.
  * @struct bgen_vm
  */
-struct bgen_vm
+struct bgen_variant_metadata
 {
     struct bgen_str const*  id;              /**< Variant identification. */
     struct bgen_str const*  rsid;            /**< RSID. */

@@ -12,7 +12,7 @@
 #include <inttypes.h>
 
 /* Write variant genotype to file and return the block size. */
-static uint64_t write_variant(FILE* stream, const struct bgen_vm* vm)
+static uint64_t write_variant(FILE* stream, const struct bgen_variant_metadata* vm)
 {
     int64_t start = bgen_ftell(stream);
 
@@ -77,7 +77,7 @@ static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32
     size_t i = 0, j = 0;
     int    end = 0;
     int    error = 0;
-    for (struct bgen_vm* vm = bgen_variant_metadata_begin(bgen, &error);
+    for (struct bgen_variant_metadata* vm = bgen_variant_metadata_begin(bgen, &error);
          vm != bgen_variant_metadata_end(bgen);
          vm = bgen_variant_metadata_next(bgen, &error)) {
 

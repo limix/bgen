@@ -13,7 +13,7 @@
  * ----
  * It assumes that the bgen file is open.
  */
-int next_variant(struct bgen_file* bgen, struct bgen_vm* vm)
+int next_variant(struct bgen_file* bgen, struct bgen_variant_metadata* vm)
 {
     if (bgen_file_layout(bgen) == 1) {
         if (bgen_fseek(bgen_file_stream(bgen), 4, SEEK_CUR))
@@ -56,7 +56,7 @@ err:
     return 1;
 }
 
-void init_metadata(struct bgen_vm* vm)
+void init_metadata(struct bgen_variant_metadata* vm)
 {
     vm->genotype_offset = 0;
     vm->allele_ids = NULL;
@@ -67,15 +67,15 @@ void init_metadata(struct bgen_vm* vm)
     vm->nalleles = 0;
 }
 
-struct bgen_vm* alloc_metadata(void)
+struct bgen_variant_metadata* alloc_metadata(void)
 {
-    struct bgen_vm* v = malloc(sizeof(struct bgen_vm));
+    struct bgen_variant_metadata* v = malloc(sizeof(struct bgen_variant_metadata));
     if (v)
         init_metadata(v);
     return v;
 }
 
-void free_metadata(struct bgen_vm* vm)
+void free_metadata(struct bgen_variant_metadata* vm)
 {
     if (vm->id)
         bgen_str_free(vm->id);

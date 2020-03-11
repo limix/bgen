@@ -36,7 +36,7 @@ void test_create_meteadata_haplotypes()
     cass_equal_int(bgen_metafile_nvariants(mf), 4);
 
     int nvars;
-    struct bgen_vm *vm = bgen_metafile_read_partition(mf, 0, &nvars);
+    struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, 0, &nvars);
 
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL);
@@ -100,7 +100,7 @@ void test_genotype_haplotypes_by_creating_metadata()
     double *probs_ptr = &probs[0];
     for (int i = 0; i < 4; ++i) {
         int nvars;
-        struct bgen_vm *vm = bgen_metafile_read_partition(mf, i, &nvars);
+        struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
@@ -179,7 +179,7 @@ void test_genotype_haplotypes_by_loading_metadata()
     double *probs_ptr = &probs[0];
     for (int i = 0; i < bgen_metafile_npartitions(mf); ++i) {
         int nvars;
-        struct bgen_vm *vm = bgen_metafile_read_partition(mf, i, &nvars);
+        struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, i, &nvars);
 
         for (int ii = 0; ii < nvars; ++ii) {
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);

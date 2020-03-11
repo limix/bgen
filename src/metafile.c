@@ -124,10 +124,10 @@ uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->nparti
 
 uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->nvariants; }
 
-struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t index,
+struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t index,
                                              uint32_t* nvars)
 {
-    struct bgen_vm* vars = NULL;
+    struct bgen_variant_metadata* vars = NULL;
     FILE*           file = mf->stream;
 
     if (index >= mf->npartitions) {
@@ -141,7 +141,7 @@ struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t 
 #endif
 
     *nvars = partition_nvariants(mf, index);
-    vars = malloc((*nvars) * sizeof(struct bgen_vm));
+    vars = malloc((*nvars) * sizeof(struct bgen_variant_metadata));
     for (uint32_t i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
 
@@ -217,7 +217,7 @@ err:
     return NULL;
 }
 
-void bgen_free_partition(struct bgen_vm* vars, uint32_t nvars)
+void bgen_free_partition(struct bgen_variant_metadata* vars, uint32_t nvars)
 {
     for (uint32_t i = 0; i < nvars; ++i)
         free_metadata(vars + i);

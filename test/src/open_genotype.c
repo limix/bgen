@@ -35,7 +35,7 @@ void test_file(void)
     bgen_samples_free(samples);
 
     struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
-    struct bgen_vm* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
+    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
 
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
@@ -80,7 +80,7 @@ void test_geno(void)
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
     int nvars;
-    struct bgen_vm* vm = bgen_metafile_read_partition(mf, 0, &nvars);
+    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvars);
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[0].genotype_offset);
 

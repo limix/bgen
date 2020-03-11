@@ -36,7 +36,7 @@ void test_haplotype(void)
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);
 
-    struct bgen_vm* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
+    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
 
     cass_cond(vm != NULL);
     cass_cond(nvariants == 4);
