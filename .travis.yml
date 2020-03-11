@@ -19,12 +19,13 @@ jobs:
       os: windows
       env: GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
+        - choco install zstandard --no-progress -y
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
     - name: Build on windows
       os: windows
       env: GENERATOR=Ninja
       before_install:
-        - choco install ninja --no-progress -y
+        - choco install ninja zstandard --no-progress -y
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
 addons:
   apt:
