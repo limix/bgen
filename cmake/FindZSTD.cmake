@@ -29,6 +29,7 @@
 set(zstd_incl_dirs "/usr/include" "/usr/local/include")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(zstd_incl_dirs ${zstd_incl_dirs} "$ENV{PROGRAMFILES}/zstd/include")
+    set(zstd_incl_dirs ${zstd_incl_dirs} "$ENV{PROGRAMDATA}/chocolatey/lib/zstandard/tools/include")
 endif()
 
 if(ZSTD_INCLUDEDIR)
@@ -44,6 +45,7 @@ find_path(
 set(zstd_lib_dirs "/usr/lib" "/usr/local/lib")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMFILES}/zstd/lib")
+    set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMDATA}/chocolatey/lib/zstandard/tools/dll")
 endif()
 
 if(ZSTD_LIBRARYDIR)
