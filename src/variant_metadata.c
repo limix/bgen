@@ -19,7 +19,8 @@ struct bgen_variant_metadata* bgen_variant_metadata_create(void)
     return vm;
 }
 
-void bgen_variant_metadata_create_alleles(struct bgen_variant_metadata* vm, uint16_t nalleles)
+void bgen_variant_metadata_create_alleles(struct bgen_variant_metadata* vm,
+                                          uint16_t const                nalleles)
 {
     vm->allele_ids = malloc(sizeof(struct bgen_str*) * nalleles);
 
@@ -69,14 +70,10 @@ struct bgen_variant_metadata* bgen_variant_metadata_next(struct bgen_file* bgen,
         goto err;
 
     vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str*));
-    for (int i = 0; i < vm->nalleles; ++i)
+    for (uint16_t i = 0; i < vm->nalleles; ++i)
         vm->allele_ids[i] = NULL;
 
-    if (!vm->allele_ids)
-        goto err;
-
     for (uint16_t i = 0; i < vm->nalleles; ++i) {
-
         if ((vm->allele_ids[i] = bgen_str_fread(bgen_file_stream(bgen), 4)) == NULL)
             goto err;
     }
@@ -104,7 +101,10 @@ err:
     return NULL;
 }
 
-struct bgen_variant_metadata* bgen_variant_metadata_end(struct bgen_file* bgen_file) { return NULL; }
+struct bgen_variant_metadata* bgen_variant_metadata_end(struct bgen_file const* bgen_file)
+{
+    return NULL;
+}
 
 void bgen_variant_metadata_destroy(struct bgen_variant_metadata const* vm)
 {
