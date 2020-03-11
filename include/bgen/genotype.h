@@ -46,14 +46,14 @@ BGEN_EXPORT uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype
  * @param index Sample index.
  * @return `1` for missing genotype; `0` otherwise.
  */
-BGEN_EXPORT bool bgen_genotype_missing(struct bgen_genotype const* genotype, int index);
+BGEN_EXPORT bool bgen_genotype_missing(struct bgen_genotype const* genotype, uint32_t index);
 /** Get the ploidy.
  *
  * @param genotype Variant genotype handler.
  * @param index Sample index.
  * @return Ploidy.
  */
-BGEN_EXPORT uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, int index);
+BGEN_EXPORT uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, uint32_t index);
 /** Get the minimum ploidy of the variant.
  *
  * @param genotype Variant genotype handler.
