@@ -10,7 +10,6 @@
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
-#include "variant.h"
 #include <assert.h>
 
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
@@ -124,60 +123,6 @@ uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->nparti
 
 uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->nvariants; }
 
-struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const* mf,
-                                                           uint32_t index, uint32_t* nvars)
-{
-    struct bgen_variant_metadata* vars = NULL;
-    FILE*                         file = mf->stream;
-
-    if (index >= mf->npartitions) {
-        bgen_error("the provided partition number %d is out-of-range", index);
-        goto err;
-    }
-
-    *nvars = partition_nvariants(mf, index);
-    vars = malloc((*nvars) * sizeof(struct bgen_variant_metadata));
-    for (uint32_t i = 0; i < *nvars; ++i)
-        init_metadata(vars + i);
-
-    if (bgen_fseek(file, 13 + 4 + 8, SEEK_SET)) {
-        bgen_perror("could not fseek metafile");
-        goto err;
-    }
-
-    if (mf->partition_offset[index] > INT64_MAX) {
-        bgen_error("`partition_offset` overflow");
-        goto err;
-    }
-
-    if (bgen_fseek(file, (int64_t)mf->partition_offset[index], SEEK_CUR)) {
-        bgen_perror("could not fseek metafile");
-        goto err;
-    }
-
-    for (uint32_t i = 0; i < *nvars; ++i) {
-        fread_ui64(file, &vars[i].genotype_offset, 8);
-
-        vars[i].id = bgen_str_fread(file, 2);
-        vars[i].rsid = bgen_str_fread(file, 2);
-        vars[i].chrom = bgen_str_fread(file, 2);
-
-        fread_ui32(file, &vars[i].position, 4);
-        fread_ui16(file, &vars[i].nalleles, 2);
-        vars[i].allele_ids = malloc(sizeof(struct bgen_str*) * vars[i].nalleles);
-
-        for (int j = 0; j < vars[i].nalleles; ++j) {
-            vars[i].allele_ids[j] = bgen_str_fread(file, 4);
-        }
-    }
-
-    return vars;
-err:
-    if (vars)
-        bgen_free_partition(vars, *nvars);
-    return NULL;
-}
-
 struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf const* mf, uint32_t index)
 {
     FILE* file = mf->stream;
@@ -241,13 +186,6 @@ struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf const* mf, u
 err:
     bgen_partition_destroy(partition);
     return NULL;
-}
-
-void bgen_free_partition(struct bgen_variant_metadata* vars, uint32_t nvars)
-{
-    for (uint32_t i = 0; i < nvars; ++i)
-        free_metadata(vars + i);
-    free(vars);
 }
 
 int bgen_mf_close(struct bgen_mf* mf)

@@ -7,7 +7,6 @@
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
-#include "variant.h"
 #include "variant_metadata.h"
 #include <inttypes.h>
 
