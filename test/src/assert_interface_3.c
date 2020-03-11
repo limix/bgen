@@ -1,14 +1,29 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <stdlib.h>
 
-void test_open_wrong_bgen_filepath()
+void test_open_wrong_bgen_filepath(void);
+void test_bgen_file_haplotypes(void);
+void test_create_meteadata_haplotypes(void);
+void test_genotype_haplotypes_by_creating_metadata(void);
+void test_genotype_haplotypes_by_loading_metadata(void);
+
+int main()
+{
+    test_open_wrong_bgen_filepath();
+    test_bgen_file_haplotypes();
+    test_create_meteadata_haplotypes();
+    test_genotype_haplotypes_by_creating_metadata();
+    test_genotype_haplotypes_by_loading_metadata();
+    return cass_status();
+}
+
+void test_open_wrong_bgen_filepath(void)
 {
     struct bgen_file* bgen = bgen_file_open("wrong.metadata");
     cass_cond(bgen == NULL);
 }
 
-void test_bgen_file_haplotypes()
+void test_bgen_file_haplotypes(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
@@ -25,7 +40,7 @@ void test_bgen_file_haplotypes()
     bgen_file_close(bgen);
 }
 
-void test_create_meteadata_haplotypes()
+void test_create_meteadata_haplotypes(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
@@ -42,7 +57,7 @@ void test_create_meteadata_haplotypes()
     cass_cond(vg != NULL);
 
     cass_equal_int(bgen_genotype_nalleles(vg), 2);
-    for (int i = 0; i < 4; ++i) {
+    for (uint32_t i = 0; i < 4; ++i) {
         cass_equal_int(bgen_genotype_missing(vg, i), 0);
         cass_equal_int(bgen_genotype_ploidy(vg, i), 2);
     }
@@ -58,7 +73,7 @@ void test_create_meteadata_haplotypes()
     bgen_file_close(bgen);
 }
 
-void test_genotype_haplotypes_by_creating_metadata()
+void test_genotype_haplotypes_by_creating_metadata(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
@@ -68,13 +83,13 @@ void test_genotype_haplotypes_by_creating_metadata()
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
     cass_equal_int(bgen_metafile_nvariants(mf), 4);
 
-    int     nalleles[] = {2, 2, 2, 2};
-    int     min_ploidy[] = {2, 2, 2, 2};
-    int     max_ploidy[] = {2, 2, 2, 2};
-    int     ncombs[] = {4, 4, 4, 4};
-    int     phased[] = {1, 1, 1, 1};
-    int     nsamples = 4;
-    double  probs[] = {1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
+    int      nalleles[] = {2, 2, 2, 2};
+    int      min_ploidy[] = {2, 2, 2, 2};
+    int      max_ploidy[] = {2, 2, 2, 2};
+    unsigned ncombs[] = {4, 4, 4, 4};
+    int      phased[] = {1, 1, 1, 1};
+    uint32_t nsamples = 4;
+    double   probs[] = {1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       0.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       0.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
@@ -96,17 +111,17 @@ void test_genotype_haplotypes_by_creating_metadata()
                       1.00000000000000000000, 1.00000000000000000000, 0.00000000000000000000,
                       1.00000000000000000000, 0.00000000000000000000, 0.00000000000000000000,
                       1.00000000000000000000};
-    double* probs_ptr = &probs[0];
-    for (int i = 0; i < 4; ++i) {
+    double*  probs_ptr = &probs[0];
+    for (uint32_t i = 0; i < 4; ++i) {
         struct bgen_partition const* partition = bgen_metafile_read_partition(mf, i);
 
-        for (int ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
+        for (uint32_t ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
             struct bgen_variant const* vm = bgen_partition_get(partition, ii);
             struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
-            for (size_t j = 0; j < (size_t)nsamples; ++j) {
+            for (uint32_t j = 0; j < nsamples; ++j) {
                 cass_equal_int(bgen_genotype_missing(vg, j), 0);
                 cass_equal_int(bgen_genotype_ploidy(vg, j), 2);
             }
@@ -118,8 +133,8 @@ void test_genotype_haplotypes_by_creating_metadata()
             double* ptr = malloc(nsamples * ncombs[i] * sizeof(double));
             cass_equal_int(bgen_genotype_read(vg, ptr), 0);
             double* p = ptr;
-            for (int j = 0; j < nsamples; ++j) {
-                for (int c = 0; c < ncombs[i]; ++c) {
+            for (uint32_t j = 0; j < nsamples; ++j) {
+                for (unsigned c = 0; c < ncombs[i]; ++c) {
                     cass_close(*p, *(probs_ptr++));
                     ++p;
                 }
@@ -135,7 +150,7 @@ void test_genotype_haplotypes_by_creating_metadata()
     bgen_file_close(bgen);
 }
 
-void test_genotype_haplotypes_by_loading_metadata()
+void test_genotype_haplotypes_by_loading_metadata(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
@@ -145,13 +160,13 @@ void test_genotype_haplotypes_by_loading_metadata()
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
     cass_equal_int(bgen_metafile_nvariants(mf), 4);
 
-    int    nalleles[] = {2, 2, 2, 2};
-    int    min_ploidy[] = {2, 2, 2, 2};
-    int    max_ploidy[] = {2, 2, 2, 2};
-    int    ncombs[] = {4, 4, 4, 4};
-    int    phased[] = {1, 1, 1, 1};
-    int    nsamples = 4;
-    double probs[] = {1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
+    int      nalleles[] = {2, 2, 2, 2};
+    int      min_ploidy[] = {2, 2, 2, 2};
+    int      max_ploidy[] = {2, 2, 2, 2};
+    unsigned ncombs[] = {4, 4, 4, 4};
+    int      phased[] = {1, 1, 1, 1};
+    uint32_t nsamples = 4;
+    double   probs[] = {1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       0.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       1.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
                       0.00000000000000000000, 0.00000000000000000000, 1.00000000000000000000,
@@ -184,7 +199,7 @@ void test_genotype_haplotypes_by_loading_metadata()
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
-            for (int j = 0; j < nsamples; ++j) {
+            for (uint32_t j = 0; j < nsamples; ++j) {
                 cass_equal_int(bgen_genotype_missing(vg, j), 0);
                 cass_equal_int(bgen_genotype_ploidy(vg, j), 2);
             }
@@ -196,8 +211,8 @@ void test_genotype_haplotypes_by_loading_metadata()
             double* ptr = malloc(nsamples * ncombs[i] * sizeof(double));
             cass_equal_int(bgen_genotype_read(vg, ptr), 0);
             double* p = ptr;
-            for (int j = 0; j < nsamples; ++j) {
-                for (int c = 0; c < ncombs[i]; ++c) {
+            for (uint32_t j = 0; j < nsamples; ++j) {
+                for (unsigned c = 0; c < ncombs[i]; ++c) {
                     cass_close(*p, *(probs_ptr++));
                     ++p;
                 }
@@ -213,12 +228,3 @@ void test_genotype_haplotypes_by_loading_metadata()
     bgen_file_close(bgen);
 }
 
-int main()
-{
-    test_open_wrong_bgen_filepath();
-    test_bgen_file_haplotypes();
-    test_create_meteadata_haplotypes();
-    test_genotype_haplotypes_by_creating_metadata();
-    test_genotype_haplotypes_by_loading_metadata();
-    return cass_status();
-}

@@ -1,7 +1,5 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <stdio.h>
-#include <string.h>
 
 void test_corrupted_metadata_file(void);
 

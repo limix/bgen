@@ -32,11 +32,9 @@ void use_metafile_properly(char const* metafile_filepath)
     struct bgen_metafile* metafile = bgen_metafile_open(metafile_filepath);
     cass_cond(metafile != NULL);
 
-    int nparts = bgen_metafile_npartitions(metafile);
-    cass_equal_int(nparts, 2);
+    cass_equal_int(bgen_metafile_npartitions(metafile), 2);
 
-    int nvars = bgen_metafile_nvariants(metafile);
-    cass_equal_int(nvars, 10);
+    cass_equal_int(bgen_metafile_nvariants(metafile), 10);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     cass_cond(partition != NULL);

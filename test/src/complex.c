@@ -1,10 +1,6 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <float.h>
 #include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 void test_complex(void);
 
@@ -16,7 +12,6 @@ int main(void)
 
 void test_complex(void)
 {
-    size_t            j, ii;
     const char        filename[] = "data/complex.23bits.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
@@ -34,7 +29,7 @@ void test_complex(void)
     bgen_samples_free(samples);
 
     struct bgen_metafile* mf =
-        bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
+        bgen_metafile_create(bgen, "complex.tmp/complex.23bits.bgen.metadata", 1, 0);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(nvariants == 10);
@@ -44,9 +39,9 @@ void test_complex(void)
     vm = bgen_partition_get(partition, 9);
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm->rsid));
 
-    int   position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
-    int   correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
-    char* allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
+    uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
+    uint16_t correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
+    char*    allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
                           "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
                           "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
                           "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
@@ -128,7 +123,7 @@ void test_complex(void)
             cass_cond(ploidys[jj] == bgen_genotype_ploidy(vg, j));
             cass_cond(bgen_genotype_missing(vg, j) == 0);
 
-            for (ii = 0; ii < (size_t)bgen_genotype_ncombs(vg); ++ii) {
+            for (unsigned ii = 0; ii < bgen_genotype_ncombs(vg); ++ii) {
                 cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                 ++rp;
                 ++p;

@@ -32,6 +32,15 @@ add_library(bgen
 )
 add_library(BGEN::bgen ALIAS bgen)
 
+add_library(warning INTERFACE)
+add_library(BGEN::warning ALIAS warning)
+target_compile_options(warning INTERFACE
+    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
+    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
+    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
+    -Wno-unused-parameter>
+)
+
 # Write out mytools_export.h to the current binary directory
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
 # search path.
@@ -54,12 +63,7 @@ set_target_properties(bgen PROPERTIES DEFINE_SYMBOL "BGEN_EXPORTS")
 target_link_libraries(bgen PUBLIC ATHR::athr)
 target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
-target_compile_options(bgen PRIVATE
-    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
-    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
-    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
-    -Wno-unused-parameter>
-)
+target_link_libraries(bgen PRIVATE BGEN::warning)
 target_compile_features(bgen PRIVATE c_restrict)
 
 include(CheckCSourceCompiles)

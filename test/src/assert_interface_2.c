@@ -1,12 +1,8 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <stdlib.h>
 
 int main()
 {
-    struct bgen_str str = {0, NULL};
-    cass_equal_int(str.length, 0);
-
     struct bgen_file* bgen = bgen_file_open("nexist");
     cass_cond(bgen == NULL);
 
@@ -35,9 +31,9 @@ int main()
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    struct bgen_metafile* mf =
-        bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
-    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_metafile* metafile = bgen_metafile_create(
+        bgen, "assert_interface_2.tmp/example.14bits.bgen.metadata", 1, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     cass_equal_int(vm->position, 2000);
@@ -48,33 +44,33 @@ int main()
     cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close(mf);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    mf = bgen_metafile_open("example.14bits.bgen.metadata");
-    partition = bgen_metafile_read_partition(mf, 0);
+    metafile = bgen_metafile_open("assert_interface_2.tmp/example.14bits.bgen.metadata");
+    partition = bgen_metafile_read_partition(metafile, 0);
     vm = bgen_partition_get(partition, 3);
-    struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
+    struct bgen_genotype* genotype = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
-    cass_equal_int(bgen_genotype_nalleles(vg), 2);
-    cass_equal_int(bgen_genotype_missing(vg, 3), 0);
-    cass_equal_int(bgen_genotype_ploidy(vg, 3), 2);
-    cass_equal_int(bgen_genotype_min_ploidy(vg), 2);
-    cass_equal_int(bgen_genotype_max_ploidy(vg), 2);
-    cass_equal_int(bgen_genotype_ncombs(vg), 3);
-    cass_equal_int(bgen_genotype_phased(vg), 0);
+    cass_equal_int(bgen_genotype_nalleles(genotype), 2);
+    cass_equal_int(bgen_genotype_missing(genotype, 3), 0);
+    cass_equal_int(bgen_genotype_ploidy(genotype, 3), 2);
+    cass_equal_int(bgen_genotype_min_ploidy(genotype), 2);
+    cass_equal_int(bgen_genotype_max_ploidy(genotype), 2);
+    cass_equal_int(bgen_genotype_ncombs(genotype), 3);
+    cass_equal_int(bgen_genotype_phased(genotype), 0);
 
     double* probs = malloc(500 * 3 * sizeof(double));
-    bgen_genotype_read(vg, probs);
+    bgen_genotype_read(genotype, probs);
     cass_close(probs[0], 0.00488311054141488121);
     cass_close(probs[1], 0.02838308002197399704);
     cass_close(probs[2], 0.96673380943661113562);
     cass_close(probs[3], 0.99047793444424092613);
 
     bgen_partition_destroy(partition);
-    bgen_genotype_close(vg);
-    bgen_metafile_close(mf);
+    bgen_genotype_close(genotype);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen);
 
     return cass_status();

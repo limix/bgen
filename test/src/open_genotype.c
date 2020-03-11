@@ -18,7 +18,6 @@ int main()
 
 void test_file(void)
 {
-    size_t            i, jj;
     const char        filename[] = "data/complex.23bits.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
@@ -49,15 +48,15 @@ void test_file(void)
     cass_cond(bgen_genotype_nalleles(vg) == 2);
     bgen_genotype_close(vg);
 
-    int   position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
-    int   correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
-    char* allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
+    uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
+    int      correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
+    char*    allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
                           "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
                           "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
                           "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
                           "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
-    jj = 0;
+    size_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
         vm = bgen_partition_get(partition, i);
         cass_cond(vm->nalleles == correct_nalleles[i]);
@@ -86,7 +85,6 @@ void test_geno(void)
     cass_cond(bgen_metafile_npartitions(mf) == 3);
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
-    int                          nvars;
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     struct bgen_variant const*   vm = bgen_partition_get(partition, 0);
 
@@ -128,11 +126,11 @@ void test_geno(void)
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
     size_t i = 0;
-    for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
+    for (uint32_t j = 0; j < bgen_metafile_npartitions(mf); ++j) {
         partition = bgen_metafile_read_partition(mf, j);
-        for (size_t l = 0; l < (size_t)nvars; ++l) {
+        for (uint32_t l = 0; l < bgen_partition_nvariants(partition); ++l) {
             vm = bgen_partition_get(partition, l);
-            vg = bgen_file_open_genotype(bgen, vm[l].genotype_offset);
+            vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(bgen_genotype_phased(vg) == phased[i]);
             bgen_genotype_close(vg);
             ++i;
@@ -187,11 +185,11 @@ void test_geno(void)
 
     double* rp = real_probs;
 
-    int    nsamples = bgen_file_nsamples(bgen);
-    size_t jj = 0;
-    for (size_t j = 0; j < (size_t)bgen_metafile_npartitions(mf); ++j) {
+    uint32_t nsamples = bgen_file_nsamples(bgen);
+    size_t   jj = 0;
+    for (uint32_t j = 0; j < bgen_metafile_npartitions(mf); ++j) {
         partition = bgen_metafile_read_partition(mf, j);
-        for (size_t l = 0; l < (size_t)nvars; ++l) {
+        for (uint32_t l = 0; l < bgen_partition_nvariants(partition); ++l) {
             vm = bgen_partition_get(partition, l);
             vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
@@ -200,12 +198,12 @@ void test_geno(void)
             double* p = probabilities;
             bgen_genotype_read(vg, probabilities);
 
-            for (j = 0; j < (size_t)nsamples; ++j) {
+            for (j = 0; j < nsamples; ++j) {
 
                 cass_cond(ploidys[jj] == bgen_genotype_ploidy(vg, j));
                 cass_cond(bgen_genotype_missing(vg, j) == 0);
 
-                for (size_t ii = 0; ii < (size_t)bgen_genotype_ncombs(vg); ++ii) {
+                for (size_t ii = 0; ii < bgen_genotype_ncombs(vg); ++ii) {
                     cass_cond(!(*rp != *p && !(isnan(*rp) && isnan(*p))));
                     ++rp;
                     ++p;

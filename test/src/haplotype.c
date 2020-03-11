@@ -15,7 +15,6 @@ int main(void)
 
 void test_haplotype(void)
 {
-    size_t            i, j, ii, jj;
     const char        filename[] = "data/haplotypes.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
@@ -30,8 +29,8 @@ void test_haplotype(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_metafile* mf =
-        bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
+    struct bgen_metafile* mf = bgen_metafile_create(
+        bgen, "haplotype.tmp/complex.23bits.bgen.metadata.1", 1, 0);
 
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);
@@ -43,7 +42,7 @@ void test_haplotype(void)
     cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm->rsid));
     cass_cond(vm->nalleles == 2);
 
-    for (i = 0; i < (size_t)nvariants; ++i) {
+    for (uint32_t i = 0; i < nvariants; ++i) {
         vm = bgen_partition_get(partition, i);
         cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
         cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
@@ -67,8 +66,8 @@ void test_haplotype(void)
                            1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0,
                            1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0};
 
-    jj = 0;
-    for (i = 0; i < (size_t)nvariants; ++i) {
+    uint32_t jj = 0;
+    for (uint32_t i = 0; i < nvariants; ++i) {
         vm = bgen_partition_get(partition, i);
         vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
@@ -76,8 +75,8 @@ void test_haplotype(void)
 
         cass_cond(bgen_genotype_read(vg, probabilities) == 0);
 
-        for (ii = 0; ii < (size_t)nsamples; ++ii) {
-            for (j = 0; j < (size_t)bgen_genotype_ncombs(vg); ++j) {
+        for (uint32_t ii = 0; ii < nsamples; ++ii) {
+            for (unsigned j = 0; j < bgen_genotype_ncombs(vg); ++j) {
                 cass_cond(probabilities[ii * bgen_genotype_ncombs(vg) + j] == real_probs[jj]);
                 jj++;
             }

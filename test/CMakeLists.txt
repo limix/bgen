@@ -1,6 +1,7 @@
 function(bgen_add_test name)
     set(target test_${name})
     add_executable(${target} src/${name}.c)
+    target_link_libraries(${target} PRIVATE BGEN::warning)
     add_custom_command(TARGET ${target} PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${target}>/${name}.tmp
     )
