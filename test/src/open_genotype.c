@@ -34,8 +34,9 @@ void test_file(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
-    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
@@ -79,14 +80,15 @@ void test_geno(void)
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "complex.23bits.bgen.og.metafile", 3, 0);
 
     cass_cond(bgen_metafile_npartitions(mf) == 3);
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
-    int                                 nvars;
-    struct bgen_partition*              partition = bgen_metafile_read_partition(mf, 0);
-    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
+    int                          nvars;
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_variant const*   vm = bgen_partition_get(partition, 0);
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 

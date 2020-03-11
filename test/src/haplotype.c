@@ -30,12 +30,13 @@ void test_haplotype(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
 
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);
 
-    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);

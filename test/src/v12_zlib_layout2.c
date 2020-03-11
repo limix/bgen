@@ -37,7 +37,7 @@ void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
     cass_cond(bgen_str_equal(BGEN_STR("sample_001"), *bgen_samples_get(samples, 0)));
     cass_cond(bgen_str_equal(BGEN_STR("sample_500"), *bgen_samples_get(samples, 499)));
 
-    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(bgen_partition_nvariants(partition) == 67);
     cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *bgen_partition_get(partition, 0)->id));
     bgen_partition_destroy(partition);
@@ -69,10 +69,10 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* mf, i
     int ii = 0;
     i = 0;
     for (int part = 0; part < bgen_metafile_npartitions(mf); ++part) {
-        struct bgen_partition* partition = bgen_metafile_read_partition(mf, part);
+        struct bgen_partition const* partition = bgen_metafile_read_partition(mf, part);
         for (ii = 0; ii < nvariants; ++ii, ++i) {
             struct bgen_variant const* vm = bgen_partition_get(partition, ii);
-            struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
+            struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
             cass_cond(bgen_genotype_max_ploidy(vg) == 2);
 
@@ -134,8 +134,8 @@ int main()
         const char* ix = get_example_index_filepath(i);
         int         prec = get_example_precision(i);
 
-        struct bgen_file* bgen = bgen_file_open(ex);
-        struct bgen_metafile*   mf = bgen_metafile_open(ix);
+        struct bgen_file*     bgen = bgen_file_open(ex);
+        struct bgen_metafile* mf = bgen_metafile_open(ix);
 
         test_read(bgen, mf, prec);
 

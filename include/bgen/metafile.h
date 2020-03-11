@@ -55,7 +55,7 @@ BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* mf);
 /* BGEN_EXPORT struct bgen_variant_metadata* bgen_metafile_read_partition( */
 /*     struct bgen_mf const* mf, uint32_t index, uint32_t* nvariants); */
 
-BGEN_EXPORT struct bgen_partition* bgen_metafile_read_partition(
+BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
     struct bgen_metafile const* metafile, uint32_t partition);
 /** Free a partition.
  *

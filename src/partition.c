@@ -6,7 +6,7 @@
 struct bgen_partition
 {
     struct bgen_variant const** variants_metadata;
-    uint32_t                             nvariants;
+    uint32_t                    nvariants;
 };
 
 void bgen_partition_destroy(struct bgen_partition const* partition)
@@ -23,7 +23,7 @@ void bgen_partition_destroy(struct bgen_partition const* partition)
 }
 
 struct bgen_variant const* bgen_partition_get(struct bgen_partition const* partition,
-                                                       uint32_t const               index)
+                                              uint32_t const               index)
 {
     return partition->variants_metadata[index];
 }

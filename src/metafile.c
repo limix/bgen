@@ -132,8 +132,8 @@ uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafile)
     return metafile->nvariants;
 }
 
-struct bgen_partition* bgen_metafile_read_partition(struct bgen_metafile const* metafile,
-                                                    uint32_t                    partition)
+struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile const* metafile,
+                                                          uint32_t partition)
 {
     FILE* file = metafile->stream;
 

@@ -16,11 +16,11 @@ int main(void)
 
 void test_complex(void)
 {
-    size_t j, ii;
-    const char filename[] = "data/complex.23bits.bgen";
+    size_t            j, ii;
+    const char        filename[] = "data/complex.23bits.bgen";
     struct bgen_file* bgen;
-    uint32_t nsamples, nvariants;
-    double* probabilities;
+    uint32_t          nsamples, nvariants;
+    double*           probabilities;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
@@ -33,9 +33,10 @@ void test_complex(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
 
-    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(nvariants == 10);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
@@ -43,8 +44,8 @@ void test_complex(void)
     vm = bgen_partition_get(partition, 9);
     cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm->rsid));
 
-    int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
-    int correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
+    int   position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
+    int   correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
     char* allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
                           "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
                           "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
@@ -66,7 +67,7 @@ void test_complex(void)
 
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
-    int ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
+    int    ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
                      1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
     double real_probs[] = {
         1.000000, 0.000000, NAN,      1.000000, 0.000000, 0.000000, 1.000000, 0.000000,

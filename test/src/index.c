@@ -16,7 +16,7 @@ void use_metafile(struct bgen_metafile* mf)
     int nvars = bgen_metafile_nvariants(mf);
     cass_equal_int(nvars, 10);
 
-    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
