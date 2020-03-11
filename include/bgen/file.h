@@ -66,6 +66,7 @@ BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, 
  * @param variant_offset Variant address in the bgen file.
  * @return Variant genotype handler. Return `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen, uint64_t variant_offset);
+BGEN_EXPORT struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen,
+                                                          uint64_t          variant_offset);
 
 #endif

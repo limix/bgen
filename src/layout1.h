@@ -1,11 +1,10 @@
 #ifndef BGEN_LAYOUT1_H
 #define BGEN_LAYOUT1_H
 
-#include "bgen/bgen.h"
-#include "index.h"
-#include <stdio.h>
+struct bgen_file;
+struct bgen_genotype;
 
-int  bgen_layout1_read_header(struct bgen_vi*, struct bgen_genotype*, FILE*);
-void bgen_layout1_read_genotype(struct bgen_genotype*, double*);
+int  bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype);
+void bgen_layout1_read_genotype(struct bgen_genotype* genotype, double* probabilities);
 
 #endif

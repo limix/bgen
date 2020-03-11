@@ -2,7 +2,6 @@
 #include "bgen/bgen.h"
 #include "file.h"
 #include "free.h"
-#include "index.h"
 #include "layout1.h"
 #include "layout2.h"
 #include "report.h"

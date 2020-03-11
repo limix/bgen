@@ -1,5 +1,6 @@
 #include "layout2.h"
 #include "bmath.h"
+#include "file.h"
 #include "genotype.h"
 #include "mem.h"
 #include "zip/zlib.h"
@@ -10,7 +11,7 @@
 
 static void  read_phased_genotype(struct bgen_genotype* genotype, double* probabilities);
 static void  read_unphased_genotype(struct bgen_genotype* genotype, double* probabilities);
-static char* _uncompress(struct bgen_vi* idx, FILE* file);
+static char* _uncompress(struct bgen_file* bgen_file);
 
 inline static uint8_t read_ploidy(uint8_t ploidy_miss) { return ploidy_miss & 127; }
 
@@ -28,27 +29,27 @@ inline static void set_array_nan(double* p, size_t n)
         p[i] = NAN;
 }
 
-int bgen_layout2_read_header(struct bgen_vi* idx, struct bgen_genotype* vg, FILE* file)
+int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* vg)
 {
-    uint32_t nsamples;
-    uint16_t nalleles;
-    uint8_t  min_ploidy, max_ploidy, phased, nbits;
+    uint32_t nsamples = 0;
+    uint16_t nalleles = 0;
+    uint8_t  min_ploidy = 0, max_ploidy = 0, phased = 0, nbits = 0;
 
     char* c;
     char* chunk;
 
-    if (idx->compression > 0) {
-        if ((chunk = _uncompress(idx, file)) == NULL)
+    if (bgen_file_compression(bgen_file) > 0) {
+        if ((chunk = _uncompress(bgen_file)) == NULL)
             return 1;
         c = chunk;
         memcpy_walk(&nsamples, &c, 4);
     } else {
-        if (fread(&nsamples, 1, 4, file) < 4)
+        if (fread(&nsamples, 1, 4, bgen_file_stream(bgen_file)) < 4)
             return 1;
 
         chunk = malloc(6 * nsamples);
 
-        if (fread(chunk, 1, 6 * nsamples, file) < 6 * nsamples) {
+        if (fread(chunk, 1, 6 * nsamples, bgen_file_stream(bgen_file)) < 6 * nsamples) {
             free(chunk);
             return 1;
         }
@@ -197,7 +198,7 @@ static void read_unphased_genotype(struct bgen_genotype* genotype, double* proba
     }
 }
 
-static char* _uncompress(struct bgen_vi* idx, FILE* file)
+static char* _uncompress(struct bgen_file* bgen_file)
 {
     size_t clength, ulength;
     char*  cchunk;
@@ -205,29 +206,29 @@ static char* _uncompress(struct bgen_vi* idx, FILE* file)
     clength = 0;
     ulength = 0;
 
-    if (fread(&clength, 1, 4, file) < 4)
+    if (fread(&clength, 1, 4, bgen_file_stream(bgen_file)) < 4)
         return NULL;
 
     clength -= 4;
 
-    if (fread(&ulength, 1, 4, file) < 4)
+    if (fread(&ulength, 1, 4, bgen_file_stream(bgen_file)) < 4)
         return NULL;
 
     cchunk = malloc(clength);
 
-    if (fread(cchunk, 1, clength, file) < clength) {
+    if (fread(cchunk, 1, clength, bgen_file_stream(bgen_file)) < clength) {
         free(cchunk);
         return NULL;
     }
 
     uchunk = malloc(ulength);
 
-    if (idx->compression == 1) {
+    if (bgen_file_compression(bgen_file) == 1) {
         if (bgen_unzlib(cchunk, clength, &uchunk, &ulength)) {
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
             goto err;
         }
-    } else if (idx->compression == 2) {
+    } else if (bgen_file_compression(bgen_file) == 2) {
         if (bgen_unzstd(cchunk, clength, (void**)&uchunk, &ulength)) {
             fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
             goto err;

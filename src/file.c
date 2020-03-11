@@ -1,6 +1,7 @@
 #include "file.h"
 #include "athr.h"
 #include "bgen/file.h"
+#include "bgen/genotype.h"
 #include "free.h"
 #include "genotype.h"
 #include "io.h"
@@ -131,8 +132,8 @@ err:
     return NULL;
 }
 
-struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
-                                              uint64_t const          variant_offset)
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen,
+                                              uint64_t const    variant_offset)
 {
     struct bgen_genotype* geno = bgen_genotype_create();
     geno->layout = bgen->layout;
@@ -148,12 +149,10 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
         goto err;
     }
 
-    struct bgen_vi vi = BGEN_VI(bgen);
-
     if (bgen_file_layout(bgen) == 1) {
-        bgen_layout1_read_header(&vi, geno, bgen_file_stream(bgen));
+        bgen_layout1_read_header(bgen, geno);
     } else if (bgen_file_layout(bgen) == 2) {
-        bgen_layout2_read_header(&vi, geno, bgen_file_stream(bgen));
+        bgen_layout2_read_header(bgen, geno);
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;
