@@ -1,6 +1,8 @@
 #include "str.h"
+#include "bgen/str.h"
 #include "free.h"
 #include "report.h"
+#include <inttypes.h>
 
 struct bgen_str const* bgen_str_fread(FILE* stream, size_t length_size)
 {

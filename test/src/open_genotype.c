@@ -9,7 +9,7 @@
 void test_file(void);
 void test_geno(void);
 
-int main()
+int main(void)
 {
     test_file();
     test_geno();

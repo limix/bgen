@@ -1,4 +1,5 @@
 #include "bgen/variant.h"
+#include "bgen/str.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"

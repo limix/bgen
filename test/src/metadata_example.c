@@ -3,7 +3,7 @@
 
 void test_corrupted_metadata_file(void);
 
-int main()
+int main(void)
 {
     test_corrupted_metadata_file();
     return cass_status();

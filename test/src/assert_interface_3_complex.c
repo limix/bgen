@@ -7,7 +7,7 @@ void test_create_metadata_complex(void);
 void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf);
 void test_genotype_complex(void);
 
-int main()
+int main(void)
 {
     test_bgen_file_complex();
     test_create_metadata_complex();

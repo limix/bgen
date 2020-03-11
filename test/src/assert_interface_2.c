@@ -1,7 +1,7 @@
 #include "bgen/bgen.h"
 #include "cass.h"
 
-int main()
+int main(void)
 {
     struct bgen_file* bgen = bgen_file_open("nexist");
     cass_cond(bgen == NULL);

@@ -7,7 +7,7 @@ void test_create_meteadata_haplotypes(void);
 void test_genotype_haplotypes_by_creating_metadata(void);
 void test_genotype_haplotypes_by_loading_metadata(void);
 
-int main()
+int main(void)
 {
     test_open_wrong_bgen_filepath();
     test_bgen_file_haplotypes();

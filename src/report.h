@@ -1,7 +1,6 @@
 #ifndef BGEN_REPORT_H
 #define BGEN_REPORT_H
 
-#include "imm/api.h"
 #include <stdarg.h>
 
 #if defined(HAVE_ATTR_FORMAT)

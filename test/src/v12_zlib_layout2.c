@@ -13,7 +13,7 @@ void        test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile
                                     uint32_t nsamples, unsigned prec);
 void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned precision);
 
-int main()
+int main(void)
 {
     for (unsigned i = 0; i < get_nexamples(); ++i) {
         const char* ex = get_example_filepath(i);
