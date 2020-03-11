@@ -158,7 +158,7 @@ void test_genotype_complex()
 
     {
         struct bgen_file* bgen = bgen_file_open("data/complex.23bits.bgen");
-        struct bgen_mf*   mf = bgen_open_metafile("complex.23bits.bgen.metadata.2");
+        struct bgen_mf*   mf = bgen_metafile_open("complex.23bits.bgen.metadata.2");
 
         _test_genotype_complex(bgen, mf);
         cass_equal_int(bgen_mf_close(mf), 0);

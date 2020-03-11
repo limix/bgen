@@ -59,7 +59,7 @@ err:
     return NULL;
 }
 
-struct bgen_mf* bgen_open_metafile(const char* filepath)
+struct bgen_mf* bgen_metafile_open(const char* filepath)
 {
     struct bgen_mf* mf = bgen_mf_alloc(filepath);
 

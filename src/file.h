@@ -1,8 +1,9 @@
 #ifndef BGEN_FILE_H_PRIVATE
 #define BGEN_FILE_H_PRIVATE
 
-#include "bgen/file.h"
 #include <stdio.h>
+
+struct bgen_file;
 
 FILE*       bgen_file_stream(struct bgen_file const* bgen_file);
 char const* bgen_file_filepath(struct bgen_file const* bgen_file);

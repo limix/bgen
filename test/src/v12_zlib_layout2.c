@@ -135,7 +135,7 @@ int main()
         int         prec = get_example_precision(i);
 
         struct bgen_file* bgen = bgen_file_open(ex);
-        struct bgen_mf*   mf = bgen_open_metafile(ix);
+        struct bgen_mf*   mf = bgen_metafile_open(ix);
 
         test_read(bgen, mf, prec);
 

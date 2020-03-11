@@ -72,11 +72,11 @@ int main()
     cass_cond(mf != NULL);
     cass_equal_int(bgen_mf_close(mf), 0);
 
-    cass_cond((mf = bgen_open_metafile(mf_filepath)) != NULL);
+    cass_cond((mf = bgen_metafile_open(mf_filepath)) != NULL);
     use_metafile(mf);
     cass_equal_int(bgen_mf_close(mf), 0);
 
-    cass_cond((mf = bgen_open_metafile(mf_filepath)) != NULL);
+    cass_cond((mf = bgen_metafile_open(mf_filepath)) != NULL);
     use_metafile_wrongly(mf);
     cass_equal_int(bgen_mf_close(mf), 0);
 

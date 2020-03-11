@@ -52,7 +52,7 @@ int main()
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    mf = bgen_open_metafile("example.14bits.bgen.metadata");
+    mf = bgen_metafile_open("example.14bits.bgen.metadata");
     partition = bgen_metafile_read_partition2(mf, 0);
     vm = bgen_partition_get(partition, 3);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);

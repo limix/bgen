@@ -32,7 +32,7 @@ BGEN_EXPORT struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char co
  * @param filepath File path to the metafile.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_mf* bgen_open_metafile(char const* filepath);
+BGEN_EXPORT struct bgen_mf* bgen_metafile_open(char const* filepath);
 /** Get the number of partitions.
  *
  * @param mf Metafile handler.

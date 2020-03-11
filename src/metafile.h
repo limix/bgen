@@ -1,5 +1,5 @@
 /** Create and query a metafile.
- * @file bgen/meta.h
+ * @file bgen/metafile.h
  *
  * A bgen metafile is defined as follows:
  *

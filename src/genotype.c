@@ -1,6 +1,5 @@
 #include "genotype.h"
-#include "bgen/bgen.h"
-#include "file.h"
+#include "bgen/genotype.h"
 #include "free.h"
 #include "layout1.h"
 #include "layout2.h"

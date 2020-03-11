@@ -140,7 +140,7 @@ void test_genotype_haplotypes_by_loading_metadata()
 {
     struct bgen_file *bgen = bgen_file_open("data/haplotypes.bgen");
 
-    struct bgen_mf *mf = bgen_open_metafile("haplotypes.bgen.metadata.2");
+    struct bgen_mf *mf = bgen_metafile_open("haplotypes.bgen.metadata.2");
     cass_cond(mf != NULL);
 
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
