@@ -6,8 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-void use_metafile(struct bgen_mf *mf)
+void use_metafile(struct bgen_mf* mf)
 {
     int nvariants;
 
@@ -17,44 +16,48 @@ void use_metafile(struct bgen_mf *mf)
     int nvars = bgen_metafile_nvariants(mf);
     cass_equal_int(nvars, 10);
 
-    struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, 0, &nvariants);
-    cass_cond(vm != NULL);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    cass_cond(partition != NULL);
 
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
-    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[0].chrom));
+    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
+    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
     cass_equal_int(vm[0].nalleles, 2);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm[1].allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[1].allele_ids[1]));
 
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm[4].id));
-    cass_cond(bgen_str_equal(BGEN_STR("M5"), *vm[4].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[4].chrom));
-    cass_equal_int(vm[4].nalleles, 2);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm[4].allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[4].allele_ids[1]));
+    vm = bgen_partition_get(partition, 1);
+    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
 
-    bgen_free_partition(vm, nvariants);
+    vm = bgen_partition_get(partition, 4);
+    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
+    cass_cond(bgen_str_equal(BGEN_STR("M5"), *vm->rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
+    cass_equal_int(vm->nalleles, 2);
+    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
 
-    vm = bgen_metafile_read_partition(mf, 1, &nvariants);
-    cass_cond(vm != NULL);
+    bgen_partition_destroy(partition);
 
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].id));
-    cass_cond(bgen_str_equal(BGEN_STR("M6"), *vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm[0].chrom));
+    partition = bgen_metafile_read_partition2(mf, 1);
+    cass_cond(partition != NULL);
+
+    vm = bgen_partition_get(partition, 0);
+    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
+    cass_cond(bgen_str_equal(BGEN_STR("M6"), *vm->rsid));
+    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
     cass_equal_int(vm[0].nalleles, 4);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm[1].allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[1].allele_ids[1]));
 
-    bgen_free_partition(vm, nvariants);
+    vm = bgen_partition_get(partition, 1);
+    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
+
+    bgen_partition_destroy(partition);
 }
 
-void use_metafile_wrongly(struct bgen_mf *mf)
+void use_metafile_wrongly(struct bgen_mf* mf)
 {
-    int nvariants;
-    bgen_metafile_npartitions(mf);
-    struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, 3, &nvariants);
-    cass_cond(vm == NULL);
+    cass_cond(bgen_metafile_read_partition2(mf, 3) == NULL);
 }
 
 int main()
@@ -63,9 +66,9 @@ int main()
     const char mf_filepath[] = "complex_index03.metadata";
     const char bgen_filepath[] = "data/complex.23bits.bgen";
 
-    struct bgen_file *bgen = bgen_file_open(bgen_filepath);
+    struct bgen_file* bgen = bgen_file_open(bgen_filepath);
     cass_cond(bgen != NULL);
-    struct bgen_mf *mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
+    struct bgen_mf* mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
     cass_cond(mf != NULL);
     cass_equal_int(bgen_mf_close(mf), 0);
 
