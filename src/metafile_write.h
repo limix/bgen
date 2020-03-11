@@ -14,7 +14,7 @@
 /* Write variant genotype to file and return the block size. */
 static uint64_t write_variant(FILE* stream, const struct bgen_vm* vm)
 {
-    OFF_T start = LONG_TELL(stream);
+    int64_t start = bgen_ftell(stream);
 
     fwrite_ui64(stream, vm->genotype_offset, 8);
     if (bgen_str_fwrite(vm->id, stream, 2))
@@ -34,9 +34,10 @@ static uint64_t write_variant(FILE* stream, const struct bgen_vm* vm)
             return 0;
     }
 
-    OFF_T stop = LONG_TELL(stream);
+    int64_t stop = bgen_ftell(stream);
     if (start > stop)
         bgen_die("start cannot be greater than stop");
+
     return (uint64_t)(stop - start);
 }
 
@@ -129,7 +130,7 @@ static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions, uint
         }
     }
 
-    if (LONG_SEEK(stream, BGEN_METAFILE_HDR_LENGTH + sizeof(uint32_t), SEEK_SET)) {
+    if (bgen_fseek(stream, BGEN_METAFILE_HDR_LENGTH + sizeof(uint32_t), SEEK_SET)) {
         bgen_perror("could not fseek");
         goto err;
     }

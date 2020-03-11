@@ -21,8 +21,8 @@ struct bgen_file
     unsigned compression;
     unsigned layout;
     bool     contain_sample;
-    OFF_T    samples_start;
-    OFF_T    variants_start;
+    int64_t  samples_start;
+    int64_t  variants_start;
 };
 
 static struct bgen_file* bgen_file_create(char const* filepath);
@@ -34,7 +34,7 @@ struct bgen_file* bgen_file_open(char const* filepath)
     if (bgen == NULL)
         return NULL;
 
-    if (fread_off(bgen->stream, &bgen->variants_start, 4)) {
+    if (fread_i64(bgen->stream, &bgen->variants_start, 4)) {
         bgen_error("could not read the `variants_start` field");
         goto err;
     }
@@ -47,7 +47,7 @@ struct bgen_file* bgen_file_open(char const* filepath)
     }
 
     /* if they actually exist */
-    bgen->samples_start = LONG_TELL(bgen->stream);
+    bgen->samples_start = bgen_ftell(bgen->stream);
 
     return bgen;
 err:
@@ -73,7 +73,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
 
-    if (LONG_SEEK(bgen->stream, bgen->samples_start, SEEK_SET)) {
+    if (bgen_fseek(bgen->stream, bgen->samples_start, SEEK_SET)) {
         bgen_error("could not fseek to `samples_start`");
         return NULL;
     }
@@ -85,7 +85,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 
     struct bgen_samples* samples = bgen_samples_create(bgen->nsamples);
 
-    if (LONG_SEEK(bgen->stream, 8, SEEK_CUR)) {
+    if (bgen_fseek(bgen->stream, 8, SEEK_CUR)) {
         bgen_perror("could not fseek eight bytes forward");
         goto err;
     }
@@ -113,7 +113,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
     if (verbose)
         athr_finish(at);
 
-    bgen->variants_start = LONG_TELL(bgen->stream);
+    bgen->variants_start = bgen_ftell(bgen->stream);
     return samples;
 
 err:
@@ -130,13 +130,14 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
     vg->layout = bgen->layout;
     vg->offset = offset;
 
-    if (offset > OFF_T_MAX)
-        bgen_die("offset overflow");
+    if (offset > INT64_MAX) {
+        bgen_error("genotype offset overflow");
+        goto err;
+    }
 
-    if (LONG_SEEK(bgen_file_stream(bgen), (OFF_T)offset, SEEK_SET)) {
+    if (bgen_fseek(bgen_file_stream(bgen), (int64_t)offset, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
-        free_c(vg);
-        return NULL;
+        goto err;
     }
 
     struct bgen_vi vi = BGEN_VI(bgen);
@@ -147,11 +148,13 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
         bgen_layout2_read_header(&vi, vg, bgen_file_stream(bgen));
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
-        free_c(vg);
-        return NULL;
+        goto err;
     }
 
     return vg;
+err:
+    bgen_genotype_close(vg);
+    return NULL;
 }
 
 FILE* bgen_file_stream(struct bgen_file const* bgen_file) { return bgen_file->stream; }
@@ -170,7 +173,7 @@ unsigned bgen_file_compression(struct bgen_file const* bgen_file)
 
 int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 {
-    if (LONG_SEEK(bgen_file->stream, bgen_file->variants_start, SEEK_SET)) {
+    if (bgen_fseek(bgen_file->stream, bgen_file->variants_start, SEEK_SET)) {
         bgen_perror("could not jump to the variants start");
         return 1;
     }
@@ -238,7 +241,7 @@ static int read_bgen_header(struct bgen_file* bgen)
     if (magic_number != 1852139362)
         bgen_warning("magic number mismatch");
 
-    if (LONG_SEEK(bgen->stream, header_length - 20, SEEK_CUR)) {
+    if (bgen_fseek(bgen->stream, header_length - 20, SEEK_CUR)) {
         bgen_error("fseek error while reading a BGEN file");
         return 1;
     }

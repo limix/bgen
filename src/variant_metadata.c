@@ -47,7 +47,7 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
         return NULL;
 
     if (bgen_file_layout(bgen) == 1) {
-        if (LONG_SEEK(bgen_file_stream(bgen), 4, SEEK_CUR))
+        if (bgen_fseek(bgen_file_stream(bgen), 4, SEEK_CUR))
             goto err;
     }
 
@@ -81,7 +81,7 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
             goto err;
     }
 
-    OFF_T offset = LONG_TELL(bgen_file_stream(bgen));
+    int64_t offset = bgen_ftell(bgen_file_stream(bgen));
     if (offset < 0) {
         bgen_perror("could not ftell");
         goto err;
@@ -92,7 +92,7 @@ struct bgen_vm* bgen_variant_metadata_next(struct bgen_file* bgen, int* error)
     if (fread_ui32(bgen_file_stream(bgen), &length, 4))
         goto err;
 
-    if (LONG_SEEK(bgen_file_stream(bgen), length, SEEK_CUR)) {
+    if (bgen_fseek(bgen_file_stream(bgen), length, SEEK_CUR)) {
         bgen_perror("could not jump to the next variant");
         goto err;
     }

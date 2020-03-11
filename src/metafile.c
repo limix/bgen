@@ -6,11 +6,11 @@
 #include "io.h"
 #include "mem.h"
 #include "metafile_write.h"
+#include "partition.h"
 #include "pbar.h"
 #include "report.h"
 #include "str.h"
 #include "variant.h"
-#include "partition.h"
 #include <assert.h>
 
 static struct bgen_mf* bgen_mf_alloc(char const* filepath);
@@ -34,7 +34,7 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
     if (write_metafile_nvariants(mf->stream, mf->nvariants))
         goto err;
 
-    if (LONG_SEEK(mf->stream, sizeof(uint64_t), SEEK_CUR))
+    if (bgen_fseek(mf->stream, sizeof(uint64_t), SEEK_CUR))
         goto err;
 
     if (bgen_file_seek_variants_start(bgen))
@@ -42,8 +42,8 @@ struct bgen_mf* bgen_metafile_create(struct bgen_file* bgen, char const* filepat
 
     mf->partition_offset = malloc(sizeof(uint64_t) * (mf->npartitions + 1));
 
-    if (write_metafile_metadata_block(mf->stream, mf->partition_offset, mf->npartitions, mf->nvariants,
-                                      bgen, verbose))
+    if (write_metafile_metadata_block(mf->stream, mf->partition_offset, mf->npartitions,
+                                      mf->nvariants, bgen, verbose))
         goto err;
 
     if (write_metafile_offsets_block(mf->stream, mf->npartitions, mf->partition_offset))
@@ -90,12 +90,12 @@ struct bgen_mf* bgen_open_metafile(const char* filepath)
         goto err;
     }
 
-    if (mf->metadata_size > OFF_T_MAX) {
-        bgen_error("fseeking would cause failure");
+    if (mf->metadata_size > INT64_MAX) {
+        bgen_error("`metadata_size` overflow");
         goto err;
     }
 
-    if (LONG_SEEK(mf->stream, (OFF_T)mf->metadata_size, SEEK_CUR)) {
+    if (bgen_fseek(mf->stream, (int64_t)mf->metadata_size, SEEK_CUR)) {
         bgen_error("Could to fseek to the number of partitions");
         goto err;
     }
@@ -125,7 +125,7 @@ uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->nparti
 uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->nvariants; }
 
 struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t index,
-                                    uint32_t* nvars)
+                                             uint32_t* nvars)
 {
     struct bgen_vm* vars = NULL;
     FILE*           file = mf->stream;
@@ -134,7 +134,7 @@ struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t 
         bgen_error("the provided partition number %d is out-of-range", index);
         goto err;
     }
-    
+
 #if 0
     uint32_t nvariants = partition_nvariants(mf, index);
     struct bgen_partition *partition = bgen_partition_create(nvariants);
@@ -145,15 +145,17 @@ struct bgen_vm* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t 
     for (uint32_t i = 0; i < *nvars; ++i)
         init_metadata(vars + i);
 
-    if (LONG_SEEK(file, 13 + 4 + 8, SEEK_SET)) {
+    if (bgen_fseek(file, 13 + 4 + 8, SEEK_SET)) {
         bgen_perror("could not fseek metafile");
         goto err;
     }
 
-    if (mf->partition_offset[index] > OFF_T_MAX)
-        bgen_die("offset overflow");
+    if (mf->partition_offset[index] > INT64_MAX) {
+        bgen_error("`partition_offset` overflow");
+        goto err;
+    }
 
-    if (LONG_SEEK(file, (OFF_T)mf->partition_offset[index], SEEK_CUR)) {
+    if (bgen_fseek(file, (int64_t)mf->partition_offset[index], SEEK_CUR)) {
         bgen_perror("could not fseek metafile");
         goto err;
     }
