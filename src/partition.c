@@ -11,12 +11,14 @@ struct bgen_partition
 
 void bgen_partition_destroy(struct bgen_partition const* partition)
 {
-    for (uint32_t i = 0; i < partition->nvariants; ++i) {
-        if (partition->variants_metadata[i])
-            bgen_variant_metadata_destroy(partition->variants_metadata[i]);
+    if (partition->variants_metadata) {
+        for (uint32_t i = 0; i < partition->nvariants; ++i) {
+            if (partition->variants_metadata[i])
+                bgen_variant_metadata_destroy(partition->variants_metadata[i]);
+        }
+        free_c(partition->variants_metadata);
     }
 
-    free_c(partition->variants_metadata);
     free_c(partition);
 }
 
