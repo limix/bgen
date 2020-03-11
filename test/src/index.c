@@ -1,22 +1,44 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <float.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-void use_metafile(struct bgen_metafile* mf)
+void create_metafile(char const* bgen_file_filepath, char const* metafile_filepath);
+void use_metafile_properly(char const* metafile_filepath);
+void use_metafile_wrongly(char const* metafile_filepath);
+
+int main()
 {
-    int nvariants;
+    char const bgen_file_filepath[] = "data/complex.23bits.bgen";
+    char const metafile_filepath[] = "index.tmp/complex_index03.metafile";
 
-    int nparts = bgen_metafile_npartitions(mf);
+    create_metafile(bgen_file_filepath, metafile_filepath);
+    use_metafile_properly(metafile_filepath);
+    use_metafile_wrongly(metafile_filepath);
+
+    return cass_status();
+}
+
+void create_metafile(char const* bgen_file_filepath, char const* metafile_filepath)
+{
+    struct bgen_file* bgen_file = bgen_file_open(bgen_file_filepath);
+    cass_cond(bgen_file != NULL);
+    struct bgen_metafile* metafile = bgen_metafile_create(bgen_file, metafile_filepath, 2, 0);
+    cass_cond(metafile != NULL);
+    cass_equal_int(bgen_metafile_close(metafile), 0);
+    bgen_file_close(bgen_file);
+}
+
+void use_metafile_properly(char const* metafile_filepath)
+{
+    struct bgen_metafile* metafile = bgen_metafile_open(metafile_filepath);
+    cass_cond(metafile != NULL);
+
+    int nparts = bgen_metafile_npartitions(metafile);
     cass_equal_int(nparts, 2);
 
-    int nvars = bgen_metafile_nvariants(mf);
+    int nvars = bgen_metafile_nvariants(metafile);
     cass_equal_int(nvars, 10);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
@@ -39,7 +61,7 @@ void use_metafile(struct bgen_metafile* mf)
 
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition(mf, 1);
+    partition = bgen_metafile_read_partition(metafile, 1);
     cass_cond(partition != NULL);
 
     vm = bgen_partition_get(partition, 0);
@@ -53,33 +75,14 @@ void use_metafile(struct bgen_metafile* mf)
     cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
 
     bgen_partition_destroy(partition);
+
+    cass_equal_int(bgen_metafile_close(metafile), 0);
 }
 
-void use_metafile_wrongly(struct bgen_metafile* mf)
+void use_metafile_wrongly(char const* metafile_filepath)
 {
-    cass_cond(bgen_metafile_read_partition(mf, 3) == NULL);
-}
-
-int main()
-{
-
-    const char mf_filepath[] = "complex_index03.metadata";
-    const char bgen_filepath[] = "data/complex.23bits.bgen";
-
-    struct bgen_file* bgen = bgen_file_open(bgen_filepath);
-    cass_cond(bgen != NULL);
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
-    cass_cond(mf != NULL);
-    cass_equal_int(bgen_metafile_close(mf), 0);
-
-    cass_cond((mf = bgen_metafile_open(mf_filepath)) != NULL);
-    use_metafile(mf);
-    cass_equal_int(bgen_metafile_close(mf), 0);
-
-    cass_cond((mf = bgen_metafile_open(mf_filepath)) != NULL);
-    use_metafile_wrongly(mf);
-    cass_equal_int(bgen_metafile_close(mf), 0);
-
-    bgen_file_close(bgen);
-    return cass_status();
+    struct bgen_metafile* metafile = bgen_metafile_open(metafile_filepath);
+    cass_cond(metafile != NULL);
+    cass_cond(bgen_metafile_read_partition(metafile, 3) == NULL);
+    cass_equal_int(bgen_metafile_close(metafile), 0);
 }

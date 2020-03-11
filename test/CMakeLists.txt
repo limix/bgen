@@ -2,10 +2,7 @@ function(bgen_add_test name)
     set(target test_${name})
     add_executable(${target} src/${name}.c)
     add_custom_command(TARGET ${target} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${target}>/tmp
-    )
-    add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E remove_directory $<TARGET_FILE_DIR:${target}>/tmp
+        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${target}>/${name}.tmp
     )
     target_link_libraries(${target} PRIVATE BGEN::bgen)
     add_test(NAME ${name} COMMAND ${target} -E environment)
