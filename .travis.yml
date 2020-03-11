@@ -15,6 +15,17 @@ jobs:
         - bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
           DO_CMD=sudo bash
+    - name: Build on windows
+      os: windows
+      env: GENERATOR="Visual Studio 15 2017 Win64"
+      before_script:
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
+    - name: Build on windows
+      os: windows
+      env: GENERATOR=Ninja
+      before_install:
+        - choco install ninja --no-progress -y
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
 addons:
   apt:
     packages:
