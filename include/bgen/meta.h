@@ -10,7 +10,7 @@ struct bgen_file;
  * @struct bgen_mf
  */
 struct bgen_mf;
-struct bgen_variant_metadata;
+struct bgen_variant;
 struct bgen_partition;
 
 /** Create a bgen metafile.
@@ -62,7 +62,7 @@ BGEN_EXPORT struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf 
  * @param vm Array of variant metatada.
  * @param nvariants Number of variants of the partition.
  */
-BGEN_EXPORT void bgen_free_partition(struct bgen_variant_metadata* vm, uint32_t nvariants);
+BGEN_EXPORT void bgen_free_partition(struct bgen_variant* vm, uint32_t nvariants);
 /** Close a metafile handler.
  *
  * @param mf Metafile handler.

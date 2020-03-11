@@ -30,7 +30,6 @@ void test_haplotype(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_vi* index;
     struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.1", 1, 0);
 
     cass_cond(mf != NULL);
@@ -39,7 +38,7 @@ void test_haplotype(void)
     struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
     cass_cond(partition != NULL);
 
-    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm->rsid));
     cass_cond(vm->nalleles == 2);
 

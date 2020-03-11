@@ -24,7 +24,7 @@ add_library(bgen
     src/metafile.c
     src/report.c
     src/samples.c
-    src/variant_metadata.c
+    src/variant.c
     src/partition.c
     src/str.c
     src/zip/zlib.c

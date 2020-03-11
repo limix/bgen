@@ -151,7 +151,7 @@ struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf const* mf, u
     }
 
     for (uint32_t i = 0; i < partition_nvariants(mf, index); ++i) {
-        struct bgen_variant_metadata* vm = bgen_variant_metadata_create();
+        struct bgen_variant* vm = bgen_variant_create();
 
         if (fread_ui64(file, &vm->genotype_offset, 8))
             goto err;
@@ -171,7 +171,7 @@ struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf const* mf, u
         if (fread_ui16(file, &vm->nalleles, 2))
             goto err;
 
-        bgen_variant_metadata_create_alleles(vm, vm->nalleles);
+        bgen_variant_create_alleles(vm, vm->nalleles);
 
         for (uint16_t j = 0; j < vm->nalleles; ++j) {
             if ((vm->allele_ids[j] = bgen_str_fread(file, 4)) == NULL)

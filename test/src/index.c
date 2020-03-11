@@ -19,7 +19,7 @@ void use_metafile(struct bgen_mf* mf)
     struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
     cass_cond(partition != NULL);
 
-    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
     cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
     cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));

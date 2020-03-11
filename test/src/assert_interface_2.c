@@ -35,12 +35,11 @@ int main()
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    struct bgen_vi *vi;
     struct bgen_mf* mf = bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
     struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
 
 
-    struct bgen_variant_metadata const *vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const *vm = bgen_partition_get(partition, 0);
     cass_equal_int(vm->position, 2000);
     cass_equal_int(vm->nalleles, 2);
     cass_cond(bgen_str_equal(BGEN_STR("RSID_2"), *vm->rsid));

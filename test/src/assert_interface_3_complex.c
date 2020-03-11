@@ -32,7 +32,7 @@ void test_create_metadata_complex()
     uint32_t               nvars = 0;
     struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
 
-    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL)
 
@@ -111,7 +111,7 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_mf* mf)
         struct bgen_partition* partition = bgen_metafile_read_partition2(mf, i);
 
         for (int ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
-            struct bgen_variant_metadata const* vm = bgen_partition_get(partition, ii);
+            struct bgen_variant const* vm = bgen_partition_get(partition, ii);
             struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL)
 

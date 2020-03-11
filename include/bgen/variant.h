@@ -1,12 +1,12 @@
-#ifndef BGEN_VARIANT_METADATA_H
-#define BGEN_VARIANT_METADATA_H
+#ifndef BGEN_VARIANT_H
+#define BGEN_VARIANT_H
 
 #include <inttypes.h>
 
 /** Variant metadata.
- * @struct bgen_vm
+ * @struct bgen_variant
  */
-struct bgen_variant_metadata
+struct bgen_variant
 {
     struct bgen_str const*  id;              /**< Variant identification. */
     struct bgen_str const*  rsid;            /**< RSID. */

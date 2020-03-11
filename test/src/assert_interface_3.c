@@ -37,7 +37,7 @@ void test_create_meteadata_haplotypes()
 
     struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
 
-    struct bgen_variant_metadata const *vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const *vm = bgen_partition_get(partition, 0);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL);
 
@@ -102,7 +102,7 @@ void test_genotype_haplotypes_by_creating_metadata()
         struct bgen_partition* partition = bgen_metafile_read_partition2(mf, i);
 
         for (int ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
-            struct bgen_variant_metadata const *vm = bgen_partition_get(partition, ii);
+            struct bgen_variant const *vm = bgen_partition_get(partition, ii);
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL);
 
@@ -181,7 +181,7 @@ void test_genotype_haplotypes_by_loading_metadata()
         struct bgen_partition* partition = bgen_metafile_read_partition2(mf, i);
 
         for (uint32_t ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
-            struct bgen_variant_metadata const *vm = bgen_partition_get(partition, ii);
+            struct bgen_variant const *vm = bgen_partition_get(partition, ii);
             struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL);
 

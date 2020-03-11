@@ -10,10 +10,10 @@
  */
 struct bgen_partition;
 
-struct bgen_variant_metadata;
+struct bgen_variant;
 
 BGEN_EXPORT void bgen_partition_destroy(struct bgen_partition const* partition);
-BGEN_EXPORT struct bgen_variant_metadata const* bgen_partition_get(
+BGEN_EXPORT struct bgen_variant const* bgen_partition_get(
     struct bgen_partition const* partition, uint32_t index);
 BGEN_EXPORT uint32_t bgen_partition_nvariants(struct bgen_partition const* partition);
 
