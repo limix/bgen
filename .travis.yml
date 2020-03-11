@@ -1,34 +1,45 @@
-os:
-- linux
-- osx
-dist: trusty
 language: c
-sudo: required
-compiler:
-- clang
-- gcc
-before_script:
-- bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
-- bash <(curl -fsSL https://raw.githubusercontent.com/horta/almosthere/master/install)
+jobs:
+  include:
+    - os: linux
+      env: GENERATOR="Unix Makefiles"
+      sudo: required
+      before_script:
+        - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
+        - bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
+          DO_CMD=sudo bash
+    - os: osx
+      env: GENERATOR="Unix Makefiles"
+      before_script:
+        - bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
+          DO_CMD=sudo bash
+addons:
+  apt:
+    packages:
+      - cmake
 script:
-- bash <(curl -fsSL https://raw.githubusercontent.com/horta/ci/master/travis-c.sh)
-after_success:
-- bash <(curl -fsSL https://raw.githubusercontent.com/horta/ci/master/travis-c-dist.sh)
-notifications:
-  email:
-    recipients:
-    - danilo.horta@gmail.com
-    on_success: never
-    on_failure: always
-deploy:
-  provider: releases
-  api_key:
-    secure: A0iflJTceOp+2plnUIfAWcB3GuU369djVDiROyPevylg/ZVjPIhttzQGtmdO2cNoFMKsZ1AlL0eu4ur68JsO6UGE63kiQk2ouOJmA04JM6hFMPMSVz7GLXOMaKFMDhAIra8dPeYH/c7dN5zJZiDqayIq0ReheDWMuYqn0WqaHw8BXjTGX8JQozcZ6qXeAOZZNjzieeQIlf7HpHm3Fh4Df7ovZH6cCvkq3Map/pRbaO6mc+O9YPCl1+5nMjFXMC4nnM+iAKkSc+Zujhxn0rMBT/MXt4xaNMkQ3az4Oaa/Rs/NP3Zx0kZBkZUVUeql1S2721ul1pfS6EzajZUXc+eCAThUuLhlLbT0oLGhZmktcHWmOOGwwmx5BSgbR+hzLxZTiEzlV22qF66U2RHiI5UrIo3ntU4VRJ+NkDAkgQ869eJSc1dJ3w+P1+avgJzrmIps/DuN5CDJeeVy+35NF5b3SezYP42ILFGpbKJ7UlIKId6slG/qyKE/9XyZNUeTBO1IvLKzIf1WbX5vtDSf9HJnXLoXZv/XnacfGX/LjE65TcKEIDRUOYxj3/9/kulLRkjmDd2PZa6M+AADZmvBBFhYgEGM4aRA5p1aQRCy/OoDe9qkzzfZ2/hteV/HFJ6xB/i2IZFBuSjbF2yFTmnrfwt+nD8NRhGniGHzGhwg6LacSbY=
-  on:
-    tags: true
-    repo: limix/bgen
-    branch: master
-env:
-  global:
-    - ZSTD=true
-    - PKG_NAME=bgen
+  - mkdir prefix
+  - mkdir build.release
+  - cd build.release
+  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
+    ..
+  - cmake --build . --config Release
+  - ctest --output-on-failure -C Release
+  - cmake --build . --config Release --target install
+  - test -e $TRAVIS_BUILD_DIR/prefix/include/bgen/bgen.h
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-config.cmake
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-targets-release.cmake
+  - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-targets.cmake
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l $TRAVIS_BUILD_DIR/prefix/lib/libbgen.dylib | grep -q LC_RPATH; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/libbgen.so; fi
+  - cd $TRAVIS_BUILD_DIR
+  - git clean -xdfq
+  - mkdir build.debug
+  - cd build.debug
+  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
+  - cmake --build . --config Debug
+  - ctest --output-on-failure -C Debug
+  - cd $TRAVIS_BUILD_DIR
+  - git clean -xdfq
