@@ -1,11 +1,6 @@
 #include "bgen/bgen.h"
 #include "cass.h"
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 void test_zeo_len_chrom_id(void);
 
 int main(void)
@@ -32,7 +27,6 @@ void test_zeo_len_chrom_id(void)
     struct bgen_metafile* mf = bgen_metafile_create(bgen, "zero_len_chrom_id.metadata", 2, 0);
     cass_cond(mf != NULL);
 
-    int                          nvariants = 0;
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     struct bgen_variant const*   vm = bgen_partition_get(partition, 0);
     cass_cond(vm != NULL);
