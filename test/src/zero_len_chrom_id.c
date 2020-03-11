@@ -33,11 +33,12 @@ void test_zeo_len_chrom_id(void)
     cass_cond(mf != NULL);
 
     int nvariants = 0;
-    struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, 0, &nvariants);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_variant_metadata const *vm = bgen_partition_get(partition, 0);
     cass_cond(vm != NULL);
-    cass_cond(nvariants == 25);
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm[0].chrom));
-    bgen_free_partition(vm, nvariants);
+    cass_cond(bgen_partition_nvariants(partition) == 25);
+    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->chrom));
+    bgen_partition_destroy(partition);
 
     bgen_mf_close(mf);
     bgen_file_close(bgen);

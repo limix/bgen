@@ -11,8 +11,8 @@
 
 const char* get_example_filepath(size_t i);
 const char* get_example_index_filepath(size_t i);
-int get_example_precision(size_t i);
-int get_nexamples();
+int         get_example_precision(size_t i);
+int         get_nexamples();
 
 int ipow(int base, int exp)
 {
@@ -29,28 +29,28 @@ int ipow(int base, int exp)
     return result;
 }
 
-void test_read_metadata(struct bgen_file* bgen, struct bgen_samples *samples, struct bgen_mf* mf)
+void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
+                        struct bgen_mf* mf)
 {
     cass_cond(bgen_file_nsamples(bgen) == 500);
     cass_cond(bgen_file_nvariants(bgen) == 199);
     cass_cond(bgen_str_equal(BGEN_STR("sample_001"), *bgen_samples_get(samples, 0)));
     cass_cond(bgen_str_equal(BGEN_STR("sample_500"), *bgen_samples_get(samples, 499)));
 
-    int nvariants = 0;
-    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
-    cass_cond(nvariants == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *vm[0].id));
-    bgen_free_partition(vm, nvariants);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    cass_cond(bgen_partition_nvariants(partition) == 67);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *bgen_partition_get(partition, 0)->id));
+    bgen_partition_destroy(partition);
 
-    vm = bgen_metafile_read_partition(mf, 1, &nvariants);
-    cass_cond(nvariants == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), *vm[5].id));
-    bgen_free_partition(vm, nvariants);
+    partition = bgen_metafile_read_partition2(mf, 1);
+    cass_cond(bgen_partition_nvariants(partition) == 67);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), *bgen_partition_get(partition, 5)->id));
+    bgen_partition_destroy(partition);
 
-    vm = bgen_metafile_read_partition(mf, 2, &nvariants);
-    cass_cond(nvariants == 65);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), *vm[60].id));
-    bgen_free_partition(vm, nvariants);
+    partition = bgen_metafile_read_partition2(mf, 2);
+    cass_cond(bgen_partition_nvariants(partition) == 65);
+    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), *bgen_partition_get(partition, 60)->id));
+    bgen_partition_destroy(partition);
 }
 
 void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsamples,
@@ -59,7 +59,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
     double prob[3];
     double abs_tol = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
     double rel_tol = 1e-09;
-    int e;
+    int    e;
     size_t i, j;
 
     FILE* f = fopen("data/example.matrix", "r");
@@ -69,9 +69,10 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
     int ii = 0;
     i = 0;
     for (int part = 0; part < bgen_metafile_npartitions(mf); ++part) {
-        struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, part, &nvariants);
+        struct bgen_partition* partition = bgen_metafile_read_partition2(mf, part);
         for (ii = 0; ii < nvariants; ++ii, ++i) {
-            struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
+            struct bgen_variant_metadata const* vm = bgen_partition_get(partition, ii);
+            struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
             cass_cond(bgen_genotype_max_ploidy(vg) == 2);
 
@@ -109,7 +110,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
             free(probabilities);
             bgen_genotype_close(vg);
         }
-        bgen_free_partition(vm, nvariants);
+        bgen_partition_destroy(partition);
     }
 
     fclose(f);
@@ -131,10 +132,10 @@ int main()
     for (i = 0; i < (size_t)get_nexamples(); ++i) {
         const char* ex = get_example_filepath(i);
         const char* ix = get_example_index_filepath(i);
-        int prec = get_example_precision(i);
+        int         prec = get_example_precision(i);
 
         struct bgen_file* bgen = bgen_file_open(ex);
-        struct bgen_mf* mf = bgen_open_metafile(ix);
+        struct bgen_mf*   mf = bgen_open_metafile(ix);
 
         test_read(bgen, mf, prec);
 
