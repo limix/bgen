@@ -27,7 +27,7 @@ BGEN_EXPORT struct bgen_file* bgen_file_open(char const* filepath);
  *
  * @param bgen Bgen file handler.
  */
-BGEN_EXPORT void bgen_file_close(struct bgen_file* bgen);
+BGEN_EXPORT void bgen_file_close(struct bgen_file const* bgen);
 /** Get the number of samples.
  *
  * @param bgen Bgen file handler.

@@ -25,17 +25,14 @@ struct bgen_file
     OFF_T    variants_start;
 };
 
-static int read_bgen_header(struct bgen_file* bgen);
+static struct bgen_file* bgen_file_create(char const* filepath);
+static int               read_bgen_header(struct bgen_file* bgen);
 
 struct bgen_file* bgen_file_open(char const* filepath)
 {
-    struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
-    bgen->filepath = strdup(filepath);
-
-    if (!(bgen->stream = fopen(bgen->filepath, "rb"))) {
-        bgen_perror("could not open bgen file %s", bgen->filepath);
-        goto err;
-    }
+    struct bgen_file* bgen = bgen_file_create(filepath);
+    if (bgen == NULL)
+        return NULL;
 
     if (fread_off(bgen->stream, &bgen->variants_start, 4)) {
         bgen_error("could not read the `variants_start` field");
@@ -58,7 +55,7 @@ err:
     return NULL;
 }
 
-void bgen_file_close(struct bgen_file* bgen)
+void bgen_file_close(struct bgen_file const* bgen)
 {
     if (bgen->stream != NULL && fclose(bgen->stream))
         bgen_perror("could not close %s file", bgen->filepath);
@@ -76,7 +73,10 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
 
-    LONG_SEEK(bgen->stream, bgen->samples_start, SEEK_SET);
+    if (LONG_SEEK(bgen->stream, bgen->samples_start, SEEK_SET)) {
+        bgen_error("could not fseek to `samples_start`");
+        return NULL;
+    }
 
     if (!bgen->contain_sample) {
         bgen_warning("file does not contain sample ids");
@@ -126,7 +126,7 @@ err:
 struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
                                               uint64_t const          offset)
 {
-    struct bgen_genotype* vg = create_vg();
+    struct bgen_genotype* vg = bgen_genotype_create();
     vg->layout = bgen->layout;
     vg->offset = offset;
 
@@ -175,6 +175,28 @@ int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
         return 1;
     }
     return 0;
+}
+
+static struct bgen_file* bgen_file_create(char const* filepath)
+{
+    struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
+    bgen->filepath = strdup(filepath);
+    bgen->stream = NULL;
+    bgen->nvariants = 0;
+    bgen->nsamples = 0;
+    bgen->compression = 0;
+    bgen->layout = 0;
+    bgen->contain_sample = 0;
+    bgen->samples_start = 0;
+    bgen->variants_start = 0;
+
+    if (!(bgen->stream = fopen(bgen->filepath, "rb"))) {
+        bgen_perror("could not open bgen file %s", bgen->filepath);
+        bgen_file_close(bgen);
+        return NULL;
+    }
+
+    return bgen;
 }
 
 /*
