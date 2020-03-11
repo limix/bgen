@@ -20,14 +20,20 @@ jobs:
       env: GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && install.bat
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
+        - ls
+        - install.bat
+        - set PATH=%programfiles%\zlib\bin;%PATH%
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
     - name: Build on windows
       os: windows
       env: GENERATOR=Ninja
       before_install:
         - choco install ninja zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && install.bat
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
+        - ls
+        - install.bat
+        - set PATH=%programfiles%\zlib\bin;%PATH%
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
 addons:
   apt:
