@@ -124,21 +124,16 @@ uint32_t bgen_metafile_npartitions(struct bgen_mf const* mf) { return mf->nparti
 
 uint32_t bgen_metafile_nvariants(struct bgen_mf const* mf) { return mf->nvariants; }
 
-struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const* mf, uint32_t index,
-                                             uint32_t* nvars)
+struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const* mf,
+                                                           uint32_t index, uint32_t* nvars)
 {
     struct bgen_variant_metadata* vars = NULL;
-    FILE*           file = mf->stream;
+    FILE*                         file = mf->stream;
 
     if (index >= mf->npartitions) {
         bgen_error("the provided partition number %d is out-of-range", index);
         goto err;
     }
-
-#if 0
-    uint32_t nvariants = partition_nvariants(mf, index);
-    struct bgen_partition *partition = bgen_partition_create(nvariants);
-#endif
 
     *nvars = partition_nvariants(mf, index);
     vars = malloc((*nvars) * sizeof(struct bgen_variant_metadata));
@@ -160,9 +155,58 @@ struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const*
         goto err;
     }
 
-#if 0
     for (uint32_t i = 0; i < *nvars; ++i) {
-        struct bgen_vm *vm = bgen_variant_metadata_create();
+        fread_ui64(file, &vars[i].genotype_offset, 8);
+
+        vars[i].id = bgen_str_fread(file, 2);
+        vars[i].rsid = bgen_str_fread(file, 2);
+        vars[i].chrom = bgen_str_fread(file, 2);
+
+        fread_ui32(file, &vars[i].position, 4);
+        fread_ui16(file, &vars[i].nalleles, 2);
+        vars[i].allele_ids = malloc(sizeof(struct bgen_str*) * vars[i].nalleles);
+
+        for (int j = 0; j < vars[i].nalleles; ++j) {
+            vars[i].allele_ids[j] = bgen_str_fread(file, 4);
+        }
+    }
+
+    return vars;
+err:
+    if (vars)
+        bgen_free_partition(vars, *nvars);
+    return NULL;
+}
+
+struct bgen_partition* bgen_metafile_read_partition2(struct bgen_mf const* mf, uint32_t index)
+{
+    FILE* file = mf->stream;
+
+    if (index >= mf->npartitions) {
+        bgen_error("the provided partition number %d is out-of-range", index);
+        return NULL;
+    }
+
+    uint32_t               nvariants = partition_nvariants(mf, index);
+    struct bgen_partition* partition = bgen_partition_create(nvariants);
+
+    if (bgen_fseek(file, 13 + 4 + 8, SEEK_SET)) {
+        bgen_perror("could not fseek metafile");
+        goto err;
+    }
+
+    if (mf->partition_offset[index] > INT64_MAX) {
+        bgen_error("`partition_offset` overflow");
+        goto err;
+    }
+
+    if (bgen_fseek(file, (int64_t)mf->partition_offset[index], SEEK_CUR)) {
+        bgen_perror("could not fseek metafile");
+        goto err;
+    }
+
+    for (uint32_t i = 0; i < partition_nvariants(mf, index); ++i) {
+        struct bgen_variant_metadata* vm = bgen_variant_metadata_create();
 
         if (fread_ui64(file, &vm->genotype_offset, 8))
             goto err;
@@ -185,35 +229,17 @@ struct bgen_variant_metadata* bgen_metafile_read_partition(struct bgen_mf const*
         bgen_variant_metadata_create_alleles(vm, vm->nalleles);
 
         for (uint16_t j = 0; j < vm->nalleles; ++j) {
-            vm->allele_ids[j] = bgen_str_fread(file, 4);
+            if ((vm->allele_ids[j] = bgen_str_fread(file, 4)) == NULL)
+                goto err;
         }
 
-        bgen_variant_metadata_destroy(vm);
+        bgen_partition_set(partition, i, vm);
     }
-#endif
 
-#if 1
-    for (uint32_t i = 0; i < *nvars; ++i) {
-        fread_ui64(file, &vars[i].genotype_offset, 8);
+    return partition;
 
-        vars[i].id = bgen_str_fread(file, 2);
-        vars[i].rsid = bgen_str_fread(file, 2);
-        vars[i].chrom = bgen_str_fread(file, 2);
-
-        fread_ui32(file, &vars[i].position, 4);
-        fread_ui16(file, &vars[i].nalleles, 2);
-        vars[i].allele_ids = malloc(sizeof(struct bgen_str*) * vars[i].nalleles);
-
-        for (int j = 0; j < vars[i].nalleles; ++j) {
-            vars[i].allele_ids[j] = bgen_str_fread(file, 4);
-        }
-    }
-#endif
-
-    return vars;
 err:
-    if (vars)
-        bgen_free_partition(vars, *nvars);
+    bgen_partition_destroy(partition);
     return NULL;
 }
 
