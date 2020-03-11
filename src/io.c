@@ -65,9 +65,6 @@ int64_t bgen_ftell(FILE* stream) { return LONG_TELL(stream); }
         return 0;                                                                             \
     }
 
-DEFINE_TYPE_FREAD(int, int)
-DEFINE_TYPE_FREAD(long, long)
-DEFINE_TYPE_FREAD(unsigned, unsigned)
 DEFINE_TYPE_FREAD(uint64_t, ui64)
 DEFINE_TYPE_FREAD(uint32_t, ui32)
 DEFINE_TYPE_FREAD(uint16_t, ui16)
@@ -90,9 +87,6 @@ DEFINE_TYPE_FREAD(int16_t, i16)
         return 0;                                                                             \
     }
 
-DEFINE_TYPE_FWRITE(int, int)
-DEFINE_TYPE_FWRITE(long, long)
-DEFINE_TYPE_FWRITE(unsigned, unsigned)
 DEFINE_TYPE_FWRITE(uint64_t, ui64)
 DEFINE_TYPE_FWRITE(uint32_t, ui32)
 DEFINE_TYPE_FWRITE(uint16_t, ui16)
