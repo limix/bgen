@@ -55,7 +55,6 @@ target_include_directories(bgen
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
-set_target_properties(bgen PROPERTIES PUBLIC_HEADER include/bgen.h)
 set_target_properties(bgen PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(bgen PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 set_target_properties(bgen PROPERTIES C_STANDARD 99)
