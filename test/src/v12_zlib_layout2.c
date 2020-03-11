@@ -1,11 +1,6 @@
 #include "bgen/bgen.h"
 #include "cass.h"
-#include <float.h>
 #include <math.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 const char* get_example_filepath(size_t i);
 const char* get_example_index_filepath(size_t i);

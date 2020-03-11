@@ -38,7 +38,7 @@ target_compile_options(warning INTERFACE
     $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
     $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
     -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
-    -Wno-unused-parameter>
+    -Wno-unused-parameter -Wsign-conversion>
 )
 
 # Write out mytools_export.h to the current binary directory
