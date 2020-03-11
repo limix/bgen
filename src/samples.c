@@ -11,7 +11,7 @@ struct bgen_samples
 void bgen_samples_free(struct bgen_samples const* samples)
 {
     for (uint32_t i = 0; i < samples->nsamples; ++i) {
-        if (samples->sample_ids[i] != NULL)
+        if (samples->sample_ids[i])
             bgen_str_free(samples->sample_ids[i]);
     }
 
