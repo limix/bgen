@@ -35,25 +35,25 @@ BGEN_EXPORT struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen,
 BGEN_EXPORT struct bgen_metafile* bgen_metafile_open(char const* filepath);
 /** Get the number of partitions.
  *
- * @param mf Metafile handler.
+ * @param metafile Metafile handler.
  * @return Number of partitions.
  */
-BGEN_EXPORT uint32_t bgen_metafile_npartitions(struct bgen_metafile const* mf);
+BGEN_EXPORT uint32_t bgen_metafile_npartitions(struct bgen_metafile const* metafile);
 /** Get the number of variants.
  *
- * @param mf Metafile handler.
+ * @param metafile Metafile handler.
  * @return Number of variants.
  */
-BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* mf);
+BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafile);
 /** Read a partition of variants.
  *
- * @param mf Metafile handler.
+ * @param metafile Metafile handler.
  * @param index Partition index.
  * @param nvariants Number of variants of the partition.
  * @return Array of variant metadata.
  */
 /* BGEN_EXPORT struct bgen_variant_metadata* bgen_metafile_read_partition( */
-/*     struct bgen_mf const* mf, uint32_t index, uint32_t* nvariants); */
+/*     struct bgen_mf const* metafile, uint32_t index, uint32_t* nvariants); */
 
 BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
     struct bgen_metafile const* metafile, uint32_t partition);
@@ -65,9 +65,9 @@ BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
 BGEN_EXPORT void bgen_free_partition(struct bgen_variant* vm, uint32_t nvariants);
 /** Close a metafile handler.
  *
- * @param mf Metafile handler.
+ * @param metafile Metafile handler.
  * @return `0` on success; `1` otherwise.
  */
-BGEN_EXPORT int bgen_metafile_close(struct bgen_metafile* mf);
+BGEN_EXPORT int bgen_metafile_close(struct bgen_metafile const* metafile);
 
 #endif

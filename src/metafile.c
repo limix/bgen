@@ -200,18 +200,15 @@ err:
     return NULL;
 }
 
-int bgen_metafile_close(struct bgen_metafile* metafile)
+int bgen_metafile_close(struct bgen_metafile const* metafile)
 {
-    if (metafile) {
-        if (fclose(metafile->stream)) {
-            bgen_perror("could not close the %s file", metafile->filepath);
-            return 1;
-        }
-        metafile->stream = NULL;
-        free_c(metafile->filepath);
-        free_c(metafile->partition_offset);
-        free_c(metafile);
+    free_c(metafile->filepath);
+    if (metafile->stream && fclose(metafile->stream)) {
+        bgen_perror("could not close %s", metafile->filepath);
+        return 1;
     }
+    free_c(metafile->partition_offset);
+    free_c(metafile);
     return 0;
 }
 
