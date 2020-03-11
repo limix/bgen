@@ -16,10 +16,10 @@ int main(void)
 
 void test_complex(void)
 {
-    size_t i, j, ii, jj;
+    size_t j, ii;
     const char filename[] = "data/complex.23bits.bgen";
     struct bgen_file* bgen;
-    int nsamples, nvariants;
+    uint32_t nsamples, nvariants;
     double* probabilities;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
@@ -35,11 +35,13 @@ void test_complex(void)
 
     struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
 
-    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
     cass_cond(nvariants == 10);
 
-    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm[0].rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm[9].rsid));
+    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
+    vm = bgen_partition_get(partition, 9);
+    cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm->rsid));
 
     int position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     int correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
@@ -49,14 +51,15 @@ void test_complex(void)
                           "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
                           "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
-    jj = 0;
-    for (i = 0; i < (size_t)nvariants; ++i) {
-        cass_cond(vm[i].nalleles == correct_nalleles[i]);
-        cass_cond(vm[i].position == position[i]);
+    uint32_t jj = 0;
+    for (uint32_t i = 0; i < nvariants; ++i) {
+        vm = bgen_partition_get(partition, i);
+        cass_cond(vm->nalleles == correct_nalleles[i]);
+        cass_cond(vm->position == position[i]);
 
-        for (int j = 0; j < vm[i].nalleles; ++j) {
+        for (uint16_t j = 0; j < vm->nalleles; ++j) {
 
-            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), *vm[i].allele_ids[j]));
+            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), *vm->allele_ids[j]));
             ++jj;
         }
     }
@@ -110,15 +113,16 @@ void test_complex(void)
     double* rp = real_probs;
 
     jj = 0;
-    for (i = 0; i < (size_t)nvariants; ++i) {
-        struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
+    for (uint32_t i = 0; i < nvariants; ++i) {
+        vm = bgen_partition_get(partition, i);
+        struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
         cass_cond(bgen_genotype_phased(vg) == phased[i]);
 
         probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
         bgen_genotype_read(vg, probabilities);
 
         double* p = probabilities;
-        for (j = 0; j < (size_t)nsamples; ++j) {
+        for (uint16_t j = 0; j < nsamples; ++j) {
 
             cass_cond(ploidys[jj] == bgen_genotype_ploidy(vg, j));
             cass_cond(bgen_genotype_missing(vg, j) == 0);
@@ -134,7 +138,7 @@ void test_complex(void)
         free(probabilities);
     }
 
-    bgen_free_partition(vm, nvariants);
+    bgen_partition_destroy(partition);
     cass_cond(bgen_mf_close(mf) == 0);
     bgen_file_close(bgen);
 }
