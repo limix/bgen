@@ -39,7 +39,7 @@
 /** Metafile header: total length. */
 #define BGEN_METAFILE_HDR_LENGTH 13
 
-struct bgen_mf
+struct bgen_metafile
 {
     char*     filepath;
     FILE*     stream;

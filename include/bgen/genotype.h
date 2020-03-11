@@ -4,14 +4,16 @@
 #ifndef BGEN_GENOTYPE_H
 #define BGEN_GENOTYPE_H
 
-#include "bgen/metafile.h"
 #include "bgen_export.h"
+#include <inttypes.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 /** Variant genotype.
  * @struct bgen_genotype
  */
 struct bgen_genotype;
+struct bgen_metafile;
 
 /** Close a variant genotype handler.
  *

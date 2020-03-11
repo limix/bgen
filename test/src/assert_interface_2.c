@@ -35,8 +35,8 @@ int main()
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    struct bgen_mf* mf = bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
-    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_metafile* mf = bgen_metafile_create(bgen, "example.14bits.bgen.metadata", 1, 0);
+    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
 
 
     struct bgen_variant const *vm = bgen_partition_get(partition, 0);
@@ -53,7 +53,7 @@ int main()
 
     bgen = bgen_file_open("data/example.14bits.bgen");
     mf = bgen_metafile_open("example.14bits.bgen.metadata");
-    partition = bgen_metafile_read_partition2(mf, 0);
+    partition = bgen_metafile_read_partition(mf, 0);
     vm = bgen_partition_get(partition, 3);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 

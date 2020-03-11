@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void use_metafile(struct bgen_mf* mf)
+void use_metafile(struct bgen_metafile* mf)
 {
     int nvariants;
 
@@ -16,7 +16,7 @@ void use_metafile(struct bgen_mf* mf)
     int nvars = bgen_metafile_nvariants(mf);
     cass_equal_int(nvars, 10);
 
-    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
@@ -39,7 +39,7 @@ void use_metafile(struct bgen_mf* mf)
 
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition2(mf, 1);
+    partition = bgen_metafile_read_partition(mf, 1);
     cass_cond(partition != NULL);
 
     vm = bgen_partition_get(partition, 0);
@@ -55,9 +55,9 @@ void use_metafile(struct bgen_mf* mf)
     bgen_partition_destroy(partition);
 }
 
-void use_metafile_wrongly(struct bgen_mf* mf)
+void use_metafile_wrongly(struct bgen_metafile* mf)
 {
-    cass_cond(bgen_metafile_read_partition2(mf, 3) == NULL);
+    cass_cond(bgen_metafile_read_partition(mf, 3) == NULL);
 }
 
 int main()
@@ -68,7 +68,7 @@ int main()
 
     struct bgen_file* bgen = bgen_file_open(bgen_filepath);
     cass_cond(bgen != NULL);
-    struct bgen_mf* mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
+    struct bgen_metafile* mf = bgen_metafile_create(bgen, mf_filepath, 2, 0);
     cass_cond(mf != NULL);
     cass_equal_int(bgen_metafile_close(mf), 0);
 

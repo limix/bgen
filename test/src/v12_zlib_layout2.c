@@ -30,30 +30,30 @@ int ipow(int base, int exp)
 }
 
 void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
-                        struct bgen_mf* mf)
+                        struct bgen_metafile* mf)
 {
     cass_cond(bgen_file_nsamples(bgen) == 500);
     cass_cond(bgen_file_nvariants(bgen) == 199);
     cass_cond(bgen_str_equal(BGEN_STR("sample_001"), *bgen_samples_get(samples, 0)));
     cass_cond(bgen_str_equal(BGEN_STR("sample_500"), *bgen_samples_get(samples, 499)));
 
-    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(bgen_partition_nvariants(partition) == 67);
     cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *bgen_partition_get(partition, 0)->id));
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition2(mf, 1);
+    partition = bgen_metafile_read_partition(mf, 1);
     cass_cond(bgen_partition_nvariants(partition) == 67);
     cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), *bgen_partition_get(partition, 5)->id));
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition2(mf, 2);
+    partition = bgen_metafile_read_partition(mf, 2);
     cass_cond(bgen_partition_nvariants(partition) == 65);
     cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), *bgen_partition_get(partition, 60)->id));
     bgen_partition_destroy(partition);
 }
 
-void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsamples,
+void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* mf, int nsamples,
                              int prec)
 {
     double prob[3];
@@ -69,7 +69,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
     int ii = 0;
     i = 0;
     for (int part = 0; part < bgen_metafile_npartitions(mf); ++part) {
-        struct bgen_partition* partition = bgen_metafile_read_partition2(mf, part);
+        struct bgen_partition* partition = bgen_metafile_read_partition(mf, part);
         for (ii = 0; ii < nvariants; ++ii, ++i) {
             struct bgen_variant const* vm = bgen_partition_get(partition, ii);
             struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
@@ -116,7 +116,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_mf* mf, int nsa
     fclose(f);
 }
 
-void test_read(struct bgen_file* bgen, struct bgen_mf* mf, int precision)
+void test_read(struct bgen_file* bgen, struct bgen_metafile* mf, int precision)
 {
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     test_read_metadata(bgen, samples, mf);
@@ -135,7 +135,7 @@ int main()
         int         prec = get_example_precision(i);
 
         struct bgen_file* bgen = bgen_file_open(ex);
-        struct bgen_mf*   mf = bgen_metafile_open(ix);
+        struct bgen_metafile*   mf = bgen_metafile_open(ix);
 
         test_read(bgen, mf, prec);
 

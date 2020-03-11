@@ -33,9 +33,9 @@ void test_complex(void)
 
     bgen_samples_free(samples);
 
-    struct bgen_mf* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
+    struct bgen_metafile* mf = bgen_metafile_create(bgen, "complex.23bits.bgen.metadata", 1, 0);
 
-    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(nvariants == 10);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);

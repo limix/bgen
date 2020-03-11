@@ -29,11 +29,11 @@ void test_zeo_len_chrom_id(void)
     cass_cond(samples != NULL);
     bgen_samples_free(samples);
 
-    struct bgen_mf *mf = bgen_metafile_create(bgen, "zero_len_chrom_id.metadata", 2, 0);
+    struct bgen_metafile *mf = bgen_metafile_create(bgen, "zero_len_chrom_id.metadata", 2, 0);
     cass_cond(mf != NULL);
 
     int nvariants = 0;
-    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    struct bgen_partition* partition = bgen_metafile_read_partition(mf, 0);
     struct bgen_variant const *vm = bgen_partition_get(partition, 0);
     cass_cond(vm != NULL);
     cass_cond(bgen_partition_nvariants(partition) == 25);
