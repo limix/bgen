@@ -68,6 +68,7 @@ int main(void)
     cass_close(probs[2], 0.96673380943661113562);
     cass_close(probs[3], 0.99047793444424092613);
 
+    free(probs);
     bgen_partition_destroy(partition);
     bgen_genotype_close(genotype);
     bgen_metafile_close(metafile);
