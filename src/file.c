@@ -47,9 +47,13 @@ struct bgen_file* bgen_file_open(char const* filepath)
     }
 
     /* if they actually exist */
-    bgen->samples_start = bgen_ftell(bgen->stream);
+    if ((bgen->samples_start = bgen_ftell(bgen->stream)) < 0) {
+        bgen_error("could not ftell");
+        goto err;
+    }
 
     return bgen;
+
 err:
     bgen_file_close(bgen);
     return NULL;
@@ -69,7 +73,7 @@ uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvaria
 
 bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
-struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
+struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int const verbose)
 {
     struct athr* at = NULL;
 
@@ -113,7 +117,11 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
     if (verbose)
         athr_finish(at);
 
-    bgen->variants_start = bgen_ftell(bgen->stream);
+    if ((bgen->variants_start = bgen_ftell(bgen->stream)) < 0) {
+        bgen_error("could not ftell `variants_start`");
+        goto err;
+    }
+
     return samples;
 
 err:
@@ -124,18 +132,18 @@ err:
 }
 
 struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
-                                              uint64_t const          offset)
+                                              uint64_t const          variant_offset)
 {
-    struct bgen_genotype* vg = bgen_genotype_create();
-    vg->layout = bgen->layout;
-    vg->offset = offset;
+    struct bgen_genotype* geno = bgen_genotype_create();
+    geno->layout = bgen->layout;
+    geno->offset = variant_offset;
 
-    if (offset > INT64_MAX) {
-        bgen_error("genotype offset overflow");
+    if (variant_offset > INT64_MAX) {
+        bgen_error("variant offset overflow");
         goto err;
     }
 
-    if (bgen_fseek(bgen_file_stream(bgen), (int64_t)offset, SEEK_SET)) {
+    if (bgen_fseek(bgen_file_stream(bgen), (int64_t)variant_offset, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
         goto err;
     }
@@ -143,17 +151,17 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file const* bgen,
     struct bgen_vi vi = BGEN_VI(bgen);
 
     if (bgen_file_layout(bgen) == 1) {
-        bgen_layout1_read_header(&vi, vg, bgen_file_stream(bgen));
+        bgen_layout1_read_header(&vi, geno, bgen_file_stream(bgen));
     } else if (bgen_file_layout(bgen) == 2) {
-        bgen_layout2_read_header(&vi, vg, bgen_file_stream(bgen));
+        bgen_layout2_read_header(&vi, geno, bgen_file_stream(bgen));
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;
     }
 
-    return vg;
+    return geno;
 err:
-    bgen_genotype_close(vg);
+    bgen_genotype_close(geno);
     return NULL;
 }
 
@@ -174,7 +182,7 @@ unsigned bgen_file_compression(struct bgen_file const* bgen_file)
 int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 {
     if (bgen_fseek(bgen_file->stream, bgen_file->variants_start, SEEK_SET)) {
-        bgen_perror("could not jump to the variants start");
+        bgen_perror("could not jump to variants start");
         return 1;
     }
     return 0;
@@ -219,22 +227,22 @@ static int read_bgen_header(struct bgen_file* bgen)
     uint32_t flags;
 
     if (fread_ui32(bgen->stream, &header_length, 4)) {
-        bgen_error("could not read the header length");
+        bgen_error("could not read header length");
         return 1;
     }
 
     if (fread_ui32(bgen->stream, &bgen->nvariants, 4)) {
-        bgen_error("could not read the number of variants");
+        bgen_error("could not read number of variants");
         return 1;
     }
 
     if (fread_ui32(bgen->stream, &bgen->nsamples, 4)) {
-        bgen_error("could not read the number of samples");
+        bgen_error("could not read number of samples");
         return 1;
     }
 
     if (fread_ui32(bgen->stream, &magic_number, 4)) {
-        bgen_error("could not read the magic number");
+        bgen_error("could not read magic number");
         return 1;
     }
 
@@ -242,12 +250,12 @@ static int read_bgen_header(struct bgen_file* bgen)
         bgen_warning("magic number mismatch");
 
     if (bgen_fseek(bgen->stream, header_length - 20, SEEK_CUR)) {
-        bgen_error("fseek error while reading a BGEN file");
+        bgen_error("fseek error while reading bgen file");
         return 1;
     }
 
     if (fread_ui32(bgen->stream, &flags, 4)) {
-        bgen_error("could not read the bgen flags");
+        bgen_error("could not read bgen flags");
         return 1;
     }
 
