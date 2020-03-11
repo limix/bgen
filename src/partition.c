@@ -28,6 +28,11 @@ struct bgen_variant_metadata const* bgen_partition_get(struct bgen_partition con
     return partition->variants_metadata[index];
 }
 
+uint32_t bgen_partition_nvariants(struct bgen_partition const* partition)
+{
+    return partition->nvariants;
+}
+
 struct bgen_partition* bgen_partition_create(uint32_t const nvariants)
 {
     struct bgen_partition* partition = malloc(sizeof(struct bgen_partition));

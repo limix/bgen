@@ -18,7 +18,7 @@ void test_haplotype(void)
     size_t            i, j, ii, jj;
     const char        filename[] = "data/haplotypes.bgen";
     struct bgen_file* bgen;
-    uint32_t               nsamples, nvariants;
+    uint32_t          nsamples, nvariants;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
@@ -36,20 +36,21 @@ void test_haplotype(void)
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);
 
-    struct bgen_variant_metadata* vm = bgen_metafile_read_partition(mf, 0, &nvariants);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
+    cass_cond(partition != NULL);
 
-    cass_cond(vm != NULL);
-    cass_cond(nvariants == 4);
-
-    cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm[0].rsid));
-    cass_cond(vm[0].nalleles == 2);
+    struct bgen_variant_metadata const* vm = bgen_partition_get(partition, 0);
+    cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm->rsid));
+    cass_cond(vm->nalleles == 2);
 
     for (i = 0; i < (size_t)nvariants; ++i) {
-        cass_cond(bgen_str_equal(BGEN_STR("A"), *vm[i].allele_ids[0]));
-        cass_cond(bgen_str_equal(BGEN_STR("G"), *vm[i].allele_ids[1]));
+        vm = bgen_partition_get(partition, i);
+        cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
+        cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
     }
 
-    struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm[1].genotype_offset);
+    vm = bgen_partition_get(partition, 1);
+    struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
     cass_cond(bgen_genotype_ncombs(vg) == 4);
     cass_cond(bgen_genotype_ploidy(vg, 0) == 2);
@@ -68,7 +69,8 @@ void test_haplotype(void)
 
     jj = 0;
     for (i = 0; i < (size_t)nvariants; ++i) {
-        vg = bgen_file_open_genotype(bgen, vm[i].genotype_offset);
+        vm = bgen_partition_get(partition, i);
+        vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
         double* probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
 
@@ -84,7 +86,7 @@ void test_haplotype(void)
         free(probabilities);
     }
 
-    bgen_free_partition(vm, nvariants);
+    bgen_partition_destroy(partition);
     cass_cond(bgen_mf_close(mf) == 0);
     bgen_file_close(bgen);
 }

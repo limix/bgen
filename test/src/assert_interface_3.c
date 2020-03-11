@@ -35,9 +35,9 @@ void test_create_meteadata_haplotypes()
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
     cass_equal_int(bgen_metafile_nvariants(mf), 4);
 
-    int nvars;
-    struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, 0, &nvars);
+    struct bgen_partition* partition = bgen_metafile_read_partition2(mf, 0);
 
+    struct bgen_variant_metadata const *vm = bgen_partition_get(partition, 0);
     struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(vg != NULL);
 
@@ -52,7 +52,7 @@ void test_create_meteadata_haplotypes()
     cass_equal_int(bgen_genotype_phased(vg), 1);
 
     bgen_genotype_close(vg);
-    bgen_free_partition(vm, nvars);
+    bgen_partition_destroy(partition);
 
     cass_equal_int(bgen_mf_close(mf), 0);
     bgen_file_close(bgen);
@@ -99,11 +99,11 @@ void test_genotype_haplotypes_by_creating_metadata()
         1.00000000000000000000};
     double *probs_ptr = &probs[0];
     for (int i = 0; i < 4; ++i) {
-        int nvars;
-        struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, i, &nvars);
+        struct bgen_partition* partition = bgen_metafile_read_partition2(mf, i);
 
-        for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
+        for (int ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
+            struct bgen_variant_metadata const *vm = bgen_partition_get(partition, ii);
+            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
@@ -129,7 +129,7 @@ void test_genotype_haplotypes_by_creating_metadata()
 
             bgen_genotype_close(vg);
         }
-        bgen_free_partition(vm, nvars);
+        bgen_partition_destroy(partition);
     }
 
     cass_equal_int(bgen_mf_close(mf), 0);
@@ -177,12 +177,12 @@ void test_genotype_haplotypes_by_loading_metadata()
         1.00000000000000000000};
     cass_equal_int(bgen_metafile_nvariants(mf), 4);
     double *probs_ptr = &probs[0];
-    for (int i = 0; i < bgen_metafile_npartitions(mf); ++i) {
-        int nvars;
-        struct bgen_variant_metadata *vm = bgen_metafile_read_partition(mf, i, &nvars);
+    for (uint32_t i = 0; i < bgen_metafile_npartitions(mf); ++i) {
+        struct bgen_partition* partition = bgen_metafile_read_partition2(mf, i);
 
-        for (int ii = 0; ii < nvars; ++ii) {
-            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm[ii].genotype_offset);
+        for (uint32_t ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
+            struct bgen_variant_metadata const *vm = bgen_partition_get(partition, ii);
+            struct bgen_genotype *vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(vg != NULL);
 
             cass_equal_int(bgen_genotype_nalleles(vg), nalleles[i]);
@@ -208,7 +208,7 @@ void test_genotype_haplotypes_by_loading_metadata()
 
             bgen_genotype_close(vg);
         }
-        bgen_free_partition(vm, nvars);
+        bgen_partition_destroy(partition);
     }
 
     cass_equal_int(bgen_mf_close(mf), 0);
