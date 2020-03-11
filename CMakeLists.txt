@@ -64,7 +64,6 @@ target_link_libraries(bgen PUBLIC ATHR::athr)
 target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
 target_link_libraries(bgen PRIVATE BGEN::warning)
-target_compile_features(bgen PRIVATE c_restrict)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles(
@@ -87,6 +86,22 @@ install(TARGETS bgen EXPORT bgen-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     PUBLIC_HEADER DESTINATION include
+)
+
+install(DIRECTORY include/ DESTINATION include)
+install(EXPORT bgen-targets
+    FILE bgen-targets.cmake
+    NAMESPACE BGEN::
+    DESTINATION lib/cmake/bgen
+)
+include(CMakePackageConfigHelpers)
+configure_package_config_file(bgen-config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
+    INSTALL_DESTINATION lib/cmake/bgen
+    NO_SET_AND_CHECK_MACRO
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
+    DESTINATION lib/cmake/bgen
 )
 
 enable_testing()
