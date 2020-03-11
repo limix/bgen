@@ -1,8 +1,8 @@
 /** Open, query, and close a variant genotype.
- * @file bgen/geno.h
+ * @file bgen/genotype.h
  */
-#ifndef BGEN_GENO_H
-#define BGEN_GENO_H
+#ifndef BGEN_GENOTYPE_H
+#define BGEN_GENOTYPE_H
 
 #include "bgen/meta.h"
 #include "bgen_export.h"
@@ -33,14 +33,13 @@ BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* genotype);
  * @param p Array of probabilities.
  * @return `0` if it succeeded; `1` otherwise.
  */
-BGEN_EXPORT int bgen_genotype_read(struct bgen_genotype* genotype,
-                                   double* probabilities);
+BGEN_EXPORT int bgen_genotype_read(struct bgen_genotype* genotype, double* probabilities);
 /** Get the number of alleles.
  *
  * @param genotype Variant genotype handler.
  * @return Number of alleles.
  */
-BGEN_EXPORT uint16_t  bgen_genotype_nalleles(struct bgen_genotype const* genotype);
+BGEN_EXPORT uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype);
 /** Return `1` if variant is missing for the sample; `0` otherwise.
  *
  * @param genotype Variant genotype handler.

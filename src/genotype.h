@@ -1,7 +1,6 @@
 #ifndef BGEN_GENO_H_PRIVATE
 #define BGEN_GENO_H_PRIVATE
 
-#include "io.h"
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -21,12 +20,21 @@ struct bgen_genotype
     uint64_t offset;
 };
 
-static inline struct bgen_genotype* create_vg(void)
+static inline struct bgen_genotype* bgen_genotype_create(void)
 {
     struct bgen_genotype* vg = malloc(sizeof(struct bgen_genotype));
+    vg->layout = 0;
+    vg->nsamples = 0;
+    vg->nalleles = 0;
+    vg->phased = 0;
+    vg->nbits = 0;
     vg->plo_miss = NULL;
+    vg->ncombs = 0;
+    vg->min_ploidy = 0;
+    vg->max_ploidy = 0;
     vg->chunk = NULL;
     vg->current_chunk = NULL;
+    vg->offset = 0;
     return vg;
 }
 
