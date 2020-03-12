@@ -20,9 +20,7 @@ jobs:
       env: GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
-        - ls
-        - ./install.bat
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
@@ -31,9 +29,7 @@ jobs:
       env: GENERATOR=Ninja
       before_install:
         - choco install ninja zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"
-        - ls
-        - ./install.bat
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
