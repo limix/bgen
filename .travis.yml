@@ -64,7 +64,7 @@ script:
   - git clean -xdfq
   - mkdir build.debug
   - cd build.debug
-  - cmake -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
+  - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_SHARED_LIBS=ON ..
   - cmake --build . --config Debug
   - ctest --output-on-failure -C Debug
   - cd $TRAVIS_BUILD_DIR
