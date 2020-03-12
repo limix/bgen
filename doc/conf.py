@@ -3,12 +3,16 @@ from __future__ import unicode_literals
 import os
 import subprocess
 import sys
+import re
 
 import sphinx_rtd_theme
 
-folder = os.path.dirname(os.path.abspath(__file__))
-with open(os.path.join(folder, "..", "VERSION")) as f:
-    version = f.read().strip()
+_folder = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(_folder, "..", "CMakeLists.txt")) as f:
+    s = re.search(r"bgen VERSION (\d+\.\d+\.\d+)", f.read())
+    if s is None:
+        raise RuntimeError("Could not fetch version")
+    version = s.groups()[0]
 
 extensions = ["sphinx.ext.viewcode", "breathe"]
 breathe_projects = {"bgen": "doxyxml/"}
@@ -22,10 +26,10 @@ author = "Danilo Horta"
 release = version
 language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "conf.py"]
-pygments_style = "sphinx"
 todo_include_todos = False
 primary_domain = "c"
 
+pygments_style = "default"
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
@@ -43,7 +47,7 @@ def run_doxygen(folder):
         sys.stderr.write("doxygen execution failed: %s" % e)
 
 
-def generate_doxygen_xml(app):
+def generate_doxygen_xml(*_):
     """Run the doxygen make commands if we're on the ReadTheDocs server"""
 
     read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
@@ -53,6 +57,5 @@ def generate_doxygen_xml(app):
 
 
 def setup(app):
-
     # Add hook for building doxygen xml when needed
     app.connect("builder-inited", generate_doxygen_xml)

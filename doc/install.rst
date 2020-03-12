@@ -2,42 +2,28 @@
 Install
 *******
 
-A successful installation of this library will copy a dynamic and a static
-libraries and a C header.
-For example, in a GNU/Linux, an installation might consists in the following
-files:
-
-- /usr/local/lib/libbgen.so.VERSION
-- /usr/local/lib/libbgen.so
-- /usr/local/include/bgen.h
-- /usr/local/include/bgen/*
-- /usr/local/lib/libbgen_static.a
-
-The easiest way of installing bgen is via `conda`_
+You can install it via conda_:
 
 .. code-block:: bash
 
   conda install -c conda-forge bgen
 
-Alternatively, it can be compiled on GNU/Linux or MacOS by entering
+Alternatively, it can be installed via:
 
 .. code-block:: bash
 
-  bash <(curl -fsSL https://raw.githubusercontent.com/limix/bgen/master/install)
+  curl -fsSL https://git.io/JerYI | GITHUB_USER=limix GITHUB_PROJECT=bgen bash
 
-or by entering
+Under Windows, please, use Git Bash terminal to enter the above command.
 
+The second option will work only if the zstandard_ library has been properly
+installed before-hand, as well as the zlib_ library (which is probably
+already installed in your system), and the athr_ library.
 
-.. code-block:: powershell
-
-  powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/limix/bgen/master/install.bat', 'install.bat')" && install.bat
-
-on Windows.
-
-The second option will work only if the Zstandard_ library has been properly
-installed before-hand, as well as the zlib library (which is probably
-already installed in your environment), and the athr_ library.
+Please, report any issue by `opening an issue`_ on Github.
 
 .. _conda: http://conda.pydata.org/docs/index.html
-.. _Zstandard: http://facebook.github.io/zstd/
+.. _zlib: https://github.com/horta/zlib.install
+.. _Zstandard: https://github.com/horta/zstd.install
 .. _athr: https://github.com/horta/almosthere
+.. _opening an issue: https://github.com/limix/bgen/issues/new

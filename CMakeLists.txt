@@ -36,7 +36,7 @@ add_library(bgen
     src/samples.c
     src/variant.c
     src/partition.c
-    src/str.c
+    src/bstring.c
     src/zip/zlib.c
     src/zip/zstd.c
 )

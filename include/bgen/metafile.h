@@ -17,17 +17,20 @@ struct bgen_partition;
  * A bgen metafile contains variant metadata (id, rsid, chrom, alleles) and variant
  * addresses. Those variants are divided in partitions.
  *
- * @param bgen Bgen file handler.
+ * @param bgen_file Bgen file handler.
  * @param filepath File path to the metafile.
- * @param npartitions Number of partitions as to be between `1` and the number of
- * samples.
+ * @param npartitions Number of partitions. It has to be a number between `1` and
+ * the number of samples.
  * @param verbose `1` for showing progress; `0` otherwise.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen,
+BGEN_EXPORT struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file,
                                                        char const*       filepath,
                                                        unsigned npartitions, int verbose);
 /** Open a bgen metafile.
+ *
+ * Remember to call @ref bgen_metafile_close to close the file and release
+ * resources after the interaction has finished.
  *
  * @param filepath File path to the metafile.
  * @return Metafile handler. `NULL` on failure.
@@ -48,21 +51,11 @@ BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafil
 /** Read a partition of variants.
  *
  * @param metafile Metafile handler.
- * @param index Partition index.
- * @param nvariants Number of variants of the partition.
- * @return Array of variant metadata.
+ * @param partition Partition index.
+ * @return Partition of variants.
  */
-/* BGEN_EXPORT struct bgen_variant_metadata* bgen_metafile_read_partition( */
-/*     struct bgen_mf const* metafile, uint32_t index, uint32_t* nvariants); */
-
 BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
     struct bgen_metafile const* metafile, uint32_t partition);
-/** Free a partition.
- *
- * @param vm Array of variant metatada.
- * @param nvariants Number of variants of the partition.
- */
-BGEN_EXPORT void bgen_free_partition(struct bgen_variant* vm, uint32_t nvariants);
 /** Close a metafile handler.
  *
  * @param metafile Metafile handler.

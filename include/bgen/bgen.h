@@ -47,7 +47,7 @@ extern "C"
 #include "bgen/metafile.h"
 #include "bgen/partition.h"
 #include "bgen/samples.h"
-#include "bgen/str.h"
+#include "bgen/bstring.h"
 #include "bgen/variant.h"
 
 #ifdef __cplusplus

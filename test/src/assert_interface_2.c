@@ -26,7 +26,7 @@ int main(void)
 
     samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL);
-    bgen_samples_free(samples);
+    bgen_samples_destroy(samples);
 
     bgen_file_close(bgen);
 
@@ -38,10 +38,10 @@ int main(void)
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
     cass_equal_int(vm->position, 2000);
     cass_equal_int(vm->nalleles, 2);
-    cass_cond(bgen_str_equal(BGEN_STR("RSID_2"), *vm->rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *vm->id));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_string_equal(BGEN_STRING("RSID_2"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_2"), *vm->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("01"), *vm->chrom));
+    cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
 
     bgen_partition_destroy(partition);
     bgen_metafile_close(metafile);

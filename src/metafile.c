@@ -9,7 +9,8 @@
 #include "metafile_write.h"
 #include "partition.h"
 #include "report.h"
-#include "str.h"
+#include "bstring.h"
+#include <string.h>
 
 static struct bgen_metafile* metafile_alloc(char const* filepath);
 static uint32_t              compute_nvariants(uint32_t nvariants, uint32_t npartitions,
@@ -168,13 +169,13 @@ struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile c
         if (fread_ui64(file, &vm->genotype_offset, 8))
             goto err;
 
-        if ((vm->id = bgen_str_fread(file, 2)) == NULL)
+        if ((vm->id = bgen_string_fread(file, 2)) == NULL)
             goto err;
 
-        if ((vm->rsid = bgen_str_fread(file, 2)) == NULL)
+        if ((vm->rsid = bgen_string_fread(file, 2)) == NULL)
             goto err;
 
-        if ((vm->chrom = bgen_str_fread(file, 2)) == NULL)
+        if ((vm->chrom = bgen_string_fread(file, 2)) == NULL)
             goto err;
 
         if (fread_ui32(file, &vm->position, 4))
@@ -186,7 +187,7 @@ struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile c
         bgen_variant_create_alleles(vm, vm->nalleles);
 
         for (uint16_t j = 0; j < vm->nalleles; ++j) {
-            if ((vm->allele_ids[j] = bgen_str_fread(file, 4)) == NULL)
+            if ((vm->allele_ids[j] = bgen_string_fread(file, 4)) == NULL)
                 goto err;
         }
 

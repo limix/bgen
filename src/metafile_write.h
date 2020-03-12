@@ -4,10 +4,10 @@
 #include "athr.h"
 #include "bgen/variant.h"
 #include "bmath.h"
+#include "bstring.h"
 #include "io.h"
 #include "metafile.h"
 #include "report.h"
-#include "str.h"
 #include "variant.h"
 #include <inttypes.h>
 
@@ -17,20 +17,20 @@ static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
     int64_t start = bgen_ftell(stream);
 
     fwrite_ui64(stream, variant->genotype_offset, 8);
-    if (bgen_str_fwrite(variant->id, stream, 2))
+    if (bgen_string_fwrite(variant->id, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(variant->rsid, stream, 2))
+    if (bgen_string_fwrite(variant->rsid, stream, 2))
         return 0;
 
-    if (bgen_str_fwrite(variant->chrom, stream, 2))
+    if (bgen_string_fwrite(variant->chrom, stream, 2))
         return 0;
 
     fwrite_ui32(stream, variant->position, 4);
     fwrite_ui16(stream, variant->nalleles, 2);
 
     for (size_t j = 0; j < (size_t)variant->nalleles; ++j) {
-        if (bgen_str_fwrite(variant->allele_ids[j], stream, 4))
+        if (bgen_string_fwrite(variant->allele_ids[j], stream, 4))
             return 0;
     }
 

@@ -25,8 +25,8 @@ void test_bgen_file_complex(void)
 
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     cass_cond(samples != NULL)
-        cass_cond(bgen_str_equal(BGEN_STR("sample_0"), *bgen_samples_get(samples, 0)));
-    bgen_samples_free(samples);
+        cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
+    bgen_samples_destroy(samples);
 
     bgen_file_close(bgen);
 }

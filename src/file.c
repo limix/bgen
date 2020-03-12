@@ -9,7 +9,7 @@
 #include "layout2.h"
 #include "report.h"
 #include "samples.h"
-#include "str.h"
+#include "bstring.h"
 #include <inttypes.h>
 #include <stdbool.h>
 
@@ -107,7 +107,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
         if (verbose)
             athr_consume(at, 1);
 
-        struct bgen_str const* sample_id = bgen_str_fread(bgen->stream, 2);
+        struct bgen_string const* sample_id = bgen_string_fread(bgen->stream, 2);
         if (sample_id == NULL) {
             bgen_error("could not read the %" PRIu32 "lu-th sample id", i);
             goto err;
@@ -128,7 +128,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 err:
     if (at)
         athr_finish(at);
-    bgen_samples_free(samples);
+    bgen_samples_destroy(samples);
     return NULL;
 }
 

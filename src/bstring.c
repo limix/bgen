@@ -1,10 +1,10 @@
-#include "str.h"
-#include "bgen/str.h"
+#include "bstring.h"
+#include "bgen/bstring.h"
 #include "free.h"
 #include "report.h"
 #include <inttypes.h>
 
-struct bgen_str const* bgen_str_fread(FILE* stream, size_t length_size)
+struct bgen_string const* bgen_string_fread(FILE* stream, size_t length_size)
 {
     uint64_t length = 0;
 
@@ -14,7 +14,7 @@ struct bgen_str const* bgen_str_fread(FILE* stream, size_t length_size)
     }
 
     if (length == 0)
-        return bgen_str_create(NULL, 0);
+        return bgen_string_create(NULL, 0);
 
     char* data = malloc(sizeof(char) * length);
 
@@ -27,10 +27,10 @@ struct bgen_str const* bgen_str_fread(FILE* stream, size_t length_size)
         return NULL;
     }
 
-    return bgen_str_create(data, length);
+    return bgen_string_create(data, length);
 }
 
-int bgen_str_fwrite(struct bgen_str const* str, FILE* stream, size_t length_size)
+int bgen_string_fwrite(struct bgen_string const* str, FILE* stream, size_t length_size)
 {
     uint64_t len = str->length;
     if (fwrite(&len, length_size, 1, stream) != 1) {

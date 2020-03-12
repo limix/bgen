@@ -23,10 +23,10 @@ void test_complex(void)
 
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
 
-    cass_cond(bgen_str_equal(BGEN_STR("sample_0"), *bgen_samples_get(samples, 0)));
-    cass_cond(bgen_str_equal(BGEN_STR("sample_3"), *bgen_samples_get(samples, 3)));
+    cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
+    cass_cond(bgen_string_equal(BGEN_STRING("sample_3"), *bgen_samples_get(samples, 3)));
 
-    bgen_samples_free(samples);
+    bgen_samples_destroy(samples);
 
     struct bgen_metafile* mf =
         bgen_metafile_create(bgen, "complex.tmp/complex.23bits.bgen.metadata", 1, 0);
@@ -35,9 +35,9 @@ void test_complex(void)
     cass_cond(nvariants == 10);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
-    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("V1"), *vm->rsid));
     vm = bgen_partition_get(partition, 9);
-    cass_cond(bgen_str_equal(BGEN_STR("M10"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("M10"), *vm->rsid));
 
     uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     uint16_t correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
@@ -55,7 +55,7 @@ void test_complex(void)
 
         for (uint16_t j = 0; j < vm->nalleles; ++j) {
 
-            cass_cond(bgen_str_equal(BGEN_STR(allele_ids[jj]), *vm->allele_ids[j]));
+            cass_cond(bgen_string_equal(BGEN_STRING(allele_ids[jj]), *vm->allele_ids[j]));
             ++jj;
         }
     }

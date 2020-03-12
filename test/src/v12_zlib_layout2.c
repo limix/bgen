@@ -53,22 +53,22 @@ void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
 {
     cass_cond(bgen_file_nsamples(bgen) == 500);
     cass_cond(bgen_file_nvariants(bgen) == 199);
-    cass_cond(bgen_str_equal(BGEN_STR("sample_001"), *bgen_samples_get(samples, 0)));
-    cass_cond(bgen_str_equal(BGEN_STR("sample_500"), *bgen_samples_get(samples, 499)));
+    cass_cond(bgen_string_equal(BGEN_STRING("sample_001"), *bgen_samples_get(samples, 0)));
+    cass_cond(bgen_string_equal(BGEN_STRING("sample_500"), *bgen_samples_get(samples, 499)));
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     cass_cond(bgen_partition_nvariants(partition) == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_2"), *bgen_partition_get(partition, 0)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_2"), *bgen_partition_get(partition, 0)->id));
     bgen_partition_destroy(partition);
 
     partition = bgen_metafile_read_partition(metafile, 1);
     cass_cond(bgen_partition_nvariants(partition) == 67);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_74"), *bgen_partition_get(partition, 5)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_74"), *bgen_partition_get(partition, 5)->id));
     bgen_partition_destroy(partition);
 
     partition = bgen_metafile_read_partition(metafile, 2);
     cass_cond(bgen_partition_nvariants(partition) == 65);
-    cass_cond(bgen_str_equal(BGEN_STR("SNPID_196"), *bgen_partition_get(partition, 60)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_196"), *bgen_partition_get(partition, 60)->id));
     bgen_partition_destroy(partition);
 }
 
@@ -144,7 +144,7 @@ void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned 
 {
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     test_read_metadata(bgen, samples, metafile);
-    bgen_samples_free(samples);
+    bgen_samples_destroy(samples);
 
     test_read_probabilities(bgen, metafile, 500, precision);
 }

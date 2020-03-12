@@ -1,10 +1,10 @@
 #include "bgen/variant.h"
-#include "bgen/str.h"
+#include "bgen/bstring.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"
 #include "report.h"
-#include "str.h"
+#include "bstring.h"
 #include "variant.h"
 
 struct bgen_variant* bgen_variant_create(void)
@@ -22,7 +22,7 @@ struct bgen_variant* bgen_variant_create(void)
 
 void bgen_variant_create_alleles(struct bgen_variant* variant, uint16_t nalleles)
 {
-    variant->allele_ids = malloc(sizeof(struct bgen_str*) * nalleles);
+    variant->allele_ids = malloc(sizeof(struct bgen_string*) * nalleles);
 
     for (uint16_t j = 0; j < nalleles; ++j) {
         variant->allele_ids[j] = NULL;
@@ -52,13 +52,13 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
             goto err;
     }
 
-    if ((vm->id = bgen_str_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if ((vm->id = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
         goto err;
 
-    if ((vm->rsid = bgen_str_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if ((vm->rsid = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
         goto err;
 
-    if ((vm->chrom = bgen_str_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if ((vm->chrom = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
         goto err;
 
     if (fread_ui32(bgen_file_stream(bgen_file), &vm->position, 4))
@@ -69,12 +69,12 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
     else if (fread_ui16(bgen_file_stream(bgen_file), &vm->nalleles, 2))
         goto err;
 
-    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_str*));
+    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_string*));
     for (uint16_t i = 0; i < vm->nalleles; ++i)
         vm->allele_ids[i] = NULL;
 
     for (uint16_t i = 0; i < vm->nalleles; ++i) {
-        if ((vm->allele_ids[i] = bgen_str_fread(bgen_file_stream(bgen_file), 4)) == NULL)
+        if ((vm->allele_ids[i] = bgen_string_fread(bgen_file_stream(bgen_file), 4)) == NULL)
             goto err;
     }
 
@@ -106,18 +106,18 @@ struct bgen_variant* bgen_variant_end(struct bgen_file const* bgen_file) { retur
 void bgen_variant_destroy(struct bgen_variant const* variant)
 {
     if (variant->id)
-        bgen_str_free(variant->id);
+        bgen_string_destroy(variant->id);
 
     if (variant->rsid)
-        bgen_str_free(variant->rsid);
+        bgen_string_destroy(variant->rsid);
 
     if (variant->chrom)
-        bgen_str_free(variant->chrom);
+        bgen_string_destroy(variant->chrom);
 
     if (variant->allele_ids) {
         for (uint16_t i = 0; i < variant->nalleles; ++i) {
             if (variant->allele_ids[i])
-                bgen_str_free(variant->allele_ids[i]);
+                bgen_string_destroy(variant->allele_ids[i]);
         }
         free_c(variant->allele_ids);
     }

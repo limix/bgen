@@ -1,11 +1,6 @@
-====================
-BGen's documentation
-====================
-
-:Date: |today|
-:Version: |version|
-
-A `BGEN file format`_ reader.
+=========================
+BGEN reader documentation
+=========================
 
 BGEN is a file format for storing large genetic datasets.
 It supports both unphased genotypes and phased haplotype data with variable
@@ -24,7 +19,6 @@ well as their optional compressed formats.
     :maxdepth: 2
 
     install
-    examples
     interface
 
 .. _BGEN file format: http://www.well.ox.ac.uk/~gav/bgen_format/

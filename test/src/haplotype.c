@@ -25,9 +25,9 @@ void test_haplotype(void)
 
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
 
-    cass_cond(bgen_str_equal(BGEN_STR("sample_0"), *bgen_samples_get(samples, 0)));
+    cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
 
-    bgen_samples_free(samples);
+    bgen_samples_destroy(samples);
 
     struct bgen_metafile* mf = bgen_metafile_create(
         bgen, "haplotype.tmp/complex.23bits.bgen.metadata.1", 1, 0);
@@ -39,13 +39,13 @@ void test_haplotype(void)
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
-    cass_cond(bgen_str_equal(BGEN_STR("RS1"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("RS1"), *vm->rsid));
     cass_cond(vm->nalleles == 2);
 
     for (uint32_t i = 0; i < nvariants; ++i) {
         vm = bgen_partition_get(partition, i);
-        cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
-        cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
+        cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
+        cass_cond(bgen_string_equal(BGEN_STRING("G"), *vm->allele_ids[1]));
     }
 
     vm = bgen_partition_get(partition, 1);

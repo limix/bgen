@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = bgen-reader
+SPHINXPROJ    = bgen
 SOURCEDIR     = .
 BUILDDIR      = _build
 

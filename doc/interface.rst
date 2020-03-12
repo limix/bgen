@@ -42,76 +42,84 @@ a :cpp:func:`bgen_close_genotype` call.
 Strings are represented by the :cpp:type:`bgen_str` type, which contains an
 array of characters and its length.
 
-
 File
 ^^^^
 
-.. doxygenfunction:: bgen_open
-.. doxygenfunction:: bgen_close
-.. doxygenfunction:: bgen_nsamples
-.. doxygenfunction:: bgen_nvariants
-.. doxygenfunction:: bgen_contain_samples
-.. doxygenfunction:: bgen_read_samples
-.. doxygenfunction:: bgen_free_samples
+.. doxygenfunction:: bgen_file_open
+.. doxygenfunction:: bgen_file_close
+.. doxygenfunction:: bgen_file_nsamples
+.. doxygenfunction:: bgen_file_nvariants
+.. doxygenfunction:: bgen_file_contain_samples
+.. doxygenfunction:: bgen_file_read_samples
+.. doxygenfunction:: bgen_file_open_genotype
 
-Types
-^^^^^
+<!-- Types -->
+<!-- ^^^^^ -->
 
-.. doxygenstruct:: bgen_str
-   :members:
-.. doxygenstruct:: bgen_file
-.. doxygenstruct:: bgen_vg
-.. doxygenstruct:: bgen_vm
-   :members:
-
+<!-- .. doxygenstruct:: bgen_str -->
+<!--    :members: -->
+<!-- .. doxygenstruct:: bgen_file -->
+<!-- .. doxygenstruct:: bgen_vg -->
+<!-- .. doxygenstruct:: bgen_vm -->
+<!--    :members: -->
 
 Genotype
 ^^^^^^^^
 
-.. doxygenfunction:: bgen_open_genotype
-.. doxygenfunction:: bgen_close_genotype
-.. doxygenfunction:: bgen_read_genotype
-.. doxygenfunction:: bgen_nalleles
-.. doxygenfunction:: bgen_missing
-.. doxygenfunction:: bgen_ploidy
-.. doxygenfunction:: bgen_min_ploidy
-.. doxygenfunction:: bgen_max_ploidy
-.. doxygenfunction:: bgen_ncombs
-.. doxygenfunction:: bgen_phased
+.. doxygenfunction:: bgen_genotype_close
+.. doxygenfunction:: bgen_genotype_read
+.. doxygenfunction:: bgen_genotype_nalleles
+.. doxygenfunction:: bgen_genotype_missing
+.. doxygenfunction:: bgen_genotype_ploidy
+.. doxygenfunction:: bgen_genotype_min_ploidy
+.. doxygenfunction:: bgen_genotype_max_ploidy
+.. doxygenfunction:: bgen_genotype_ncombs
+.. doxygenfunction:: bgen_genotype_phased
 
-
-Metadata
+Metafile
 ^^^^^^^^
 
-.. doxygenfunction:: bgen_create_metafile
-.. doxygenfunction:: bgen_open_metafile
+.. doxygenfunction:: bgen_metafile_create
+.. doxygenfunction:: bgen_metafile_open
 .. doxygenfunction:: bgen_metafile_npartitions
 .. doxygenfunction:: bgen_metafile_nvariants
-.. doxygenfunction:: bgen_read_partition
-.. doxygenfunction:: bgen_free_partition
-.. doxygenfunction:: bgen_close_metafile
+.. doxygenfunction:: bgen_metafile_read_partition
+.. doxygenfunction:: bgen_metafile_close
+
+Partition
+^^^^^^^^^
+
+.. doxygenfunction:: bgen_partition_destroy
+.. doxygenfunction:: bgen_partition_get
+.. doxygenfunction:: bgen_partition_nvariants
+
+Samples
+^^^^^^^
+
+.. doxygenfunction:: bgen_samples_destroy
+.. doxygenfunction:: bgen_samples_get
 
 
-Deprecated
-^^^^^^^^^^
+<!-- Deprecated -->
+<!-- ^^^^^^^^^^ -->
 
-.. doxygenstruct:: bgen_var
-   :members:
-.. doxygenstruct:: bgen_vi
-   :members:
-.. doxygenstruct:: bgen_string
-   :members:
-.. doxygenfunction:: bgen_open_variant_genotype
-.. doxygenfunction:: bgen_read_variant_genotype
-.. doxygenfunction:: bgen_close_variant_genotype
-.. doxygenfunction:: bgen_sample_ids_presence
-.. doxygenfunction:: bgen_read_variants_metadata
-.. doxygenfunction:: bgen_free_variants_metadata
-.. doxygenfunction:: bgen_free_index
-.. doxygenfunction:: bgen_store_variants_metadata
-.. doxygenfunction:: bgen_load_variants_metadata
-.. doxygenfunction:: bgen_create_variants_metadata_file
-.. doxygenfunction:: bgen_max_nalleles
+<!-- .. doxygenstruct:: bgen_var -->
+<!--    :members: -->
+<!-- .. doxygenstruct:: bgen_vi -->
+<!--    :members: -->
+<!-- .. doxygenstruct:: bgen_string -->
+<!--    :members: -->
+<!-- .. doxygenfunction:: bgen_open_variant_genotype -->
+<!-- .. doxygenfunction:: bgen_read_variant_genotype -->
+<!-- .. doxygenfunction:: bgen_close_variant_genotype -->
+<!-- .. doxygenfunction:: bgen_sample_ids_presence -->
+<!-- .. doxygenfunction:: bgen_read_variants_metadata -->
+<!-- .. doxygenfunction:: bgen_free_variants_metadata -->
+<!-- .. doxygenfunction:: bgen_free_index -->
+<!-- .. doxygenfunction:: bgen_store_variants_metadata -->
+<!-- .. doxygenfunction:: bgen_load_variants_metadata -->
+<!-- .. doxygenfunction:: bgen_create_variants_metadata_file -->
+<!-- .. doxygenfunction:: bgen_max_nalleles -->
 
 .. |bgen format specification| raw:: html
 

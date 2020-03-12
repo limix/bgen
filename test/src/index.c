@@ -40,22 +40,22 @@ void use_metafile_properly(char const* metafile_filepath)
     cass_cond(partition != NULL);
 
     struct bgen_variant const* vm = bgen_partition_get(partition, 0);
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
-    cass_cond(bgen_str_equal(BGEN_STR("V1"), *vm->rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
+    cass_cond(bgen_string_equal(BGEN_STRING(""), *vm->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("V1"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("01"), *vm->chrom));
     cass_equal_int(vm[0].nalleles, 2);
 
     vm = bgen_partition_get(partition, 1);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
+    cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_string_equal(BGEN_STRING("G"), *vm->allele_ids[1]));
 
     vm = bgen_partition_get(partition, 4);
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
-    cass_cond(bgen_str_equal(BGEN_STR("M5"), *vm->rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
+    cass_cond(bgen_string_equal(BGEN_STRING(""), *vm->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("M5"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("01"), *vm->chrom));
     cass_equal_int(vm->nalleles, 2);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
+    cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_string_equal(BGEN_STRING("G"), *vm->allele_ids[1]));
 
     bgen_partition_destroy(partition);
 
@@ -63,14 +63,14 @@ void use_metafile_properly(char const* metafile_filepath)
     cass_cond(partition != NULL);
 
     vm = bgen_partition_get(partition, 0);
-    cass_cond(bgen_str_equal(BGEN_STR(""), *vm->id));
-    cass_cond(bgen_str_equal(BGEN_STR("M6"), *vm->rsid));
-    cass_cond(bgen_str_equal(BGEN_STR("01"), *vm->chrom));
+    cass_cond(bgen_string_equal(BGEN_STRING(""), *vm->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("M6"), *vm->rsid));
+    cass_cond(bgen_string_equal(BGEN_STRING("01"), *vm->chrom));
     cass_equal_int(vm[0].nalleles, 4);
 
     vm = bgen_partition_get(partition, 1);
-    cass_cond(bgen_str_equal(BGEN_STR("A"), *vm->allele_ids[0]));
-    cass_cond(bgen_str_equal(BGEN_STR("G"), *vm->allele_ids[1]));
+    cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
+    cass_cond(bgen_string_equal(BGEN_STRING("G"), *vm->allele_ids[1]));
 
     bgen_partition_destroy(partition);
 

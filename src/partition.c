@@ -1,6 +1,6 @@
 #include "partition.h"
 #include "free.h"
-#include "str.h"
+#include "bstring.h"
 #include "variant.h"
 
 struct bgen_partition
