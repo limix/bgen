@@ -1,5 +1,6 @@
 #include "bgen/bgen.h"
 #include "cass.h"
+#include <stdio.h>
 #include <math.h>
 
 const char* get_example_filepath(size_t i);
@@ -103,6 +104,8 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
             for (j = 0; j < 500; ++j) {
 
                 e = fscanf(f, "%lf", prob + 0);
+                if (e != 0)
+                    perror("fscanf has failed");
                 cass_cond(e == 1);
 
                 e = fscanf(f, "%lf", prob + 1);

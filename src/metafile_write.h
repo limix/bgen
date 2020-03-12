@@ -70,7 +70,7 @@ static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32
 
     struct athr* at = NULL;
     if (verbose) {
-        at = athr_create(nvariants, "Writing variants", ATHR_BAR | ATHR_ETA);
+        at = athr_create((long)nvariants, "Writing variants", ATHR_BAR | ATHR_ETA);
         if (at == NULL) {
             bgen_error("could not create a progress bar");
             goto err;

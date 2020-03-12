@@ -96,7 +96,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
     }
 
     if (verbose) {
-        at = athr_create(bgen->nsamples, "Reading samples", ATHR_BAR);
+        at = athr_create((long)bgen->nsamples, "Reading samples", ATHR_BAR);
         if (!at) {
             bgen_error("could not create a progress bar");
             goto err;
