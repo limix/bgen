@@ -21,8 +21,10 @@ jobs:
       env:
         - INCLUDE="/c/ProgramData/chocolatey/lib/zstandard/tools/include"
         - INCLUDE="/c/Program Files/zlib/include"
+        - INCLUDE="/c/Program Files/athr/include"
         - LIB="/c/ProgramData/chocolatey/lib/zstandard/tools/dll"
         - LIB="/c/Program Files/zlib/lib"
+        - LIB="/c/Program Files/athr/lib"
         - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
         - GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
@@ -30,7 +32,7 @@ jobs:
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
-        - file /c/Program\ Files/zlib/bin/zlib.dll
+        - cp /c/Program\ Files/athr/bin/athr.dll /c/Windows/system32/
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere CMAKE_GENERATOR="$GENERATOR" bash
     # - name: Build on windows
     #   os: windows
