@@ -2,13 +2,16 @@ function(bgen_add_test name)
     set(target test_${name})
     add_executable(${target} src/${name}.c)
     target_link_libraries(${target} PRIVATE BGEN::warning)
-    add_custom_command(TARGET ${target} PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${target}>/${name}.tmp
-    )
     target_link_libraries(${target} PRIVATE BGEN::bgen)
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
-    add_test(NAME ${name} COMMAND ${target} -E environment)
+
+    add_test(NAME ${name} COMMAND ${target} -E environment
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+
+    add_custom_command(TARGET ${target} PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/${name}.tmp"
+    )
 
     # Ugly hacky to make the tests work on Windows.
     file(TO_CMAKE_PATH "$ENV{PATH}" PATH)
