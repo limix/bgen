@@ -17,7 +17,14 @@ jobs:
           DO_CMD=sudo bash
     - name: Build on windows
       os: windows
-      env: GENERATOR="Visual Studio 15 2017 Win64"
+      # env: GENERATOR="Visual Studio 15 2017 Win64"
+      env:
+        - INCLUDE="/c/ProgramData/chocolatey/lib/zstandard/tools/include"
+        - INCLUDE="/c/Program Files/zlib/include"
+        - LIB="/c/ProgramData/chocolatey/lib/zstandard/tools/dll"
+        - LIB="/c/Program Files/zlib/lib"
+        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+        - GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
