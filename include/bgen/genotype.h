@@ -71,10 +71,10 @@ BGEN_EXPORT uint8_t bgen_genotype_max_ploidy(struct bgen_genotype const* genotyp
  *
  * Precisely, if the bgen file is of **Layout 1**, the number of combinations is always
  * equal to `3`. In the case of **Layout 2**, we have two options. For phased genotype,
- * the number of combinations is equal to the product of @ref bgen_nalleles with
- * @ref bgen_max_ploidy. For unphased genotype, let `n` and `m` be the values returned
- * by calling @ref bgen_nalleles and @ref bgen_max_ploidy. This function returns the
- * number of combinations `n-1` alleles can be selected from `n+m-1`, such that the
+ * the number of combinations is equal to the product of @ref bgen_genotype_nalleles with
+ * @ref bgen_genotype_max_ploidy. For unphased genotype, let `n` and `m` be the values returned
+ * by calling @ref bgen_genotype_nalleles and @ref bgen_genotype_max_ploidy. This function
+ * returns the number of combinations `n-1` alleles can be selected from `n+m-1`, such that the
  * order of a selection does not matter.
  *
  * @param genotype Variant genotype handler.

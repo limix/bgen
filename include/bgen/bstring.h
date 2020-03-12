@@ -1,5 +1,5 @@
 /** Handy string definition.
- * @file: bgen/string.h
+ * @file: bgen/bstring.h
  */
 #ifndef BGEN_STRING_H
 #define BGEN_STRING_H
@@ -11,7 +11,7 @@
 #include <string.h>
 
 /** String.
- * @struct bgen_str
+ * @struct bgen_string
  */
 struct bgen_string
 {
@@ -34,31 +34,31 @@ static inline struct bgen_string const* bgen_string_create(char const* data, siz
 }
 /** Destroy a bgen string.
  *
- * @param bgen_str Bgen string.
+ * @param bgen_string Bgen string.
  */
-static inline void bgen_string_destroy(struct bgen_string const* bgen_str)
+static inline void bgen_string_destroy(struct bgen_string const* bgen_string)
 {
-    if (bgen_str->length > 0)
-        free((char*)bgen_str->data);
-    free((struct bgen_string*)bgen_str);
+    if (bgen_string->length > 0)
+        free((char*)bgen_string->data);
+    free((struct bgen_string*)bgen_string);
 }
 /** Get a pointer to the C string.
  *
- * @param bgen_str Bgen string.
+ * @param bgen_string Bgen string.
  * @return Pointer to the internal C string.
  */
-static inline char const* bgen_string_data(struct bgen_string const* bgen_str)
+static inline char const* bgen_string_data(struct bgen_string const* bgen_string)
 {
-    return bgen_str->data;
+    return bgen_string->data;
 }
 /** Get string length.
  *
- * @param bgen_str Bgen string.
+ * @param bgen_string Bgen string.
  * @return Length.
  */
-static inline size_t bgen_string_length(struct bgen_string const* bgen_str)
+static inline size_t bgen_string_length(struct bgen_string const* bgen_string)
 {
-    return bgen_str->length;
+    return bgen_string->length;
 }
 /** Compare if two bgen strings are equal.
  *

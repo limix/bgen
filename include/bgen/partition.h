@@ -1,3 +1,6 @@
+/** Partition of variants.
+ * @file bgen/partition.h
+ */
 #ifndef BGEN_PARTITION_H
 #define BGEN_PARTITION_H
 

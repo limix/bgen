@@ -1,3 +1,6 @@
+/** Open, close, and query metafile.
+ * @file bgen/metafile.h
+ */
 #ifndef BGEN_METAFILE_H
 #define BGEN_METAFILE_H
 
