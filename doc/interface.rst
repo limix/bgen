@@ -20,11 +20,8 @@ The allocated resources must be released by a subsequent call to
 The function :cpp:func:`bgen_metafile_read_partition` reads the variants metadata in the
 corresponding partition (i.e., names, chromosomes, number of alleles, etc.).
 It returns the read information as an array of type :cpp:type:`bgen_partition`.
-Let ``v`` be such an array.
-The user can, for example, get the name of the i-th variant from
-``v[i].id`` or its genetic position from ``v[i].position``.
 After use, its resources have to be released by calling
-:cpp:func:`bgen_free_partition`.
+:cpp:func:`bgen_partition_destroy`.
 
 To fetch a genotype information, the user has to first get a variant genotype
 handler (:cpp:type:`bgen_genotype`) by calling :cpp:func:`bgen_file_open_genotype`.
