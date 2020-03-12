@@ -49,6 +49,7 @@ jobs:
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/libzlib.dll /c/Windows/system32/
         - cp /c/Program\ Files\ (x86)/athr/bin/libathr.dll /c/Windows/system32/
+        - file /c/Program\ Files\ (x86)/athr/bin/libathr.dll
 addons:
   apt:
     packages:
