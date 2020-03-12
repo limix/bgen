@@ -105,11 +105,11 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
 
                 fprintf(stderr, "Ponto 1\n");
                 e = fscanf(f, "%lf", prob + 0);
-                fprintf(stderr, "Ponto 1.e: %d\n", e);
                 if (e != 1)
                 {
                     perror("fscanf has failed?");
                 }
+                fprintf(stderr, "Ponto 1.e: %d\n", e);
                 if (feof(f))
                     fprintf(stderr, "End of file\n");
                 else
