@@ -34,12 +34,12 @@ uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype)
     return genotype->nalleles;
 }
 
-bool bgen_genotype_missing(struct bgen_genotype const* genotype, uint32_t const index)
+bool bgen_genotype_missing(struct bgen_genotype const* genotype, uint32_t index)
 {
     return genotype->plo_miss[index] >> 7;
 }
 
-uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, uint32_t const index)
+uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, uint32_t index)
 {
     return genotype->plo_miss[index] & 127;
 }

@@ -23,7 +23,7 @@ void bgen_partition_destroy(struct bgen_partition const* partition)
 }
 
 struct bgen_variant const* bgen_partition_get(struct bgen_partition const* partition,
-                                              uint32_t const               index)
+                                              uint32_t                     index)
 {
     return partition->variants_metadata[index];
 }
@@ -33,7 +33,7 @@ uint32_t bgen_partition_nvariants(struct bgen_partition const* partition)
     return partition->nvariants;
 }
 
-struct bgen_partition* bgen_partition_create(uint32_t const nvariants)
+struct bgen_partition* bgen_partition_create(uint32_t nvariants)
 {
     struct bgen_partition* partition = malloc(sizeof(struct bgen_partition));
     partition->variants_metadata = malloc(sizeof(struct bgen_variant*) * nvariants);
@@ -43,7 +43,7 @@ struct bgen_partition* bgen_partition_create(uint32_t const nvariants)
     return partition;
 }
 
-void bgen_partition_set(struct bgen_partition* partition, uint32_t const index,
+void bgen_partition_set(struct bgen_partition* partition, uint32_t index,
                         struct bgen_variant const* variant_metadata)
 {
     partition->variants_metadata[index] = variant_metadata;

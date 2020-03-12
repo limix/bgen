@@ -6,6 +6,8 @@ function(bgen_add_test name)
         COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:${target}>/${name}.tmp
     )
     target_link_libraries(${target} PRIVATE BGEN::bgen)
+    target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
+    target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
     add_test(NAME ${name} COMMAND ${target} -E environment)
 
     # Ugly hacky to make the tests work on Windows.

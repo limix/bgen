@@ -74,7 +74,7 @@ uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvaria
 
 bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
-struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int const verbose)
+struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
 
@@ -132,8 +132,7 @@ err:
     return NULL;
 }
 
-struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen,
-                                              uint64_t const    variant_offset)
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t variant_offset)
 {
     struct bgen_genotype* geno = bgen_genotype_create();
     geno->layout = bgen->layout;

@@ -55,7 +55,7 @@ target_compile_options(warning INTERFACE
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
 # search path.
 include(GenerateExportHeader)
-generate_export_header(bgen)
+generate_export_header(bgen BASE_NAME BGEN)
 
 target_include_directories(bgen
     PUBLIC
@@ -68,7 +68,6 @@ target_include_directories(bgen
 set_target_properties(bgen PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(bgen PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 set_target_properties(bgen PROPERTIES C_STANDARD 99)
-set_target_properties(bgen PROPERTIES DEFINE_SYMBOL "BGEN_EXPORTS")
 target_compile_definitions(bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_definitions(bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_link_libraries(bgen PUBLIC ATHR::athr)

@@ -20,7 +20,7 @@ struct bgen_variant* bgen_variant_create(void)
     return variant;
 }
 
-void bgen_variant_create_alleles(struct bgen_variant* variant, uint16_t const nalleles)
+void bgen_variant_create_alleles(struct bgen_variant* variant, uint16_t nalleles)
 {
     variant->allele_ids = malloc(sizeof(struct bgen_str*) * nalleles);
 
