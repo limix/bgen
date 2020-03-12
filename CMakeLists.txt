@@ -13,7 +13,7 @@ if("${isSystemDir}" STREQUAL "-1")
 endif()
 
 # merge request fix: https://gitlab.kitware.com/cmake/cmake/-/merge_requests/1799
-if(${CMAKE_VERSION} VERSION_GREATER "3.12.0") 
+if(CMAKE_VERSION VERSION_GREATER 3.12.0)
     # Hide things by default
     set(CMAKE_C_VISIBILITY_PRESET hidden)
     set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)

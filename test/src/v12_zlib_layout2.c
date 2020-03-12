@@ -107,17 +107,14 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
                 char* tmp = NULL;
 
                 e = fscanf(f, "%s", string);
-                /* e = fscanf(f, "%lf", prob + 0); */
                 cass_cond(e == 1);
                 prob[0] = strtod(string, &tmp);
 
                 e = fscanf(f, "%s", string);
-                /* e = fscanf(f, "%lf", prob + 1); */
                 cass_cond(e == 1);
                 prob[1] = strtod(string, &tmp);
 
                 e = fscanf(f, "%s", string);
-                /* e = fscanf(f, "%lf", prob + 2); */
                 cass_cond(e == 1);
                 prob[2] = strtod(string, &tmp);
 
