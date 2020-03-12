@@ -27,8 +27,10 @@ jobs:
         - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
-        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
+          'install.bat')" && ./install.bat
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
+          bash
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/zlib.dll /c/Windows/system32/
         - cp /c/Program\ Files/athr/bin/athr.dll /c/Windows/system32/
@@ -44,8 +46,10 @@ jobs:
         - CMAKE_GENERATOR=Ninja
       before_install:
         - choco install ninja zstandard --no-progress -y
-        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')" && ./install.bat
-        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere bash
+        - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
+          'install.bat')" && ./install.bat
+        - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
+          bash
         - cp /c/ProgramData/chocolatey/lib/zstandard/tools/dll/libzstd.dll /c/Windows/system32/
         - cp /c/Program\ Files/zlib/bin/libzlib.dll /c/Windows/system32/
         - cp /c/Program\ Files\ \(x86\)/athr/bin/libathr.dll /c/Windows/system32/
@@ -67,8 +71,10 @@ script:
   - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-config.cmake
   - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-targets-release.cmake
   - test -e $TRAVIS_BUILD_DIR/prefix/lib/cmake/bgen/bgen-targets.cmake
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l $TRAVIS_BUILD_DIR/prefix/lib/libbgen.dylib | grep -q LC_RPATH; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/libbgen.so; fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then otool -l $TRAVIS_BUILD_DIR/prefix/lib/libbgen.dylib
+    | grep -q LC_RPATH; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then test -e $TRAVIS_BUILD_DIR/prefix/lib/libbgen.so;
+    fi
   - cd $TRAVIS_BUILD_DIR
   - git clean -xdfq
   - mkdir build.debug
@@ -78,3 +84,18 @@ script:
   - ctest --output-on-failure -C Debug
   - cd $TRAVIS_BUILD_DIR
   - git clean -xdfq
+notifications:
+  email:
+    recipients:
+      - danilo.horta@pm.me
+    on_success: never
+    on_failure: always
+deploy:
+  provider: releases
+  api_key:
+    secure: Abd3Rfn8/EzSD5z+a+kasb7QlmKTnJJSAMmrmNIDHPSMHZhisxThJR7MPtDaBIhmJqzXuVqFzonZn+xqQrndBKz5DDVwbMDWU9kBMeOyT0tKtf1FbDvP7F7R1z0kZZ1Pw1b9K/v3zU3QiSj1/NEwHL+TGhNZh8AKsRL21h+KXye8GkZW1nI5gEU0YNLHEMU6QYTb0CWlDpF2Z0f/sUCriPigVgHYvQN2jiZLk/y1rgndYwAMMJ6+S3xmXC6kUhNnji5q+eWbgLAE68MqAxFcpf1RpS2iiY9S4TJotBeLfsnZOAgSg6XEt3Plec79anS+5Rw2OVrkuICOsnFaU+79N1h26P3PXf7xZ6S5JZTw2EJfc4DONAHUFxi3LJ9GYap4jipxSLXZPOhZ6GVkSvh6Aj/OuFg4E6N/U9yI51GA5jD4gPukKJOAkEripvK1Q5vykEGz0aCtMVt2iBqz7SbcQ7g1du3GRBk90nhJ7LU9+pYuyY8vqyEGhYN0UwEji2HjxLHkiPHSTPdKCvFTq4PcSm6M32FKerDcSxUcfnZgk+WkZLGjQMWtP5ioaUD0uHC8RwRggUeRnpkfoHEaosg4UQim41gn//Bod41eUnN0iSxoljlL7DNqi4p9eoWehqulyCUmV+EaFMKuA7jtRs1pdlf+ln4N5fKRGNwa+KKZFsQ=
+  on:
+    tags: true
+    repo: limix/bgen
+    branch: master
+    skip_existing: true
