@@ -13,7 +13,7 @@
 struct bgen_partition;
 struct bgen_variant;
 
-/** Destroy a partition.
+/** Destroy a partition by releasing its resources.
  *
  * @param partition Partition of variants metadata.
  */
@@ -22,7 +22,7 @@ BGEN_EXPORT void bgen_partition_destroy(struct bgen_partition const* partition);
  *
  * @param partition Partition of variants metadata.
  * @param index Variant index.
- * @return Variant metadata.
+ * @return Variant metadata. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_variant const* bgen_partition_get(
     struct bgen_partition const* partition, uint32_t index);

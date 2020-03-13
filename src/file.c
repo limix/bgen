@@ -2,6 +2,7 @@
 #include "athr.h"
 #include "bgen/file.h"
 #include "bgen/genotype.h"
+#include "bstring.h"
 #include "free.h"
 #include "genotype.h"
 #include "io.h"
@@ -9,7 +10,6 @@
 #include "layout2.h"
 #include "report.h"
 #include "samples.h"
-#include "bstring.h"
 #include <inttypes.h>
 #include <stdbool.h>
 
@@ -132,18 +132,18 @@ err:
     return NULL;
 }
 
-struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t variant_offset)
+struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t genotype_offset)
 {
     struct bgen_genotype* geno = bgen_genotype_create();
     geno->layout = bgen->layout;
-    geno->offset = variant_offset;
+    geno->offset = genotype_offset;
 
-    if (variant_offset > INT64_MAX) {
+    if (genotype_offset > INT64_MAX) {
         bgen_error("variant offset overflow");
         goto err;
     }
 
-    if (bgen_fseek(bgen_file_stream(bgen), (int64_t)variant_offset, SEEK_SET)) {
+    if (bgen_fseek(bgen_file_stream(bgen), (int64_t)genotype_offset, SEEK_SET)) {
         bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
         goto err;
     }

@@ -2,6 +2,7 @@
 #include "bgen/file.h"
 #include "bgen/variant.h"
 #include "bmath.h"
+#include "bstring.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"
@@ -9,7 +10,6 @@
 #include "metafile_write.h"
 #include "partition.h"
 #include "report.h"
-#include "bstring.h"
 #include <string.h>
 
 static struct bgen_metafile* metafile_alloc(char const* filepath);
@@ -17,7 +17,7 @@ static uint32_t              compute_nvariants(uint32_t nvariants, uint32_t npar
                                                uint32_t partition);
 
 struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file, char const* filepath,
-                                           unsigned npartitions, int verbose)
+                                           uint32_t npartitions, int verbose)
 {
     struct bgen_metafile* metafile = metafile_alloc(filepath);
     metafile->npartitions = npartitions;

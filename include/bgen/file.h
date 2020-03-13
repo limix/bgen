@@ -19,7 +19,7 @@ struct bgen_file;
  * resources after the interaction has finished.
  *
  * @param filepath File path to the bgen file.
- * @return Bgen file handler.
+ * @return Bgen file handler. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_file* bgen_file_open(char const* filepath);
 /** Close bgen file handler.
@@ -41,11 +41,6 @@ BGEN_EXPORT uint32_t bgen_file_nsamples(struct bgen_file const* bgen_file);
 BGEN_EXPORT uint32_t bgen_file_nvariants(struct bgen_file const* bgen_file);
 /** Check if the file contain sample identifications.
  *
- * \rst
- * .. seealso::
- *     Please, refer to the |bgen format specification| for more details.
- * \endrst
- *
  * @param bgen_file Bgen file handler.
  * @return `true` if bgen file contains the sample ids; `false` otherwise.
  */
@@ -54,17 +49,17 @@ BGEN_EXPORT bool bgen_file_contain_samples(struct bgen_file const* bgen_file);
  *
  * @param bgen_file Bgen file handler.
  * @param verbose `1` to show progress; `0` otherwise.
- * @return Sample identifications.
+ * @return Sample identifications. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen_file,
                                                         int               verbose);
 /** Open a variant for genotype queries.
  *
  * @param bgen_file Bgen file handler.
- * @param variant_offset Variant address in the bgen file.
+ * @param genotype_offset Genotype offset obtained from @ref bgen_variant.genotype_offset.
  * @return Variant genotype handler. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen_file,
-                                                          uint64_t          variant_offset);
+                                                          uint64_t          genotype_offset);
 
 #endif

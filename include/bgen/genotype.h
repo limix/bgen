@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-/** Variant genotype.
+/** Variant genotype handler.
  * @struct bgen_genotype
  */
 struct bgen_genotype;

@@ -3,34 +3,32 @@ Interface
 *********
 
 A BGEN file is associated with a :cpp:type:`bgen_file` variable, returned by
-:cpp:func:`bgen_file_open`, and is required by many functions.
-The user can query, for example, the number of samples contained in a BGEN file
-by passing a :cpp:type:`bgen_file` variable to the :cpp:func:`bgen_file_nsamples`
-function.
-The user has to release resources by calling :cpp:func:`bgen_file_close` after its
-use.
+:cpp:func:`bgen_file_open`, and is required by many functions. The user can
+query, for example, the number of samples contained in a BGEN file by passing
+a :cpp:type:`bgen_file` variable to the :cpp:func:`bgen_file_nsamples`
+function. The user has to release resources by calling
+:cpp:func:`bgen_file_close` after its use.
 
 The function :cpp:func:`bgen_file_contain_samples` can be used to detect
-whether the BGEN file contain sample identifications.
-If it does, the function :cpp:func:`bgen_file_read_samples` will return an array
-of sample identifications.
-The allocated resources must be released by a subsequent call to
-:cpp:func:`bgen_samples_destroy`.
+whether the BGEN file contain sample identifications. If it does, the function
+:cpp:func:`bgen_file_read_samples` will return a struct of sample
+identifications. The allocated resources must be released by a subsequent call
+to :cpp:func:`bgen_samples_destroy`.
 
-The function :cpp:func:`bgen_metafile_read_partition` reads the variants metadata in the
-corresponding partition (i.e., names, chromosomes, number of alleles, etc.).
-It returns the read information as an array of type :cpp:type:`bgen_partition`.
-After use, its resources have to be released by calling
-:cpp:func:`bgen_partition_destroy`.
+The function :cpp:func:`bgen_metafile_read_partition` reads the variants
+metadata in the corresponding partition (i.e., names, chromosomes, number of
+alleles, etc.). It returns the read information as an array of type
+:cpp:type:`bgen_partition`. After use, its resources have to be released by
+calling :cpp:func:`bgen_partition_destroy`.
 
 To fetch a genotype information, the user has to first get a variant genotype
-handler (:cpp:type:`bgen_genotype`) by calling :cpp:func:`bgen_file_open_genotype`.
-The number of possible genotypes of a given variant, for example, can then be
-found by a call to :cpp:func:`bgen_genotype_ncombs`.
-The probabilities of each possible genotype can be found by a call to
-:cpp:func:`bgen_genotype_read`.
-After use, the variant genotype handler has to be closed by
-a :cpp:func:`bgen_genotype_close` call.
+handler (:cpp:type:`bgen_genotype`) by calling
+:cpp:func:`bgen_file_open_genotype`. The number of possible genotypes of
+a given variant, for example, can then be found by a call to
+:cpp:func:`bgen_genotype_ncombs`. The probabilities of each possible genotype
+can be found by a call to :cpp:func:`bgen_genotype_read`. After use, the
+variant genotype handler has to be closed by a :cpp:func:`bgen_genotype_close`
+call.
 
 Strings are represented by the :cpp:type:`bgen_string` type, which contains an
 array of characters and its length.

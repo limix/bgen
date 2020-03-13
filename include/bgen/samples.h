@@ -10,7 +10,7 @@
  */
 struct bgen_samples;
 
-/** Destroy samples data.
+/** Destroy samples data by releasing its resources.
  *
  * @param samples Samples data.
  */
@@ -19,9 +19,9 @@ BGEN_EXPORT void bgen_samples_destroy(struct bgen_samples const* samples);
  *
  * @param samples Samples data.
  * @param index Sample index.
- * @return Sample information.
+ * @return Sample information. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_string const* bgen_samples_get(struct bgen_samples const* samples,
-                                                    uint32_t                   index);
+                                                       uint32_t                   index);
 
 #endif

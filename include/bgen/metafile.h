@@ -18,7 +18,7 @@ struct bgen_partition;
 /** Create a bgen metafile.
  *
  * A bgen metafile contains variant metadata (id, rsid, chrom, alleles) and variant
- * addresses. Those variants are divided in partitions.
+ * addresses. Those variants are grouped in partitions.
  *
  * @param bgen_file Bgen file handler.
  * @param filepath File path to the metafile.
@@ -29,7 +29,7 @@ struct bgen_partition;
  */
 BGEN_EXPORT struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file,
                                                        char const*       filepath,
-                                                       unsigned npartitions, int verbose);
+                                                       uint32_t npartitions, int verbose);
 /** Open a bgen metafile.
  *
  * Remember to call @ref bgen_metafile_close to close the file and release
@@ -53,9 +53,12 @@ BGEN_EXPORT uint32_t bgen_metafile_npartitions(struct bgen_metafile const* metaf
 BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafile);
 /** Read a partition of variants.
  *
+ * Remember to call @ref bgen_partition_destroy to release resources after the
+ * interaction has finished.
+ *
  * @param metafile Metafile handler.
  * @param partition Partition index.
- * @return Partition of variants.
+ * @return Partition of variants. Return `NULL` on failure.
  */
 BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
     struct bgen_metafile const* metafile, uint32_t partition);
