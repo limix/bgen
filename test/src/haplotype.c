@@ -38,17 +38,17 @@ void test_haplotype(void)
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(partition != NULL);
 
-    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     cass_cond(bgen_string_equal(BGEN_STRING("RS1"), *vm->rsid));
     cass_cond(vm->nalleles == 2);
 
     for (uint32_t i = 0; i < nvariants; ++i) {
-        vm = bgen_partition_get(partition, i);
+        vm = bgen_partition_get_variant(partition, i);
         cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
         cass_cond(bgen_string_equal(BGEN_STRING("G"), *vm->allele_ids[1]));
     }
 
-    vm = bgen_partition_get(partition, 1);
+    vm = bgen_partition_get_variant(partition, 1);
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
     cass_cond(bgen_genotype_ncombs(vg) == 4);
@@ -68,7 +68,7 @@ void test_haplotype(void)
 
     uint32_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
-        vm = bgen_partition_get(partition, i);
+        vm = bgen_partition_get_variant(partition, i);
         vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
         double* probabilities = malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));

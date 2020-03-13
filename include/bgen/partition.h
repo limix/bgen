@@ -24,7 +24,7 @@ BGEN_EXPORT void bgen_partition_destroy(struct bgen_partition const* partition);
  * @param index Variant index.
  * @return Variant metadata. Return `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_variant const* bgen_partition_get(
+BGEN_EXPORT struct bgen_variant const* bgen_partition_get_variant(
     struct bgen_partition const* partition, uint32_t index);
 /** Get the number of variants.
  *

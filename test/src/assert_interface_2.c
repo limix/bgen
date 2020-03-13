@@ -35,7 +35,7 @@ int main(void)
         bgen, "assert_interface_2.tmp/example.14bits.bgen.metadata", 1, 0);
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
 
-    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     cass_equal_int(vm->position, 2000);
     cass_equal_int(vm->nalleles, 2);
     cass_cond(bgen_string_equal(BGEN_STRING("RSID_2"), *vm->rsid));
@@ -50,7 +50,7 @@ int main(void)
     bgen = bgen_file_open("data/example.14bits.bgen");
     metafile = bgen_metafile_open("assert_interface_2.tmp/example.14bits.bgen.metadata");
     partition = bgen_metafile_read_partition(metafile, 0);
-    vm = bgen_partition_get(partition, 3);
+    vm = bgen_partition_get_variant(partition, 3);
     struct bgen_genotype* genotype = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
     cass_equal_int(bgen_genotype_nalleles(genotype), 2);

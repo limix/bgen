@@ -13,7 +13,7 @@ int main(void)
                                                           1, 0);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
-    struct bgen_variant const*   variant = bgen_partition_get(partition, 99);
+    struct bgen_variant const*   variant = bgen_partition_get_variant(partition, 99);
 
     cass_cond(variant->position == 3037630001);
 

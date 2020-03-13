@@ -34,9 +34,9 @@ void test_complex(void)
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(nvariants == 10);
 
-    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     cass_cond(bgen_string_equal(BGEN_STRING("V1"), *vm->rsid));
-    vm = bgen_partition_get(partition, 9);
+    vm = bgen_partition_get_variant(partition, 9);
     cass_cond(bgen_string_equal(BGEN_STRING("M10"), *vm->rsid));
 
     uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
@@ -49,7 +49,7 @@ void test_complex(void)
 
     uint32_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
-        vm = bgen_partition_get(partition, i);
+        vm = bgen_partition_get_variant(partition, i);
         cass_cond(vm->nalleles == correct_nalleles[i]);
         cass_cond(vm->position == position[i]);
 
@@ -110,7 +110,7 @@ void test_complex(void)
 
     jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
-        vm = bgen_partition_get(partition, i);
+        vm = bgen_partition_get_variant(partition, i);
         struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
         cass_cond(bgen_genotype_phased(vg) == phased[i]);
 

@@ -22,7 +22,7 @@ void bgen_partition_destroy(struct bgen_partition const* partition)
     free_c(partition);
 }
 
-struct bgen_variant const* bgen_partition_get(struct bgen_partition const* partition,
+struct bgen_variant const* bgen_partition_get_variant(struct bgen_partition const* partition,
                                               uint32_t                     index)
 {
     return partition->variants_metadata[index];

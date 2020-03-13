@@ -37,13 +37,13 @@ void test_file(void)
         bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 1, 0);
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
 
-    struct bgen_variant const* vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     cass_cond(bgen_string_equal(BGEN_STRING("V1"), *vm->rsid));
 
-    vm = bgen_partition_get(partition, 9);
+    vm = bgen_partition_get_variant(partition, 9);
     cass_cond(bgen_string_equal(BGEN_STRING("M10"), *vm->rsid));
 
-    vm = bgen_partition_get(partition, 0);
+    vm = bgen_partition_get_variant(partition, 0);
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
     cass_cond(bgen_genotype_nalleles(vg) == 2);
     bgen_genotype_close(vg);
@@ -58,7 +58,7 @@ void test_file(void)
 
     size_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
-        vm = bgen_partition_get(partition, i);
+        vm = bgen_partition_get_variant(partition, i);
         cass_cond(vm->nalleles == correct_nalleles[i]);
         cass_cond(vm->position == position[i]);
         for (int j = 0; j < vm->nalleles; ++j) {
@@ -86,7 +86,7 @@ void test_geno(void)
     cass_cond(bgen_metafile_nvariants(mf) == 10);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
-    struct bgen_variant const*   vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const*   vm = bgen_partition_get_variant(partition, 0);
 
     struct bgen_genotype* vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
@@ -104,7 +104,7 @@ void test_geno(void)
 
     bgen_genotype_close(vg);
 
-    vm = bgen_partition_get(partition, 1);
+    vm = bgen_partition_get_variant(partition, 1);
     vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
     cass_cond(bgen_genotype_nalleles(vg) == 2);
@@ -129,7 +129,7 @@ void test_geno(void)
     for (uint32_t j = 0; j < bgen_metafile_npartitions(mf); ++j) {
         partition = bgen_metafile_read_partition(mf, j);
         for (uint32_t l = 0; l < bgen_partition_nvariants(partition); ++l) {
-            vm = bgen_partition_get(partition, l);
+            vm = bgen_partition_get_variant(partition, l);
             vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
             cass_cond(bgen_genotype_phased(vg) == phased[i]);
             bgen_genotype_close(vg);
@@ -190,7 +190,7 @@ void test_geno(void)
     for (uint32_t j = 0; j < bgen_metafile_npartitions(mf); ++j) {
         partition = bgen_metafile_read_partition(mf, j);
         for (uint32_t l = 0; l < bgen_partition_nvariants(partition); ++l) {
-            vm = bgen_partition_get(partition, l);
+            vm = bgen_partition_get_variant(partition, l);
             vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
             double* probabilities =

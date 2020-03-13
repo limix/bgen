@@ -28,7 +28,7 @@ void test_zeo_len_chrom_id(void)
     cass_cond(mf != NULL);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
-    struct bgen_variant const*   vm = bgen_partition_get(partition, 0);
+    struct bgen_variant const*   vm = bgen_partition_get_variant(partition, 0);
     cass_cond(vm != NULL);
     cass_cond(bgen_partition_nvariants(partition) == 25);
     cass_cond(bgen_string_equal(BGEN_STRING(""), *vm->chrom));

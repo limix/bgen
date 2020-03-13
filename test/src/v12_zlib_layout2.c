@@ -58,17 +58,17 @@ void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     cass_cond(bgen_partition_nvariants(partition) == 67);
-    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_2"), *bgen_partition_get(partition, 0)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_2"), *bgen_partition_get_variant(partition, 0)->id));
     bgen_partition_destroy(partition);
 
     partition = bgen_metafile_read_partition(metafile, 1);
     cass_cond(bgen_partition_nvariants(partition) == 67);
-    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_74"), *bgen_partition_get(partition, 5)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_74"), *bgen_partition_get_variant(partition, 5)->id));
     bgen_partition_destroy(partition);
 
     partition = bgen_metafile_read_partition(metafile, 2);
     cass_cond(bgen_partition_nvariants(partition) == 65);
-    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_196"), *bgen_partition_get(partition, 60)->id));
+    cass_cond(bgen_string_equal(BGEN_STRING("SNPID_196"), *bgen_partition_get_variant(partition, 60)->id));
     bgen_partition_destroy(partition);
 }
 
@@ -89,7 +89,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
     for (uint32_t part = 0; part < bgen_metafile_npartitions(metafile); ++part) {
         struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, part);
         for (ii = 0; ii < bgen_partition_nvariants(partition); ++ii, ++i) {
-            struct bgen_variant const* vm = bgen_partition_get(partition, ii);
+            struct bgen_variant const* vm = bgen_partition_get_variant(partition, ii);
             struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
             cass_cond(bgen_genotype_max_ploidy(vg) == 2);
