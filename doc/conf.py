@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+from datetime import datetime
 import os
 import subprocess
 import sys
@@ -21,7 +22,7 @@ templates_path = ["_templates"]
 source_suffix = ".rst"
 master_doc = "index"
 project = "bgen"
-copyright = "2017, Danilo Horta"
+copyright = f"2017-{datetime.now().year}, Danilo Horta"
 author = "Danilo Horta"
 release = version
 language = "en"
