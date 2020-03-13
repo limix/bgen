@@ -9,7 +9,7 @@ struct bgen_string const* bgen_string_fread(FILE* stream, size_t length_size)
     uint64_t length = 0;
 
     if (fread(&length, 1, length_size, stream) < length_size) {
-        bgen_perror("error while freading a string length");
+        /* we wont print error here because we might instead have reached end-of-file */
         return NULL;
     }
 

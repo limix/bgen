@@ -40,6 +40,7 @@ bgen_add_test(assert_interface_3)
 bgen_add_test(assert_interface_3_complex)
 bgen_add_test(wrong_bgen_files)
 bgen_add_test(wrong_metadata_files)
+bgen_add_test(variant_position_overflow)
 
 bgen_copy(example.matrix)
 bgen_copy(example.1bits.bgen)
@@ -60,3 +61,5 @@ bgen_copy(complex.23bits.bgen)
 
 bgen_copy(random.bgen)
 bgen_copy(random.bgen.metadata)
+
+bgen_copy(roundtrip1.bgen)

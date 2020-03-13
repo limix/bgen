@@ -1,10 +1,10 @@
 #include "bgen/variant.h"
 #include "bgen/bstring.h"
+#include "bstring.h"
 #include "file.h"
 #include "free.h"
 #include "io.h"
 #include "report.h"
-#include "bstring.h"
 #include "variant.h"
 
 struct bgen_variant* bgen_variant_create(void)
@@ -41,40 +41,54 @@ struct bgen_variant* bgen_variant_begin(struct bgen_file* bgen_file, int* error)
 
 struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
 {
-    struct bgen_variant* vm = bgen_variant_create();
     *error = 0;
 
-    if (feof(bgen_file_stream(bgen_file)))
-        return NULL;
+    struct bgen_variant* v = bgen_variant_create();
 
     if (bgen_file_layout(bgen_file) == 1) {
         if (bgen_fseek(bgen_file_stream(bgen_file), 4, SEEK_CUR))
             goto err;
     }
-
-    if ((vm->id = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if (bgen_file_layout(bgen_file) != 2) {
+        bgen_error("unknown layout %d", bgen_file_layout(bgen_file));
         goto err;
+    }
 
-    if ((vm->rsid = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if ((v->id = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL) {
+        if (feof(bgen_file_stream(bgen_file))) {
+            bgen_variant_destroy(v);
+            return NULL;
+        }
+        bgen_error("could not read variant id");
         goto err;
+    }
 
-    if ((vm->chrom = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL)
+    if ((v->rsid = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL) {
+        bgen_error("could not read variant rsid");
         goto err;
+    }
 
-    if (fread_ui32(bgen_file_stream(bgen_file), &vm->position, 4))
+    if ((v->chrom = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL) {
+        bgen_error("could not read variant chrom");
         goto err;
+    }
+
+    if (fread_ui32(bgen_file_stream(bgen_file), &v->position, 4)) {
+        bgen_error("could not read variant position");
+        goto err;
+    }
 
     if (bgen_file_layout(bgen_file) == 1)
-        vm->nalleles = 2;
-    else if (fread_ui16(bgen_file_stream(bgen_file), &vm->nalleles, 2))
+        v->nalleles = 2;
+    else if (fread_ui16(bgen_file_stream(bgen_file), &v->nalleles, 2))
         goto err;
 
-    vm->allele_ids = malloc(vm->nalleles * sizeof(struct bgen_string*));
-    for (uint16_t i = 0; i < vm->nalleles; ++i)
-        vm->allele_ids[i] = NULL;
+    v->allele_ids = malloc(v->nalleles * sizeof(struct bgen_string*));
+    for (uint16_t i = 0; i < v->nalleles; ++i)
+        v->allele_ids[i] = NULL;
 
-    for (uint16_t i = 0; i < vm->nalleles; ++i) {
-        if ((vm->allele_ids[i] = bgen_string_fread(bgen_file_stream(bgen_file), 4)) == NULL)
+    for (uint16_t i = 0; i < v->nalleles; ++i) {
+        if ((v->allele_ids[i] = bgen_string_fread(bgen_file_stream(bgen_file), 4)) == NULL)
             goto err;
     }
 
@@ -83,7 +97,7 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
         bgen_perror("could not ftell");
         goto err;
     }
-    vm->genotype_offset = (uint64_t)offset;
+    v->genotype_offset = (uint64_t)offset;
 
     uint32_t length = 0;
     if (fread_ui32(bgen_file_stream(bgen_file), &length, 4))
@@ -94,9 +108,9 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
         goto err;
     }
 
-    return vm;
+    return v;
 err:
-    bgen_variant_destroy(vm);
+    bgen_variant_destroy(v);
     *error = 1;
     return NULL;
 }

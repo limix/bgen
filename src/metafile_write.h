@@ -81,7 +81,7 @@ static int write_metafile_metadata_block(FILE* stream, uint64_t* poffset, uint32
     int    end = 0;
     int    error = 0;
     for (struct bgen_variant* vm = bgen_variant_begin(bgen, &error);
-         vm != bgen_variant_end(bgen); vm = bgen_variant_next(bgen, &error)) {
+         error == 0 && vm != bgen_variant_end(bgen); vm = bgen_variant_next(bgen, &error)) {
 
         if (error)
             goto err;
