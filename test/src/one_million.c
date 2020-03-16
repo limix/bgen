@@ -65,7 +65,7 @@ void test_3_partition(void)
 
     struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
-                                                          "roundtrip1.bgen.metafile2",
+                                                          "roundtrip1.bgen.metafile3",
                                                           3, 0);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 2);
@@ -87,7 +87,7 @@ void test_100_partition(void)
 
     struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
-                                                          "roundtrip1.bgen.metafile2",
+                                                          "roundtrip1.bgen.metafile100",
                                                           100, 0);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 99);
