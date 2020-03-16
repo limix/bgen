@@ -32,6 +32,7 @@ add_library(bgen
     src/layout1.c
     src/layout2.c
     src/metafile.c
+    src/metafile_04.c
     src/report.c
     src/samples.c
     src/variant.c

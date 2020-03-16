@@ -78,7 +78,7 @@ DEFINE_TYPE_FREAD(int16_t, i16)
         if (fwrite(&value, size, 1, fp) != 1) {                                               \
                                                                                               \
             if (feof(fp))                                                                     \
-                bgen_error("error reading file (unexpected end of file)");                    \
+                bgen_error("error writing file (unexpected end of file)");                    \
             else                                                                              \
                 bgen_perror("error writing file");                                            \
                                                                                               \

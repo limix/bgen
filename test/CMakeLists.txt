@@ -41,6 +41,7 @@ bgen_add_test(assert_interface_3_complex)
 bgen_add_test(wrong_bgen_files)
 bgen_add_test(wrong_metadata_files)
 bgen_add_test(variant_position_overflow)
+bgen_add_test(create_metafile_04)
 
 bgen_copy(example.matrix)
 bgen_copy(example.1bits.bgen)
