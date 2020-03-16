@@ -126,7 +126,6 @@ static int write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
         /* true for the first variant of every partition */
         if (i % part_size == 0) {
             poffset[j] = curr_offset;
-            bgen_error("curr_offset: %lld\n", curr_offset);
             ++j;
         }
 
