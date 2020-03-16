@@ -99,4 +99,3 @@ void test_100_partition(void)
     bgen_metafile_close(metafile);
     bgen_file_close(bgen_file);
 }
-
