@@ -45,4 +45,6 @@ struct bgen_metafile_04
     uint64_t* partition_offset; /**< Array of partition offsets */
 };
 
+uint32_t bgen_metafile_04_partition_size(uint32_t nvariants, uint32_t npartitions);
+
 #endif

@@ -23,8 +23,6 @@ static uint64_t write_variant_04(FILE* stream, const struct bgen_variant* varian
         return 0;
     }
 
-    /* bgen_error("writing id: %.*s", bgen_string_length(variant->id),
-     * bgen_string_data(variant->id)); */
     if (bgen_string_fwrite(variant->id, stream, 2))
         return 0;
 
@@ -89,7 +87,6 @@ static int write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
                                             uint32_t npartitions, uint32_t nvariants,
                                             struct bgen_file* bgen, int verbose)
 {
-
     struct athr* at = NULL;
     if (verbose) {
         at = athr_create((long)nvariants, "Writing variants", ATHR_BAR | ATHR_ETA);
@@ -109,7 +106,7 @@ static int write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
     }
     uint64_t curr_offset = (uint64_t)ftold;
 
-    uint32_t part_size = ceildiv_uint32(nvariants, npartitions);
+    uint32_t part_size = bgen_metafile_04_partition_size(nvariants, npartitions);
     for (struct bgen_variant* variant = bgen_variant_begin(bgen, &error);
          variant != bgen_variant_end(bgen); variant = bgen_variant_next(bgen, &error)) {
 
