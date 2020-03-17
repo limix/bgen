@@ -53,7 +53,7 @@ err:
     return 1;
 }
 
-int bgen_unzlib_chunked(const char* src, size_t src_size, char** dst, size_t* dst_size)
+int bgen_unzlib_chunked(char const* src, size_t src_size, char** dst, size_t* dst_size)
 {
     if (*dst_size > UINT_MAX) {
         bgen_error("zlib *dst_size overflow");
@@ -74,7 +74,7 @@ int bgen_unzlib_chunked(const char* src, size_t src_size, char** dst, size_t* ds
     }
 
     strm.avail_in = (unsigned)src_size;
-    strm.next_in = (unsigned char*)src;
+    strm.next_in = (unsigned char const*)src;
 
     while (1) {
         strm.avail_out = unused;
