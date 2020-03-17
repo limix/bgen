@@ -56,17 +56,10 @@ static uint64_t write_variant_04(FILE* stream, const struct bgen_variant* varian
 
 static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t npartitions)
 {
-    char const* name = BGEN_METAFILE_04_NAME;
+    char const name[] = BGEN_METAFILE_04_SIGNATURE;
 
     if (fwrite(name, strlen(name), 1, stream) != 1) {
-        bgen_perror("could not write name");
-        return 1;
-    }
-
-    char const* version = BGEN_METAFILE_04_VERSION;
-
-    if (fwrite(version, strlen(version), 1, stream) != 1) {
-        bgen_perror("could not write version");
+        bgen_perror("could not write signature");
         return 1;
     }
 

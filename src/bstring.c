@@ -4,14 +4,12 @@
 #include "report.h"
 #include <inttypes.h>
 
-struct bgen_string const* bgen_string_fread(FILE* stream, size_t length_size)
+struct bgen_string const* bgen_string_fread(FILE* restrict stream, size_t length_size)
 {
     uint64_t length = 0;
 
-    if (fread(&length, 1, length_size, stream) < length_size) {
-        /* we wont print error here because we might instead have reached end-of-file */
+    if (fread(&length, 1, length_size, stream) < length_size)
         return NULL;
-    }
 
     if (length == 0)
         return bgen_string_create(NULL, 0);
@@ -19,10 +17,6 @@ struct bgen_string const* bgen_string_fread(FILE* stream, size_t length_size)
     char* data = malloc(sizeof(char) * length);
 
     if (fread(data, 1, length, stream) < length) {
-        if (ferror(stream))
-            bgen_perror("error while freading a string str");
-        else
-            bgen_error("unexpected end of file while reading a string");
         free_c(data);
         return NULL;
     }

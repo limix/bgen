@@ -1,28 +1,27 @@
 /** Create and query a metafile.
- * @file bgen/metafile.h
+ * @file bgen/metafile_04.h
  *
  * A bgen metafile is defined as follows:
  *
- * [ char[11] : name (e.g. "bgen index ") ],        \
- * [ char[2] : version (e.g. "04") ],              | Header block
- * [ uint32_t : number of variants ],              |
- * [ uint32_t : number of partitions ],            /
- * [                                               \
- *   [                                             |
- *     uint64_t : partition offset (this file)     | Offsets block
- *   ], ...                                        |
- * ]                                               /
- * [                                               \
- *   uint64_t        : genotype offset (bgen file) |
- *   uint16_t, str,  : variant id                  |
- *   uint16_t, str,  : variant rsid                |
- *   uint16_t, str,  : variant chrom               |
- *   uint32_t,       : genetic position            | Metadata block
- *   uint16_t,       : number of alleles           |
- *   [                                             |
- *     uint32_t, str : allele id                   |
- *   ], ...                                        |
- * ], ...                                          /
+ * [ char[13] : signature (e.g. "bgen index 04") ], \
+ * [ uint32_t : number of variants ],               | Header block
+ * [ uint32_t : number of partitions ],             /
+ * [                                                \
+ *   [                                              |
+ *     uint64_t : partition offset (this file)      | Offsets block
+ *   ], ...                                         |
+ * ]                                                /
+ * [                                                \
+ *   uint64_t        : genotype offset (bgen file)  |
+ *   uint16_t, str,  : variant id                   |
+ *   uint16_t, str,  : variant rsid                 |
+ *   uint16_t, str,  : variant chrom                |
+ *   uint32_t,       : genetic position             | Metadata block
+ *   uint16_t,       : number of alleles            |
+ *   [                                              |
+ *     uint32_t, str : allele id                    |
+ *   ], ...                                         |
+ * ], ...                                           /
  *
  * Version 04.
  */
@@ -32,8 +31,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#define BGEN_METAFILE_04_NAME "bgen index "
-#define BGEN_METAFILE_04_VERSION "04"
+#define BGEN_METAFILE_04_SIGNATURE "bgen index 04"
 #define BGEN_METAFILE_04_HEADER_SIZE (13 + 4 + 4)
 
 struct bgen_metafile_04
