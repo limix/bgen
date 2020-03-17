@@ -11,7 +11,7 @@ struct bgen_file;
 /** Metafile handler.
  * @struct bgen_metafile_04
  */
-struct bgen_metafile_04;
+struct bgen_metafile;
 struct bgen_variant;
 struct bgen_partition;
 
@@ -27,7 +27,7 @@ struct bgen_partition;
  * @param verbose `1` for showing progress; `0` otherwise.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
+BGEN_EXPORT struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file,
                                                        char const*       filepath,
                                                        uint32_t npartitions, int verbose);
 /** Open a bgen metafile.
@@ -38,19 +38,19 @@ BGEN_EXPORT struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* b
  * @param filepath File path to the metafile.
  * @return Metafile handler. `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath);
+BGEN_EXPORT struct bgen_metafile* bgen_metafile_open(char const* filepath);
 /** Get the number of partitions.
  *
  * @param metafile Metafile handler.
  * @return Number of partitions.
  */
-BGEN_EXPORT uint32_t bgen_metafile_npartitions_04(struct bgen_metafile_04 const* metafile);
+BGEN_EXPORT uint32_t bgen_metafile_npartitions(struct bgen_metafile const* metafile);
 /** Get the number of variants.
  *
  * @param metafile Metafile handler.
  * @return Number of variants.
  */
-BGEN_EXPORT uint32_t bgen_metafile_nvariants_04(struct bgen_metafile_04 const* metafile);
+BGEN_EXPORT uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafile);
 /** Read a partition of variants.
  *
  * Remember to call @ref bgen_partition_destroy to release resources after the
@@ -60,13 +60,13 @@ BGEN_EXPORT uint32_t bgen_metafile_nvariants_04(struct bgen_metafile_04 const* m
  * @param partition Partition index.
  * @return Partition of variants. Return `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition_04(
-    struct bgen_metafile_04 const* metafile, uint32_t partition);
+BGEN_EXPORT struct bgen_partition const* bgen_metafile_read_partition(
+    struct bgen_metafile const* metafile, uint32_t partition);
 /** Close a metafile handler.
  *
  * @param metafile Metafile handler.
  * @return `0` on success; `1` otherwise.
  */
-BGEN_EXPORT int bgen_metafile_close_04(struct bgen_metafile_04 const* metafile);
+BGEN_EXPORT int bgen_metafile_close(struct bgen_metafile const* metafile);
 
 #endif

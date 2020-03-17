@@ -11,5 +11,5 @@ int main(void)
 
 void test_corrupted_metafile_file(void)
 {
-    cass_cond(bgen_metafile_open_04("data/wrong.metafile") == NULL);
+    cass_cond(bgen_metafile_open("data/wrong.metafile") == NULL);
 }

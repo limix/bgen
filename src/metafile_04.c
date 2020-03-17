@@ -13,15 +13,14 @@
 #include "report.h"
 #include <string.h>
 
-static struct bgen_metafile_04* metafile_alloc_04(char const* filepath);
-static uint32_t                 compute_nvariants_04(uint32_t nvariants, uint32_t npartitions,
-                                                     uint32_t partition);
+static struct bgen_metafile* metafile_alloc(char const* filepath);
+static uint32_t              compute_nvariants(uint32_t nvariants, uint32_t npartitions,
+                                               uint32_t partition);
 
-struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
-                                                 char const* filepath, uint32_t npartitions,
-                                                 int verbose)
+struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file, char const* filepath,
+                                           uint32_t npartitions, int verbose)
 {
-    struct bgen_metafile_04* metafile = metafile_alloc_04(filepath);
+    struct bgen_metafile* metafile = metafile_alloc(filepath);
     metafile->npartitions = npartitions;
     metafile->nvariants = bgen_file_nvariants(bgen_file);
 
@@ -38,8 +37,8 @@ struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
     metafile->partition_offset = malloc(sizeof(uint64_t) * npartitions);
 
     uint64_t metadata_block_size =
-        write_metafile_metadata_block_04(metafile->stream, metafile->partition_offset,
-                                         npartitions, metafile->nvariants, bgen_file, verbose);
+        write_metafile_metadata_block(metafile->stream, metafile->partition_offset,
+                                      npartitions, metafile->nvariants, bgen_file, verbose);
 
     if (metadata_block_size == 0)
         goto err;
@@ -47,12 +46,12 @@ struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
     metafile->metadata_block_size = metadata_block_size;
     rewind(metafile->stream);
 
-    if (write_metafile_header_04(metafile->stream, metafile->nvariants, npartitions,
-                                 metafile->metadata_block_size))
+    if (write_metafile_header(metafile->stream, metafile->nvariants, npartitions,
+                              metafile->metadata_block_size))
         goto err;
 
-    if (write_metafile_offsets_block_04(metafile->stream, npartitions,
-                                        metafile->partition_offset))
+    if (write_metafile_offsets_block(metafile->stream, npartitions,
+                                     metafile->partition_offset))
         goto err;
 
     if (fflush(metafile->stream)) {
@@ -62,13 +61,13 @@ struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
 
     return metafile;
 err:
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     return NULL;
 }
 
-struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
+struct bgen_metafile* bgen_metafile_open(char const* filepath)
 {
-    struct bgen_metafile_04* metafile = metafile_alloc_04(filepath);
+    struct bgen_metafile* metafile = metafile_alloc(filepath);
 
     if (!(metafile->stream = fopen(metafile->filepath, "rb"))) {
         bgen_perror("could not open %s", metafile->filepath);
@@ -116,22 +115,22 @@ struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
 
     return metafile;
 err:
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     return NULL;
 }
 
-uint32_t bgen_metafile_npartitions_04(struct bgen_metafile_04 const* metafile)
+uint32_t bgen_metafile_npartitions(struct bgen_metafile const* metafile)
 {
     return metafile->npartitions;
 }
 
-uint32_t bgen_metafile_nvariants_04(struct bgen_metafile_04 const* metafile)
+uint32_t bgen_metafile_nvariants(struct bgen_metafile const* metafile)
 {
     return metafile->nvariants;
 }
 
-struct bgen_partition const* bgen_metafile_read_partition_04(
-    struct bgen_metafile_04 const* metafile, uint32_t partition)
+struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile const* metafile,
+                                                          uint32_t partition)
 {
     FILE* stream = metafile->stream;
     char* block = NULL;
@@ -142,7 +141,7 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
     }
 
     uint32_t const nvariants =
-        compute_nvariants_04(metafile->nvariants, metafile->npartitions, partition);
+        compute_nvariants(metafile->nvariants, metafile->npartitions, partition);
 
     struct bgen_partition* part = bgen_partition_create(nvariants);
 
@@ -198,7 +197,7 @@ err:
     return NULL;
 }
 
-int bgen_metafile_close_04(struct bgen_metafile_04 const* metafile)
+int bgen_metafile_close(struct bgen_metafile const* metafile)
 {
     free_c(metafile->filepath);
     if (metafile->stream && fclose(metafile->stream)) {
@@ -210,23 +209,22 @@ int bgen_metafile_close_04(struct bgen_metafile_04 const* metafile)
     return 0;
 }
 
-uint32_t bgen_metafile_04_partition_size(uint32_t nvariants, uint32_t npartitions)
+uint32_t bgen_metafile_partition_size(uint32_t nvariants, uint32_t npartitions)
 {
     return ceildiv_uint32(nvariants, npartitions);
 }
 
-static struct bgen_metafile_04* metafile_alloc_04(char const* filepath)
+static struct bgen_metafile* metafile_alloc(char const* filepath)
 {
-    struct bgen_metafile_04* metafile = malloc(sizeof(struct bgen_metafile_04));
+    struct bgen_metafile* metafile = malloc(sizeof(struct bgen_metafile));
     metafile->filepath = strdup(filepath);
     metafile->stream = NULL;
     metafile->partition_offset = NULL;
     return metafile;
 }
 
-static uint32_t compute_nvariants_04(uint32_t nvariants, uint32_t npartitions,
-                                     uint32_t partition)
+static uint32_t compute_nvariants(uint32_t nvariants, uint32_t npartitions, uint32_t partition)
 {
-    uint32_t size = bgen_metafile_04_partition_size(nvariants, npartitions);
+    uint32_t size = bgen_metafile_partition_size(nvariants, npartitions);
     return min_uint32(size, nvariants - size * partition);
 }

@@ -14,7 +14,7 @@
 #include <string.h>
 
 /* Write variant genotype to file and return the block size. */
-static uint64_t write_variant_04(FILE* stream, const struct bgen_variant* variant)
+static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
 {
     int64_t start = bgen_ftell(stream);
 
@@ -54,7 +54,7 @@ static uint64_t write_variant_04(FILE* stream, const struct bgen_variant* varian
     return (uint64_t)(stop - start);
 }
 
-static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t npartitions,
+static int write_metafile_header(FILE* stream, uint32_t nvariants, uint32_t npartitions,
                                     uint64_t metadata_block_size)
 {
     char const name[] = BGEN_METAFILE_04_SIGNATURE;
@@ -82,7 +82,7 @@ static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t n
     return 0;
 }
 
-static uint64_t write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
+static uint64_t write_metafile_metadata_block(FILE* stream, uint64_t* poffset,
                                                  uint32_t npartitions, uint32_t nvariants,
                                                  struct bgen_file* bgen, int verbose)
 {
@@ -105,7 +105,7 @@ static uint64_t write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset
     }
     uint64_t curr_offset = (uint64_t)ftold;
 
-    uint32_t part_size = bgen_metafile_04_partition_size(nvariants, npartitions);
+    uint32_t part_size = bgen_metafile_partition_size(nvariants, npartitions);
     for (struct bgen_variant* variant = bgen_variant_begin(bgen, &error);
          variant != bgen_variant_end(bgen); variant = bgen_variant_next(bgen, &error)) {
 
@@ -114,7 +114,7 @@ static uint64_t write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset
             goto err;
         }
 
-        uint64_t size = write_variant_04(stream, variant);
+        uint64_t size = write_variant(stream, variant);
 
         if (size == 0)
             goto err;
@@ -141,7 +141,7 @@ err:
     return 0;
 }
 
-static int write_metafile_offsets_block_04(FILE* stream, uint32_t npartitions,
+static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions,
                                            uint64_t* poffset)
 {
     if (fwrite(poffset, sizeof(uint64_t) * npartitions, 1, stream) != 1) {

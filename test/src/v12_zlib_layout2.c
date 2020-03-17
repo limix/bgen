@@ -9,10 +9,10 @@ unsigned    get_example_precision(size_t i);
 unsigned    get_nexamples(void);
 unsigned    ipow(unsigned base, unsigned exp);
 void        test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
-                               struct bgen_metafile_04* metafile);
-void        test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile_04* metafile,
+                               struct bgen_metafile* metafile);
+void        test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metafile,
                                     uint32_t nsamples, unsigned prec);
-void test_read(struct bgen_file* bgen, struct bgen_metafile_04* metafile, unsigned precision);
+void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned precision);
 
 int main(void)
 {
@@ -22,11 +22,11 @@ int main(void)
         unsigned    prec = get_example_precision(i);
 
         struct bgen_file*        bgen = bgen_file_open(ex);
-        struct bgen_metafile_04* mf = bgen_metafile_open_04(ix);
+        struct bgen_metafile* mf = bgen_metafile_open(ix);
 
         test_read(bgen, mf, prec);
 
-        cass_cond(bgen_metafile_close_04(mf) == 0);
+        cass_cond(bgen_metafile_close(mf) == 0);
         bgen_file_close(bgen);
     }
 
@@ -49,33 +49,33 @@ unsigned ipow(unsigned base, unsigned exp)
 }
 
 void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
-                        struct bgen_metafile_04* metafile)
+                        struct bgen_metafile* metafile)
 {
     cass_cond(bgen_file_nsamples(bgen) == 500);
     cass_cond(bgen_file_nvariants(bgen) == 199);
     cass_cond(bgen_string_equal(BGEN_STRING("sample_001"), *bgen_samples_get(samples, 0)));
     cass_cond(bgen_string_equal(BGEN_STRING("sample_500"), *bgen_samples_get(samples, 499)));
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     cass_cond(bgen_partition_nvariants(partition) == 67);
     cass_cond(bgen_string_equal(BGEN_STRING("SNPID_2"),
                                 *bgen_partition_get_variant(partition, 0)->id));
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition_04(metafile, 1);
+    partition = bgen_metafile_read_partition(metafile, 1);
     cass_cond(bgen_partition_nvariants(partition) == 67);
     cass_cond(bgen_string_equal(BGEN_STRING("SNPID_74"),
                                 *bgen_partition_get_variant(partition, 5)->id));
     bgen_partition_destroy(partition);
 
-    partition = bgen_metafile_read_partition_04(metafile, 2);
+    partition = bgen_metafile_read_partition(metafile, 2);
     cass_cond(bgen_partition_nvariants(partition) == 65);
     cass_cond(bgen_string_equal(BGEN_STRING("SNPID_196"),
                                 *bgen_partition_get_variant(partition, 60)->id));
     bgen_partition_destroy(partition);
 }
 
-void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile_04* metafile,
+void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metafile,
                              uint32_t nsamples, unsigned prec)
 {
     double prob[3];
@@ -89,9 +89,9 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile_04* me
 
     uint32_t ii = 0;
     i = 0;
-    for (uint32_t part = 0; part < bgen_metafile_npartitions_04(metafile); ++part) {
+    for (uint32_t part = 0; part < bgen_metafile_npartitions(metafile); ++part) {
         struct bgen_partition const* partition =
-            bgen_metafile_read_partition_04(metafile, part);
+            bgen_metafile_read_partition(metafile, part);
         for (ii = 0; ii < bgen_partition_nvariants(partition); ++ii, ++i) {
             struct bgen_variant const* vm = bgen_partition_get_variant(partition, ii);
             struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
@@ -144,7 +144,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile_04* me
     fclose(f);
 }
 
-void test_read(struct bgen_file* bgen, struct bgen_metafile_04* metafile, unsigned precision)
+void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned precision)
 {
     struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
     test_read_metadata(bgen, samples, metafile);

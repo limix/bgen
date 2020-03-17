@@ -28,10 +28,10 @@ void test_complex(void)
 
     bgen_samples_destroy(samples);
 
-    struct bgen_metafile_04* mf =
-        bgen_metafile_create_04(bgen, "complex.tmp/complex.23bits.bgen.metafile", 1, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "complex.tmp/complex.23bits.bgen.metafile", 1, 0);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
     cass_cond(nvariants == 10);
 
     struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
@@ -135,6 +135,6 @@ void test_complex(void)
     }
 
     bgen_partition_destroy(partition);
-    cass_cond(bgen_metafile_close_04(mf) == 0);
+    cass_cond(bgen_metafile_close(mf) == 0);
     bgen_file_close(bgen);
 }

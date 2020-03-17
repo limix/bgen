@@ -21,18 +21,18 @@ void test_1_partition(void)
 
     cass_cond(bgen_file_nvariants(bgen_file) == 100);
 
-    struct bgen_metafile_04* metafile = bgen_metafile_create_04(bgen_file,
+    struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
                                                           "roundtrip1.bgen.metafile1",
                                                           1, 0);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     struct bgen_variant const*   variant = bgen_partition_get_variant(partition, 99);
 
     cass_cond(variant->position == 3037630001);
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen_file);
 }
 
@@ -42,18 +42,18 @@ void test_2_partition(void)
 
     cass_cond(bgen_file_nvariants(bgen_file) == 100);
 
-    struct bgen_metafile_04* metafile = bgen_metafile_create_04(bgen_file,
+    struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
                                                           "roundtrip1.bgen.metafile2",
                                                           2, 0);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
     struct bgen_variant const*   variant = bgen_partition_get_variant(partition, 24);
 
     cass_cond(variant->position == 762630001);
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen_file);
 }
 
@@ -63,19 +63,19 @@ void test_3_partition(void)
 
     cass_cond(bgen_file_nvariants(bgen_file) == 100);
 
-    struct bgen_metafile_04* metafile = bgen_metafile_create_04(bgen_file,
+    struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
                                                           "roundtrip1.bgen.metafile3",
                                                           3, 0);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 2);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 2);
     cass_cond(bgen_partition_nvariants(partition) == 32);
 
     struct bgen_variant const*   variant = bgen_partition_get_variant(partition, 31);
     cass_cond(variant->position == 3037630001);
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen_file);
 }
 
@@ -85,17 +85,17 @@ void test_100_partition(void)
 
     cass_cond(bgen_file_nvariants(bgen_file) == 100);
 
-    struct bgen_metafile_04* metafile = bgen_metafile_create_04(bgen_file,
+    struct bgen_metafile* metafile = bgen_metafile_create(bgen_file,
                                                           "one_million.tmp/"
                                                           "roundtrip1.bgen.metafile100",
                                                           100, 0);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 99);
+    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 99);
     struct bgen_variant const*   variant = bgen_partition_get_variant(partition, 0);
 
     cass_cond(variant->position == 3037630001);
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close_04(metafile);
+    bgen_metafile_close(metafile);
     bgen_file_close(bgen_file);
 }

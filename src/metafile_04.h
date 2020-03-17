@@ -35,7 +35,7 @@
 #define BGEN_METAFILE_04_SIGNATURE "bgen index 04"
 #define BGEN_METAFILE_04_HEADER_SIZE (13 + 4 + 4 + 8)
 
-struct bgen_metafile_04
+struct bgen_metafile
 {
     char*     filepath;
     FILE*     stream;
@@ -45,6 +45,6 @@ struct bgen_metafile_04
     uint64_t* partition_offset; /**< Array of partition offsets */
 };
 
-uint32_t bgen_metafile_04_partition_size(uint32_t nvariants, uint32_t npartitions);
+uint32_t bgen_metafile_partition_size(uint32_t nvariants, uint32_t npartitions);
 
 #endif
