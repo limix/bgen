@@ -35,8 +35,9 @@ struct bgen_file* bgen_file_open(char const* filepath)
     if (bgen == NULL)
         return NULL;
 
-    if (fread_i64(bgen->stream, &bgen->variants_start, 4)) {
-        bgen_error("could not read the `variants_start` field");
+    bgen->variants_start = 0;
+    if (fread(&bgen->variants_start, 4, 1, bgen->stream) != 1) {
+        bgen_perror_eof(bgen->stream, "could not read the `variants_start` field");
         goto err;
     }
 
@@ -224,22 +225,22 @@ static int read_bgen_header(struct bgen_file* bgen)
     uint32_t magic_number;
     uint32_t flags;
 
-    if (fread_ui32(bgen->stream, &header_length, 4)) {
-        bgen_error("could not read header length");
+    if (fread(&header_length, sizeof(header_length), 1, bgen->stream) != 1) {
+        bgen_perror_eof(bgen->stream, "could not read header length");
         return 1;
     }
 
-    if (fread_ui32(bgen->stream, &bgen->nvariants, 4)) {
+    if (fread(&bgen->nvariants, sizeof(bgen->nvariants), 1, bgen->stream) != 1) {
         bgen_error("could not read number of variants");
         return 1;
     }
 
-    if (fread_ui32(bgen->stream, &bgen->nsamples, 4)) {
+    if (fread(&bgen->nsamples, sizeof(bgen->nsamples), 1, bgen->stream) != 1) {
         bgen_error("could not read number of samples");
         return 1;
     }
 
-    if (fread_ui32(bgen->stream, &magic_number, 4)) {
+    if (fread(&magic_number, sizeof(magic_number), 1, bgen->stream) != 1) {
         bgen_error("could not read magic number");
         return 1;
     }
@@ -252,7 +253,7 @@ static int read_bgen_header(struct bgen_file* bgen)
         return 1;
     }
 
-    if (fread_ui32(bgen->stream, &flags, 4)) {
+    if (fread(&flags, sizeof(flags), 1, bgen->stream) != 1) {
         bgen_error("could not read bgen flags");
         return 1;
     }

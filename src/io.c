@@ -47,31 +47,6 @@ int bgen_fseek(FILE* stream, int64_t offset, int origin)
 
 int64_t bgen_ftell(FILE* stream) { return LONG_TELL(stream); }
 
-#define DEFINE_TYPE_FREAD(TYPE, SUF)                                                          \
-    int fread_##SUF(FILE* fp, TYPE* value, size_t size)                                       \
-    {                                                                                         \
-        *value = 0;                                                                           \
-                                                                                              \
-        if (fread(value, size, 1, fp) != 1) {                                                 \
-                                                                                              \
-            if (feof(fp))                                                                     \
-                bgen_error("error reading file (unexpected end of file)");                    \
-            else                                                                              \
-                bgen_perror("error reading file");                                            \
-                                                                                              \
-            return 1;                                                                         \
-        }                                                                                     \
-                                                                                              \
-        return 0;                                                                             \
-    }
-
-DEFINE_TYPE_FREAD(uint64_t, ui64)
-DEFINE_TYPE_FREAD(uint32_t, ui32)
-DEFINE_TYPE_FREAD(uint16_t, ui16)
-DEFINE_TYPE_FREAD(int64_t, i64)
-DEFINE_TYPE_FREAD(int32_t, i32)
-DEFINE_TYPE_FREAD(int16_t, i16)
-
 #define DEFINE_TYPE_FWRITE(TYPE, SUF)                                                         \
     int fwrite_##SUF(FILE* fp, TYPE value, size_t size)                                       \
     {                                                                                         \
