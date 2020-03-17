@@ -18,7 +18,7 @@ struct bgen_string const* bgen_string_fread(FILE* restrict stream, size_t length
     char* data = malloc(sizeof(char) * length);
 
     if (fread(data, 1, length, stream) < length) {
-        free_c(data);
+        bgen_free(data);
         return NULL;
     }
 

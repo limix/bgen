@@ -65,8 +65,8 @@ void bgen_file_close(struct bgen_file const* bgen)
 {
     if (bgen->stream != NULL && fclose(bgen->stream))
         bgen_perror("could not close %s file", bgen->filepath);
-    free_c(bgen->filepath);
-    free_c(bgen);
+    bgen_free(bgen->filepath);
+    bgen_free(bgen);
 }
 
 uint32_t bgen_file_nsamples(struct bgen_file const* bgen) { return bgen->nsamples; }

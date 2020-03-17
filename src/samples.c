@@ -15,8 +15,8 @@ void bgen_samples_destroy(struct bgen_samples const* samples)
             bgen_string_destroy(samples->sample_ids[i]);
     }
 
-    free_c(samples->sample_ids);
-    free_c(samples);
+    bgen_free(samples->sample_ids);
+    bgen_free(samples);
 }
 
 struct bgen_string const* bgen_samples_get(struct bgen_samples const* samples, uint32_t index)

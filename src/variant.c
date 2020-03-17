@@ -137,8 +137,8 @@ void bgen_variant_destroy(struct bgen_variant const* variant)
             if (variant->allele_ids[i])
                 bgen_string_destroy(variant->allele_ids[i]);
         }
-        free_c(variant->allele_ids);
+        bgen_free(variant->allele_ids);
     }
 
-    free_c(variant);
+    bgen_free(variant);
 }

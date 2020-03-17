@@ -6,18 +6,18 @@
 
 struct bgen_genotype
 {
-    unsigned layout;
-    uint32_t nsamples;
-    uint16_t nalleles;
-    uint8_t  phased;
-    uint8_t  nbits;
-    uint8_t* plo_miss;
-    unsigned ncombs;
-    uint8_t  min_ploidy;
-    uint8_t  max_ploidy;
-    char*    chunk;
-    char*    current_chunk;
-    uint64_t offset;
+    unsigned    layout;
+    uint32_t    nsamples;
+    uint16_t    nalleles;
+    uint8_t     phased;
+    uint8_t     nbits;
+    uint8_t*    plo_miss;
+    unsigned    ncombs;
+    uint8_t     min_ploidy;
+    uint8_t     max_ploidy;
+    char*       chunk;
+    char const* current_chunk;
+    uint64_t    offset;
 };
 
 static inline struct bgen_genotype* bgen_genotype_create(void)

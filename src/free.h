@@ -3,6 +3,6 @@
 
 #include <stdlib.h>
 
-static inline void free_c(void const* p) { free((void*)p); }
+static inline void bgen_free(void const* p) { free((void*)p); }
 
 #endif

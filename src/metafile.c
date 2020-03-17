@@ -187,25 +187,25 @@ struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile c
         bgen_partition_set(part, i, v);
     }
 
-    free_c(block);
+    bgen_free(block);
     return part;
 
 err:
     bgen_partition_destroy(part);
     if (block)
-        free_c(block);
+        bgen_free(block);
     return NULL;
 }
 
 int bgen_metafile_close(struct bgen_metafile const* metafile)
 {
-    free_c(metafile->filepath);
+    bgen_free(metafile->filepath);
     if (metafile->stream && fclose(metafile->stream)) {
         bgen_perror("could not close %s", metafile->filepath);
         return 1;
     }
-    free_c(metafile->partition_offset);
-    free_c(metafile);
+    bgen_free(metafile->partition_offset);
+    bgen_free(metafile);
     return 0;
 }
 

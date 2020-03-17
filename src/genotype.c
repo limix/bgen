@@ -8,12 +8,12 @@
 void bgen_genotype_close(struct bgen_genotype const* genotype)
 {
     if (genotype->plo_miss)
-        free_c(genotype->plo_miss);
+        bgen_free(genotype->plo_miss);
 
     if (genotype->chunk)
-        free_c(genotype->chunk);
+        bgen_free(genotype->chunk);
 
-    free_c(genotype);
+    bgen_free(genotype);
 }
 
 int bgen_genotype_read(struct bgen_genotype* genotype, double* probabilities)

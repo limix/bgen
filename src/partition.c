@@ -16,10 +16,10 @@ void bgen_partition_destroy(struct bgen_partition const* partition)
             if (partition->variants_metadata[i])
                 bgen_variant_destroy(partition->variants_metadata[i]);
         }
-        free_c(partition->variants_metadata);
+        bgen_free(partition->variants_metadata);
     }
 
-    free_c(partition);
+    bgen_free(partition);
 }
 
 struct bgen_variant const* bgen_partition_get_variant(struct bgen_partition const* partition,
