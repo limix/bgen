@@ -110,7 +110,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 
         struct bgen_string const* sample_id = bgen_string_fread(bgen->stream, 2);
         if (sample_id == NULL) {
-            bgen_error("could not read the %" PRIu32 "lu-th sample id", i);
+            bgen_perror_eof(bgen->stream, "could not read the %" PRIu32 "lu-th sample id", i);
             goto err;
         }
         bgen_samples_set(samples, i, sample_id);

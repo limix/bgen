@@ -57,17 +57,17 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
             bgen_variant_destroy(v);
             return NULL;
         }
-        bgen_error("could not read variant id");
+        bgen_perror("could not read variant id");
         goto err;
     }
 
     if ((v->rsid = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL) {
-        bgen_error("could not read variant rsid");
+        bgen_perror_eof(bgen_file_stream(bgen_file), "could not read variant rsid");
         goto err;
     }
 
     if ((v->chrom = bgen_string_fread(bgen_file_stream(bgen_file), 2)) == NULL) {
-        bgen_error("could not read variant chrom");
+        bgen_perror_eof(bgen_file_stream(bgen_file), "could not read variant chrom");
         goto err;
     }
 
@@ -88,8 +88,10 @@ struct bgen_variant* bgen_variant_next(struct bgen_file* bgen_file, int* error)
         v->allele_ids[i] = NULL;
 
     for (uint16_t i = 0; i < v->nalleles; ++i) {
-        if ((v->allele_ids[i] = bgen_string_fread(bgen_file_stream(bgen_file), 4)) == NULL)
+        if ((v->allele_ids[i] = bgen_string_fread(bgen_file_stream(bgen_file), 4)) == NULL) {
+            bgen_perror_eof(bgen_file_stream(bgen_file), "could not read allele id");
             goto err;
+        }
     }
 
     int64_t offset = bgen_ftell(bgen_file_stream(bgen_file));
