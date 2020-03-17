@@ -78,7 +78,7 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     genotype->nalleles = nalleles;
     genotype->phased = phased;
     genotype->nbits = nbits;
-    genotype->plo_miss = plo_miss;
+    genotype->ploidy_missingness = plo_miss;
 
     if (genotype->max_ploidy == 0) {
         bgen_error("`max_ploidy` cannot be zero");
@@ -118,10 +118,10 @@ static void read_phased_genotype(struct bgen_genotype* genotype, double* probabi
 
     uint64_t sample_start = 0;
     for (uint32_t j = 0; j < genotype->nsamples; ++j) {
-        unsigned ploidy = read_ploidy(genotype->plo_miss[j]);
+        unsigned ploidy = read_ploidy(genotype->ploidy_missingness[j]);
         double*  pend = probabilities + max_ploidy * nalleles;
 
-        if (read_missingness(genotype->plo_miss[j]) != 0) {
+        if (read_missingness(genotype->ploidy_missingness[j]) != 0) {
             set_array_nan(probabilities, (size_t)(pend - probabilities));
             probabilities = pend;
             sample_start += nbits * ploidy * (nalleles - 1);
@@ -173,10 +173,10 @@ static void read_unphased_genotype(struct bgen_genotype* genotype, double* proba
     uint64_t sample_start = 0;
     for (uint32_t j = 0; j < genotype->nsamples; ++j) {
         double*  pend = probabilities + max_ncombs;
-        uint8_t  ploidy = read_ploidy(genotype->plo_miss[j]);
+        uint8_t  ploidy = read_ploidy(genotype->ploidy_missingness[j]);
         unsigned ncombs = choose(nalleles + (unsigned)(ploidy - 1), (unsigned)(nalleles - 1));
 
-        if (read_missingness(genotype->plo_miss[j]) != 0) {
+        if (read_missingness(genotype->ploidy_missingness[j]) != 0) {
             set_array_nan(probabilities, (size_t)(pend - probabilities));
             probabilities = pend;
             sample_start += nbits * (ncombs - 1);

@@ -7,8 +7,8 @@
 
 void bgen_genotype_close(struct bgen_genotype const* genotype)
 {
-    if (genotype->plo_miss)
-        bgen_free(genotype->plo_miss);
+    if (genotype->ploidy_missingness)
+        bgen_free(genotype->ploidy_missingness);
 
     if (genotype->chunk)
         bgen_free(genotype->chunk);
@@ -36,12 +36,12 @@ uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype)
 
 bool bgen_genotype_missing(struct bgen_genotype const* genotype, uint32_t index)
 {
-    return genotype->plo_miss[index] >> 7;
+    return genotype->ploidy_missingness[index] >> 7;
 }
 
 uint8_t bgen_genotype_ploidy(struct bgen_genotype const* genotype, uint32_t index)
 {
-    return genotype->plo_miss[index] & 127;
+    return genotype->ploidy_missingness[index] & 127;
 }
 
 uint8_t bgen_genotype_min_ploidy(struct bgen_genotype const* genotype)

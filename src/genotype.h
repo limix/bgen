@@ -11,7 +11,7 @@ struct bgen_genotype
     uint16_t    nalleles;
     uint8_t     phased;
     uint8_t     nbits;
-    uint8_t*    plo_miss;
+    uint8_t*    ploidy_missingness;
     unsigned    ncombs;
     uint8_t     min_ploidy;
     uint8_t     max_ploidy;
@@ -28,7 +28,7 @@ static inline struct bgen_genotype* bgen_genotype_create(void)
     genotype->nalleles = 0;
     genotype->phased = 0;
     genotype->nbits = 0;
-    genotype->plo_miss = NULL;
+    genotype->ploidy_missingness = NULL;
     genotype->ncombs = 0;
     genotype->min_ploidy = 0;
     genotype->max_ploidy = 0;
