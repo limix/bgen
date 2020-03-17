@@ -21,7 +21,7 @@ void test_complex(void)
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_file_nvariants(bgen)) == 10);
 
-    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen);
 
     cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
     cass_cond(bgen_string_equal(BGEN_STRING("sample_3"), *bgen_samples_get(samples, 3)));

@@ -76,10 +76,9 @@ uint32_t bgen_file_nvariants(struct bgen_file const* bgen) { return bgen->nvaria
 
 bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->contain_sample; }
 
-struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
+struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen)
 {
-    struct athr* at = NULL;
-    char*        block = NULL;
+    char* block = NULL;
 
     if (bgen_fseek(bgen->stream, bgen->samples_start, SEEK_SET)) {
         bgen_perror("could not fseek to `samples_start`");
@@ -114,24 +113,10 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
         goto err;
     }
 
-    if (verbose) {
-        at = athr_create((long)bgen->nsamples, "Reading samples", ATHR_BAR);
-        if (!at) {
-            bgen_error("could not create a progress bar");
-            goto err;
-        }
-    }
-
     for (uint32_t i = 0; i < bgen->nsamples; ++i) {
-        if (verbose)
-            athr_consume(at, 1);
-
         struct bgen_string const* sample_id = bgen_string_memfread(&block_ptr, 2);
         bgen_samples_set(samples, i, sample_id);
     }
-
-    if (verbose)
-        athr_finish(at);
 
     if ((bgen->variants_start = bgen_ftell(bgen->stream)) < 0) {
         bgen_error("could not ftell `variants_start`");
@@ -142,8 +127,6 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
     return samples;
 
 err:
-    if (at)
-        athr_finish(at);
     bgen_samples_destroy(samples);
     bgen_free(block);
     return NULL;

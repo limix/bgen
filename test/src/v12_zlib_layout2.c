@@ -21,7 +21,7 @@ int main(void)
         const char* ix = get_example_index_filepath(i);
         unsigned    prec = get_example_precision(i);
 
-        struct bgen_file*        bgen = bgen_file_open(ex);
+        struct bgen_file*     bgen = bgen_file_open(ex);
         struct bgen_metafile* mf = bgen_metafile_open(ix);
 
         test_read(bgen, mf, prec);
@@ -90,8 +90,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
     uint32_t ii = 0;
     i = 0;
     for (uint32_t part = 0; part < bgen_metafile_npartitions(metafile); ++part) {
-        struct bgen_partition const* partition =
-            bgen_metafile_read_partition(metafile, part);
+        struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, part);
         for (ii = 0; ii < bgen_partition_nvariants(partition); ++ii, ++i) {
             struct bgen_variant const* vm = bgen_partition_get_variant(partition, ii);
             struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
@@ -146,7 +145,7 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
 
 void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned precision)
 {
-    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen);
     test_read_metadata(bgen, samples, metafile);
     bgen_samples_destroy(samples);
 

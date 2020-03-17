@@ -48,11 +48,9 @@ BGEN_EXPORT bool bgen_file_contain_samples(struct bgen_file const* bgen_file);
 /** Return all sample identifications.
  *
  * @param bgen_file Bgen file handler.
- * @param verbose `1` to show progress; `0` otherwise.
  * @return Sample identifications. Return `NULL` on failure.
  */
-BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen_file,
-                                                        int               verbose);
+BGEN_EXPORT struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen_file);
 /** Open a variant for genotype queries.
  *
  * @param bgen_file Bgen file handler.

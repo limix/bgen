@@ -32,7 +32,7 @@ void test_bgen_file_haplotypes(void)
     cass_equal_int(bgen_file_nvariants(bgen), 4);
     cass_equal_int(bgen_file_contain_samples(bgen), 1);
 
-    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen);
     cass_cond(samples != NULL);
     cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
     bgen_samples_destroy(samples);
@@ -44,7 +44,8 @@ void test_create_meteadata_haplotypes(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.1", 4, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.1", 4, 0);
     cass_cond(mf != NULL);
 
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
@@ -77,7 +78,8 @@ void test_genotype_haplotypes_by_creating_metadata(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.2", 4, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.2", 4, 0);
     cass_cond(mf != NULL);
 
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
@@ -154,7 +156,8 @@ void test_genotype_haplotypes_by_loading_metadata(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
 
-    struct bgen_metafile* mf = bgen_metafile_open("assert_interface_3.tmp/haplotypes.bgen.metafile.2");
+    struct bgen_metafile* mf =
+        bgen_metafile_open("assert_interface_3.tmp/haplotypes.bgen.metafile.2");
     cass_cond(mf != NULL);
 
     cass_equal_int(bgen_metafile_npartitions(mf), 4);
@@ -227,4 +230,3 @@ void test_genotype_haplotypes_by_loading_metadata(void)
     cass_equal_int(bgen_metafile_close(mf), 0);
     bgen_file_close(bgen);
 }
-

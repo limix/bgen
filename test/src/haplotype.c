@@ -23,14 +23,14 @@ void test_haplotype(void)
     cass_cond((nsamples = bgen_file_nsamples(bgen)) == 4);
     cass_cond((nvariants = bgen_file_nvariants(bgen)) == 4);
 
-    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen);
 
     cass_cond(bgen_string_equal(BGEN_STRING("sample_0"), *bgen_samples_get(samples, 0)));
 
     bgen_samples_destroy(samples);
 
-    struct bgen_metafile* mf = bgen_metafile_create(
-        bgen, "haplotype.tmp/complex.23bits.bgen.metafile", 1, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "haplotype.tmp/complex.23bits.bgen.metafile", 1, 0);
 
     cass_cond(mf != NULL);
     cass_cond(bgen_metafile_npartitions(mf) == 1);

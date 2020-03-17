@@ -20,11 +20,12 @@ void test_zeo_len_chrom_id(void)
     cass_cond(bgen_file_nsamples(bgen) == 182);
     cass_cond(bgen_file_nvariants(bgen) == 50);
 
-    struct bgen_samples* samples = bgen_file_read_samples(bgen, 0);
+    struct bgen_samples* samples = bgen_file_read_samples(bgen);
     cass_cond(samples != NULL);
     bgen_samples_destroy(samples);
 
-    struct bgen_metafile* mf = bgen_metafile_create(bgen, "zero_len_chrom_id.tmp/zero_len_chrom_id.metafile", 2, 0);
+    struct bgen_metafile* mf =
+        bgen_metafile_create(bgen, "zero_len_chrom_id.tmp/zero_len_chrom_id.metafile", 2, 0);
     cass_cond(mf != NULL);
 
     struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
