@@ -6,6 +6,7 @@
 #include "file.h"
 #include "free.h"
 #include "io.h"
+#include "mem.h"
 #include "metafile_04.h"
 #include "metafile_write_04.h"
 #include "partition.h"
@@ -44,8 +45,18 @@ struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
         goto err;
 
     metafile->metadata_block_size = metadata_block_size;
+    bgen_warning("metadata_block_size: %lld", metadata_block_size);
 
     rewind(metafile->stream);
+    long ftell_start = ftell(metafile->stream);
+    fseek(metafile->stream, 0, SEEK_END);
+    long ftell_end = ftell(metafile->stream);
+    rewind(metafile->stream);
+
+    bgen_warning("total file size: %lld", ftell_end - ftell_start);
+    bgen_warning("estimated metadata block size: %lld", ftell_end - ftell_start -
+                                                            BGEN_METAFILE_04_HEADER_SIZE -
+                                                            npartitions * sizeof(uint64_t));
 
     if (write_metafile_header_04(metafile->stream, metafile->nvariants, npartitions,
                                  metafile->metadata_block_size))
@@ -133,6 +144,7 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
     struct bgen_metafile_04 const* metafile, uint32_t partition)
 {
     FILE* stream = metafile->stream;
+    char* block = NULL;
 
     if (partition >= metafile->npartitions) {
         bgen_error("the provided partition number %" PRIu32 " is out-of-range", partition);
@@ -156,45 +168,57 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
         goto err;
     }
 
+    uint64_t block_size = 0;
+    if (partition == metafile->npartitions - 1)
+        block_size = metafile->metadata_block_size - (metafile->partition_offset[partition] - metafile->partition_offset[0]);
+    else
+        block_size =
+            metafile->partition_offset[partition + 1] - metafile->partition_offset[partition];
+
+    block = malloc(block_size);
+    if (fread(block, block_size, 1, stream) != 1) {
+        bgen_perror_eof(stream, "could not read partition");
+        goto err;
+    }
+
+    long ftold0 = ftell(metafile->stream);
     bgen_warning("BEGIN");
+    char* block_ptr = block;
     for (uint32_t i = 0; i < nvariants; ++i) {
         struct bgen_variant* vm = bgen_variant_create();
 
-        /* bgen_fseek(stream, 8, SEEK_CUR); */
-        /* fseek(stream, 8, SEEK_CUR); */
-        if (fread(&vm->genotype_offset, sizeof(vm->genotype_offset), 1, stream) != 1) {
-            bgen_perror_eof(stream, "could not read genotype");
-            goto err;
-        }
+        bgen_memfread(&vm->genotype_offset, &block_ptr, sizeof(vm->genotype_offset));
+        /* if (fread(&vm->genotype_offset, sizeof(vm->genotype_offset), 1, stream) != 1) { */
+        /*     bgen_perror_eof(stream, "could not read genotype"); */
+        /*     goto err; */
+        /* } */
 
-        if ((vm->id = bgen_string_fread(stream, 2)) == NULL) {
-            bgen_perror_eof(stream, "could not read id");
-            goto err;
-        }
+        vm->id = bgen_string_memfread(&block_ptr, 2);
+        /* if ((vm->id = bgen_string_fread(stream, 2)) == NULL) { */
+        /*     bgen_perror_eof(stream, "could not read id"); */
+        /*     goto err; */
+        /* } */
 
-        if ((vm->rsid = bgen_string_fread(stream, 2)) == NULL) {
-            bgen_perror_eof(stream, "could not read rsid");
-            goto err;
-        }
+        vm->rsid = bgen_string_memfread(&block_ptr, 2);
+        /* if ((vm->rsid = bgen_string_fread(stream, 2)) == NULL) { */
+        /*     bgen_perror_eof(stream, "could not read rsid"); */
+        /*     goto err; */
+        /* } */
 
-        if ((vm->chrom = bgen_string_fread(stream, 2)) == NULL) {
-            bgen_perror_eof(stream, "could not read chromosome");
-            goto err;
-        }
+        vm->chrom = bgen_string_memfread(&block_ptr, 2);
+        /* if ((vm->chrom = bgen_string_fread(stream, 2)) == NULL) { */
+        /*     bgen_perror_eof(stream, "could not read chromosome"); */
+        /*     goto err; */
+        /* } */
 
-        /* bgen_fseek(stream, 4, SEEK_CUR); */
-        /* fseek(stream, 4, SEEK_CUR); */
-        if (fread(&vm->position, sizeof(vm->position), 1, stream) != 1) {
-            bgen_perror_eof(stream, "could not read position");
-            goto err;
-        }
+        bgen_memfread(&vm->position, &block_ptr, sizeof(vm->position));
+        /* if (fread(&vm->position, sizeof(vm->position), 1, stream) != 1) { */
+        /*     bgen_perror_eof(stream, "could not read position"); */
+        /*     goto err; */
+        /* } */
 
-        if (fread(&vm->nalleles, sizeof(vm->nalleles), 1, stream) != 1) {
-            bgen_perror_eof(stream, "could not read number of alleles");
-            goto err;
-        }
-
-        /* if (fread_ui16(stream, &vm->nalleles, 2)) { */
+        bgen_memfread(&vm->nalleles, &block_ptr, sizeof(vm->nalleles));
+        /* if (fread(&vm->nalleles, sizeof(vm->nalleles), 1, stream) != 1) { */
         /*     bgen_perror_eof(stream, "could not read number of alleles"); */
         /*     goto err; */
         /* } */
@@ -202,20 +226,26 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
         bgen_variant_create_alleles(vm, vm->nalleles);
 
         for (uint16_t j = 0; j < vm->nalleles; ++j) {
-            if ((vm->allele_ids[j] = bgen_string_fread(stream, 4)) == NULL) {
-                bgen_perror_eof(stream, "could not read allele");
-                goto err;
-            }
+            vm->allele_ids[j] = bgen_string_memfread(&block_ptr, 4);
+            /* if ((vm->allele_ids[j] = bgen_string_fread(stream, 4)) == NULL) { */
+            /*     bgen_perror_eof(stream, "could not read allele"); */
+            /*     goto err; */
+            /* } */
         }
 
         bgen_partition_set(part, i, vm);
     }
     bgen_warning("END");
+    long ftold1 = ftell(metafile->stream);
+    bgen_warning("block size: %ld vs %ld", ftold1 - ftold0, block_size);
 
+    free_c(block);
     return part;
 
 err:
     bgen_partition_destroy(part);
+    if (block)
+        free_c(block);
     return NULL;
 }
 
