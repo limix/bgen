@@ -44,21 +44,14 @@ struct bgen_string const* bgen_string_memfread(char const* restrict* src, size_t
 int bgen_string_fwrite(struct bgen_string const* str, FILE* stream, size_t length_size)
 {
     uint64_t len = str->length;
-    if (fwrite(&len, length_size, 1, stream) != 1) {
-        bgen_perror("error while fwriting a string length");
+    if (fwrite(&len, length_size, 1, stream) != 1)
         return 1;
-    }
 
     if (len == 0)
         return 0;
 
-    if (fwrite(str->data, 1, len, stream) != len) {
-
-        if (ferror(stream))
-            bgen_perror("error while fwriting a string str");
-        else
-            bgen_error("unexpected end of file while writing a string");
+    if (fwrite(str->data, 1, len, stream) != len)
         return 1;
-    }
+
     return 0;
 }

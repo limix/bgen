@@ -19,32 +19,39 @@ static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
     int64_t start = bgen_ftell(stream);
 
     if (fwrite(&variant->genotype_offset, sizeof(variant->genotype_offset), 1, stream) != 1) {
-        bgen_error("could not write genotype offset");
+        bgen_perror("could not write genotype offset");
         return 0;
     }
 
-    if (bgen_string_fwrite(variant->id, stream, 2))
+    if (bgen_string_fwrite(variant->id, stream, 2)) {
+        bgen_perror("could not write variant id");
         return 0;
+    }
 
-    if (bgen_string_fwrite(variant->rsid, stream, 2))
+    if (bgen_string_fwrite(variant->rsid, stream, 2)) {
+        bgen_perror("could not write variant rsid");
         return 0;
+    }
 
-    if (bgen_string_fwrite(variant->chrom, stream, 2))
+    if (bgen_string_fwrite(variant->chrom, stream, 2)) {
+        bgen_perror("could not write chromosome");
         return 0;
+    }
 
     if (fwrite(&variant->position, sizeof(variant->position), 1, stream) != 1) {
-        bgen_error("could not write variant position");
+        bgen_perror("could not write variant position");
         return 0;
     }
 
     if (fwrite(&variant->nalleles, sizeof(variant->nalleles), 1, stream) != 1) {
-        bgen_error("could not write number of alleles");
+        bgen_perror("could not write number of alleles");
         return 0;
     }
 
     for (uint16_t j = 0; j < variant->nalleles; ++j) {
-        if (bgen_string_fwrite(variant->allele_ids[j], stream, 4))
+        if (bgen_string_fwrite(variant->allele_ids[j], stream, 4)) {
             return 0;
+        }
     }
 
     int64_t stop = bgen_ftell(stream);
@@ -144,7 +151,7 @@ err:
 static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions, uint64_t* poffset)
 {
     if (fwrite(poffset, sizeof(uint64_t) * npartitions, 1, stream) != 1) {
-        bgen_error("could not write offsets block");
+        bgen_perror("could not write offsets block");
         return 1;
     }
 

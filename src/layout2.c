@@ -36,14 +36,14 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     uint16_t nalleles = 0;
     uint8_t  min_ploidy = 0, max_ploidy = 0, phased = 0, nbits = 0;
 
-    char* c;
-    char* chunk;
+    char const* c;
+    char*       chunk;
 
     if (bgen_file_compression(bgen_file) > 0) {
         if ((chunk = _uncompress(bgen_file)) == NULL)
             return 1;
         c = chunk;
-        memcpy_walk(&nsamples, &c, 4);
+        bgen_memfread(&nsamples, &c, 4);
     } else {
         if (fread(&nsamples, 1, 4, bgen_file_stream(bgen_file)) < 4)
             return 1;
@@ -58,9 +58,9 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
         c = chunk;
     }
 
-    memcpy_walk(&nalleles, &c, 2);
-    memcpy_walk(&min_ploidy, &c, 1);
-    memcpy_walk(&max_ploidy, &c, 1);
+    bgen_memfread(&nalleles, &c, 2);
+    bgen_memfread(&min_ploidy, &c, 1);
+    bgen_memfread(&max_ploidy, &c, 1);
     genotype->min_ploidy = min_ploidy;
     genotype->max_ploidy = max_ploidy;
 
@@ -71,8 +71,8 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     }
     c += nsamples;
 
-    memcpy_walk(&phased, &c, 1);
-    memcpy_walk(&nbits, &c, 1);
+    bgen_memfread(&phased, &c, 1);
+    bgen_memfread(&nbits, &c, 1);
 
     genotype->nsamples = nsamples;
     genotype->nalleles = nalleles;

@@ -46,25 +46,3 @@ int bgen_fseek(FILE* stream, int64_t offset, int origin)
 }
 
 int64_t bgen_ftell(FILE* stream) { return LONG_TELL(stream); }
-
-#define DEFINE_TYPE_FWRITE(TYPE, SUF)                                                         \
-    int fwrite_##SUF(FILE* fp, TYPE value, size_t size)                                       \
-    {                                                                                         \
-        if (fwrite(&value, size, 1, fp) != 1) {                                               \
-                                                                                              \
-            if (feof(fp))                                                                     \
-                bgen_error("error writing file (unexpected end of file)");                    \
-            else                                                                              \
-                bgen_perror("error writing file");                                            \
-                                                                                              \
-            return 1;                                                                         \
-        }                                                                                     \
-        return 0;                                                                             \
-    }
-
-DEFINE_TYPE_FWRITE(uint64_t, ui64)
-DEFINE_TYPE_FWRITE(uint32_t, ui32)
-DEFINE_TYPE_FWRITE(uint16_t, ui16)
-DEFINE_TYPE_FWRITE(int64_t, i64)
-DEFINE_TYPE_FWRITE(int32_t, i32)
-DEFINE_TYPE_FWRITE(int16_t, i16)

@@ -56,13 +56,13 @@ static void read_unphased(struct bgen_genotype* genotype, double* probabilities)
 
     size_t i, j;
 
-    char* chunk = genotype->current_chunk;
+    char const* restrict chunk = genotype->current_chunk;
 
     for (j = 0; j < genotype->nsamples; ++j) {
         unsigned int ui_prob_sum = 0;
 
         for (i = 0; i < 3; ++i) {
-            memcpy_walk(&ui_prob, &chunk, 2);
+            bgen_memfread(&ui_prob, &chunk, 2);
             probabilities[j * 3 + i] = ui_prob / denom;
             ui_prob_sum += ui_prob;
         }
