@@ -16,7 +16,7 @@ struct bgen_genotype
     uint8_t     min_ploidy;
     uint8_t     max_ploidy;
     char*       chunk;
-    char const* current_chunk;
+    char const* chunk_ptr;
     uint64_t    offset;
 };
 
@@ -33,7 +33,7 @@ static inline struct bgen_genotype* bgen_genotype_create(void)
     genotype->min_ploidy = 0;
     genotype->max_ploidy = 0;
     genotype->chunk = NULL;
-    genotype->current_chunk = NULL;
+    genotype->chunk_ptr = NULL;
     genotype->offset = 0;
     return genotype;
 }

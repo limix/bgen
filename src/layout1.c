@@ -1,35 +1,32 @@
 #include "layout1.h"
 #include "bgen/bgen.h"
 #include "file.h"
+#include "free.h"
 #include "genotype.h"
 #include "mem.h"
+#include "report.h"
 #include "zip/zlib.h"
-#include "zip/zstd.h"
-#include <assert.h>
 #include <math.h>
 #include <stdlib.h>
 
 static void  read_unphased(struct bgen_genotype* vg, double* probabilities);
-static char* _uncompress(struct bgen_file* bgen_file);
+static char* decompress(struct bgen_file* bgen_file);
 
 int bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype)
 {
-    char* c;
-    char* chunk;
+    char* chunk = NULL;
 
     if (bgen_file_compression(bgen_file) > 0) {
-        chunk = _uncompress(bgen_file);
-        c = chunk;
+        chunk = decompress(bgen_file);
     } else {
-        chunk = malloc(6 * bgen_file_nsamples(bgen_file));
+        size_t size = 6 * bgen_file_nsamples(bgen_file);
+        chunk = malloc(size);
 
-        if (fread(chunk, 1, 6 * bgen_file_nsamples(bgen_file), bgen_file_stream(bgen_file)) <
-            6 * bgen_file_nsamples(bgen_file)) {
-            free(chunk);
+        FILE* stream = bgen_file_stream(bgen_file);
+        if (fread(chunk, size, 1, stream) < 1) {
+            bgen_free(chunk);
             return 1;
         }
-
-        c = chunk;
     }
 
     genotype->nsamples = bgen_file_nsamples(bgen_file);
@@ -38,7 +35,7 @@ int bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     genotype->min_ploidy = 2;
     genotype->max_ploidy = 2;
     genotype->chunk = chunk;
-    genotype->current_chunk = c;
+    genotype->chunk_ptr = chunk;
 
     return 0;
 }
@@ -50,61 +47,57 @@ void bgen_layout1_read_genotype(struct bgen_genotype* genotype, double* probabil
 
 static void read_unphased(struct bgen_genotype* genotype, double* probabilities)
 {
-    uint16_t ui_prob;
+    uint16_t ui_prob = 0;
+    double   denom = 32768;
 
-    double denom = 32768;
+    char const* restrict chunk = genotype->chunk_ptr;
 
-    size_t i, j;
-
-    char const* restrict chunk = genotype->current_chunk;
-
-    for (j = 0; j < genotype->nsamples; ++j) {
+    for (uint32_t j = 0; j < genotype->nsamples; ++j) {
         unsigned int ui_prob_sum = 0;
 
-        for (i = 0; i < 3; ++i) {
+        for (size_t i = 0; i < 3; ++i) {
             bgen_memfread(&ui_prob, &chunk, 2);
             probabilities[j * 3 + i] = ui_prob / denom;
             ui_prob_sum += ui_prob;
         }
 
         if (ui_prob_sum == 0) {
-            for (i = 0; i < 3; ++i)
+            for (size_t i = 0; i < 3; ++i)
                 probabilities[j * 3 + i] = NAN;
         }
     }
 }
 
-static char* _uncompress(struct bgen_file* bgen_file)
+static char* decompress(struct bgen_file* bgen_file)
 {
-    size_t clength, ulength;
-    char * cchunk, *uchunk;
+    uint32_t compressed_length = 0;
+    FILE*    stream = bgen_file_stream(bgen_file);
 
-    clength = 0;
-    ulength = 0;
-
-    if (fread(&clength, 1, 4, bgen_file_stream(bgen_file)) < 4)
+    if (fread(&compressed_length, sizeof(compressed_length), 1, stream) < 1) {
+        bgen_perror_eof(stream, "could not read chunk size");
         return NULL;
+    }
 
-    cchunk = malloc(clength);
+    char* compressed_chunk = malloc(compressed_length);
 
-    if (fread(cchunk, 1, clength, bgen_file_stream(bgen_file)) < clength) {
-        free(cchunk);
+    if (fread(compressed_chunk, compressed_length, 1, stream) < 1) {
+        bgen_perror_eof(stream, "could not read compressed chunk");
+        bgen_free(compressed_chunk);
         return NULL;
     }
 
     if (bgen_file_compression(bgen_file) != 1) {
-        free(cchunk);
-        fprintf(stderr, "Compression flag should be 1; not %u.\n",
-                bgen_file_compression(bgen_file));
+        bgen_error("compression flag should be 1; not %u", bgen_file_compression(bgen_file));
+        bgen_free(compressed_chunk);
         return NULL;
     }
 
-    ulength = 10 * clength;
-    uchunk = malloc(ulength);
+    size_t length = 10 * compressed_length;
+    char*  chunk = malloc(length);
 
-    bgen_unzlib_chunked(cchunk, clength, &uchunk, &ulength);
+    bgen_unzlib_chunked(compressed_chunk, compressed_length, &chunk, &length);
 
-    free(cchunk);
+    bgen_free(compressed_chunk);
 
-    return uchunk;
+    return chunk;
 }

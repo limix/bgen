@@ -96,7 +96,7 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
                                   (unsigned)(nalleles - 1));
 
     genotype->chunk = chunk;
-    genotype->current_chunk = c;
+    genotype->chunk_ptr = c;
 
     return 0;
 }
@@ -140,7 +140,7 @@ static void read_phased_genotype(struct bgen_genotype* genotype, double* probabi
 
                 for (uint8_t bi = 0; bi < nbits; ++bi) {
 
-                    if (get_bit(genotype->current_chunk, bi + offset)) {
+                    if (get_bit(genotype->chunk_ptr, bi + offset)) {
                         ui_prob |= ((uint64_t)1 << bi);
                     }
                 }
@@ -193,7 +193,7 @@ static void read_unphased_genotype(struct bgen_genotype* genotype, double* proba
 
             for (uint8_t bi = 0; bi < (size_t)nbits; ++bi) {
 
-                if (get_bit(genotype->current_chunk, bi + offset)) {
+                if (get_bit(genotype->chunk_ptr, bi + offset)) {
                     ui_prob |= ((uint64_t)1 << bi);
                 }
             }
