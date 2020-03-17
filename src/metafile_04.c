@@ -78,7 +78,7 @@ struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
     char header[] = BGEN_METAFILE_04_SIGNATURE;
 
     if (fread(header, strlen(BGEN_METAFILE_04_SIGNATURE), 1, metafile->stream) != 1) {
-        bgen_perror("could not fetch the metafile header");
+        bgen_perror_eof(metafile->stream, "could not fetch the metafile header");
         goto err;
     }
 
@@ -89,17 +89,18 @@ struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
     }
 
     if (fread(&(metafile->nvariants), sizeof(uint32_t), 1, metafile->stream) != 1) {
-        bgen_perror("could not read the number of variants from metafile");
+        bgen_perror_eof(metafile->stream,
+                        "could not read the number of variants from metafile");
         goto err;
     }
 
     if (fread(&(metafile->npartitions), sizeof(uint32_t), 1, metafile->stream) != 1) {
-        bgen_perror("could not read the number of partitions");
+        bgen_perror_eof(metafile->stream, "could not read the number of partitions");
         goto err;
     }
 
     if (fread(&(metafile->metadata_block_size), sizeof(uint64_t), 1, metafile->stream) != 1) {
-        bgen_perror("could not read the metadata block size");
+        bgen_perror_eof(metafile->stream, "could not read the metadata block size");
         goto err;
     }
 
@@ -108,7 +109,7 @@ struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
     for (uint32_t i = 0; i < metafile->npartitions; ++i) {
         uint64_t* ptr = metafile->partition_offset + i;
         if (fread(ptr, sizeof(uint64_t), 1, metafile->stream) != 1) {
-            bgen_perror("Could not read partition offsets");
+            bgen_perror_eof(metafile->stream, "Could not read partition offsets");
             goto err;
         }
     }

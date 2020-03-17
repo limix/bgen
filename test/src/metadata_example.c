@@ -1,15 +1,15 @@
 #include "bgen/bgen.h"
 #include "cass.h"
 
-void test_corrupted_metadata_file(void);
+void test_corrupted_metafile_file(void);
 
 int main(void)
 {
-    test_corrupted_metadata_file();
+    test_corrupted_metafile_file();
     return cass_status();
 }
 
-void test_corrupted_metadata_file(void)
+void test_corrupted_metafile_file(void)
 {
-    cass_cond(bgen_metafile_open("data/wrong.metadata") == NULL);
+    cass_cond(bgen_metafile_open_04("data/wrong.metafile") == NULL);
 }

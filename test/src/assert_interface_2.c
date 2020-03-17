@@ -31,9 +31,9 @@ int main(void)
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    struct bgen_metafile* metafile = bgen_metafile_create(
-        bgen, "assert_interface_2.tmp/example.14bits.bgen.metadata", 1, 0);
-    struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, 0);
+    struct bgen_metafile_04* metafile = bgen_metafile_create_04(
+        bgen, "assert_interface_2.tmp/example.14bits.bgen.metafile", 1, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition_04(metafile, 0);
 
     struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     cass_equal_int(vm->position, 2000);
@@ -44,12 +44,12 @@ int main(void)
     cass_cond(bgen_string_equal(BGEN_STRING("A"), *vm->allele_ids[0]));
 
     bgen_partition_destroy(partition);
-    bgen_metafile_close(metafile);
+    bgen_metafile_close_04(metafile);
     bgen_file_close(bgen);
 
     bgen = bgen_file_open("data/example.14bits.bgen");
-    metafile = bgen_metafile_open("assert_interface_2.tmp/example.14bits.bgen.metadata");
-    partition = bgen_metafile_read_partition(metafile, 0);
+    metafile = bgen_metafile_open_04("assert_interface_2.tmp/example.14bits.bgen.metafile");
+    partition = bgen_metafile_read_partition_04(metafile, 0);
     vm = bgen_partition_get_variant(partition, 3);
     struct bgen_genotype* genotype = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
@@ -71,7 +71,7 @@ int main(void)
     free(probs);
     bgen_partition_destroy(partition);
     bgen_genotype_close(genotype);
-    bgen_metafile_close(metafile);
+    bgen_metafile_close_04(metafile);
     bgen_file_close(bgen);
 
     return cass_status();

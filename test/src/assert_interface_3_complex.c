@@ -4,7 +4,7 @@
 
 void test_bgen_file_complex(void);
 void test_create_metadata_complex(void);
-void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf);
+void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile_04* mf);
 void test_genotype_complex(void);
 
 int main(void)
@@ -35,14 +35,14 @@ void test_create_metadata_complex(void)
 {
     struct bgen_file* bgen = bgen_file_open("data/complex.23bits.bgen");
 
-    struct bgen_metafile* mf = bgen_metafile_create(
-        bgen, "assert_interface_3_complex.tmp/complex.23bits.bgen.metadata.1", 4, 0);
+    struct bgen_metafile_04* mf = bgen_metafile_create_04(
+        bgen, "assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.1", 4, 0);
     cass_cond(mf != NULL);
 
-    cass_equal_int(bgen_metafile_npartitions(mf), 4);
-    cass_equal_int(bgen_metafile_nvariants(mf), 10);
+    cass_equal_int(bgen_metafile_npartitions_04(mf), 4);
+    cass_equal_int(bgen_metafile_nvariants_04(mf), 10);
 
-    struct bgen_partition const* partition = bgen_metafile_read_partition(mf, 0);
+    struct bgen_partition const* partition = bgen_metafile_read_partition_04(mf, 0);
 
     struct bgen_variant const* vm = bgen_partition_get_variant(partition, 0);
     struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
@@ -63,16 +63,16 @@ void test_create_metadata_complex(void)
     bgen_genotype_close(vg);
     bgen_partition_destroy(partition);
 
-    cass_equal_int(bgen_metafile_close(mf), 0);
+    cass_equal_int(bgen_metafile_close_04(mf), 0);
     bgen_file_close(bgen);
 }
 
-void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf)
+void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile_04* mf)
 {
     cass_cond(mf != NULL)
 
-        cass_equal_int(bgen_metafile_npartitions(mf), 4);
-    cass_equal_int(bgen_metafile_nvariants(mf), 10);
+        cass_equal_int(bgen_metafile_npartitions_04(mf), 4);
+    cass_equal_int(bgen_metafile_nvariants_04(mf), 10);
 
     double probs[] = {
         1.0000, 0.0000, NAN,    1.0000, 0.0000, 0.0000, 1.0000, 0.0000, 0.0000, 0.0000, 1.0000,
@@ -119,8 +119,8 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf)
     int     phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
     int*    phased_ptr = phased + 0;
 
-    for (uint32_t i = 0; i < bgen_metafile_npartitions(mf); ++i) {
-        struct bgen_partition const* partition = bgen_metafile_read_partition(mf, i);
+    for (uint32_t i = 0; i < bgen_metafile_npartitions_04(mf); ++i) {
+        struct bgen_partition const* partition = bgen_metafile_read_partition_04(mf, i);
 
         for (uint32_t ii = 0; ii < bgen_partition_nvariants(partition); ++ii) {
             struct bgen_variant const* vm = bgen_partition_get_variant(partition, ii);
@@ -160,20 +160,20 @@ void test_genotype_complex(void)
 {
     {
         struct bgen_file*     bgen = bgen_file_open("data/complex.23bits.bgen");
-        struct bgen_metafile* mf =
-            bgen_metafile_create(bgen, "complex.23bits.bgen.metadata.2", 4, 0);
+        struct bgen_metafile_04* mf =
+            bgen_metafile_create_04(bgen, "assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.2", 4, 0);
 
         _test_genotype_complex(bgen, mf);
-        cass_equal_int(bgen_metafile_close(mf), 0);
+        cass_equal_int(bgen_metafile_close_04(mf), 0);
         bgen_file_close(bgen);
     }
 
     {
         struct bgen_file*     bgen = bgen_file_open("data/complex.23bits.bgen");
-        struct bgen_metafile* mf = bgen_metafile_open("complex.23bits.bgen.metadata.2");
+        struct bgen_metafile_04* mf = bgen_metafile_open_04("assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.2");
 
         _test_genotype_complex(bgen, mf);
-        cass_equal_int(bgen_metafile_close(mf), 0);
+        cass_equal_int(bgen_metafile_close_04(mf), 0);
         bgen_file_close(bgen);
     }
 }
