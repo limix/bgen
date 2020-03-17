@@ -5,7 +5,8 @@
  *
  * [ char[13] : signature (e.g. "bgen index 04") ], \
  * [ uint32_t : number of variants ],               | Header block
- * [ uint32_t : number of partitions ],             /
+ * [ uint32_t : number of partitions ],             |
+ * [ uint64_t : metadata block size ],              /
  * [                                                \
  *   [                                              |
  *     uint64_t : partition offset (this file)      | Offsets block
@@ -32,7 +33,7 @@
 #include <stdio.h>
 
 #define BGEN_METAFILE_04_SIGNATURE "bgen index 04"
-#define BGEN_METAFILE_04_HEADER_SIZE (13 + 4 + 4)
+#define BGEN_METAFILE_04_HEADER_SIZE (13 + 4 + 4 + 8)
 
 struct bgen_metafile_04
 {
@@ -40,6 +41,7 @@ struct bgen_metafile_04
     FILE*     stream;
     uint32_t  nvariants;
     uint32_t  npartitions;
+    uint64_t  metadata_block_size;
     uint64_t* partition_offset; /**< Array of partition offsets */
 };
 

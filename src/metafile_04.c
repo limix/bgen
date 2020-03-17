@@ -29,24 +29,29 @@ struct bgen_metafile_04* bgen_metafile_create_04(struct bgen_file* bgen_file,
         goto err;
     }
 
-    if (write_metafile_header_04(metafile->stream, metafile->nvariants, metafile->npartitions))
-        goto err;
-
     /* seek to metadata block */
-    if (bgen_fseek(metafile->stream, sizeof(uint64_t) * metafile->npartitions, SEEK_CUR))
+    if (bgen_fseek(metafile->stream,
+                   BGEN_METAFILE_04_HEADER_SIZE + sizeof(uint64_t) * npartitions, SEEK_SET))
         goto err;
 
-    metafile->partition_offset = malloc(sizeof(uint64_t) * metafile->npartitions);
+    metafile->partition_offset = malloc(sizeof(uint64_t) * npartitions);
 
-    if (write_metafile_metadata_block_04(metafile->stream, metafile->partition_offset,
-                                         metafile->npartitions, metafile->nvariants, bgen_file,
-                                         verbose))
+    uint64_t metadata_block_size =
+        write_metafile_metadata_block_04(metafile->stream, metafile->partition_offset,
+                                         npartitions, metafile->nvariants, bgen_file, verbose);
+
+    if (metadata_block_size == 0)
         goto err;
 
-    if (bgen_fseek(metafile->stream, BGEN_METAFILE_04_HEADER_SIZE, SEEK_SET))
+    metafile->metadata_block_size = metadata_block_size;
+
+    rewind(metafile->stream);
+
+    if (write_metafile_header_04(metafile->stream, metafile->nvariants, npartitions,
+                                 metafile->metadata_block_size))
         goto err;
 
-    if (write_metafile_offsets_block_04(metafile->stream, metafile->npartitions,
+    if (write_metafile_offsets_block_04(metafile->stream, npartitions,
                                         metafile->partition_offset))
         goto err;
 
@@ -90,6 +95,11 @@ struct bgen_metafile_04* bgen_metafile_open_04(char const* filepath)
 
     if (fread(&(metafile->npartitions), sizeof(uint32_t), 1, metafile->stream) != 1) {
         bgen_perror("could not read the number of partitions");
+        goto err;
+    }
+
+    if (fread(&(metafile->metadata_block_size), sizeof(uint64_t), 1, metafile->stream) != 1) {
+        bgen_perror("could not read the metadata block size");
         goto err;
     }
 

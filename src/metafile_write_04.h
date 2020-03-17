@@ -54,7 +54,8 @@ static uint64_t write_variant_04(FILE* stream, const struct bgen_variant* varian
     return (uint64_t)(stop - start);
 }
 
-static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t npartitions)
+static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t npartitions,
+                                    uint64_t metadata_block_size)
 {
     char const name[] = BGEN_METAFILE_04_SIGNATURE;
 
@@ -73,12 +74,17 @@ static int write_metafile_header_04(FILE* stream, uint32_t nvariants, uint32_t n
         return 1;
     }
 
+    if (fwrite(&metadata_block_size, sizeof(metadata_block_size), 1, stream) != 1) {
+        bgen_perror("could not write metadata block size");
+        return 1;
+    }
+
     return 0;
 }
 
-static int write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
-                                            uint32_t npartitions, uint32_t nvariants,
-                                            struct bgen_file* bgen, int verbose)
+static uint64_t write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
+                                                 uint32_t npartitions, uint32_t nvariants,
+                                                 struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
     if (verbose) {
@@ -130,9 +136,9 @@ static int write_metafile_metadata_block_04(FILE* stream, uint64_t* poffset,
     if (verbose)
         athr_finish(at);
 
-    return 0;
+    return (curr_offset - (uint64_t)ftold);
 err:
-    return 1;
+    return 0;
 }
 
 static int write_metafile_offsets_block_04(FILE* stream, uint32_t npartitions,
