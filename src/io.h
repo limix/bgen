@@ -1,4 +1,3 @@
-/* Define low-level io read and write functions. */
 #ifndef BGEN_IO_H
 #define BGEN_IO_H
 
