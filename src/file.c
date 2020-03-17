@@ -1,5 +1,4 @@
 #include "file.h"
-#include "athr.h"
 #include "bgen/file.h"
 #include "bgen/genotype.h"
 #include "bstring.h"
@@ -134,9 +133,9 @@ err:
 
 struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t genotype_offset)
 {
-    struct bgen_genotype* geno = bgen_genotype_create();
-    geno->layout = bgen->layout;
-    geno->offset = genotype_offset;
+    struct bgen_genotype* genotype = bgen_genotype_create();
+    genotype->layout = bgen->layout;
+    genotype->offset = genotype_offset;
 
     if (genotype_offset > INT64_MAX) {
         bgen_error("variant offset overflow");
@@ -144,22 +143,22 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t g
     }
 
     if (bgen_fseek(bgen_file_stream(bgen), (int64_t)genotype_offset, SEEK_SET)) {
-        bgen_perror("could not seek a variant in %s", bgen_file_filepath(bgen));
+        bgen_perror("could not fseek a variant");
         goto err;
     }
 
     if (bgen_file_layout(bgen) == 1) {
-        bgen_layout1_read_header(bgen, geno);
+        bgen_layout1_read_header(bgen, genotype);
     } else if (bgen_file_layout(bgen) == 2) {
-        bgen_layout2_read_header(bgen, geno);
+        bgen_layout2_read_header(bgen, genotype);
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;
     }
 
-    return geno;
+    return genotype;
 err:
-    bgen_genotype_close(geno);
+    bgen_genotype_close(genotype);
     return NULL;
 }
 
