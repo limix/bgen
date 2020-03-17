@@ -150,20 +150,17 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
         goto err;
     }
 
-    /* bgen_warning("ftell: %lld -> %lld", bgen_ftell(stream),
-     * metafile->partition_offset[partition]); */
     if (bgen_fseek(stream, (int64_t)metafile->partition_offset[partition], SEEK_SET)) {
         bgen_perror("could not fseek partition");
         goto err;
     }
 
-    uint64_t block_size = 0;
+    uint64_t        block_size = 0;
+    uint64_t const* poffset = metafile->partition_offset;
     if (partition == metafile->npartitions - 1)
-        block_size = metafile->metadata_block_size -
-                     (metafile->partition_offset[partition] - metafile->partition_offset[0]);
+        block_size = metafile->metadata_block_size - (poffset[partition] - poffset[0]);
     else
-        block_size =
-            metafile->partition_offset[partition + 1] - metafile->partition_offset[partition];
+        block_size = poffset[partition + 1] - poffset[partition];
 
     block = malloc(block_size);
     if (fread(block, block_size, 1, stream) != 1) {
@@ -171,29 +168,24 @@ struct bgen_partition const* bgen_metafile_read_partition_04(
         goto err;
     }
 
-    /* long ftold0 = ftell(metafile->stream); */
-    bgen_warning("BEGIN");
-    char* block_ptr = block;
+    char const* block_ptr = block;
     for (uint32_t i = 0; i < nvariants; ++i) {
-        struct bgen_variant* vm = bgen_variant_create();
+        struct bgen_variant* v = bgen_variant_create();
 
-        bgen_memfread(&vm->genotype_offset, &block_ptr, sizeof(vm->genotype_offset));
-        vm->id = bgen_string_memfread(&block_ptr, 2);
-        vm->rsid = bgen_string_memfread(&block_ptr, 2);
-        vm->chrom = bgen_string_memfread(&block_ptr, 2);
-        bgen_memfread(&vm->position, &block_ptr, sizeof(vm->position));
-        bgen_memfread(&vm->nalleles, &block_ptr, sizeof(vm->nalleles));
+        bgen_memfread(&v->genotype_offset, &block_ptr, sizeof(v->genotype_offset));
+        v->id = bgen_string_memfread(&block_ptr, 2);
+        v->rsid = bgen_string_memfread(&block_ptr, 2);
+        v->chrom = bgen_string_memfread(&block_ptr, 2);
+        bgen_memfread(&v->position, &block_ptr, sizeof(v->position));
+        bgen_memfread(&v->nalleles, &block_ptr, sizeof(v->nalleles));
 
-        bgen_variant_create_alleles(vm, vm->nalleles);
+        bgen_variant_create_alleles(v, v->nalleles);
 
-        for (uint16_t j = 0; j < vm->nalleles; ++j)
-            vm->allele_ids[j] = bgen_string_memfread(&block_ptr, 4);
+        for (uint16_t j = 0; j < v->nalleles; ++j)
+            v->allele_ids[j] = bgen_string_memfread(&block_ptr, 4);
 
-        bgen_partition_set(part, i, vm);
+        bgen_partition_set(part, i, v);
     }
-    bgen_warning("END");
-    /* long ftold1 = ftell(metafile->stream); */
-    /* bgen_warning("block size: %ld vs %ld", ftold1 - ftold0, block_size); */
 
     free_c(block);
     return part;

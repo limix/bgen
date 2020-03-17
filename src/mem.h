@@ -9,7 +9,7 @@ static inline void memcpy_walk(void* dst, char** src, size_t n)
     *src = *src + n;
 }
 
-static inline void bgen_memfread(void* restrict dst, char* restrict* src, size_t n)
+static inline void bgen_memfread(void* restrict dst, char const* restrict* src, size_t n)
 {
     memcpy(dst, *src, n);
     *src = *src + n;

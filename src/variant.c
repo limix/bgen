@@ -23,10 +23,8 @@ struct bgen_variant* bgen_variant_create(void)
 void bgen_variant_create_alleles(struct bgen_variant* variant, uint16_t nalleles)
 {
     variant->allele_ids = malloc(sizeof(struct bgen_string*) * nalleles);
-
-    for (uint16_t j = 0; j < nalleles; ++j) {
+    for (uint16_t j = 0; j < nalleles; ++j)
         variant->allele_ids[j] = NULL;
-    }
 }
 
 struct bgen_variant* bgen_variant_begin(struct bgen_file* bgen_file, int* error)

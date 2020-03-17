@@ -25,13 +25,11 @@ struct bgen_string const* bgen_string_fread(FILE* restrict stream, size_t length
     return bgen_string_create(data, length);
 }
 
-struct bgen_string const* bgen_string_memfread(char* restrict* src, size_t length_size)
+struct bgen_string const* bgen_string_memfread(char const* restrict* src, size_t length_size)
 {
     uint64_t length = 0;
 
     bgen_memfread(&length, src, length_size);
-    /* if (fread(&length, 1, length_size, stream) < length_size) */
-    /*     return NULL; */
 
     if (length == 0)
         return bgen_string_create(NULL, 0);
@@ -39,10 +37,6 @@ struct bgen_string const* bgen_string_memfread(char* restrict* src, size_t lengt
     char* data = malloc(sizeof(char) * length);
 
     bgen_memfread(data, src, length);
-    /* if (fread(data, 1, length, stream) < length) { */
-    /*     free_c(data); */
-    /*     return NULL; */
-    /* } */
 
     return bgen_string_create(data, length);
 }
