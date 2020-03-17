@@ -57,7 +57,7 @@ static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
 static int write_metafile_header(FILE* stream, uint32_t nvariants, uint32_t npartitions,
                                  uint64_t metadata_block_size)
 {
-    char const name[] = BGEN_METAFILE_04_SIGNATURE;
+    char const name[] = BGEN_METAFILE_SIGNATURE;
 
     if (fwrite(name, strlen(name), 1, stream) != 1) {
         bgen_perror("could not write signature");

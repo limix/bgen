@@ -26,14 +26,14 @@
  *
  * Version 04.
  */
-#ifndef BGEN_METAFILE_04_H_PRIVATE
-#define BGEN_METAFILE_04_H_PRIVATE
+#ifndef BGEN_METAFILE_H_PRIVATE
+#define BGEN_METAFILE_H_PRIVATE
 
 #include <inttypes.h>
 #include <stdio.h>
 
-#define BGEN_METAFILE_04_SIGNATURE "bgen index 04"
-#define BGEN_METAFILE_04_HEADER_SIZE (13 + 4 + 4 + 8)
+#define BGEN_METAFILE_SIGNATURE "bgen index 04"
+#define BGEN_METAFILE_HEADER_SIZE (13 + 4 + 4 + 8)
 
 struct bgen_metafile
 {

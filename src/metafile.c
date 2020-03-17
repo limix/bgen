@@ -31,7 +31,7 @@ struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file, char con
 
     /* seek to metadata block */
     if (bgen_fseek(metafile->stream,
-                   BGEN_METAFILE_04_HEADER_SIZE + sizeof(uint64_t) * npartitions, SEEK_SET))
+                   BGEN_METAFILE_HEADER_SIZE + sizeof(uint64_t) * npartitions, SEEK_SET))
         goto err;
 
     metafile->partition_offset = malloc(sizeof(uint64_t) * npartitions);
@@ -74,16 +74,16 @@ struct bgen_metafile* bgen_metafile_open(char const* filepath)
         goto err;
     }
 
-    char header[] = BGEN_METAFILE_04_SIGNATURE;
+    char header[] = BGEN_METAFILE_SIGNATURE;
 
-    if (fread(header, strlen(BGEN_METAFILE_04_SIGNATURE), 1, metafile->stream) != 1) {
+    if (fread(header, strlen(BGEN_METAFILE_SIGNATURE), 1, metafile->stream) != 1) {
         bgen_perror_eof(metafile->stream, "could not fetch the metafile header");
         goto err;
     }
 
-    if (strncmp(header, BGEN_METAFILE_04_SIGNATURE, strlen(BGEN_METAFILE_04_SIGNATURE))) {
+    if (strncmp(header, BGEN_METAFILE_SIGNATURE, strlen(BGEN_METAFILE_SIGNATURE))) {
         bgen_error("unrecognized bgen index version: %.*s",
-                   (int)strlen(BGEN_METAFILE_04_SIGNATURE), header);
+                   (int)strlen(BGEN_METAFILE_SIGNATURE), header);
         goto err;
     }
 
