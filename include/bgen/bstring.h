@@ -1,8 +1,8 @@
 /** Handy string definition.
  * @file: bgen/bstring.h
  */
-#ifndef BGEN_STRING_H
-#define BGEN_STRING_H
+#ifndef BGEN_BSTRING_H
+#define BGEN_BSTRING_H
 
 #include "bgen_export.h"
 #include <stdbool.h>

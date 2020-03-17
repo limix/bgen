@@ -8,6 +8,7 @@
 #include "io.h"
 #include "layout1.h"
 #include "layout2.h"
+#include "mem.h"
 #include "report.h"
 #include "samples.h"
 #include <inttypes.h>
@@ -27,7 +28,7 @@ struct bgen_file
 };
 
 static struct bgen_file* bgen_file_create(char const* filepath);
-static int               read_bgen_header(struct bgen_file* bgen);
+static int               bgen_file_read_header(struct bgen_file* bgen);
 
 struct bgen_file* bgen_file_open(char const* filepath)
 {
@@ -43,14 +44,14 @@ struct bgen_file* bgen_file_open(char const* filepath)
 
     bgen->variants_start += 4;
 
-    if (read_bgen_header(bgen)) {
+    if (bgen_file_read_header(bgen)) {
         bgen_error("could not read bgen header");
         goto err;
     }
 
     /* if they actually exist */
     if ((bgen->samples_start = bgen_ftell(bgen->stream)) < 0) {
-        bgen_error("could not ftell");
+        bgen_perror("could not ftell");
         goto err;
     }
 
@@ -78,9 +79,10 @@ bool bgen_file_contain_samples(struct bgen_file const* bgen) { return bgen->cont
 struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
+    char*        block = NULL;
 
     if (bgen_fseek(bgen->stream, bgen->samples_start, SEEK_SET)) {
-        bgen_error("could not fseek to `samples_start`");
+        bgen_perror("could not fseek to `samples_start`");
         return NULL;
     }
 
@@ -91,8 +93,24 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
 
     struct bgen_samples* samples = bgen_samples_create(bgen->nsamples);
 
-    if (bgen_fseek(bgen->stream, 8, SEEK_CUR)) {
-        bgen_perror("could not fseek eight bytes forward");
+    uint32_t block_size = 0;
+    if (fread(&block_size, sizeof(block_size), 1, bgen->stream) != 1) {
+        bgen_perror_eof(bgen->stream, "could not read block size");
+        goto err;
+    }
+
+    block = malloc(block_size - sizeof(block_size));
+    if (fread(block, block_size - sizeof(block_size), 1, bgen->stream) != 1) {
+        bgen_perror_eof(bgen->stream, "could not read samples block");
+        goto err;
+    }
+
+    char const* block_ptr = block;
+    uint32_t    nsamples = 0;
+    bgen_memfread(&nsamples, &block_ptr, sizeof(nsamples));
+
+    if (nsamples != bgen->nsamples) {
+        bgen_error("number of samples mismatch (corrupted file?)");
         goto err;
     }
 
@@ -108,11 +126,7 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
         if (verbose)
             athr_consume(at, 1);
 
-        struct bgen_string const* sample_id = bgen_string_fread(bgen->stream, 2);
-        if (sample_id == NULL) {
-            bgen_perror_eof(bgen->stream, "could not read the %" PRIu32 "lu-th sample id", i);
-            goto err;
-        }
+        struct bgen_string const* sample_id = bgen_string_memfread(&block_ptr, 2);
         bgen_samples_set(samples, i, sample_id);
     }
 
@@ -124,12 +138,14 @@ struct bgen_samples* bgen_file_read_samples(struct bgen_file* bgen, int verbose)
         goto err;
     }
 
+    bgen_free(block);
     return samples;
 
 err:
     if (at)
         athr_finish(at);
     bgen_samples_destroy(samples);
+    bgen_free(block);
     return NULL;
 }
 
@@ -201,7 +217,7 @@ static struct bgen_file* bgen_file_create(char const* filepath)
     bgen->variants_start = 0;
 
     if (!(bgen->stream = fopen(bgen->filepath, "rb"))) {
-        bgen_perror("could not open bgen file %s", bgen->filepath);
+        bgen_perror("could not open file %s", bgen->filepath);
         bgen_file_close(bgen);
         return NULL;
     }
@@ -219,11 +235,11 @@ static struct bgen_file* bgen_file_create(char const* filepath)
  *   unused space: header length minus 20 bytes
  *   bgen flags: 4 bytes
  */
-static int read_bgen_header(struct bgen_file* bgen)
+static int bgen_file_read_header(struct bgen_file* bgen)
 {
-    uint32_t header_length;
-    uint32_t magic_number;
-    uint32_t flags;
+    uint32_t header_length = 0;
+    uint32_t magic_number = 0;
+    uint32_t flags = 0;
 
     if (fread(&header_length, sizeof(header_length), 1, bgen->stream) != 1) {
         bgen_perror_eof(bgen->stream, "could not read header length");
@@ -231,17 +247,17 @@ static int read_bgen_header(struct bgen_file* bgen)
     }
 
     if (fread(&bgen->nvariants, sizeof(bgen->nvariants), 1, bgen->stream) != 1) {
-        bgen_error("could not read number of variants");
+        bgen_perror_eof(bgen->stream, "could not read number of variants");
         return 1;
     }
 
     if (fread(&bgen->nsamples, sizeof(bgen->nsamples), 1, bgen->stream) != 1) {
-        bgen_error("could not read number of samples");
+        bgen_perror_eof(bgen->stream, "could not read number of samples");
         return 1;
     }
 
     if (fread(&magic_number, sizeof(magic_number), 1, bgen->stream) != 1) {
-        bgen_error("could not read magic number");
+        bgen_perror_eof(bgen->stream, "could not read magic number");
         return 1;
     }
 
@@ -249,12 +265,12 @@ static int read_bgen_header(struct bgen_file* bgen)
         bgen_warning("magic number mismatch");
 
     if (bgen_fseek(bgen->stream, header_length - 20, SEEK_CUR)) {
-        bgen_error("fseek error while reading bgen file");
+        bgen_perror("fseek error while reading bgen file");
         return 1;
     }
 
     if (fread(&flags, sizeof(flags), 1, bgen->stream) != 1) {
-        bgen_error("could not read bgen flags");
+        bgen_perror_eof(bgen->stream, "could not read bgen flags");
         return 1;
     }
 

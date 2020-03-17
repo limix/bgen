@@ -1,5 +1,5 @@
-#ifndef BGEN_STR_H_PRIVATE
-#define BGEN_STR_H_PRIVATE
+#ifndef BGEN_BSTRING_H_PRIVATE
+#define BGEN_BSTRING_H_PRIVATE
 
 #include <stdio.h>
 
