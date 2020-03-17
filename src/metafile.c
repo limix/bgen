@@ -1,5 +1,5 @@
-#include "bgen/metafile_04.h"
 #include "bgen/file.h"
+#include "bgen/metafile.h"
 #include "bgen/variant.h"
 #include "bmath.h"
 #include "bstring.h"
@@ -7,8 +7,8 @@
 #include "free.h"
 #include "io.h"
 #include "mem.h"
-#include "metafile_04.h"
-#include "metafile_write_04.h"
+#include "metafile.h"
+#include "metafile_write.h"
 #include "partition.h"
 #include "report.h"
 #include <string.h>

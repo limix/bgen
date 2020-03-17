@@ -1,5 +1,5 @@
-#ifndef BGEN_METAFILE_WRITE_04_H
-#define BGEN_METAFILE_WRITE_04_H
+#ifndef BGEN_METAFILE_WRITE_H
+#define BGEN_METAFILE_WRITE_H
 
 #include "athr.h"
 #include "bgen/bstring.h"
@@ -7,7 +7,7 @@
 #include "bmath.h"
 #include "bstring.h"
 #include "io.h"
-#include "metafile_04.h"
+#include "metafile.h"
 #include "report.h"
 #include "variant.h"
 #include <inttypes.h>
@@ -55,7 +55,7 @@ static uint64_t write_variant(FILE* stream, const struct bgen_variant* variant)
 }
 
 static int write_metafile_header(FILE* stream, uint32_t nvariants, uint32_t npartitions,
-                                    uint64_t metadata_block_size)
+                                 uint64_t metadata_block_size)
 {
     char const name[] = BGEN_METAFILE_04_SIGNATURE;
 
@@ -83,8 +83,8 @@ static int write_metafile_header(FILE* stream, uint32_t nvariants, uint32_t npar
 }
 
 static uint64_t write_metafile_metadata_block(FILE* stream, uint64_t* poffset,
-                                                 uint32_t npartitions, uint32_t nvariants,
-                                                 struct bgen_file* bgen, int verbose)
+                                              uint32_t npartitions, uint32_t nvariants,
+                                              struct bgen_file* bgen, int verbose)
 {
     struct athr* at = NULL;
     if (verbose) {
@@ -141,8 +141,7 @@ err:
     return 0;
 }
 
-static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions,
-                                           uint64_t* poffset)
+static int write_metafile_offsets_block(FILE* stream, uint32_t npartitions, uint64_t* poffset)
 {
     if (fwrite(poffset, sizeof(uint64_t) * npartitions, 1, stream) != 1) {
         bgen_error("could not write offsets block");

@@ -1,15 +1,15 @@
 /** Open, close, and query metafile.
- * @file bgen/metafile_04.h
+ * @file bgen/metafile.h
  */
-#ifndef BGEN_METAFILE_04_H
-#define BGEN_METAFILE_04_H
+#ifndef BGEN_METAFILE_H
+#define BGEN_METAFILE_H
 
 #include "bgen_export.h"
 #include <inttypes.h>
 
 struct bgen_file;
 /** Metafile handler.
- * @struct bgen_metafile_04
+ * @struct bgen_metafile
  */
 struct bgen_metafile;
 struct bgen_variant;
