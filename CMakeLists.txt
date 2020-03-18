@@ -76,7 +76,8 @@ target_link_libraries(bgen PUBLIC ZSTD::zstd)
 target_link_libraries(bgen PRIVATE BGEN::warning)
 
 if (NOT c_restrict IN_LIST CMAKE_C_COMPILE_FEATURES)
-    target_compile_definitions(bgen PUBLIC restrict)
+    message(WARNING "restrict feature is not supported")
+    target_compile_definitions(bgen PUBLIC restrict=)
 endif()
 
 include(CheckCSourceCompiles)
