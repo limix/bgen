@@ -55,7 +55,9 @@ target_compile_options(warning INTERFACE
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
 # search path.
 include(GenerateExportHeader)
-generate_export_header(bgen BASE_NAME BGEN)
+generate_export_header(bgen BASE_NAME BGEN
+    INCLUDE_GUARD_NAME BGEN_EXPORT_H
+    EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h)
 
 target_include_directories(bgen
     PUBLIC
@@ -104,6 +106,9 @@ install(TARGETS bgen EXPORT bgen-targets
 )
 
 install(DIRECTORY include/ DESTINATION include)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h
+    DESTINATION include/bgen
+)
 install(EXPORT bgen-targets
     FILE bgen-targets.cmake
     NAMESPACE BGEN::
@@ -117,9 +122,6 @@ configure_package_config_file(bgen-config.cmake.in
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
     DESTINATION lib/cmake/bgen
-)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen_export.h
-    DESTINATION include
 )
 
 enable_testing()

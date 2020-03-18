@@ -4,7 +4,7 @@
 #ifndef BGEN_METAFILE_H
 #define BGEN_METAFILE_H
 
-#include "bgen_export.h"
+#include "bgen/export.h"
 #include <inttypes.h>
 
 struct bgen_file;

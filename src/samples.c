@@ -1,11 +1,11 @@
 #include "samples.h"
-#include "free.h"
 #include "bgen/bstring.h"
+#include "free.h"
 
 struct bgen_samples
 {
     struct bgen_string const** sample_ids;
-    uint32_t                nsamples;
+    uint32_t                   nsamples;
 };
 
 void bgen_samples_destroy(struct bgen_samples const* samples)

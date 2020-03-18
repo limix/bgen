@@ -4,7 +4,7 @@
 #ifndef BGEN_PARTITION_H
 #define BGEN_PARTITION_H
 
-#include "bgen_export.h"
+#include "bgen/export.h"
 #include <stdint.h>
 
 /** Partition of variants metadata.

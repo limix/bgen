@@ -1,7 +1,7 @@
 #ifndef BGEN_SAMPLES_H
 #define BGEN_SAMPLES_H
 
-#include "bgen_export.h"
+#include "bgen/export.h"
 #include <stdint.h>
 
 /** Bgen samples.

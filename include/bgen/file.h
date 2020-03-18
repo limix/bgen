@@ -4,7 +4,7 @@
 #ifndef BGEN_FILE_H
 #define BGEN_FILE_H
 
-#include "bgen_export.h"
+#include "bgen/export.h"
 #include <stdbool.h>
 #include <stdint.h>
 
