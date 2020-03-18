@@ -1,7 +1,6 @@
 #ifndef BGEN_SAMPLES_H
 #define BGEN_SAMPLES_H
 
-#include "bgen/str.h"
 #include "bgen_export.h"
 #include <stdint.h>
 
@@ -9,6 +8,8 @@
  * @struct bgen_samples
  */
 struct bgen_samples;
+
+struct bgen_string;
 
 /** Destroy samples data by releasing its resources.
  *
