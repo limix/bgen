@@ -1,6 +1,6 @@
 #include "partition.h"
-#include "free.h"
 #include "bstring.h"
+#include "free.h"
 #include "variant.h"
 
 struct bgen_partition
@@ -23,7 +23,7 @@ void bgen_partition_destroy(struct bgen_partition const* partition)
 }
 
 struct bgen_variant const* bgen_partition_get_variant(struct bgen_partition const* partition,
-                                              uint32_t                     index)
+                                                      uint32_t                     index)
 {
     return partition->variants_metadata[index];
 }

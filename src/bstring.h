@@ -1,6 +1,7 @@
 #ifndef BGEN_BSTRING_H_PRIVATE
 #define BGEN_BSTRING_H_PRIVATE
 
+#include <stddef.h>
 #include <stdio.h>
 
 struct bgen_string;
