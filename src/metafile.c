@@ -1,5 +1,5 @@
-#include "bgen/file.h"
 #include "bgen/metafile.h"
+#include "bgen/file.h"
 #include "bgen/variant.h"
 #include "bmath.h"
 #include "bstring.h"
@@ -60,6 +60,7 @@ struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file, char con
     }
 
     return metafile;
+
 err:
     bgen_metafile_close(metafile);
     return NULL;
@@ -76,7 +77,7 @@ struct bgen_metafile* bgen_metafile_open(char const* filepath)
 
     char header[] = BGEN_METAFILE_SIGNATURE;
 
-    if (fread(header, strlen(BGEN_METAFILE_SIGNATURE), 1, metafile->stream) != 1) {
+    if (fread(header, strlen(BGEN_METAFILE_SIGNATURE), 1, metafile->stream) < 1) {
         bgen_perror_eof(metafile->stream, "could not fetch the metafile header");
         goto err;
     }
@@ -87,18 +88,18 @@ struct bgen_metafile* bgen_metafile_open(char const* filepath)
         goto err;
     }
 
-    if (fread(&(metafile->nvariants), sizeof(uint32_t), 1, metafile->stream) != 1) {
+    if (fread(&(metafile->nvariants), sizeof(uint32_t), 1, metafile->stream) < 1) {
         bgen_perror_eof(metafile->stream,
                         "could not read the number of variants from metafile");
         goto err;
     }
 
-    if (fread(&(metafile->npartitions), sizeof(uint32_t), 1, metafile->stream) != 1) {
+    if (fread(&(metafile->npartitions), sizeof(uint32_t), 1, metafile->stream) < 1) {
         bgen_perror_eof(metafile->stream, "could not read the number of partitions");
         goto err;
     }
 
-    if (fread(&(metafile->metadata_block_size), sizeof(uint64_t), 1, metafile->stream) != 1) {
+    if (fread(&(metafile->metadata_block_size), sizeof(uint64_t), 1, metafile->stream) < 1) {
         bgen_perror_eof(metafile->stream, "could not read the metadata block size");
         goto err;
     }
@@ -107,7 +108,7 @@ struct bgen_metafile* bgen_metafile_open(char const* filepath)
 
     for (uint32_t i = 0; i < metafile->npartitions; ++i) {
         uint64_t* ptr = metafile->partition_offset + i;
-        if (fread(ptr, sizeof(uint64_t), 1, metafile->stream) != 1) {
+        if (fread(ptr, sizeof(uint64_t), 1, metafile->stream) < 1) {
             bgen_perror_eof(metafile->stream, "Could not read partition offsets");
             goto err;
         }
@@ -163,7 +164,7 @@ struct bgen_partition const* bgen_metafile_read_partition(struct bgen_metafile c
         block_size = poffset[partition + 1] - poffset[partition];
 
     block = malloc(block_size);
-    if (fread(block, block_size, 1, stream) != 1) {
+    if (fread(block, block_size, 1, stream) < 1) {
         bgen_perror_eof(stream, "could not read partition");
         goto err;
     }
