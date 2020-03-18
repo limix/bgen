@@ -1,6 +1,7 @@
 #include "layout2.h"
 #include "bmath.h"
 #include "file.h"
+#include "free.h"
 #include "genotype.h"
 #include "mem.h"
 #include "zip/zlib.h"
@@ -12,19 +13,19 @@
 
 static void  read_phased_genotype(struct bgen_genotype* genotype, double* probabilities);
 static void  read_unphased_genotype(struct bgen_genotype* genotype, double* probabilities);
-static char* _uncompress(struct bgen_file* bgen_file);
+static char* decompress(struct bgen_file* bgen_file);
 
-inline static uint8_t read_ploidy(uint8_t ploidy_miss) { return ploidy_miss & 127; }
+static inline uint8_t read_ploidy(uint8_t ploidy_miss) { return ploidy_miss & 127; }
 
-inline static int read_missingness(uint8_t ploidy_miss) { return ploidy_miss >> 7; }
+static inline int read_missingness(uint8_t ploidy_miss) { return ploidy_miss >> 7; }
 
-inline static int get_bit(char const* mem, uint64_t bit_idx)
+static inline int get_bit(char const* mem, uint64_t bit_idx)
 {
     uint64_t bytes = bit_idx / 8;
     return BIT(*(mem + bytes), bit_idx % 8);
 }
 
-inline static void set_array_nan(double* p, size_t n)
+static inline void set_array_nan(double* p, size_t n)
 {
     for (size_t i = 0; i < n; ++i)
         p[i] = NAN;
@@ -33,46 +34,56 @@ inline static void set_array_nan(double* p, size_t n)
 int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype)
 {
     uint32_t nsamples = 0;
-    uint16_t nalleles = 0;
-    uint8_t  min_ploidy = 0, max_ploidy = 0, phased = 0, nbits = 0;
+    uint8_t* plo_miss = NULL;
 
-    char const* c;
-    char*       chunk;
+    char const* chunk_ptr = NULL;
+    char*       chunk = NULL;
 
     if (bgen_file_compression(bgen_file) > 0) {
-        if ((chunk = _uncompress(bgen_file)) == NULL)
-            return 1;
-        c = chunk;
-        bgen_memfread(&nsamples, &c, 4);
+
+        if ((chunk = decompress(bgen_file)) == NULL)
+            goto err;
+
+        chunk_ptr = chunk;
+        bgen_memfread(&nsamples, &chunk_ptr, sizeof(nsamples));
+
     } else {
-        if (fread(&nsamples, 1, 4, bgen_file_stream(bgen_file)) < 4)
-            return 1;
+
+        if (fread(&nsamples, sizeof(nsamples), 1, bgen_file_stream(bgen_file)) < 1) {
+            bgen_perror_eof(bgen_file_stream(bgen_file), "could not read number of samples");
+            goto err;
+        }
 
         chunk = malloc(6 * nsamples);
 
-        if (fread(chunk, 1, 6 * nsamples, bgen_file_stream(bgen_file)) < 6 * nsamples) {
-            free(chunk);
-            return 1;
+        if (fread(chunk, 6 * nsamples, 1, bgen_file_stream(bgen_file)) < 1) {
+            bgen_perror_eof(bgen_file_stream(bgen_file), "could not read chunk");
+            goto err;
         }
 
-        c = chunk;
+        chunk_ptr = chunk;
     }
 
-    bgen_memfread(&nalleles, &c, 2);
-    bgen_memfread(&min_ploidy, &c, 1);
-    bgen_memfread(&max_ploidy, &c, 1);
+    uint16_t nalleles = 0;
+    bgen_memfread(&nalleles, &chunk_ptr, 2);
+    uint8_t min_ploidy = 0;
+    bgen_memfread(&min_ploidy, &chunk_ptr, 1);
+    uint8_t max_ploidy = 0;
+    bgen_memfread(&max_ploidy, &chunk_ptr, 1);
     genotype->min_ploidy = min_ploidy;
     genotype->max_ploidy = max_ploidy;
 
-    uint8_t* plo_miss = malloc(nsamples * sizeof(uint8_t));
+    plo_miss = malloc(nsamples * sizeof(uint8_t));
 
     for (uint32_t i = 0; i < nsamples; ++i) {
-        plo_miss[i] = (uint8_t)c[i];
+        plo_miss[i] = (uint8_t)chunk_ptr[i];
     }
-    c += nsamples;
+    chunk_ptr += nsamples;
 
-    bgen_memfread(&phased, &c, 1);
-    bgen_memfread(&nbits, &c, 1);
+    uint8_t phased = 0;
+    bgen_memfread(&phased, &chunk_ptr, 1);
+    uint8_t nbits = 0;
+    bgen_memfread(&nbits, &chunk_ptr, 1);
 
     genotype->nsamples = nsamples;
     genotype->nalleles = nalleles;
@@ -82,11 +93,11 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
 
     if (genotype->max_ploidy == 0) {
         bgen_error("`max_ploidy` cannot be zero");
-        return 1;
+        goto err;
     }
     if (genotype->nalleles == 0) {
         bgen_error("`nalleles` cannot be zero");
-        return 1;
+        goto err;
     }
 
     if (phased)
@@ -96,17 +107,22 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
                                   (unsigned)(nalleles - 1));
 
     genotype->chunk = chunk;
-    genotype->chunk_ptr = c;
+    genotype->chunk_ptr = chunk_ptr;
 
     return 0;
+
+err:
+    bgen_free(chunk);
+    bgen_free(plo_miss);
+    return 1;
 }
 
-void bgen_layout2_read_genotype(struct bgen_genotype* vg, double* p)
+void bgen_layout2_read_genotype(struct bgen_genotype* genotype, double* probabilities)
 {
-    if (vg->phased)
-        read_phased_genotype(vg, p);
+    if (genotype->phased)
+        read_phased_genotype(genotype, probabilities);
     else
-        read_unphased_genotype(vg, p);
+        read_unphased_genotype(genotype, probabilities);
 }
 
 static void read_phased_genotype(struct bgen_genotype* genotype, double* probabilities)
@@ -211,53 +227,57 @@ static void read_unphased_genotype(struct bgen_genotype* genotype, double* proba
     }
 }
 
-static char* _uncompress(struct bgen_file* bgen_file)
+static char* decompress(struct bgen_file* bgen_file)
 {
-    size_t clength, ulength;
-    char*  cchunk;
-    char*  uchunk;
-    clength = 0;
-    ulength = 0;
+    char* compressed_chunk = NULL;
+    char* chunk = NULL;
 
-    if (fread(&clength, 1, 4, bgen_file_stream(bgen_file)) < 4)
-        return NULL;
-
-    clength -= 4;
-
-    if (fread(&ulength, 1, 4, bgen_file_stream(bgen_file)) < 4)
-        return NULL;
-
-    cchunk = malloc(clength);
-
-    if (fread(cchunk, 1, clength, bgen_file_stream(bgen_file)) < clength) {
-        free(cchunk);
-        return NULL;
+    size_t compressed_length = 0;
+    if (fread(&compressed_length, 4, 1, bgen_file_stream(bgen_file)) < 1) {
+        bgen_perror_eof(bgen_file_stream(bgen_file), "could not read compressed length");
+        goto err;
     }
-
-    uchunk = malloc(ulength);
-
-    if (bgen_file_compression(bgen_file) == 1) {
-        if (bgen_unzlib(cchunk, clength, &uchunk, &ulength)) {
-            fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
-            goto err;
-        }
-    } else if (bgen_file_compression(bgen_file) == 2) {
-        if (bgen_unzstd(cchunk, clength, (void**)&uchunk, &ulength)) {
-            fprintf(stderr, "Failed while uncompressing chunk for layout 2.");
-            goto err;
-        }
-    } else {
-        fprintf(stderr, "Unrecognized compression method.");
+    if (compressed_length < 4) {
+        bgen_error("wrong compressed (corrupted file?)");
         goto err;
     }
 
-    free(cchunk);
+    compressed_length -= 4;
 
-    return uchunk;
+    size_t length = 0;
+    if (fread(&length, 4, 1, bgen_file_stream(bgen_file)) < 1) {
+        bgen_perror_eof(bgen_file_stream(bgen_file), "could not read length");
+        goto err;
+    }
+
+    compressed_chunk = malloc(compressed_length);
+
+    if (fread(compressed_chunk, compressed_length, 1, bgen_file_stream(bgen_file)) < 1) {
+        bgen_perror_eof(bgen_file_stream(bgen_file), "could not read chunk");
+        goto err;
+    }
+
+    chunk = malloc(length);
+
+    if (bgen_file_compression(bgen_file) == 1) {
+        if (bgen_unzlib(compressed_chunk, compressed_length, &chunk, &length))
+            goto err;
+
+    } else if (bgen_file_compression(bgen_file) == 2) {
+        if (bgen_unzstd(compressed_chunk, compressed_length, (void**)&chunk, &length))
+            goto err;
+
+    } else {
+        bgen_error("unrecognized compression method");
+        goto err;
+    }
+
+    bgen_free(compressed_chunk);
+
+    return chunk;
+
 err:
-    fflush(stderr);
-
-    free(cchunk);
-    free(uchunk);
+    bgen_free(compressed_chunk);
+    bgen_free(chunk);
     return NULL;
 }

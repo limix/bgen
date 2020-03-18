@@ -4,7 +4,7 @@
 struct bgen_file;
 struct bgen_genotype;
 
-int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* vg);
-void bgen_layout2_read_genotype(struct bgen_genotype*, double*);
+int  bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype);
+void bgen_layout2_read_genotype(struct bgen_genotype* genotype, double* probabilities);
 
 #endif
