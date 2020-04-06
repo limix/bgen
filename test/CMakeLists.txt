@@ -1,8 +1,8 @@
 function(bgen_add_test name)
     set(target test_${name})
     add_executable(${target} src/${name}.c)
-    target_link_libraries(${target} PRIVATE BGEN::warning)
     target_link_libraries(${target} PRIVATE BGEN::bgen)
+    target_compile_options(${target} PRIVATE ${WARNING_FLAGS})
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 

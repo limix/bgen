@@ -42,14 +42,13 @@ add_library(bgen
 )
 add_library(BGEN::bgen ALIAS bgen)
 
-add_library(warning INTERFACE)
-add_library(BGEN::warning ALIAS warning)
-target_compile_options(warning INTERFACE
-    $<$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>:/W3>
-    $<$<NOT:$<STREQUAL:${CMAKE_C_COMPILER_ID},MSVC>>:-Wall -Wextra -pedantic
-    -Wstrict-prototypes -Wshadow -Wconversion -Wmissing-prototypes
-    -Wno-unused-parameter -Wsign-conversion>
-)
+if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
+    set(WARNING_FLAGS /W3)
+else()
+    set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
+        -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
+    )
+endif()
 
 # Write out mytools_export.h to the current binary directory
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
@@ -75,7 +74,7 @@ target_compile_definitions(bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRE
 target_link_libraries(bgen PUBLIC ATHR::athr)
 target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
-target_link_libraries(bgen PRIVATE BGEN::warning)
+target_compile_options(bgen PRIVATE ${WARNING_FLAGS})
 
 if (NOT c_restrict IN_LIST CMAKE_C_COMPILE_FEATURES)
     message(WARNING "restrict feature is not supported")
