@@ -44,12 +44,15 @@ add_library(BGEN::bgen ALIAS bgen)
 
 message(WARNING "CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
 if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
+    message(WARNING "equal")
     set(WARNING_FLAGS /W3)
 else()
     set(WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
         -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
     )
+    message(WARNING "not equal")
 endif()
+set(WARNING_FLAGS "")
 
 # Write out mytools_export.h to the current binary directory
 # Must include ${CMAKE_CURRENT_BINARY_DIR} in the target's
