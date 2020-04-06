@@ -43,7 +43,7 @@ add_library(bgen
 add_library(BGEN::bgen ALIAS bgen)
 
 message(WARNING "CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
-if(${CMAKE_C_COMPILER_ID} MATCHES "MSVC")
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
     message(WARNING "equal")
     set(WARNING_FLAGS /W3)
 else()
