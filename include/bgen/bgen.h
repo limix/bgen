@@ -33,21 +33,21 @@
 /** Minor bgen version. */
 #define BGEN_VERSION_MINOR 0
 /** Minor bgen version. */
-#define BGEN_VERSION_PATCH 0
+#define BGEN_VERSION_PATCH 1
 /** Bgen version. */
-#define BGEN_VERSION "4.0.0"
+#define BGEN_VERSION "4.0.1"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+#include "bgen/bstring.h"
 #include "bgen/file.h"
 #include "bgen/genotype.h"
 #include "bgen/metafile.h"
 #include "bgen/partition.h"
 #include "bgen/samples.h"
-#include "bgen/bstring.h"
 #include "bgen/variant.h"
 
 #ifdef __cplusplus

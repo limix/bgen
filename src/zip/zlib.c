@@ -19,7 +19,7 @@ int bgen_unzlib(char const* src, size_t src_size, char** dst, size_t* dst_size)
     int e = inflateInit(&strm);
 
     if (e != Z_OK) {
-        bgen_error("zlib failed to uncompress (%s)", zError(e));
+        bgen_error("zlib failed to init (%s)", zError(e));
         goto err;
     }
 
@@ -36,16 +36,16 @@ int bgen_unzlib(char const* src, size_t src_size, char** dst, size_t* dst_size)
     strm.avail_out = (unsigned)*dst_size;
     strm.next_out = (unsigned char*)*dst;
 
-    e = inflate(&strm, Z_NO_FLUSH);
-    if (e == Z_NEED_DICT) {
-        e = Z_DATA_ERROR;
+    e = inflate(&strm, Z_FINISH);
+    if (e != Z_STREAM_END) {
+        bgen_error("zlib failed to inflate (%s)", zError(e));
         goto err;
     }
 
-    if (e == Z_DATA_ERROR || e == Z_MEM_ERROR)
-        goto err;
-
-    inflateEnd(&strm);
+    if (inflateEnd(&strm) != Z_OK) {
+        bgen_error("zlib failed to inflateEnd (%s)", zError(e));
+        return 1;
+    }
     return 0;
 
 err:

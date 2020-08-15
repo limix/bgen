@@ -148,9 +148,11 @@ struct bgen_genotype* bgen_file_open_genotype(struct bgen_file* bgen, uint64_t g
     }
 
     if (bgen_file_layout(bgen) == 1) {
-        bgen_layout1_read_header(bgen, genotype);
+        if (bgen_layout1_read_header(bgen, genotype))
+            goto err;
     } else if (bgen_file_layout(bgen) == 2) {
-        bgen_layout2_read_header(bgen, genotype);
+        if (bgen_layout2_read_header(bgen, genotype))
+            goto err;
     } else {
         bgen_error("unrecognized layout type %d", bgen_file_layout(bgen));
         goto err;

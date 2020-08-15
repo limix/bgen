@@ -41,8 +41,9 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
 
     if (bgen_file_compression(bgen_file) > 0) {
 
-        if ((chunk = decompress(bgen_file)) == NULL)
+        if ((chunk = decompress(bgen_file)) == NULL) {
             goto err;
+        }
 
         chunk_ptr = chunk;
         bgen_memfread(&nsamples, &chunk_ptr, sizeof(nsamples));
@@ -114,6 +115,8 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
 err:
     bgen_free(chunk);
     bgen_free(plo_miss);
+    genotype->chunk = NULL;
+    genotype->ploidy_missingness = NULL;
     return 1;
 }
 
@@ -251,6 +254,10 @@ static char* decompress(struct bgen_file* bgen_file)
     }
 
     compressed_chunk = malloc(compressed_length);
+    if (compressed_chunk == NULL) {
+        bgen_error("could not malloc compressed chunk");
+        goto err;
+    }
 
     if (fread(compressed_chunk, compressed_length, 1, bgen_file_stream(bgen_file)) < 1) {
         bgen_perror_eof(bgen_file_stream(bgen_file), "could not read chunk");
@@ -258,6 +265,10 @@ static char* decompress(struct bgen_file* bgen_file)
     }
 
     chunk = malloc(length);
+    if (chunk == NULL) {
+        bgen_error("could not malloc chunk");
+        goto err;
+    }
 
     if (bgen_file_compression(bgen_file) == 1) {
         if (bgen_unzlib(compressed_chunk, compressed_length, &chunk, &length))
