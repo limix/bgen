@@ -20,7 +20,7 @@ struct bgen_metafile;
  * @param genotype Variant genotype handler.
  */
 BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* genotype);
-/** Read the probabilities of each possible genotype.
+/** Read the probabilities of each possible genotype (64-bits).
  *
  * The length of this array is equal to the product of the values obtained by calling
  * the functions @ref bgen_file_nsamples and @ref bgen_genotype_ncombs.
@@ -35,6 +35,21 @@ BGEN_EXPORT void bgen_genotype_close(struct bgen_genotype const* genotype);
  * @return `0` if it succeeds; `1` otherwise.
  */
 BGEN_EXPORT int bgen_genotype_read(struct bgen_genotype* genotype, double* probabilities);
+/** Read the probabilities of each possible genotype (64-bits).
+ *
+ * The length of this array is equal to the product of the values obtained by calling
+ * the functions @ref bgen_file_nsamples and @ref bgen_genotype_ncombs.
+ * \rst
+ * .. seealso::
+ *     Please, refer to the corresponding section **Probability data storage** of the
+ *     |bgen format specification| for more information.
+ * \endrst
+ *
+ * @param genotype Variant genotype handler.
+ * @param probabilities Array of probabilities.
+ * @return `0` if it succeeds; `1` otherwise.
+ */
+BGEN_EXPORT int bgen_genotype_read64(struct bgen_genotype* genotype, double* probabilities);
 /** Get the number of alleles.
  *
  * @param genotype Variant genotype handler.

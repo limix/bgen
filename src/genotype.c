@@ -15,14 +15,19 @@ void bgen_genotype_close(struct bgen_genotype const* genotype)
 int bgen_genotype_read(struct bgen_genotype* genotype, double* probabilities)
 {
     if (genotype->layout == 1) {
-        bgen_layout1_read_genotype(genotype, probabilities);
+        bgen_layout1_read_genotype64(genotype, probabilities);
     } else if (genotype->layout == 2) {
-        bgen_layout2_read_genotype(genotype, probabilities);
+        bgen_layout2_read_genotype64(genotype, probabilities);
     } else {
         bgen_error("unrecognized layout type %d", genotype->layout);
         return 1;
     }
     return 0;
+}
+
+int bgen_genotype_read64(struct bgen_genotype* genotype, double* probabilities)
+{
+    return bgen_genotype_read(genotype, probabilities);
 }
 
 uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype)

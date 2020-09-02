@@ -9,7 +9,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static void  read_unphased(struct bgen_genotype* vg, double* probabilities);
+static void  read_unphased64(struct bgen_genotype* vg, double* probs);
 static char* decompress(struct bgen_file* bgen_file);
 
 int bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype)
@@ -40,12 +40,12 @@ int bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     return 0;
 }
 
-void bgen_layout1_read_genotype(struct bgen_genotype* genotype, double* probabilities)
+void bgen_layout1_read_genotype64(struct bgen_genotype* genotype, double* probs)
 {
-    read_unphased(genotype, probabilities);
+    read_unphased64(genotype, probs);
 }
 
-static void read_unphased(struct bgen_genotype* genotype, double* probabilities)
+static void read_unphased64(struct bgen_genotype* genotype, double* probs)
 {
     uint16_t ui_prob = 0;
     double   denom = 32768;
@@ -57,13 +57,13 @@ static void read_unphased(struct bgen_genotype* genotype, double* probabilities)
 
         for (size_t i = 0; i < 3; ++i) {
             bgen_memfread(&ui_prob, &chunk, 2);
-            probabilities[j * 3 + i] = ui_prob / denom;
+            probs[j * 3 + i] = ui_prob / denom;
             ui_prob_sum += ui_prob;
         }
 
         if (ui_prob_sum == 0) {
             for (size_t i = 0; i < 3; ++i)
-                probabilities[j * 3 + i] = NAN;
+                probs[j * 3 + i] = NAN;
         }
     }
 }
