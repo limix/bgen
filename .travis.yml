@@ -25,6 +25,7 @@ jobs:
         - LIB="/c/Program Files/zlib/lib"
         - LIB="/c/Program Files/athr/lib"
         - GENERATOR="Visual Studio 15 2017 Win64"
+        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
@@ -44,6 +45,7 @@ jobs:
         - LIB="/c/Program Files/zlib/lib"
         - LIB="/c/Program Files (x86)/athr/lib"
         - GENERATOR=Ninja
+        - CMAKE_GENERATOR=Ninja
       before_install:
         - choco install ninja zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
