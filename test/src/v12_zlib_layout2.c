@@ -10,8 +10,10 @@ unsigned    get_nexamples(void);
 unsigned    ipow(unsigned base, unsigned exp);
 void        test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
                                struct bgen_metafile* metafile);
-void        test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metafile,
-                                    uint32_t nsamples, unsigned prec);
+void        test_read_probabilities64(struct bgen_file* bgen, struct bgen_metafile* metafile,
+                                      uint32_t nsamples, unsigned prec);
+void        test_read_probabilities32(struct bgen_file* bgen, struct bgen_metafile* metafile,
+                                      uint32_t nsamples, unsigned prec);
 void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned precision);
 
 int main(void)
@@ -75,8 +77,8 @@ void test_read_metadata(struct bgen_file* bgen, struct bgen_samples* samples,
     bgen_partition_destroy(partition);
 }
 
-void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metafile,
-                             uint32_t nsamples, unsigned prec)
+void test_read_probabilities64(struct bgen_file* bgen, struct bgen_metafile* metafile,
+                               uint32_t nsamples, unsigned prec)
 {
     double prob[3];
     double abs_tol = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
@@ -100,9 +102,77 @@ void test_read_probabilities(struct bgen_file* bgen, struct bgen_metafile* metaf
             unsigned ncombs = bgen_genotype_ncombs(vg);
             cass_cond(ncombs == 3);
 
-            double* probabilities = calloc(nsamples * ncombs, sizeof(double));
+            double* probabilities = calloc(nsamples * ncombs, sizeof(*probabilities));
 
             cass_cond(bgen_genotype_read(vg, probabilities) == 0);
+
+            for (j = 0; j < 500; ++j) {
+
+                char  string[100];
+                char* tmp = NULL;
+
+                e = fscanf(f, "%s", string);
+                cass_cond(e == 1);
+                prob[0] = strtod(string, &tmp);
+
+                e = fscanf(f, "%s", string);
+                cass_cond(e == 1);
+                prob[1] = strtod(string, &tmp);
+
+                e = fscanf(f, "%s", string);
+                cass_cond(e == 1);
+                prob[2] = strtod(string, &tmp);
+
+                if ((prob[0] == 0) && (prob[1] == 0) && (prob[2] == 0)) {
+                    prob[0] = NAN;
+                    prob[1] = NAN;
+                    prob[2] = NAN;
+                    cass_cond(isnan(probabilities[j * 3 + 0]));
+                    cass_cond(isnan(probabilities[j * 3 + 1]));
+                    cass_cond(isnan(probabilities[j * 3 + 2]));
+                } else {
+                    cass_close2(probabilities[j * 3 + 0], prob[0], rel_tol, abs_tol);
+                    cass_close2(probabilities[j * 3 + 1], prob[1], rel_tol, abs_tol);
+                    cass_close2(probabilities[j * 3 + 2], prob[2], rel_tol, abs_tol);
+                }
+            }
+            free(probabilities);
+            bgen_genotype_close(vg);
+        }
+        bgen_partition_destroy(partition);
+    }
+
+    fclose(f);
+}
+
+void test_read_probabilities32(struct bgen_file* bgen, struct bgen_metafile* metafile,
+                               uint32_t nsamples, unsigned prec)
+{
+    double prob[3];
+    double abs_tol = 1. / ipow(2, prec) + 1. / ipow(2, prec) / 3.;
+    double rel_tol = 1e-09;
+    int    e;
+    size_t i, j;
+
+    FILE* f = fopen("data/example.matrix", "r");
+    cass_cond(f != NULL);
+
+    uint32_t ii = 0;
+    i = 0;
+    for (uint32_t part = 0; part < bgen_metafile_npartitions(metafile); ++part) {
+        struct bgen_partition const* partition = bgen_metafile_read_partition(metafile, part);
+        for (ii = 0; ii < bgen_partition_nvariants(partition); ++ii, ++i) {
+            struct bgen_variant const* vm = bgen_partition_get_variant(partition, ii);
+            struct bgen_genotype*      vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
+
+            cass_cond(bgen_genotype_max_ploidy(vg) == 2);
+
+            unsigned ncombs = bgen_genotype_ncombs(vg);
+            cass_cond(ncombs == 3);
+
+            float* probabilities = calloc(nsamples * ncombs, sizeof(*probabilities));
+
+            cass_cond(bgen_genotype_read32(vg, probabilities) == 0);
 
             for (j = 0; j < 500; ++j) {
 
@@ -149,7 +219,8 @@ void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned 
     test_read_metadata(bgen, samples, metafile);
     bgen_samples_destroy(samples);
 
-    test_read_probabilities(bgen, metafile, 500, precision);
+    test_read_probabilities64(bgen, metafile, 500, precision);
+    test_read_probabilities32(bgen, metafile, 500, precision);
 }
 
 const char* examples[] = {"data/example.1bits.bgen", "data/example.14bits.bgen",

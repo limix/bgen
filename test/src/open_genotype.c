@@ -194,7 +194,7 @@ void test_geno(void)
             vg = bgen_file_open_genotype(bgen, vm->genotype_offset);
 
             double* probabilities =
-                malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(double));
+                malloc(nsamples * bgen_genotype_ncombs(vg) * sizeof(*probabilities));
             double* p = probabilities;
             bgen_genotype_read(vg, probabilities);
 

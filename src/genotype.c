@@ -30,6 +30,19 @@ int bgen_genotype_read64(struct bgen_genotype* genotype, double* probabilities)
     return bgen_genotype_read(genotype, probabilities);
 }
 
+int bgen_genotype_read32(struct bgen_genotype* genotype, float* probabilities)
+{
+    if (genotype->layout == 1) {
+        bgen_layout1_read_genotype32(genotype, probabilities);
+    } else if (genotype->layout == 2) {
+        bgen_layout2_read_genotype32(genotype, probabilities);
+    } else {
+        bgen_error("unrecognized layout type %d", genotype->layout);
+        return 1;
+    }
+    return 0;
+}
+
 uint16_t bgen_genotype_nalleles(struct bgen_genotype const* genotype)
 {
     return genotype->nalleles;

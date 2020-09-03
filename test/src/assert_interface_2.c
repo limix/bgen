@@ -61,14 +61,22 @@ int main(void)
     cass_equal_int(bgen_genotype_ncombs(genotype), 3);
     cass_equal_int(bgen_genotype_phased(genotype), 0);
 
-    double* probs = malloc(500 * 3 * sizeof(double));
-    bgen_genotype_read(genotype, probs);
-    cass_close(probs[0], 0.00488311054141488121);
-    cass_close(probs[1], 0.02838308002197399704);
-    cass_close(probs[2], 0.96673380943661113562);
-    cass_close(probs[3], 0.99047793444424092613);
+    double* probs64 = malloc(500 * 3 * sizeof(*probs64));
+    bgen_genotype_read(genotype, probs64);
+    cass_close(probs64[0], 0.00488311054141488121);
+    cass_close(probs64[1], 0.02838308002197399704);
+    cass_close(probs64[2], 0.96673380943661113562);
+    cass_close(probs64[3], 0.99047793444424092613);
 
-    free(probs);
+    float* probs32 = malloc(500 * 3 * sizeof(*probs32));
+    bgen_genotype_read32(genotype, probs32);
+    cass_close2(probs32[0], 0.00488311054141488121, 1e-7, 0);
+    cass_close2(probs32[1], 0.02838308002197399704, 1e-7, 0);
+    cass_close2(probs32[2], 0.96673380943661113562, 1e-7, 0);
+    cass_close2(probs32[3], 0.99047793444424092613, 1e-7, 0);
+
+    free(probs64);
+    free(probs32);
     bgen_partition_destroy(partition);
     bgen_genotype_close(genotype);
     bgen_metafile_close(metafile);

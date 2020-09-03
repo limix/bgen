@@ -11,8 +11,10 @@
 
 #define BIT(var, bit) ((var & (1 << bit)) != 0)
 
-static void  read_phased_genotype(struct bgen_genotype* genotype, double* probs);
-static void  read_unphased_genotype(struct bgen_genotype* genotype, double* probs);
+static void  read_phased_genotype64(struct bgen_genotype* genotype, double* probs);
+static void  read_phased_genotype32(struct bgen_genotype* genotype, float* probs);
+static void  read_unphased_genotype64(struct bgen_genotype* genotype, double* probs);
+static void  read_unphased_genotype32(struct bgen_genotype* genotype, float* probs);
 static char* decompress(struct bgen_file* bgen_file);
 
 static inline uint8_t read_ploidy(uint8_t ploidy_miss) { return ploidy_miss & 127; }
@@ -26,6 +28,12 @@ static inline int get_bit(char const* mem, uint64_t bit_idx)
 }
 
 static inline void set_array_nan64(double* p, size_t n)
+{
+    for (size_t i = 0; i < n; ++i)
+        p[i] = NAN;
+}
+
+static inline void set_array_nan32(float* p, size_t n)
 {
     for (size_t i = 0; i < n; ++i)
         p[i] = NAN;
@@ -123,112 +131,129 @@ err:
 void bgen_layout2_read_genotype64(struct bgen_genotype* genotype, double* probs)
 {
     if (genotype->phased)
-        read_phased_genotype(genotype, probs);
+        read_phased_genotype64(genotype, probs);
     else
-        read_unphased_genotype(genotype, probs);
+        read_unphased_genotype64(genotype, probs);
 }
 
-static void read_phased_genotype(struct bgen_genotype* genotype, double* probs)
+void bgen_layout2_read_genotype32(struct bgen_genotype* genotype, float* probs)
 {
-    unsigned nbits = genotype->nbits;
-    unsigned nalleles = genotype->nalleles;
-    uint8_t  max_ploidy = genotype->max_ploidy;
-    double   denom = (double)((((uint64_t)1 << nbits)) - 1);
-
-    uint64_t sample_start = 0;
-    for (uint32_t j = 0; j < genotype->nsamples; ++j) {
-        unsigned ploidy = read_ploidy(genotype->ploidy_missingness[j]);
-        double*  pend = probs + max_ploidy * nalleles;
-
-        if (read_missingness(genotype->ploidy_missingness[j]) != 0) {
-            set_array_nan64(probs, (size_t)(pend - probs));
-            probs = pend;
-            sample_start += nbits * ploidy * (nalleles - 1);
-            continue;
-        }
-
-        uint64_t haplo_start = 0;
-        for (uint8_t i = 0; i < ploidy; ++i) {
-
-            uint64_t uip_sum = 0;
-            uint64_t allele_start = 0;
-            for (uint16_t ii = 0; ii < nalleles - 1; ++ii) {
-
-                uint64_t ui_prob = 0;
-                uint64_t offset = sample_start + haplo_start + allele_start;
-
-                for (uint8_t bi = 0; bi < nbits; ++bi) {
-
-                    if (get_bit(genotype->chunk_ptr, bi + offset)) {
-                        ui_prob |= ((uint64_t)1 << bi);
-                    }
-                }
-
-                *probs = (double)ui_prob / denom;
-                ++probs;
-                uip_sum += ui_prob;
-                allele_start += nbits;
-            }
-            *probs = (denom - (double)uip_sum) / denom;
-            ++probs;
-            haplo_start += nbits * (nalleles - 1);
-        }
-        sample_start += nbits * ploidy * (nalleles - 1);
-        set_array_nan64(probs, (size_t)(pend - probs));
-        probs = pend;
-    }
+    if (genotype->phased)
+        read_phased_genotype32(genotype, probs);
+    else
+        read_unphased_genotype32(genotype, probs);
 }
 
-static void read_unphased_genotype(struct bgen_genotype* genotype, double* probs)
-{
-    uint8_t  nbits = genotype->nbits;
-    uint16_t nalleles = genotype->nalleles;
-    uint8_t  max_ploidy = genotype->max_ploidy;
-
-    double   denom = (double)((((uint64_t)1 << nbits)) - 1);
-    unsigned max_ncombs =
-        choose(nalleles + (unsigned)(max_ploidy - 1), (unsigned)(nalleles - 1));
-
-    uint64_t sample_start = 0;
-    for (uint32_t j = 0; j < genotype->nsamples; ++j) {
-        double*  pend = probs + max_ncombs;
-        uint8_t  ploidy = read_ploidy(genotype->ploidy_missingness[j]);
-        unsigned ncombs = choose(nalleles + (unsigned)(ploidy - 1), (unsigned)(nalleles - 1));
-
-        if (read_missingness(genotype->ploidy_missingness[j]) != 0) {
-            set_array_nan64(probs, (size_t)(pend - probs));
-            probs = pend;
-            sample_start += nbits * (ncombs - 1);
-            continue;
-        }
-
-        uint64_t uip_sum = 0;
-
-        uint64_t geno_start = 0;
-        for (uint8_t i = 0; i < (size_t)(ncombs - 1); ++i) {
-
-            uint64_t ui_prob = 0;
-            uint64_t offset = sample_start + geno_start;
-
-            for (uint8_t bi = 0; bi < (size_t)nbits; ++bi) {
-
-                if (get_bit(genotype->chunk_ptr, bi + offset)) {
-                    ui_prob |= ((uint64_t)1 << bi);
-                }
-            }
-
-            *probs = (double)ui_prob / denom;
-            ++probs;
-            uip_sum += ui_prob;
-            geno_start += nbits;
-        }
-        *probs = (denom - (double)uip_sum) / denom;
-        ++probs;
-        sample_start += nbits * (ncombs - 1);
-        set_array_nan64(probs, (size_t)(pend - probs));
-        probs = pend;
+#define MAKE_READ_PHASED_GENOTYPE(BITS, FPTYPE)                                               \
+    static void read_phased_genotype##BITS(struct bgen_genotype* genotype, FPTYPE* probs)     \
+    {                                                                                         \
+        unsigned nbits = genotype->nbits;                                                     \
+        unsigned nalleles = genotype->nalleles;                                               \
+        uint8_t  max_ploidy = genotype->max_ploidy;                                           \
+        FPTYPE   denom = (FPTYPE)((((uint64_t)1 << nbits)) - 1);                              \
+                                                                                              \
+        uint64_t sample_start = 0;                                                            \
+        for (uint32_t j = 0; j < genotype->nsamples; ++j) {                                   \
+            unsigned ploidy = read_ploidy(genotype->ploidy_missingness[j]);                   \
+            FPTYPE*  pend = probs + max_ploidy * nalleles;                                    \
+                                                                                              \
+            if (read_missingness(genotype->ploidy_missingness[j]) != 0) {                     \
+                set_array_nan##BITS(probs, (size_t)(pend - probs));                           \
+                probs = pend;                                                                 \
+                sample_start += nbits * ploidy * (nalleles - 1);                              \
+                continue;                                                                     \
+            }                                                                                 \
+                                                                                              \
+            uint64_t haplo_start = 0;                                                         \
+            for (uint8_t i = 0; i < ploidy; ++i) {                                            \
+                                                                                              \
+                uint##BITS##_t uip_sum = 0;                                                   \
+                uint64_t       allele_start = 0;                                              \
+                for (uint16_t ii = 0; ii < nalleles - 1; ++ii) {                              \
+                                                                                              \
+                    uint64_t ui_prob = 0;                                                     \
+                    uint64_t offset = sample_start + haplo_start + allele_start;              \
+                                                                                              \
+                    for (uint8_t bi = 0; bi < nbits; ++bi) {                                  \
+                                                                                              \
+                        if (get_bit(genotype->chunk_ptr, bi + offset)) {                      \
+                            ui_prob |= ((uint64_t)1 << bi);                                   \
+                        }                                                                     \
+                    }                                                                         \
+                                                                                              \
+                    *probs = (FPTYPE)ui_prob / denom;                                         \
+                    ++probs;                                                                  \
+                    uip_sum += ui_prob;                                                       \
+                    allele_start += nbits;                                                    \
+                }                                                                             \
+                *probs = (denom - (FPTYPE)uip_sum) / denom;                                   \
+                ++probs;                                                                      \
+                haplo_start += nbits * (nalleles - 1);                                        \
+            }                                                                                 \
+            sample_start += nbits * ploidy * (nalleles - 1);                                  \
+            set_array_nan##BITS(probs, (size_t)(pend - probs));                               \
+            probs = pend;                                                                     \
+        }                                                                                     \
     }
-}
+
+MAKE_READ_PHASED_GENOTYPE(64, double)
+MAKE_READ_PHASED_GENOTYPE(32, float)
+
+#define MAKE_UNPHASED_GENOTYPE(BITS, FPTYPE)                                                  \
+    static void read_unphased_genotype##BITS(struct bgen_genotype* genotype, FPTYPE* probs)   \
+    {                                                                                         \
+        uint8_t  nbits = genotype->nbits;                                                     \
+        uint16_t nalleles = genotype->nalleles;                                               \
+        uint8_t  max_ploidy = genotype->max_ploidy;                                           \
+                                                                                              \
+        FPTYPE   denom = (FPTYPE)((((uint64_t)1 << nbits)) - 1);                              \
+        unsigned max_ncombs =                                                                 \
+            choose(nalleles + (unsigned)(max_ploidy - 1), (unsigned)(nalleles - 1));          \
+                                                                                              \
+        uint64_t sample_start = 0;                                                            \
+        for (uint32_t j = 0; j < genotype->nsamples; ++j) {                                   \
+            FPTYPE*  pend = probs + max_ncombs;                                               \
+            uint8_t  ploidy = read_ploidy(genotype->ploidy_missingness[j]);                   \
+            unsigned ncombs =                                                                 \
+                choose(nalleles + (unsigned)(ploidy - 1), (unsigned)(nalleles - 1));          \
+                                                                                              \
+            if (read_missingness(genotype->ploidy_missingness[j]) != 0) {                     \
+                set_array_nan##BITS(probs, (size_t)(pend - probs));                           \
+                probs = pend;                                                                 \
+                sample_start += nbits * (ncombs - 1);                                         \
+                continue;                                                                     \
+            }                                                                                 \
+                                                                                              \
+            uint##BITS##_t uip_sum = 0;                                                       \
+                                                                                              \
+            uint64_t geno_start = 0;                                                          \
+            for (uint8_t i = 0; i < (uint8_t)(ncombs - 1); ++i) {                             \
+                                                                                              \
+                uint##BITS##_t ui_prob = 0;                                                   \
+                uint64_t       offset = sample_start + geno_start;                            \
+                                                                                              \
+                for (uint8_t bi = 0; bi < (uint8_t)nbits; ++bi) {                             \
+                                                                                              \
+                    if (get_bit(genotype->chunk_ptr, bi + offset)) {                          \
+                        ui_prob |= ((uint##BITS##_t)1 << bi);                                 \
+                    }                                                                         \
+                }                                                                             \
+                                                                                              \
+                *probs = (FPTYPE)ui_prob / denom;                                             \
+                ++probs;                                                                      \
+                uip_sum += ui_prob;                                                           \
+                geno_start += nbits;                                                          \
+            }                                                                                 \
+            *probs = (denom - (FPTYPE)uip_sum) / denom;                                       \
+            ++probs;                                                                          \
+            sample_start += nbits * (ncombs - 1);                                             \
+            set_array_nan##BITS(probs, (size_t)(pend - probs));                               \
+            probs = pend;                                                                     \
+        }                                                                                     \
+    }
+
+MAKE_UNPHASED_GENOTYPE(64, double)
+MAKE_UNPHASED_GENOTYPE(32, float)
 
 static char* decompress(struct bgen_file* bgen_file)
 {
