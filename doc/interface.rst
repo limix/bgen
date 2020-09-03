@@ -50,6 +50,8 @@ Genotype
 
 .. doxygenfunction:: bgen_genotype_close
 .. doxygenfunction:: bgen_genotype_read
+.. doxygenfunction:: bgen_genotype_read64
+.. doxygenfunction:: bgen_genotype_read32
 .. doxygenfunction:: bgen_genotype_nalleles
 .. doxygenfunction:: bgen_genotype_missing
 .. doxygenfunction:: bgen_genotype_ploidy
