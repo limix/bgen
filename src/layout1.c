@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 static void  read_unphased64(struct bgen_genotype* vg, double* probs);
+static void  read_unphased32(struct bgen_genotype* vg, float* probs);
 static char* decompress(struct bgen_file* bgen_file);
 
 int bgen_layout1_read_header(struct bgen_file* bgen_file, struct bgen_genotype* genotype)
@@ -45,28 +46,37 @@ void bgen_layout1_read_genotype64(struct bgen_genotype* genotype, double* probs)
     read_unphased64(genotype, probs);
 }
 
-static void read_unphased64(struct bgen_genotype* genotype, double* probs)
+void bgen_layout1_read_genotype32(struct bgen_genotype* genotype, float* probs)
 {
-    uint16_t ui_prob = 0;
-    double   denom = 32768;
-
-    char const* restrict chunk = genotype->chunk_ptr;
-
-    for (uint32_t j = 0; j < genotype->nsamples; ++j) {
-        unsigned int ui_prob_sum = 0;
-
-        for (size_t i = 0; i < 3; ++i) {
-            bgen_memfread(&ui_prob, &chunk, 2);
-            probs[j * 3 + i] = ui_prob / denom;
-            ui_prob_sum += ui_prob;
-        }
-
-        if (ui_prob_sum == 0) {
-            for (size_t i = 0; i < 3; ++i)
-                probs[j * 3 + i] = NAN;
-        }
-    }
+    read_unphased32(genotype, probs);
 }
+
+#define MAKE_READ_UNPHASED(BITS, FPTYPE)                                                      \
+    static void read_unphased##BITS(struct bgen_genotype* genotype, FPTYPE* probs)            \
+    {                                                                                         \
+        uint16_t ui_prob = 0;                                                                 \
+        FPTYPE   denom = 32768;                                                               \
+                                                                                              \
+        char const* restrict chunk = genotype->chunk_ptr;                                     \
+                                                                                              \
+        for (uint32_t j = 0; j < genotype->nsamples; ++j) {                                   \
+            unsigned int ui_prob_sum = 0;                                                     \
+                                                                                              \
+            for (size_t i = 0; i < 3; ++i) {                                                  \
+                bgen_memfread(&ui_prob, &chunk, 2);                                           \
+                probs[j * 3 + i] = ui_prob / denom;                                           \
+                ui_prob_sum += ui_prob;                                                       \
+            }                                                                                 \
+                                                                                              \
+            if (ui_prob_sum == 0) {                                                           \
+                for (size_t i = 0; i < 3; ++i)                                                \
+                    probs[j * 3 + i] = NAN;                                                   \
+            }                                                                                 \
+        }                                                                                     \
+    }
+
+MAKE_READ_UNPHASED(64, double)
+MAKE_READ_UNPHASED(32, float)
 
 static char* decompress(struct bgen_file* bgen_file)
 {
