@@ -63,8 +63,6 @@ script:
   - cd build.release
   - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
     ..
-  - cat "C:/Users/travis/build/limix/bgen/build.release/CMakeFiles/CMakeOutput.log"
-  - cat "C:/Users/travis/build/limix/bgen/build.release/CMakeFiles/CMakeError.log"
   - cmake --build . --config Release
   - ctest --output-on-failure -C Release
   - cmake --build . --config Release --target install
