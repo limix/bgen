@@ -2,7 +2,7 @@ language: c
 jobs:
   include:
     - os: linux
-      env: CMAKE_GENERATOR="Unix Makefiles"
+      env: GENERATOR="Unix Makefiles"
       sudo: required
       before_script:
         - test -e /usr/bin/cmake || sudo ln -s $(which cmake) /usr/bin/cmake
@@ -10,14 +10,13 @@ jobs:
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
           DO_CMD=sudo bash
     - os: osx
-      env: CMAKE_GENERATOR="Unix Makefiles"
+      env: GENERATOR="Unix Makefiles"
       before_script:
         - bash <(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/master/install)
         - curl -fsSL https://git.io/JerYI | GITHUB_USER=horta GITHUB_PROJECT=almosthere
           DO_CMD=sudo bash
     - name: Build on windows
       os: windows
-      compiler: cl
       env:
         - INCLUDE="/c/ProgramData/chocolatey/lib/zstandard/tools/include"
         - INCLUDE="/c/Program Files/zlib/include"
@@ -25,7 +24,7 @@ jobs:
         - LIB="/c/ProgramData/chocolatey/lib/zstandard/tools/dll"
         - LIB="/c/Program Files/zlib/lib"
         - LIB="/c/Program Files/athr/lib"
-        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+        - GENERATOR="Visual Studio 15 2017 Win64"
       before_script:
         - choco install zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
@@ -44,7 +43,7 @@ jobs:
         - LIB="/c/ProgramData/chocolatey/lib/zstandard/tools/dll"
         - LIB="/c/Program Files/zlib/lib"
         - LIB="/c/Program Files (x86)/athr/lib"
-        - CMAKE_GENERATOR=Ninja
+        - GENERATOR=Ninja
       before_install:
         - choco install ninja zstandard --no-progress -y
         - powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat',
@@ -62,8 +61,7 @@ script:
   - mkdir prefix
   - mkdir build.release
   - cd build.release
-  - cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
-    ..
+  - cmake .. -G"$GENERATOR" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$TRAVIS_BUILD_DIR/prefix
   - cmake --build . --config Release
   - ctest --output-on-failure -C Release
   - cmake --build . --config Release --target install
