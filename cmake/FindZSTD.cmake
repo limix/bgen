@@ -46,7 +46,6 @@ set(zstd_lib_dirs "/usr/lib" "/usr/local/lib")
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMFILES}/zstd/lib")
     set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMDATA}/chocolatey/lib/zstandard/tools/dll")
-    # set(zstd_lib_dirs ${zstd_lib_dirs} "$ENV{PROGRAMDATA}/chocolatey/lib/zstandard/tools/static")
 endif()
 
 if(ZSTD_LIBRARYDIR)
@@ -55,7 +54,7 @@ endif()
 
 find_library(
     ZSTD_LIBRARY
-    NAMES zstd zstdlib libzstd libzstd.dll.a
+    NAMES zstd zstdlib libzstd
     HINTS ${zstd_lib_dirs}
 )
 
