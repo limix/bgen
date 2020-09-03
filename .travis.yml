@@ -17,6 +17,7 @@ jobs:
           DO_CMD=sudo bash
     - name: Build on windows
       os: windows
+      language: cpp
       env:
         - INCLUDE="/c/ProgramData/chocolatey/lib/zstandard/tools/include"
         - INCLUDE="/c/Program Files/zlib/include"
