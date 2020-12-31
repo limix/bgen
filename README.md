@@ -1,7 +1,5 @@
 # bgen
 
-[![Travis](https://travis-ci.com/limix/bgen.svg?branch=master)](https://travis-ci.com/limix/bgen)
-
 A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
 
 It fully supports the BGEN format specifications 1.2 and 1.3.
@@ -82,4 +80,4 @@ missing DLLs. Find those DLLs in your system and copy them into the build folder
 
 ## License
 
-This project is licensed under the [MIT License](https://raw.githubusercontent.com/limix/bgen/master/LICENSE.md).
+This project is licensed under the [MIT License](https://raw.githubusercontent.com/limix/bgen/main/LICENSE.md).
