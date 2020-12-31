@@ -1,7 +1,7 @@
 #ifndef BGEN_METAFILE_WRITE_H
 #define BGEN_METAFILE_WRITE_H
 
-#include "athr.h"
+#include "athr/athr.h"
 #include "bgen/bstring.h"
 #include "bgen/variant.h"
 #include "bmath.h"

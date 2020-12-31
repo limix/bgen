@@ -33,9 +33,9 @@
 /** Minor bgen version. */
 #define BGEN_VERSION_MINOR 1
 /** Minor bgen version. */
-#define BGEN_VERSION_PATCH 0
+#define BGEN_VERSION_PATCH 1
 /** Bgen version. */
-#define BGEN_VERSION "4.1.0"
+#define BGEN_VERSION "4.1.1"
 
 #ifdef __cplusplus
 extern "C"
