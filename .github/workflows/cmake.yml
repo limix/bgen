@@ -18,11 +18,15 @@ jobs:
 
     - name: Install zstd
       shell: bash
-      run: sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/main/install)"
+      run: |
+        if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
+        $SUDO bash -c "$(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/main/install)"
 
     - name: Install almosthere
       shell: bash
-      run: sudo bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/almosthere
+      run: |
+        if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
+        $SUDO bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/almosthere
 
     - name: Create Build Environment
       run: cmake -E make_directory '${{runner.workspace}}/build' -E make_directory '${{runner.workspace}}/prefix'
@@ -45,4 +49,6 @@ jobs:
     - name: Install
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: cmake --build . --target install --config $BUILD_TYPE
+      run: |
+        if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
+        $SUDO cmake --build . --target install --config $BUILD_TYPE
