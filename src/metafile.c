@@ -30,8 +30,9 @@ struct bgen_metafile* bgen_metafile_create(struct bgen_file* bgen_file, char con
     }
 
     /* seek to metadata block */
-    if (bgen_fseek(metafile->stream,
-                   BGEN_METAFILE_HEADER_SIZE + sizeof(uint64_t) * npartitions, SEEK_SET))
+    int64_t block_seek = (int64_t)BGEN_METAFILE_HEADER_SIZE;
+    block_seek += (int64_t)(sizeof(uint64_t) * npartitions);
+    if (bgen_fseek(metafile->stream, block_seek, SEEK_SET))
         goto err;
 
     metafile->partition_offset = malloc(sizeof(uint64_t) * npartitions);

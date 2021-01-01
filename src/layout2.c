@@ -167,8 +167,8 @@ void bgen_layout2_read_genotype32(struct bgen_genotype* genotype, float* probs)
             uint64_t haplo_start = 0;                                                         \
             for (uint8_t i = 0; i < ploidy; ++i) {                                            \
                                                                                               \
-                uint##BITS##_t uip_sum = 0;                                                   \
-                uint64_t       allele_start = 0;                                              \
+                uint64_t uip_sum = 0;                                                         \
+                uint64_t allele_start = 0;                                                    \
                 for (uint16_t ii = 0; ii < nalleles - 1; ++ii) {                              \
                                                                                               \
                     uint64_t ui_prob = 0;                                                     \
