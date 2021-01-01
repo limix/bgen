@@ -45,6 +45,14 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
+    - name: Pre-test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      if: matrix.os == 'windows-latest'
+      run: |
+        cp "C:/Program Files/zstd/bin/zstd.dll" .
+        cp "C:/Program Files/zlib/bin/zlib.dll" .
+
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
