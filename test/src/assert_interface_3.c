@@ -19,13 +19,13 @@ int main(void)
 
 void test_open_wrong_bgen_filepath(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/wrong.metafile");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "wrong.metafile");
     cass_cond(bgen == NULL);
 }
 
 void test_bgen_file_haplotypes(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "haplotypes.bgen");
 
     cass_cond(bgen != NULL);
     cass_equal_int(bgen_file_nsamples(bgen), 4);
@@ -42,7 +42,7 @@ void test_bgen_file_haplotypes(void)
 
 void test_create_meteadata_haplotypes(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "haplotypes.bgen");
 
     struct bgen_metafile* mf =
         bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.1", 4, 0);
@@ -76,7 +76,7 @@ void test_create_meteadata_haplotypes(void)
 
 void test_genotype_haplotypes_by_creating_metadata(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "haplotypes.bgen");
 
     struct bgen_metafile* mf =
         bgen_metafile_create(bgen, "assert_interface_3.tmp/haplotypes.bgen.metafile.2", 4, 0);
@@ -154,7 +154,7 @@ void test_genotype_haplotypes_by_creating_metadata(void)
 
 void test_genotype_haplotypes_by_loading_metadata(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/haplotypes.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "haplotypes.bgen");
 
     struct bgen_metafile* mf =
         bgen_metafile_open("assert_interface_3.tmp/haplotypes.bgen.metafile.2");

@@ -18,7 +18,7 @@ int main(void)
 
 void test_file(void)
 {
-    const char        filename[] = "data/complex.23bits.bgen";
+    const char        filename[] = TEST_DATADIR "complex.23bits.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
 
@@ -74,7 +74,7 @@ void test_file(void)
 
 void test_geno(void)
 {
-    const char        filename[] = "data/complex.23bits.bgen";
+    const char        filename[] = TEST_DATADIR "complex.23bits.bgen";
     struct bgen_file* bgen;
 
     cass_cond((bgen = bgen_file_open(filename)) != NULL);

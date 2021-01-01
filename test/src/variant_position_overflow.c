@@ -3,7 +3,7 @@
 
 int main(void)
 {
-    struct bgen_file* bgen_file = bgen_file_open("data/roundtrip1.bgen");
+    struct bgen_file* bgen_file = bgen_file_open(TEST_DATADIR "roundtrip1.bgen");
 
     cass_cond(bgen_file_nvariants(bgen_file) == 100);
 

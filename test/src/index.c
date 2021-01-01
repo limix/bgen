@@ -7,7 +7,7 @@ void use_metafile_wrongly(char const* metafile_filepath);
 
 int main(void)
 {
-    char const bgen_file_filepath[] = "data/complex.23bits.bgen";
+    char const bgen_file_filepath[] = TEST_DATADIR "complex.23bits.bgen";
     char const metafile_filepath[] = "index.tmp/complex_index03.metafile";
 
     create_metafile(bgen_file_filepath, metafile_filepath);

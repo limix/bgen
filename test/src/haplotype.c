@@ -17,7 +17,7 @@ int main(void)
 
 void test_haplotype64(void)
 {
-    const char        filename[] = "data/haplotypes.bgen";
+    const char        filename[] = TEST_DATADIR "haplotypes.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
 
@@ -95,7 +95,7 @@ void test_haplotype64(void)
 
 void test_haplotype32(void)
 {
-    const char        filename[] = "data/haplotypes.bgen";
+    const char        filename[] = TEST_DATADIR "haplotypes.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
 

@@ -6,6 +6,9 @@ function(bgen_add_test name)
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(${target} PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 
+    set(datadir "${CMAKE_CURRENT_BINARY_DIR}/data/")
+    target_compile_definitions(${target} PUBLIC "TEST_DATADIR=\"${datadir}\"")
+
     add_test(NAME ${name} COMMAND ${target} -E environment
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -20,7 +23,7 @@ function(bgen_add_test name)
     list(APPEND PATH $<TARGET_FILE_DIR:ATHR::athr>)
     list(APPEND PATH $<TARGET_FILE_DIR:BGEN::bgen>)
     string(REPLACE ";" "\\;" PATH "${PATH}")
-    set_tests_properties(${name} PROPERTIES ENVIRONMENT "PATH=${PATH}" )
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT "PATH=${PATH}")
 endfunction()
 
 function(bgen_copy filename)

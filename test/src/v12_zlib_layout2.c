@@ -86,7 +86,7 @@ void test_read_probabilities64(struct bgen_file* bgen, struct bgen_metafile* met
     int    e;
     size_t i, j;
 
-    FILE* f = fopen("data/example.matrix", "r");
+    FILE* f = fopen(TEST_DATADIR "example.matrix", "r");
     cass_cond(f != NULL);
 
     uint32_t ii = 0;
@@ -154,7 +154,7 @@ void test_read_probabilities32(struct bgen_file* bgen, struct bgen_metafile* met
     int    e;
     size_t i, j;
 
-    FILE* f = fopen("data/example.matrix", "r");
+    FILE* f = fopen(TEST_DATADIR "example.matrix", "r");
     cass_cond(f != NULL);
 
     uint32_t ii = 0;
@@ -223,12 +223,13 @@ void test_read(struct bgen_file* bgen, struct bgen_metafile* metafile, unsigned 
     test_read_probabilities32(bgen, metafile, 500, precision);
 }
 
-const char* examples[] = {"data/example.1bits.bgen", "data/example.14bits.bgen",
-                          "data/example.32bits.bgen"};
+const char* examples[] = {TEST_DATADIR "example.1bits.bgen",
+                          TEST_DATADIR "example.14bits.bgen",
+                          TEST_DATADIR "example.32bits.bgen"};
 
-const char* indices[] = {"data/example.1bits.bgen.metafile",
-                         "data/example.14bits.bgen.metafile",
-                         "data/example.32bits.bgen.metafile"};
+const char* indices[] = {TEST_DATADIR "example.1bits.bgen.metafile",
+                         TEST_DATADIR "example.14bits.bgen.metafile",
+                         TEST_DATADIR "example.32bits.bgen.metafile"};
 
 const unsigned precision[] = {1, 14, 32};
 

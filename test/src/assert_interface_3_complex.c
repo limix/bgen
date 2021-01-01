@@ -17,7 +17,7 @@ int main(void)
 
 void test_bgen_file_complex(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/complex.23bits.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "complex.23bits.bgen");
 
     cass_cond(bgen != NULL) cass_equal_int(bgen_file_nsamples(bgen), 4);
     cass_equal_int(bgen_file_nvariants(bgen), 10);
@@ -33,7 +33,7 @@ void test_bgen_file_complex(void)
 
 void test_create_metadata_complex(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/complex.23bits.bgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "complex.23bits.bgen");
 
     struct bgen_metafile* mf = bgen_metafile_create(
         bgen, "assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.1", 4, 0);
@@ -159,7 +159,7 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf)
 void test_genotype_complex(void)
 {
     {
-        struct bgen_file*     bgen = bgen_file_open("data/complex.23bits.bgen");
+        struct bgen_file*     bgen = bgen_file_open(TEST_DATADIR "complex.23bits.bgen");
         struct bgen_metafile* mf = bgen_metafile_create(
             bgen, "assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.2", 4, 0);
 
@@ -169,7 +169,7 @@ void test_genotype_complex(void)
     }
 
     {
-        struct bgen_file*     bgen = bgen_file_open("data/complex.23bits.bgen");
+        struct bgen_file*     bgen = bgen_file_open(TEST_DATADIR "complex.23bits.bgen");
         struct bgen_metafile* mf = bgen_metafile_open(
             "assert_interface_3_complex.tmp/complex.23bits.bgen.metafile.2");
 

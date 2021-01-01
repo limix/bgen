@@ -14,7 +14,7 @@ int main(void)
 
 void test_complex64(void)
 {
-    const char        filename[] = "data/complex.23bits.bgen";
+    const char        filename[] = TEST_DATADIR "complex.23bits.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
     double*           probabilities;
@@ -143,7 +143,7 @@ void test_complex64(void)
 
 void test_complex32(void)
 {
-    const char        filename[] = "data/complex.23bits.bgen";
+    const char        filename[] = TEST_DATADIR "complex.23bits.bgen";
     struct bgen_file* bgen;
     uint32_t          nsamples, nvariants;
     float*            probabilities;

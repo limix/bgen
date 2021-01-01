@@ -11,6 +11,6 @@ int main(void)
 
 void test_pbgen_example(void)
 {
-    struct bgen_file* bgen = bgen_file_open("data/pbgen_example.pgen");
+    struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "pbgen_example.pgen");
     cass_cond(bgen == NULL);
 }
