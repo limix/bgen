@@ -22,6 +22,10 @@ jobs:
         if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
         $SUDO bash -c "$(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/main/install)"
 
+    - name: Install zlib
+      if: matrix.os == "windows-latest"
+      run: powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"; ./install.bat
+
     - name: Install almosthere
       shell: bash
       run: |
