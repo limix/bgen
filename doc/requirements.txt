@@ -1,2 +1,2 @@
-breathe
-sphinx-rtd-theme
+breathe>=4.30.0
+sphinx-rtd-theme>=0.5.2
