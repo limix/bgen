@@ -56,9 +56,7 @@ jobs:
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: |
-        test/test_assert_interface_2
-        ctest -C $BUILD_TYPE
+      run: ctest -C $BUILD_TYPE
 
     - name: Install
       working-directory: ${{runner.workspace}}/build
