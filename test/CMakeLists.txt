@@ -19,7 +19,7 @@ function(bgen_add_test name)
     set_tests_properties(${name}
         PROPERTIES
         ENVIRONMENT
-        "PATH=$<TARGET_PROPERTY:ZLIB::ZLIB,RUNTIME_OUTPUT_DIRECTORY>;$<TARGET_FILE_DIR:ZLIB::ZLIB>;$<TARGET_FILE_DIR:ZSTD::zstd>;$<TARGET_FILE_DIR:ATHR::athr>;$<TARGET_FILE_DIR:BGEN::bgen>;$ENV{PATH}"
+        "PATH=$<TARGET_FILE_DIR:ZLIB::ZLIB>/../bin;$<TARGET_FILE_DIR:ZSTD::zstd>/../bin;$<TARGET_FILE_DIR:ATHR::athr>;$<TARGET_FILE_DIR:BGEN::bgen>;$ENV{PATH}"
     )
 
 endfunction()
