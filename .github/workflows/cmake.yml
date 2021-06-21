@@ -53,6 +53,7 @@ jobs:
       run: |
         cp "C:/Program Files/zstd/bin/zstd.dll" .
         cp "C:/Program Files/zlib/bin/zlib.dll" .
+        cp "C:/Program Files/athr/bin/athr.dll" .
 
     - name: Test
       working-directory: ${{runner.workspace}}/build
