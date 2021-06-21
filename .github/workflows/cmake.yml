@@ -30,7 +30,6 @@ jobs:
       shell: bash
       run: |
         if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
-        env
         $SUDO bash -c "$(curl -fsSL https://git.io/JerYI)" -s horta/almosthere
 
     - name: Create Build Environment
@@ -59,7 +58,9 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
+        pwd
         ls
+        ls test/
         ctest -C $BUILD_TYPE --rerun-failed --output-on-failure
 
     - name: Install
