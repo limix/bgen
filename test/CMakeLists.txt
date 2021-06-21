@@ -16,11 +16,14 @@ function(bgen_add_test name)
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/${name}.tmp"
     )
 
-    set_tests_properties(${name}
-        PROPERTIES
-        ENVIRONMENT
-        "PATH=$<TARGET_FILE_DIR:ZLIB::ZLIB>/../bin;$<TARGET_FILE_DIR:ZSTD::zstd>/../bin;$<TARGET_FILE_DIR:ATHR::athr>;$<TARGET_FILE_DIR:BGEN::bgen>;$ENV{PATH}"
-    )
+    # Ugly hacky to make the tests work on Windows.
+    file(TO_CMAKE_PATH "$ENV{PATH}" PATH)
+    list(APPEND PATH $<TARGET_FILE_DIR:ZLIB::ZLIB>/../bin)
+    list(APPEND PATH $<TARGET_FILE_DIR:ZSTD::zstd>/../bin)
+    list(APPEND PATH $<TARGET_FILE_DIR:ATHR::athr>)
+    list(APPEND PATH $<TARGET_FILE_DIR:BGEN::bgen>)
+    string(REPLACE ";" "\\;" PATH "${PATH}")
+    set_tests_properties(${name} PROPERTIES ENVIRONMENT "PATH=${PATH}")
 
 endfunction()
 
