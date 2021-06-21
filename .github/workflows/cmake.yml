@@ -45,19 +45,19 @@ jobs:
       shell: bash
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Pre-test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      if: matrix.os == 'windows-latest'
-      run: |
-        pwd
-        test/Release/test_assert_interface_2.exe
+#     - name: Pre-test
+#       working-directory: ${{runner.workspace}}/build
+#       shell: bash
+#       if: matrix.os == 'windows-latest'
+#       run: |
+#         pwd
+#         test/Release/test_assert_interface_2.exe
 
     - name: Test
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
-        ctest -C $BUILD_TYPE --rerun-failed --output-on-failure
+        ctest -C $BUILD_TYPE -V --rerun-failed --output-on-failure
 
     - name: Install
       working-directory: ${{runner.workspace}}/build
