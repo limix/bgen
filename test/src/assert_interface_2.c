@@ -1,8 +1,13 @@
 #include "bgen/bgen.h"
 #include "cass.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(void)
 {
+    char *p = getenv("PATH");
+    fprintf(stdout, "PATH = %s\n", p);
+
     struct bgen_file* bgen = bgen_file_open(TEST_DATADIR "nexist");
     cass_cond(bgen == NULL);
 
