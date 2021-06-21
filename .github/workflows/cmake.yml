@@ -59,8 +59,7 @@ jobs:
       shell: bash
       run: |
         pwd
-        ls
-        ls test/
+        test/Release/test_assert_interface_2.exe
         ctest -C $BUILD_TYPE --rerun-failed --output-on-failure
 
     - name: Install
