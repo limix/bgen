@@ -100,8 +100,8 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     genotype->nbits = nbits;
     genotype->ploidy_missingness = plo_miss;
 
-    if (genotype->max_ploidy == 0) {
-        bgen_error("`max_ploidy` cannot be zero");
+    if (phased && genotype->max_ploidy == 0) {
+        bgen_error("phased genotype cannot have zero `max_ploidy`");
         goto err;
     }
     if (genotype->nalleles == 0) {
@@ -112,7 +112,7 @@ int bgen_layout2_read_header(struct bgen_file* bgen_file, struct bgen_genotype* 
     if (phased)
         genotype->ncombs = (unsigned)nalleles * (unsigned)genotype->max_ploidy;
     else
-        genotype->ncombs = choose((unsigned)nalleles + (unsigned)(genotype->max_ploidy - 1),
+        genotype->ncombs = choose((unsigned)(genotype->max_ploidy) + (unsigned)(nalleles - 1),
                                   (unsigned)(nalleles - 1));
 
     genotype->chunk = chunk;
