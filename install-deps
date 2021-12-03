@@ -1,0 +1,4 @@
+#!/bin/bash
+
+bash -c "$(curl -fsSL https://git.io/Jz7Oa)" -s horta/elapsed || exit 1
+bash -c "$(curl -fsSL https://git.io/Jz7Oa)" -s horta/almosthere || exit 1

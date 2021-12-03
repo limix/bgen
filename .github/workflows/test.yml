@@ -1,0 +1,53 @@
+name: Test
+
+on: push
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: Running on ${{matrix.os}}
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Check for sudo
+      shell: bash
+      run: |
+        if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
+        echo "SUDO=$SUDO" >> $GITHUB_ENV
+
+    - name: Install zstd
+      shell: bash
+      run: $SUDO bash -c "$(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/main/install)"
+
+    - name: Install zlib
+      if: matrix.os == 'windows-latest'
+      run: powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"; ./install.bat
+
+    - name: Install dependencies
+      shell: bash
+      run: if [ -f install-deps ]; then $SUDO ./install-deps; fi
+
+    - name: Configure CMake
+      shell: bash
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      shell: bash
+      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ctest -C $BUILD_TYPE --output-on-failure
+
+    - name: Install
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: $SUDO cmake --build . --target install --config $BUILD_TYPE
