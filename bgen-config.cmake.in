@@ -1,6 +1,8 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
-find_dependency(almosthere)
+find_dependency(athr)
+find_dependency(elapsed)
 include("${CMAKE_CURRENT_LIST_DIR}/bgen-targets.cmake")
-check_required_components(almosthere)
+check_required_components(elapsed)
+check_required_components(athr)
