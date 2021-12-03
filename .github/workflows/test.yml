@@ -15,17 +15,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
-    - uses: actions/checkout@v2
-    - uses: fbactions/setup-winsdk@v1
+    - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1
       with:
-        winsdk-build-version: 19041
+        sdk-version: 19041
 
     - name: Check for sudo
       shell: bash
       run: |
         if type sudo >/dev/null 2>&1; then SUDO="sudo"; else SUDO=""; fi
         echo "SUDO=$SUDO" >> $GITHUB_ENV
+
+    - name: Set system version
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: echo "CMAKE_SYSTEM_VERSION=10.0.19041.0" >> $GITHUB_ENV
 
     - name: Install zstd
       shell: bash
