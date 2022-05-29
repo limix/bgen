@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(bgen VERSION 4.1.4 LANGUAGES C)
 set(PROJECT_DESCRIPTION "It fully supports the BGEN format specifications 1.2 and 1.3.")
 
@@ -12,12 +12,9 @@ if("${isSystemDir}" STREQUAL "-1")
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
 
-# merge request fix: https://gitlab.kitware.com/cmake/cmake/-/merge_requests/1799
-if(CMAKE_VERSION VERSION_GREATER 3.12.0)
-  # Hide things by default
-  set(CMAKE_C_VISIBILITY_PRESET hidden)
-  set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-endif()
+# Hide things by default
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
@@ -45,12 +42,33 @@ add_library(
 add_library(BGEN::bgen ALIAS bgen)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-  set(WARNING_FLAGS /W3)
+  # /wd5105:
+  # https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
+  set(WARNING_FLAGS /W3 /wd5105)
 else()
-  set(
-    WARNING_FLAGS -Wall -Wextra -pedantic -Wstrict-prototypes -Wshadow
-    -Wconversion -Wmissing-prototypes -Wno-unused-parameter -Wsign-conversion
-  )
+  set(WARNING_FLAGS
+      -Wall
+      -Wextra
+      -Wstrict-prototypes
+      -Wshadow
+      -Wconversion
+      -Wmissing-prototypes
+      -Wno-unused-parameter
+      -Wsign-conversion
+      -Wno-unused-function
+      -Wmissing-field-initializers)
+
+  if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    list(
+      APPEND
+      WARNING_FLAGS
+      -Wno-gnu-designator
+      -Wno-empty-translation-unit
+      -Wno-gnu-statement-expression
+      -Wno-nullability-extension
+      -Wconditional-uninitialized
+      -Wgnu-empty-initializer)
+  endif()
 endif()
 
 include(GenerateExportHeader)
