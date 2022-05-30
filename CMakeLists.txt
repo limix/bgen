@@ -1,13 +1,18 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
-project(bgen VERSION 4.1.5 LANGUAGES C)
-set(PROJECT_DESCRIPTION "It fully supports the BGEN format specifications 1.2 and 1.3.")
+project(
+  bgen
+  VERSION 4.1.6
+  LANGUAGES C)
+set(PROJECT_DESCRIPTION
+    "It fully supports the BGEN format specifications 1.2 and 1.3.")
 
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # Set RPATH only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
+     "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 if("${isSystemDir}" STREQUAL "-1")
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endif()
@@ -17,9 +22,11 @@ set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(cmake/CPM.cmake)
 
-find_package(elapsed REQUIRED)
-find_package(athr REQUIRED)
+cpmaddpackage(NAME elapsed GIT_TAG 3.0.5 GITHUB_REPOSITORY horta/elapsed)
+cpmaddpackage(NAME athr GIT_TAG 4.0.1 GITHUB_REPOSITORY horta/almosthere)
+
 find_package(ZLIB REQUIRED)
 find_package(ZSTD REQUIRED)
 
@@ -37,8 +44,7 @@ add_library(
   src/partition.c
   src/bstring.c
   src/zip/zlib.c
-  src/zip/zstd.c
-)
+  src/zip/zstd.c)
 add_library(BGEN::bgen ALIAS bgen)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
@@ -73,25 +79,27 @@ endif()
 
 include(GenerateExportHeader)
 generate_export_header(
-  bgen BASE_NAME BGEN
-  INCLUDE_GUARD_NAME BGEN_EXPORT_H
-  EXPORT_FILE_NAME ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h
-)
+  bgen
+  BASE_NAME
+  BGEN
+  INCLUDE_GUARD_NAME
+  BGEN_EXPORT_H
+  EXPORT_FILE_NAME
+  ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h)
 
 target_include_directories(
   bgen
-  PUBLIC
-  $<INSTALL_INTERFACE:include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-  PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/src
-)
+  PUBLIC $<INSTALL_INTERFACE:include>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set_target_properties(bgen PROPERTIES VERSION ${PROJECT_VERSION})
 set_target_properties(bgen PROPERTIES SOVERSION ${PROJECT_VERSION_MAJOR})
 set_target_properties(bgen PROPERTIES C_STANDARD 99)
-target_compile_definitions(bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
-target_compile_definitions(bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
+target_compile_definitions(bgen
+                           PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_definitions(
+  bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_link_libraries(bgen PUBLIC ELAPSED::elapsed)
 target_link_libraries(bgen PUBLIC ATHR::athr)
 target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
@@ -109,9 +117,9 @@ check_c_source_compiles(
         static void f(char const* err, ...) __attribute__((format(printf, 1, 2)));
         int main(void) {return 0;}
   "
-  HAVE_ATTR_FORMAT
-)
-target_compile_definitions(bgen PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
+  HAVE_ATTR_FORMAT)
+target_compile_definitions(
+  bgen PRIVATE $<$<BOOL:${HAVE_ATTR_FORMAT}>:HAVE_ATTR_FORMAT>)
 
 include(TestBigEndian)
 test_big_endian(IS_BIG_ENDIAN)
@@ -120,35 +128,28 @@ if(IS_BIG_ENDIAN)
 endif()
 
 install(
-  TARGETS bgen EXPORT bgen-targets
+  TARGETS bgen
+  EXPORT bgen-targets
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
-  PUBLIC_HEADER DESTINATION include
-)
+  PUBLIC_HEADER DESTINATION include)
 
 install(DIRECTORY include/ DESTINATION include)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h
-  DESTINATION include/bgen
-)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen/export.h
+        DESTINATION include/bgen)
 install(
   EXPORT bgen-targets
   FILE bgen-targets.cmake
   NAMESPACE BGEN::
-  DESTINATION lib/cmake/bgen
-)
+  DESTINATION lib/cmake/bgen)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-  bgen-config.cmake.in
-  ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
+  bgen-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
   INSTALL_DESTINATION lib/cmake/bgen
-  NO_SET_AND_CHECK_MACRO
-)
-install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
-  DESTINATION lib/cmake/bgen
-)
+  NO_SET_AND_CHECK_MACRO)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/bgen-config.cmake
+        DESTINATION lib/cmake/bgen)
 
 enable_testing()
 add_subdirectory(test)
