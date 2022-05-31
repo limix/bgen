@@ -30,10 +30,6 @@ jobs:
       shell: bash
       run: echo "CMAKE_SYSTEM_VERSION=10.0.19041.0" >> $GITHUB_ENV
 
-    - name: Install zstd
-      shell: bash
-      run: $SUDO bash -c "$(curl -fsSL https://raw.githubusercontent.com/horta/zstd.install/main/install)"
-
     - name: Install zlib
       if: matrix.os == 'windows-latest'
       run: powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/horta/zlib.install/master/install.bat', 'install.bat')"; ./install.bat
