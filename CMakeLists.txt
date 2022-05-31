@@ -21,14 +21,32 @@ endif()
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(cmake/CPM.cmake)
 
 cpmaddpackage(NAME elapsed GIT_TAG 3.0.5 GITHUB_REPOSITORY horta/elapsed)
 cpmaddpackage(NAME athr GIT_TAG 4.0.1 GITHUB_REPOSITORY horta/almosthere)
+cpmaddpackage(
+  NAME
+  zstd
+  GITHUB_REPOSITORY
+  facebook/zstd
+  VERSION
+  1.5.2
+  SOURCE_SUBDIR
+  build/cmake
+  OPTIONS
+  "ZSTD_LEGACY_SUPPORT OFF")
+
+if(zstd_ADDED)
+  if(NOT TARGET ZSTD::zstd)
+    add_library(ZSTD::zstd ALIAS libzstd_static)
+    set_target_properties(
+      libzstd_static PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
+                                "$<BUILD_INTERFACE:${zstd_SOURCE_DIR}/lib>")
+  endif()
+endif()
 
 find_package(ZLIB REQUIRED)
-find_package(ZSTD REQUIRED)
 
 add_library(
   bgen
@@ -44,7 +62,7 @@ add_library(
   src/partition.c
   src/bstring.c
   src/zip/zlib.c
-  src/zip/zstd.c)
+  src/unzstd.c)
 add_library(BGEN::bgen ALIAS bgen)
 
 if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")

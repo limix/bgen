@@ -5,7 +5,7 @@
 #include "genotype.h"
 #include "mem.h"
 #include "zip/zlib.h"
-#include "zip/zstd.h"
+#include "unzstd.h"
 #include <inttypes.h>
 #include <math.h>
 

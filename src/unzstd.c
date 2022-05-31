@@ -1,6 +1,6 @@
-#include "zip/zstd.h"
+#include "unzstd.h"
 #include "report.h"
-#include <zstd.h>
+#include "zstd.h"
 
 int bgen_unzstd(char const* src, size_t src_size, void** dst, size_t* dst_size)
 {

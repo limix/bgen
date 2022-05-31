@@ -1,5 +1,5 @@
-#ifndef BGEN_ZIP_ZSTD_H
-#define BGEN_ZIP_ZSTD_H
+#ifndef BGEN_UNZSTD_H
+#define BGEN_UNZSTD_H
 
 #include <stddef.h>
 
