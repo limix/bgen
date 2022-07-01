@@ -119,7 +119,11 @@ err:
     return NULL;
 }
 
-struct bgen_variant* bgen_variant_end(struct bgen_file const* bgen_file) { return NULL; }
+struct bgen_variant* bgen_variant_end(struct bgen_file const* bgen_file)
+{
+    (void)bgen_file;
+    return NULL;
+}
 
 void bgen_variant_destroy(struct bgen_variant const* variant)
 {

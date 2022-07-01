@@ -4,7 +4,7 @@
 #include "free.h"
 #include "genotype.h"
 #include "mem.h"
-#include "zip/zlib.h"
+#include "unzlib.h"
 #include "unzstd.h"
 #include <inttypes.h>
 #include <math.h>

@@ -9,19 +9,9 @@ set(PROJECT_DESCRIPTION
 # Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-# Set RPATH only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-     "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif()
-
-# Hide things by default
-set(CMAKE_C_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-
 include(cmake/CPM.cmake)
+include(cmake/compiler-options.cmake)
+include(cmake/sanitizers.cmake)
 
 cpmaddpackage(NAME elapsed GIT_TAG 3.0.5 GITHUB_REPOSITORY horta/elapsed)
 cpmaddpackage(NAME athr GIT_TAG 4.0.1 GITHUB_REPOSITORY horta/almosthere)
@@ -36,6 +26,7 @@ cpmaddpackage(
   build/cmake
   OPTIONS
   "ZSTD_LEGACY_SUPPORT OFF")
+cpmaddpackage(NAME zlib VERSION 1.2.12.1 GITHUB_REPOSITORY horta/zlib)
 
 if(zstd_ADDED)
   if(NOT TARGET ZSTD::zstd)
@@ -45,8 +36,6 @@ if(zstd_ADDED)
                                 "$<BUILD_INTERFACE:${zstd_SOURCE_DIR}/lib>")
   endif()
 endif()
-
-find_package(ZLIB REQUIRED)
 
 add_library(
   bgen
@@ -61,39 +50,9 @@ add_library(
   src/variant.c
   src/partition.c
   src/bstring.c
-  src/zip/zlib.c
+  src/unzlib.c
   src/unzstd.c)
 add_library(BGEN::bgen ALIAS bgen)
-
-if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
-  # /wd5105:
-  # https://docs.microsoft.com/en-us/cpp/error-messages/compiler-warnings/c5105?view=msvc-160
-  set(WARNING_FLAGS /W3 /wd5105)
-else()
-  set(WARNING_FLAGS
-      -Wall
-      -Wextra
-      -Wstrict-prototypes
-      -Wshadow
-      -Wconversion
-      -Wmissing-prototypes
-      -Wno-unused-parameter
-      -Wsign-conversion
-      -Wno-unused-function
-      -Wmissing-field-initializers)
-
-  if(NOT CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    list(
-      APPEND
-      WARNING_FLAGS
-      -Wno-gnu-designator
-      -Wno-empty-translation-unit
-      -Wno-gnu-statement-expression
-      -Wno-nullability-extension
-      -Wconditional-uninitialized
-      -Wgnu-empty-initializer)
-  endif()
-endif()
 
 include(GenerateExportHeader)
 generate_export_header(
@@ -120,7 +79,7 @@ target_compile_definitions(
   bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
 target_link_libraries(bgen PUBLIC ELAPSED::elapsed)
 target_link_libraries(bgen PUBLIC ATHR::athr)
-target_link_libraries(bgen PUBLIC ZLIB::ZLIB)
+target_link_libraries(bgen PUBLIC ZLIB::zlibstatic)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
 target_compile_options(bgen PRIVATE ${WARNING_FLAGS})
 

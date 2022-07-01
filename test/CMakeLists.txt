@@ -21,7 +21,7 @@ function(bgen_add_test name)
 
   # Ugly hacky to make the tests work on Windows.
   file(TO_CMAKE_PATH "$ENV{PATH}" PATH)
-  list(APPEND PATH $<TARGET_FILE_DIR:ZLIB::ZLIB>/../bin)
+  list(APPEND PATH $<TARGET_FILE_DIR:ZLIB::zlib>/../bin)
   list(APPEND PATH $<TARGET_FILE_DIR:ZSTD::zstd>/../bin)
   list(APPEND PATH $<TARGET_FILE_DIR:ATHR::athr>)
   list(APPEND PATH $<TARGET_FILE_DIR:ELAPSED::elapsed>)

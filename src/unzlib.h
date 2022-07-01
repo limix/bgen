@@ -1,5 +1,5 @@
-#ifndef BGEN_ZIP_ZLIB_H
-#define BGEN_ZIP_ZLIB_H
+#ifndef BGEN_UNZLIB_H
+#define BGEN_UNZLIB_H
 
 #include <stddef.h>
 

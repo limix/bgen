@@ -1,10 +1,10 @@
 #define ZLIB_CONST
-#include "zip/zlib.h"
+#include "unzlib.h"
 #include "report.h"
+#include "zlib.h"
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <zlib.h>
 
 int bgen_unzlib(char const* src, size_t src_size, char** dst, size_t* dst_size)
 {
