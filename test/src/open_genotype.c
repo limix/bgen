@@ -51,10 +51,10 @@ void test_file(void)
     uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     int      correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
     char*    allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
-                          "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
-                          "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
-                          "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
-                          "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
+                             "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
+                             "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
+                             "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
+                             "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
     size_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {

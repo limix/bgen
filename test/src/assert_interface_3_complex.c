@@ -108,7 +108,7 @@ void _test_genotype_complex(struct bgen_file* bgen, struct bgen_metafile* mf)
     int     nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
     int*    nalleles_ptr = nalleles + 0;
     int     ploidy[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
-                    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
+                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
     int*    ploidy_ptr = ploidy + 0;
     int     min_ploidy[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 4};
     int*    min_ploidy_ptr = min_ploidy + 0;

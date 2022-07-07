@@ -44,10 +44,10 @@ void test_complex64(void)
     uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     uint16_t correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
     char*    allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
-                          "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
-                          "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
-                          "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
-                          "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
+                             "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
+                             "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
+                             "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
+                             "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
     uint32_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
@@ -65,7 +65,7 @@ void test_complex64(void)
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
     int    ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
+                        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
     double real_probs[] = {
         1.000000, 0.000000, NAN,      1.000000, 0.000000, 0.000000, 1.000000, 0.000000,
         0.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000,
@@ -173,10 +173,10 @@ void test_complex32(void)
     uint32_t position[] = {1, 2, 3, 4, 5, 7, 7, 8, 9, 10};
     uint16_t correct_nalleles[] = {2, 2, 2, 3, 2, 4, 6, 7, 8, 2};
     char*    allele_ids[] = {"A",    "G",     "A",      "G",       "A",     "G",  "A",   "G",
-                          "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
-                          "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
-                          "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
-                          "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
+                             "T",    "A",     "G",      "A",       "G",     "GT", "GTT", "A",
+                             "G",    "GT",    "GTT",    "GTTT",    "GTTTT", "A",  "G",   "GT",
+                             "GTT",  "GTTT",  "GTTTT",  "GTTTTT",  "A",     "G",  "GT",  "GTT",
+                             "GTTT", "GTTTT", "GTTTTT", "GTTTTTT", "A",     "G"};
 
     uint32_t jj = 0;
     for (uint32_t i = 0; i < nvariants; ++i) {
@@ -194,7 +194,7 @@ void test_complex32(void)
     int phased[] = {0, 1, 1, 0, 1, 1, 1, 1, 0, 0};
 
     int   ploidys[] = {1, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 3, 3, 2,
-                     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
+                       1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 4, 4, 4, 4};
     float real_probs[] = {
         1.000000, 0.000000, NAN,      1.000000, 0.000000, 0.000000, 1.000000, 0.000000,
         0.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000, 1.000000, 0.000000,
