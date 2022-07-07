@@ -4,14 +4,6 @@ A [BGEN file format](http://www.well.ox.ac.uk/~gav/bgen_format/) reader.
 
 It fully supports the BGEN format specifications 1.2 and 1.3.
 
-## Requirements
-
-It makes use of the [Zstandard library](http://facebook.github.io/zstd/). You don't need to install it by yourself if you choose to install bgen via [conda](http://conda.pydata.org/docs/index.html) but you do need it installed before-hand if you choose to build bgen library by yourself. It also makes use of the [almosthere library](https://github.com/horta/almosthere) for showing progress while performing time-consuming tasks:
-
-- [zstd install](https://github.com/horta/zstd.install)
-- [zlib install](https://github.com/horta/zlib.install)
-- [almosthere install](https://github.com/horta/almosthere)
-
 ## Install
 
 You can install it via `conda`:
@@ -46,7 +38,6 @@ From terminal, clone the repository and checkout the develop branch:
 ```bash
 git clone https://github.com/limix/bgen.git
 cd bgen
-git checkout develop
 ```
 
 Create a build folder and compile from there:
@@ -55,18 +46,12 @@ Create a build folder and compile from there:
 mkdir build
 cd build
 # Configure and generate scripts that will build it
-cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=On ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 # Compile it
 cmake --build . --config Release
 # Test it
 ctest --output-on-failure -C Release
 ```
-
-### Windows
-
-The tests might fail because it could not find some of its dependencies.
-To check it, run any of the test binaries that are failing: it should show the
-missing DLLs. Find those DLLs in your system and copy them into the build folder.
 
 ## Acknowledgments
 

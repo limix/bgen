@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(
   bgen
-  VERSION 4.1.6
+  VERSION 4.1.7
   LANGUAGES C)
 set(PROJECT_DESCRIPTION
     "It fully supports the BGEN format specifications 1.2 and 1.3.")
