@@ -13,7 +13,7 @@ include(cmake/CPM.cmake)
 include(cmake/compiler-options.cmake)
 include(cmake/sanitizers.cmake)
 
-cpmaddpackage(NAME athr VERSION 4.0.2 GITHUB_REPOSITORY horta/almosthere)
+cpmaddpackage(NAME athr VERSION 4.0.3 GITHUB_REPOSITORY horta/almosthere)
 cpmaddpackage(
   NAME
   zstd
