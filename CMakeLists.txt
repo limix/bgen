@@ -13,8 +13,7 @@ include(cmake/CPM.cmake)
 include(cmake/compiler-options.cmake)
 include(cmake/sanitizers.cmake)
 
-cpmaddpackage(NAME elapsed GIT_TAG 3.0.5 GITHUB_REPOSITORY horta/elapsed)
-cpmaddpackage(NAME athr GIT_TAG 4.0.1 GITHUB_REPOSITORY horta/almosthere)
+cpmaddpackage(NAME athr VERSION 4.0.2 GITHUB_REPOSITORY horta/almosthere)
 cpmaddpackage(
   NAME
   zstd
@@ -77,7 +76,6 @@ target_compile_definitions(bgen
                            PRIVATE $<$<BOOL:${WIN32}>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_definitions(
   bgen PRIVATE $<$<BOOL:${WIN32}>:_CRT_NONSTDC_NO_DEPRECATE>)
-target_link_libraries(bgen PUBLIC ELAPSED::elapsed)
 target_link_libraries(bgen PUBLIC ATHR::athr)
 target_link_libraries(bgen PUBLIC ZLIB::zlibstatic)
 target_link_libraries(bgen PUBLIC ZSTD::zstd)
