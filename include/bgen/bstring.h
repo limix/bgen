@@ -27,7 +27,7 @@ struct bgen_string
  */
 static inline struct bgen_string const* bgen_string_create(char const* data, size_t length)
 {
-    struct bgen_string* str = malloc(sizeof(struct bgen_string));
+    struct bgen_string* str = (struct bgen_string*)malloc(sizeof(struct bgen_string));
     str->data = data;
     str->length = length;
     return str;
