@@ -15,17 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1
-        with:
-          sdk-version: 19041
-
-      - name: Set system version
-        if: matrix.os == 'windows-latest'
-        shell: bash
-        run: echo "CMAKE_SYSTEM_VERSION=10.0.19041.0" >> $GITHUB_ENV
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCMAKE_SYSTEM_VERSION="10.0.19041.0"
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
