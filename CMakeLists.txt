@@ -6,8 +6,11 @@ project(
 set(PROJECT_DESCRIPTION
     "It fully supports the BGEN format specifications 1.2 and 1.3.")
 
-# Generate compile_commands.json file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_EXTENSIONS OFF)
+set(ZSTD_BUILD_STATIC ON)
+set(ZSTD_BUILD_SHARED OFF)
 
 include(cmake/CPM.cmake)
 include(cmake/compiler-options.cmake)
@@ -24,7 +27,7 @@ cpmaddpackage(
   SOURCE_SUBDIR
   build/cmake
   OPTIONS
-  "ZSTD_LEGACY_SUPPORT OFF")
+  "ZSTD_LEGACY_SUPPORT OFF" "ZSTD_BUILD_STATIC ON" "ZSTD_BUILD_SHARED OFF")
 cpmaddpackage(NAME zlib VERSION 1.3.1.1 GITHUB_REPOSITORY horta/zlib)
 
 if(zstd_ADDED)
