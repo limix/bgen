@@ -53,7 +53,8 @@ add_library(
   src/partition.c
   src/bstring.c
   src/unzlib.c
-  src/unzstd.c)
+  src/unzstd.c
+  src/strdup.c)
 add_library(BGEN::bgen ALIAS bgen)
 
 include(GenerateExportHeader)

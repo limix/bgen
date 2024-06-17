@@ -10,6 +10,7 @@
 #include "mem.h"
 #include "report.h"
 #include "samples.h"
+#include "strdup.h"
 #include <inttypes.h>
 #include <stdbool.h>
 
@@ -190,7 +191,7 @@ int bgen_file_seek_variants_start(struct bgen_file* bgen_file)
 static struct bgen_file* bgen_file_create(char const* filepath)
 {
     struct bgen_file* bgen = malloc(sizeof(struct bgen_file));
-    bgen->filepath = strdup(filepath);
+    bgen->filepath = bgen_strdup(filepath);
     bgen->stream = NULL;
     bgen->nvariants = 0;
     bgen->nsamples = 0;

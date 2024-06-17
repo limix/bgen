@@ -11,6 +11,7 @@
 #include "metafile_write.h"
 #include "partition.h"
 #include "report.h"
+#include "strdup.h"
 #include <string.h>
 
 static struct bgen_metafile* metafile_alloc(char const* filepath);
@@ -222,7 +223,7 @@ uint32_t bgen_metafile_partition_size(uint32_t nvariants, uint32_t npartitions)
 static struct bgen_metafile* metafile_alloc(char const* filepath)
 {
     struct bgen_metafile* metafile = malloc(sizeof(struct bgen_metafile));
-    metafile->filepath = strdup(filepath);
+    metafile->filepath = bgen_strdup(filepath);
     metafile->stream = NULL;
     metafile->partition_offset = NULL;
     return metafile;
