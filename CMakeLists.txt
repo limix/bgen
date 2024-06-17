@@ -25,7 +25,7 @@ cpmaddpackage(
   build/cmake
   OPTIONS
   "ZSTD_LEGACY_SUPPORT OFF")
-cpmaddpackage(NAME zlib VERSION 1.2.12.2 GITHUB_REPOSITORY horta/zlib)
+cpmaddpackage(NAME zlib VERSION 1.3.1.1 GITHUB_REPOSITORY horta/zlib)
 
 if(zstd_ADDED)
   if(NOT TARGET ZSTD::zstd)
