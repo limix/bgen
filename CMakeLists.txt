@@ -20,7 +20,7 @@ cpmaddpackage(
   GITHUB_REPOSITORY
   facebook/zstd
   VERSION
-  1.5.2
+  1.5.6
   SOURCE_SUBDIR
   build/cmake
   OPTIONS
